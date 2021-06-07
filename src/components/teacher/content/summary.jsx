@@ -1,8 +1,7 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import Switch from "react-switch";
 import { Link } from "react-router-dom";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -238,7 +237,6 @@ class TeacherSummary extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             showDeleteModal: false,
             showLoader: false,
@@ -268,12 +266,6 @@ class TeacherSummary extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleImageModal = () => {
         this.setState({
@@ -502,13 +494,11 @@ class TeacherSummary extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -525,12 +515,6 @@ class TeacherSummary extends Component {
                             showErrorAlert: false,
                         });
                     }}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
                 />
 
                 {/* Image modal */}
@@ -560,152 +544,129 @@ class TeacherSummary extends Component {
                     />
                 ) : null}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                {/* ----- Breadcrumb ----- */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/teacher">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        {this.groupId !== undefined ? (
+                            <li className="breadcrumb-item">
+                                <Link to={`/teacher/group/${this.groupId}`}>
+                                    {this.props.group_name}
+                                </Link>
+                            </li>
+                        ) : (
+                            ""
+                        )}
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.subject_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Summary</li>
+                    </ol>
+                </nav>
 
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/teacher">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                {this.groupId !== undefined ? (
-                                    <li className="breadcrumb-item">
-                                        <Link
-                                            to={`/teacher/group/${this.groupId}`}
-                                        >
-                                            {this.props.group_name}
-                                        </Link>
-                                    </li>
-                                ) : (
-                                    ""
-                                )}
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
+                <div className="card secondary-bg mb-3">
+                    <div className="card-body p-3">
+                        <div className="row align-items-center">
+                            <div className="col-md-6">
+                                <p className="small mb-0">
+                                    <span className="font-weight-bold">
+                                        Summary:
+                                    </span>{" "}
+                                    {this.props.chapter_name}
+                                </p>
+                            </div>
+                            <div className="col-md-6 d-flex align-items-center justify-content-end">
+                                {this.state.summary_id !== "" &&
+                                this.state.summary_name !== undefined ? (
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none mr-2"
+                                        onClick={this.toggleDeleteModal}
                                     >
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Summary
-                                </li>
-                            </ol>
-                        </nav>
-
-                        <div className="card secondary-bg mb-3">
-                            <div className="card-body p-3">
-                                <div className="row align-items-center">
-                                    <div className="col-md-6">
-                                        <p className="small mb-0">
-                                            <span className="font-weight-bold">
-                                                Summary:
-                                            </span>{" "}
-                                            {this.props.chapter_name}
-                                        </p>
-                                    </div>
-                                    <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                        {this.state.summary_id !== "" &&
-                                        this.state.summary_name !==
-                                            undefined ? (
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none mr-2"
-                                                onClick={this.toggleDeleteModal}
-                                            >
-                                                Delete
-                                            </button>
-                                        ) : null}
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-2"
-                                            onClick={this.handleSubmit}
-                                        >
-                                            {this.state.showLoader ? (
-                                                <Spinner
-                                                    as="span"
-                                                    animation="border"
-                                                    size="sm"
-                                                    role="status"
-                                                    aria-hidden="true"
-                                                    className="mr-2"
-                                                />
-                                            ) : (
-                                                ""
-                                            )}
-                                            Save
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-3"
-                                            onClick={this.toggleImageModal}
-                                        >
-                                            Upload Image
-                                        </button>
-                                        <div className="d-flex justify-content-end">
-                                            <span className="mr-2 small primary-text font-weight-bold">
-                                                Limited
-                                            </span>
-                                            <Switch
-                                                checked={this.state.limited}
-                                                onChange={this.handleSwitch}
-                                                onColor="#621012"
-                                                onHandleColor="#efd2ac"
-                                                handleDiameter={12}
-                                                uncheckedIcon={false}
-                                                checkedIcon={false}
-                                                boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                height={18}
-                                                width={35}
-                                                className="react-switch"
-                                                id="select-all"
-                                            />
-                                        </div>
-                                    </div>
+                                        Delete
+                                    </button>
+                                ) : null}
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-2"
+                                    onClick={this.handleSubmit}
+                                >
+                                    {this.state.showLoader ? (
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                            className="mr-2"
+                                        />
+                                    ) : (
+                                        ""
+                                    )}
+                                    Save
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-3"
+                                    onClick={this.toggleImageModal}
+                                >
+                                    Upload Image
+                                </button>
+                                <div className="d-flex justify-content-end">
+                                    <span className="mr-2 small primary-text font-weight-bold">
+                                        Limited
+                                    </span>
+                                    <Switch
+                                        checked={this.state.limited}
+                                        onChange={this.handleSwitch}
+                                        onColor="#621012"
+                                        onHandleColor="#efd2ac"
+                                        handleDiameter={12}
+                                        uncheckedIcon={false}
+                                        checkedIcon={false}
+                                        boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                        activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                        height={18}
+                                        width={35}
+                                        className="react-switch"
+                                        id="select-all"
+                                    />
                                 </div>
                             </div>
                         </div>
-
-                        <div className="card shadow-sm mb-3">
-                            <div className="card-body">
-                                <input
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    value={this.state.title}
-                                    className="form-control border-secondary"
-                                    placeholder="Add summary title"
-                                    onChange={this.handleTitle}
-                                    autoComplete="off"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        {/* Editor */}
-                        <div className="card shadow-sm">
-                            <CKeditor
-                                data={this.state.content}
-                                onChange={this.onEditorChange}
-                            />
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                <div className="card shadow-sm mb-3">
+                    <div className="card-body">
+                        <input
+                            type="text"
+                            name="title"
+                            id="title"
+                            value={this.state.title}
+                            className="form-control border-secondary"
+                            placeholder="Add summary title"
+                            onChange={this.handleTitle}
+                            autoComplete="off"
+                            required
+                        />
+                    </div>
+                </div>
+
+                {/* Editor */}
+                <div className="card shadow-sm">
+                    <CKeditor
+                        data={this.state.content}
+                        onChange={this.onEditorChange}
+                    />
+                </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
@@ -277,7 +276,6 @@ class TeacherCycleTestAuto extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             errorMsg: "",
             successMsg: "",
@@ -318,12 +316,6 @@ class TeacherCycleTestAuto extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleModal = () => {
         this.setState({
@@ -1110,13 +1102,11 @@ class TeacherCycleTestAuto extends Component {
     render() {
         document.title = `${this.props.cycle_name} - Teacher | IQLabs`;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -1135,12 +1125,6 @@ class TeacherCycleTestAuto extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
                 {/* Scorecard modal */}
                 {this.state.showModal ? (
                     <Scorecard
@@ -1155,554 +1139,513 @@ class TeacherCycleTestAuto extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
+                {/* ----- Breadcrumb ----- */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/teacher">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        {this.groupId !== undefined ? (
+                            <>
                                 <li className="breadcrumb-item">
-                                    <Link to="/teacher">
-                                        <i className="fas fa-home fa-sm"></i>
+                                    <Link to={`/teacher/group/${this.groupId}`}>
+                                        {this.props.group_name}
                                     </Link>
                                 </li>
-                                {this.groupId !== undefined ? (
-                                    <>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/teacher/group/${this.groupId}`}
-                                            >
-                                                {this.props.group_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
-                                    </>
-                                ) : (
-                                    <li className="breadcrumb-item">
-                                        <Link
-                                            to={`/teacher/subject/${this.subjectId}`}
-                                        >
-                                            {this.props.subject_name}
-                                        </Link>
-                                    </li>
-                                )}
                                 <li className="breadcrumb-item">
                                     <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
+                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
                                     >
-                                        {this.props.chapter_name}
+                                        {this.props.subject_name}
                                     </Link>
                                 </li>
-                                <li className="breadcrumb-item active">
-                                    {this.props.cycle_name}
-                                </li>
-                            </ol>
-                        </nav>
+                            </>
+                        ) : (
+                            <li className="breadcrumb-item">
+                                <Link to={`/teacher/subject/${this.subjectId}`}>
+                                    {this.props.subject_name}
+                                </Link>
+                            </li>
+                        )}
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.chapter_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">
+                            {this.props.cycle_name}
+                        </li>
+                    </ol>
+                </nav>
 
-                        {/* Header configuration */}
-                        <div className="row align-items-center mb-3">
+                {/* Header configuration */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-6">
+                        <div className="row align-items-center">
                             <div className="col-md-6">
-                                <div className="row align-items-center">
-                                    <div className="col-md-6">
-                                        <input
-                                            type="number"
-                                            name="duration"
-                                            className="form-control form-shadow"
-                                            placeholder="Enter duration (In minutes)"
-                                            onChange={this.handleDuration}
-                                            value={this.state.duration || ""}
-                                            autoComplete="off"
-                                            min="1"
-                                            max="360"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <Select
-                                            className="basic-single form-shadow"
-                                            placeholder="Select attempt"
-                                            isSearchable={true}
-                                            name="attempt"
-                                            value={(
-                                                this.state.attempts || []
-                                            ).map((data) => {
-                                                return data ===
-                                                    this.state.selectedAttempt
-                                                    ? {
-                                                          value: data,
-                                                          label: data,
-                                                      }
-                                                    : "";
-                                            })}
-                                            options={(
-                                                this.state.attempts || []
-                                            ).map((data) => {
-                                                return {
-                                                    value: data,
-                                                    label: data,
-                                                };
-                                            })}
-                                            onChange={this.handleAttempt}
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                                <input
+                                    type="number"
+                                    name="duration"
+                                    className="form-control form-shadow"
+                                    placeholder="Enter duration (In minutes)"
+                                    onChange={this.handleDuration}
+                                    value={this.state.duration || ""}
+                                    autoComplete="off"
+                                    min="1"
+                                    max="360"
+                                    required
+                                />
                             </div>
-                            <div className="col-md-6 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.toggleModal}
-                                >
-                                    Score Configuration
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none ml-1"
-                                    onClick={this.handlePublish}
-                                    disabled={
-                                        this.state.sections.length !== 0
-                                            ? this.state.sections[0]
-                                                  .section_id === ""
-                                                ? true
-                                                : false
-                                            : true
-                                    }
-                                >
-                                    Publish
-                                </button>
-                            </div>
-                        </div>
-
-                        <div
-                            className="card shadow-sm mb-3"
-                            style={{ overflowX: "auto" }}
-                        >
-                            <div
-                                className="table-responsive"
-                                style={{ minWidth: "1000px" }}
-                            >
-                                <table className="table table-hover">
-                                    <thead className="primary-bg text-white">
-                                        <tr style={{ whiteSpace: "nowrap" }}>
-                                            <th scope="col">
-                                                Section Description
-                                            </th>
-                                            <th scope="col">Question Type</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Marks</th>
-                                            <th scope="col">Total Questions</th>
-                                            <th scope="col">
-                                                No. of Questions
-                                            </th>
-                                            <th scope="col">Any Questions</th>
-                                            <th scope="col">Total Marks</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.state.sections.length !== 0
-                                            ? this.state.sections.map(
-                                                  (section, index) => {
-                                                      return (
-                                                          <tr key={index}>
-                                                              <td>
-                                                                  <input
-                                                                      type="text"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      placeholder={`Section Description ${
-                                                                          index +
-                                                                          1
-                                                                      }`}
-                                                                      value={
-                                                                          section.section_description ||
-                                                                          ""
-                                                                      }
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleSectionData(
-                                                                              index,
-                                                                              event,
-                                                                              "name"
-                                                                          )
-                                                                      }
-                                                                      required
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <select
-                                                                      name="type"
-                                                                      id="type"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleType(
-                                                                              index,
-                                                                              event
-                                                                          )
-                                                                      }
-                                                                      value={
-                                                                          section.question_type ||
-                                                                          ""
-                                                                      }
-                                                                      required
-                                                                  >
-                                                                      <option value="">
-                                                                          Select
-                                                                          type
-                                                                      </option>
-                                                                      {this
-                                                                          .state
-                                                                          .question_type
-                                                                          .length !==
-                                                                      0
-                                                                          ? this.state.question_type.map(
-                                                                                (
-                                                                                    data,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <option
-                                                                                            value={
-                                                                                                data ||
-                                                                                                ""
-                                                                                            }
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                        >
-                                                                                            {data ===
-                                                                                            "type_1"
-                                                                                                ? "Type 1"
-                                                                                                : "type_2"
-                                                                                                ? "Type 2"
-                                                                                                : ""}
-                                                                                        </option>
-                                                                                    );
-                                                                                }
-                                                                            )
-                                                                          : null}
-                                                                  </select>
-                                                              </td>
-                                                              <td>
-                                                                  <select
-                                                                      name="category"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleCategory(
-                                                                              index,
-                                                                              event
-                                                                          )
-                                                                      }
-                                                                      value={
-                                                                          section.category ||
-                                                                          ""
-                                                                      }
-                                                                      disabled={
-                                                                          section.question_type ===
-                                                                          ""
-                                                                              ? true
-                                                                              : false
-                                                                      }
-                                                                      required
-                                                                  >
-                                                                      <option value="">
-                                                                          Select
-                                                                          category
-                                                                      </option>
-                                                                      {this
-                                                                          .state
-                                                                          .filterData[
-                                                                          index
-                                                                      ] !==
-                                                                      undefined
-                                                                          ? this
-                                                                                .state
-                                                                                .filterData[
-                                                                                index
-                                                                            ]
-                                                                                .category
-                                                                                .length !==
-                                                                            0
-                                                                              ? this.state.filterData[
-                                                                                    index
-                                                                                ].category.map(
-                                                                                    (
-                                                                                        data,
-                                                                                        c_index
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <option
-                                                                                                value={
-                                                                                                    data ||
-                                                                                                    ""
-                                                                                                }
-                                                                                                key={
-                                                                                                    c_index
-                                                                                                }
-                                                                                            >
-                                                                                                {
-                                                                                                    data
-                                                                                                }
-                                                                                            </option>
-                                                                                        );
-                                                                                    }
-                                                                                )
-                                                                              : null
-                                                                          : null}
-                                                                  </select>
-                                                              </td>
-                                                              <td>
-                                                                  <select
-                                                                      name="marks"
-                                                                      id="marks"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      value={
-                                                                          section.marks ||
-                                                                          ""
-                                                                      }
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleMarks(
-                                                                              index,
-                                                                              event
-                                                                          )
-                                                                      }
-                                                                      disabled={
-                                                                          section.category ===
-                                                                          ""
-                                                                              ? true
-                                                                              : false
-                                                                      }
-                                                                      required
-                                                                  >
-                                                                      <option value="">
-                                                                          Select
-                                                                          marks
-                                                                      </option>
-                                                                      {this
-                                                                          .state
-                                                                          .filterData[
-                                                                          index
-                                                                      ] !==
-                                                                      undefined
-                                                                          ? this
-                                                                                .state
-                                                                                .filterData[
-                                                                                index
-                                                                            ]
-                                                                                .marks
-                                                                                .length !==
-                                                                            0
-                                                                              ? this.state.filterData[
-                                                                                    index
-                                                                                ].marks.map(
-                                                                                    (
-                                                                                        data,
-                                                                                        c_index
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <option
-                                                                                                value={
-                                                                                                    data ||
-                                                                                                    ""
-                                                                                                }
-                                                                                                key={
-                                                                                                    c_index
-                                                                                                }
-                                                                                            >
-                                                                                                {
-                                                                                                    data
-                                                                                                }
-                                                                                            </option>
-                                                                                        );
-                                                                                    }
-                                                                                )
-                                                                              : null
-                                                                          : null}
-                                                                  </select>
-                                                              </td>
-                                                              <td>
-                                                                  <input
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      type="text"
-                                                                      value={
-                                                                          section.total_questions ||
-                                                                          ""
-                                                                      }
-                                                                      placeholder="Total question"
-                                                                      disabled
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <input
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      type="text"
-                                                                      value={
-                                                                          section.no_questions ||
-                                                                          ""
-                                                                      }
-                                                                      placeholder="No. of questions"
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleSectionData(
-                                                                              index,
-                                                                              event,
-                                                                              "no_questions"
-                                                                          )
-                                                                      }
-                                                                      disabled={
-                                                                          section.total_questions ===
-                                                                          ""
-                                                                              ? true
-                                                                              : false
-                                                                      }
-                                                                      required
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <input
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      type="text"
-                                                                      value={
-                                                                          section.any_questions ||
-                                                                          ""
-                                                                      }
-                                                                      placeholder="Any questions"
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleSectionData(
-                                                                              index,
-                                                                              event,
-                                                                              "any_questions"
-                                                                          )
-                                                                      }
-                                                                      disabled={
-                                                                          section.no_questions ===
-                                                                          ""
-                                                                              ? true
-                                                                              : false
-                                                                      }
-                                                                      required
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <input
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      type="text"
-                                                                      placeholder="Total marks"
-                                                                      value={
-                                                                          section.total_marks ||
-                                                                          ""
-                                                                      }
-                                                                      disabled
-                                                                  />
-                                                              </td>
-                                                              <td className="d-flex justify-content-end">
-                                                                  {section.section_id !==
-                                                                  "" ? (
-                                                                      <button
-                                                                          className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                          onClick={() => {
-                                                                              this.sectionRedirect(
-                                                                                  section.section_id
-                                                                              );
-                                                                          }}
-                                                                      >
-                                                                          <i className="fas fa-eye"></i>
-                                                                      </button>
-                                                                  ) : null}
-
-                                                                  <Dropdown>
-                                                                      <Dropdown.Toggle
-                                                                          variant="white"
-                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
-                                                                      >
-                                                                          <i className="fas fa-ellipsis-v"></i>
-                                                                      </Dropdown.Toggle>
-
-                                                                      <Dropdown.Menu
-                                                                          className={`dropdown-menu-btn ${
-                                                                              this
-                                                                                  .state
-                                                                                  .sections
-                                                                                  .length <=
-                                                                              2
-                                                                                  ? "position-fixed"
-                                                                                  : "position-absolute"
-                                                                          }`}
-                                                                      >
-                                                                          <Dropdown.Item
-                                                                              onClick={(
-                                                                                  event
-                                                                              ) =>
-                                                                                  this.handleSubmit(
-                                                                                      index,
-                                                                                      event
-                                                                                  )
-                                                                              }
-                                                                          >
-                                                                              <i className="far fa-save fa-sm mr-1"></i>{" "}
-                                                                              Save
-                                                                          </Dropdown.Item>
-                                                                          <Dropdown.Item
-                                                                              onClick={() =>
-                                                                                  this.removeSection(
-                                                                                      index,
-                                                                                      section.section_id
-                                                                                  )
-                                                                              }
-                                                                          >
-                                                                              <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
-                                                                              Delete
-                                                                          </Dropdown.Item>
-                                                                      </Dropdown.Menu>
-                                                                  </Dropdown>
-                                                              </td>
-                                                          </tr>
-                                                      );
+                            <div className="col-md-6">
+                                <Select
+                                    className="basic-single form-shadow"
+                                    placeholder="Select attempt"
+                                    isSearchable={true}
+                                    name="attempt"
+                                    value={(this.state.attempts || []).map(
+                                        (data) => {
+                                            return data ===
+                                                this.state.selectedAttempt
+                                                ? {
+                                                      value: data,
+                                                      label: data,
                                                   }
-                                              )
-                                            : ""}
-                                    </tbody>
-                                </table>
+                                                : "";
+                                        }
+                                    )}
+                                    options={(this.state.attempts || []).map(
+                                        (data) => {
+                                            return {
+                                                value: data,
+                                                label: data,
+                                            };
+                                        }
+                                    )}
+                                    onChange={this.handleAttempt}
+                                    required
+                                />
                             </div>
                         </div>
-
+                    </div>
+                    <div className="col-md-6 text-right">
                         <button
-                            className="btn btn-light bg-white btn-block shadow-sm shadow-none"
-                            onClick={this.addSection}
+                            className="btn btn-primary btn-sm shadow-none"
+                            onClick={this.toggleModal}
                         >
-                            Add Section +
+                            Score Configuration
                         </button>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                        <button
+                            className="btn btn-primary btn-sm shadow-none ml-1"
+                            onClick={this.handlePublish}
+                            disabled={
+                                this.state.sections.length !== 0
+                                    ? this.state.sections[0].section_id === ""
+                                        ? true
+                                        : false
+                                    : true
+                            }
+                        >
+                            Publish
+                        </button>
                     </div>
                 </div>
-            </div>
+
+                <div
+                    className="card shadow-sm mb-3"
+                    style={{ overflowX: "auto" }}
+                >
+                    <div
+                        className="table-responsive"
+                        style={{ minWidth: "1000px" }}
+                    >
+                        <table className="table table-hover">
+                            <thead className="primary-bg text-white">
+                                <tr style={{ whiteSpace: "nowrap" }}>
+                                    <th scope="col">Section Description</th>
+                                    <th scope="col">Question Type</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Marks</th>
+                                    <th scope="col">Total Questions</th>
+                                    <th scope="col">No. of Questions</th>
+                                    <th scope="col">Any Questions</th>
+                                    <th scope="col">Total Marks</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.state.sections.length !== 0
+                                    ? this.state.sections.map(
+                                          (section, index) => {
+                                              return (
+                                                  <tr key={index}>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              placeholder={`Section Description ${
+                                                                  index + 1
+                                                              }`}
+                                                              value={
+                                                                  section.section_description ||
+                                                                  ""
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleSectionData(
+                                                                      index,
+                                                                      event,
+                                                                      "name"
+                                                                  )
+                                                              }
+                                                              required
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <select
+                                                              name="type"
+                                                              id="type"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleType(
+                                                                      index,
+                                                                      event
+                                                                  )
+                                                              }
+                                                              value={
+                                                                  section.question_type ||
+                                                                  ""
+                                                              }
+                                                              required
+                                                          >
+                                                              <option value="">
+                                                                  Select type
+                                                              </option>
+                                                              {this.state
+                                                                  .question_type
+                                                                  .length !== 0
+                                                                  ? this.state.question_type.map(
+                                                                        (
+                                                                            data,
+                                                                            index
+                                                                        ) => {
+                                                                            return (
+                                                                                <option
+                                                                                    value={
+                                                                                        data ||
+                                                                                        ""
+                                                                                    }
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                >
+                                                                                    {data ===
+                                                                                    "type_1"
+                                                                                        ? "Type 1"
+                                                                                        : "type_2"
+                                                                                        ? "Type 2"
+                                                                                        : ""}
+                                                                                </option>
+                                                                            );
+                                                                        }
+                                                                    )
+                                                                  : null}
+                                                          </select>
+                                                      </td>
+                                                      <td>
+                                                          <select
+                                                              name="category"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleCategory(
+                                                                      index,
+                                                                      event
+                                                                  )
+                                                              }
+                                                              value={
+                                                                  section.category ||
+                                                                  ""
+                                                              }
+                                                              disabled={
+                                                                  section.question_type ===
+                                                                  ""
+                                                                      ? true
+                                                                      : false
+                                                              }
+                                                              required
+                                                          >
+                                                              <option value="">
+                                                                  Select
+                                                                  category
+                                                              </option>
+                                                              {this.state
+                                                                  .filterData[
+                                                                  index
+                                                              ] !== undefined
+                                                                  ? this.state
+                                                                        .filterData[
+                                                                        index
+                                                                    ].category
+                                                                        .length !==
+                                                                    0
+                                                                      ? this.state.filterData[
+                                                                            index
+                                                                        ].category.map(
+                                                                            (
+                                                                                data,
+                                                                                c_index
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        value={
+                                                                                            data ||
+                                                                                            ""
+                                                                                        }
+                                                                                        key={
+                                                                                            c_index
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            data
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )
+                                                                      : null
+                                                                  : null}
+                                                          </select>
+                                                      </td>
+                                                      <td>
+                                                          <select
+                                                              name="marks"
+                                                              id="marks"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              value={
+                                                                  section.marks ||
+                                                                  ""
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleMarks(
+                                                                      index,
+                                                                      event
+                                                                  )
+                                                              }
+                                                              disabled={
+                                                                  section.category ===
+                                                                  ""
+                                                                      ? true
+                                                                      : false
+                                                              }
+                                                              required
+                                                          >
+                                                              <option value="">
+                                                                  Select marks
+                                                              </option>
+                                                              {this.state
+                                                                  .filterData[
+                                                                  index
+                                                              ] !== undefined
+                                                                  ? this.state
+                                                                        .filterData[
+                                                                        index
+                                                                    ].marks
+                                                                        .length !==
+                                                                    0
+                                                                      ? this.state.filterData[
+                                                                            index
+                                                                        ].marks.map(
+                                                                            (
+                                                                                data,
+                                                                                c_index
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        value={
+                                                                                            data ||
+                                                                                            ""
+                                                                                        }
+                                                                                        key={
+                                                                                            c_index
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            data
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )
+                                                                      : null
+                                                                  : null}
+                                                          </select>
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              className="form-control form-control-sm border-secondary"
+                                                              type="text"
+                                                              value={
+                                                                  section.total_questions ||
+                                                                  ""
+                                                              }
+                                                              placeholder="Total question"
+                                                              disabled
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              className="form-control form-control-sm border-secondary"
+                                                              type="text"
+                                                              value={
+                                                                  section.no_questions ||
+                                                                  ""
+                                                              }
+                                                              placeholder="No. of questions"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleSectionData(
+                                                                      index,
+                                                                      event,
+                                                                      "no_questions"
+                                                                  )
+                                                              }
+                                                              disabled={
+                                                                  section.total_questions ===
+                                                                  ""
+                                                                      ? true
+                                                                      : false
+                                                              }
+                                                              required
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              className="form-control form-control-sm border-secondary"
+                                                              type="text"
+                                                              value={
+                                                                  section.any_questions ||
+                                                                  ""
+                                                              }
+                                                              placeholder="Any questions"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleSectionData(
+                                                                      index,
+                                                                      event,
+                                                                      "any_questions"
+                                                                  )
+                                                              }
+                                                              disabled={
+                                                                  section.no_questions ===
+                                                                  ""
+                                                                      ? true
+                                                                      : false
+                                                              }
+                                                              required
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              className="form-control form-control-sm border-secondary"
+                                                              type="text"
+                                                              placeholder="Total marks"
+                                                              value={
+                                                                  section.total_marks ||
+                                                                  ""
+                                                              }
+                                                              disabled
+                                                          />
+                                                      </td>
+                                                      <td className="d-flex justify-content-end">
+                                                          {section.section_id !==
+                                                          "" ? (
+                                                              <button
+                                                                  className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                  onClick={() => {
+                                                                      this.sectionRedirect(
+                                                                          section.section_id
+                                                                      );
+                                                                  }}
+                                                              >
+                                                                  <i className="fas fa-eye"></i>
+                                                              </button>
+                                                          ) : null}
+
+                                                          <Dropdown>
+                                                              <Dropdown.Toggle
+                                                                  variant="white"
+                                                                  className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                              >
+                                                                  <i className="fas fa-ellipsis-v"></i>
+                                                              </Dropdown.Toggle>
+
+                                                              <Dropdown.Menu
+                                                                  className={`${
+                                                                      this.state
+                                                                          .sections
+                                                                          .length <=
+                                                                      2
+                                                                          ? "position-fixed"
+                                                                          : "position-absolute"
+                                                                  }`}
+                                                              >
+                                                                  <Dropdown.Item
+                                                                      onClick={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleSubmit(
+                                                                              index,
+                                                                              event
+                                                                          )
+                                                                      }
+                                                                  >
+                                                                      <i className="far fa-save fa-sm mr-1"></i>{" "}
+                                                                      Save
+                                                                  </Dropdown.Item>
+                                                                  <Dropdown.Item
+                                                                      onClick={() =>
+                                                                          this.removeSection(
+                                                                              index,
+                                                                              section.section_id
+                                                                          )
+                                                                      }
+                                                                  >
+                                                                      <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                      Delete
+                                                                  </Dropdown.Item>
+                                                              </Dropdown.Menu>
+                                                          </Dropdown>
+                                                      </td>
+                                                  </tr>
+                                              );
+                                          }
+                                      )
+                                    : ""}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <button
+                    className="btn btn-light bg-white btn-block shadow-sm shadow-none"
+                    onClick={this.addSection}
+                >
+                    Add Section +
+                </button>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

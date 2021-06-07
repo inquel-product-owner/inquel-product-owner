@@ -8,6 +8,8 @@ import Loading from "../common/loader";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import { TEMP } from "../../redux/action";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "../common/ErrorFallback";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -247,130 +249,138 @@ class TestResult extends Component {
 
                 <div className="exam-section">
                     <div className="container-fluid">
-                        <div className="row justify-content-center">
-                            <div className="col-md-10">
-                                <div className="row align-items-center font-weight-bold-600 primary-text mb-3">
-                                    <div className="col-md-3">
-                                        TEST ANALYSIS
+                        <ErrorBoundary
+                            FallbackComponent={ErrorFallback}
+                            onReset={() => window.location.reload()}
+                        >
+                            <div className="row justify-content-center">
+                                <div className="col-md-10">
+                                    <div className="row align-items-center font-weight-bold-600 primary-text mb-3">
+                                        <div className="col-md-3">
+                                            TEST ANALYSIS
+                                        </div>
+                                        <div className="col-md-7">
+                                            ATTEMPTS & PAPERS
+                                        </div>
+                                        <div className="col-md-2 text-right">
+                                            <button className="btn btn-primary btn-sm shadow-none">
+                                                Generate marks
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="col-md-7">
-                                        ATTEMPTS & PAPERS
-                                    </div>
-                                    <div className="col-md-2 text-right">
-                                        <button className="btn btn-primary btn-sm shadow-none">
-                                            Generate marks
-                                        </button>
-                                    </div>
+
+                                    {/* ----- Cycle test list ----- */}
+                                    {(this.state.cycle_test || []).map(
+                                        (data, index) => {
+                                            return (
+                                                <div
+                                                    className="card light-bg shadow-sm mb-2"
+                                                    key={index}
+                                                >
+                                                    <div className="row align-items-center font-weight-bold-600 small">
+                                                        <div className="col-3">
+                                                            <div className="card card-body secondary-bg p-3">
+                                                                {
+                                                                    data.cycle_test_name
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        {/* ----- Attempts score card ----- */}
+                                                        <div className="col-9">
+                                                            {(
+                                                                data.student_cycle_test ||
+                                                                []
+                                                            ).map(
+                                                                (
+                                                                    attempt,
+                                                                    attempt_index
+                                                                ) => {
+                                                                    return (
+                                                                        <CycleTestAttempts
+                                                                            key={
+                                                                                attempt_index
+                                                                            }
+                                                                            attempt={
+                                                                                attempt
+                                                                            }
+                                                                            data={
+                                                                                data
+                                                                            }
+                                                                            url={
+                                                                                this
+                                                                                    .props
+                                                                                    .match
+                                                                                    .url
+                                                                            }
+                                                                        />
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                    )}
+
+                                    {/* ----- Semester list ----- */}
+                                    {(this.state.semester || []).map(
+                                        (data, index) => {
+                                            return (
+                                                <div
+                                                    className="card light-bg shadow-sm mb-2"
+                                                    key={index}
+                                                >
+                                                    <div className="row align-items-center font-weight-bold-600 small">
+                                                        <div className="col-3">
+                                                            <div className="card card-body secondary-bg p-3">
+                                                                {
+                                                                    data.semester_name
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-9">
+                                                            {(
+                                                                data.student_semester ||
+                                                                []
+                                                            ).map(
+                                                                (
+                                                                    attempt,
+                                                                    attempt_index
+                                                                ) => {
+                                                                    return (
+                                                                        <SemesterAttempts
+                                                                            key={
+                                                                                attempt_index
+                                                                            }
+                                                                            attempt={
+                                                                                attempt
+                                                                            }
+                                                                            data={
+                                                                                data
+                                                                            }
+                                                                            url={
+                                                                                this
+                                                                                    .props
+                                                                                    .match
+                                                                                    .url
+                                                                            }
+                                                                        />
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                    )}
                                 </div>
-
-                                {/* ----- Cycle test list ----- */}
-                                {(this.state.cycle_test || []).map(
-                                    (data, index) => {
-                                        return (
-                                            <div
-                                                className="card light-bg shadow-sm mb-2"
-                                                key={index}
-                                            >
-                                                <div className="row align-items-center font-weight-bold-600 small">
-                                                    <div className="col-3">
-                                                        <div className="card card-body secondary-bg p-3">
-                                                            {
-                                                                data.cycle_test_name
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                    {/* ----- Attempts score card ----- */}
-                                                    <div className="col-9">
-                                                        {(
-                                                            data.student_cycle_test ||
-                                                            []
-                                                        ).map(
-                                                            (
-                                                                attempt,
-                                                                attempt_index
-                                                            ) => {
-                                                                return (
-                                                                    <CycleTestAttempts
-                                                                        key={
-                                                                            attempt_index
-                                                                        }
-                                                                        attempt={
-                                                                            attempt
-                                                                        }
-                                                                        data={
-                                                                            data
-                                                                        }
-                                                                        url={
-                                                                            this
-                                                                                .props
-                                                                                .match
-                                                                                .url
-                                                                        }
-                                                                    />
-                                                                );
-                                                            }
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-                                )}
-
-                                {/* ----- Semester list ----- */}
-                                {(this.state.semester || []).map(
-                                    (data, index) => {
-                                        return (
-                                            <div
-                                                className="card light-bg shadow-sm mb-2"
-                                                key={index}
-                                            >
-                                                <div className="row align-items-center font-weight-bold-600 small">
-                                                    <div className="col-3">
-                                                        <div className="card card-body secondary-bg p-3">
-                                                            {data.semester_name}
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-9">
-                                                        {(
-                                                            data.student_semester ||
-                                                            []
-                                                        ).map(
-                                                            (
-                                                                attempt,
-                                                                attempt_index
-                                                            ) => {
-                                                                return (
-                                                                    <SemesterAttempts
-                                                                        key={
-                                                                            attempt_index
-                                                                        }
-                                                                        attempt={
-                                                                            attempt
-                                                                        }
-                                                                        data={
-                                                                            data
-                                                                        }
-                                                                        url={
-                                                                            this
-                                                                                .props
-                                                                                .match
-                                                                                .url
-                                                                        }
-                                                                    />
-                                                                );
-                                                            }
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-                                )}
                             </div>
-                        </div>
+                        </ErrorBoundary>
                     </div>
                 </div>
+                
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}
             </>

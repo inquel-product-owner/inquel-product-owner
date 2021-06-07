@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
@@ -21,7 +20,6 @@ class TeacherCycleDirectEvaluation extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             selectedStudent: "",
             student_list: [],
             answerData: {},
@@ -54,12 +52,6 @@ class TeacherCycleDirectEvaluation extends Component {
         };
         pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     loadStudentList = () => {
         fetch(
@@ -318,13 +310,11 @@ class TeacherCycleDirectEvaluation extends Component {
     render() {
         document.title = `${this.props.cycle_name} : Direct test evaluation - Teacher | IQLabs`;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -343,425 +333,370 @@ class TeacherCycleDirectEvaluation extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
+                <div className="row align-items-center mb-4">
+                    <div className="col-md-9">
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link to={`/teacher/group/${this.groupId}`}>
+                                        {this.props.group_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}/chapter/${this.chapterId}`}
+                                    >
+                                        {this.props.chapter_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.cycle_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Student evaluation
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-3 text-right">
                         <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
+                            className="btn btn-primary btn-sm shadow-none"
+                            onClick={this.handlePublish}
+                            disabled={
+                                this.state.topics.length === 0 ? true : false
+                            }
                         >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                            Publish
                         </button>
+                    </div>
+                </div>
 
-                        <div className="row align-items-center mb-4">
-                            <div className="col-md-9">
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/teacher">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/teacher/group/${this.groupId}`}
-                                            >
+                {/* ----- Header configuration ----- */}
+
+                <div className="card shadow-sm mb-3">
+                    <div className="card-body">
+                        <div className="row align-items-center">
+                            <div className="col-md-8">
+                                <div className="row">
+                                    {this.groupId !== undefined ? (
+                                        <div className="col-md-4">
+                                            <p className="font-weight-bold-600 primary-text mb-2">
+                                                Group:
+                                            </p>
+                                            <p className="small font-weight-bold-600 mb-0">
                                                 {this.props.group_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}/chapter/${this.chapterId}`}
-                                            >
-                                                {this.props.chapter_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.cycle_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            Student evaluation
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-3 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.handlePublish}
-                                    disabled={
-                                        this.state.topics.length === 0
-                                            ? true
-                                            : false
-                                    }
-                                >
-                                    Publish
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* ----- Header configuration ----- */}
-
-                        <div className="card shadow-sm mb-3">
-                            <div className="card-body">
-                                <div className="row align-items-center">
-                                    <div className="col-md-8">
-                                        <div className="row">
-                                            {this.groupId !== undefined ? (
-                                                <div className="col-md-4">
-                                                    <p className="font-weight-bold-600 primary-text mb-2">
-                                                        Group:
-                                                    </p>
-                                                    <p className="small font-weight-bold-600 mb-0">
-                                                        {this.props.group_name}
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                ""
-                                            )}
-                                            <div className="col-md-4">
-                                                <p className="font-weight-bold-600 primary-text mb-2">
-                                                    Subject:
-                                                </p>
-                                                <p className="small font-weight-bold-600 mb-0">
-                                                    {this.props.subject_name}
-                                                </p>
-                                            </div>
-                                            <div className="col-md-4">
-                                                <p className="font-weight-bold-600 primary-text mb-2">
-                                                    Chapter:
-                                                </p>
-                                                <p className="small font-weight-bold-600 mb-0">
-                                                    {this.props.chapter_name}
-                                                </p>
-                                            </div>
+                                            </p>
                                         </div>
+                                    ) : (
+                                        ""
+                                    )}
+                                    <div className="col-md-4">
+                                        <p className="font-weight-bold-600 primary-text mb-2">
+                                            Subject:
+                                        </p>
+                                        <p className="small font-weight-bold-600 mb-0">
+                                            {this.props.subject_name}
+                                        </p>
                                     </div>
                                     <div className="col-md-4">
-                                        <p className="primary-text mb-2">
-                                            Select student
+                                        <p className="font-weight-bold-600 primary-text mb-2">
+                                            Chapter:
                                         </p>
-                                        <Select
-                                            className="basic-single form-shadow"
-                                            isSearchable={true}
-                                            name="student"
-                                            options={this.state.student_list.map(
-                                                (list) => {
-                                                    return {
-                                                        value: list,
-                                                        label: list,
-                                                    };
-                                                }
-                                            )}
-                                            onChange={this.handleSelect}
-                                            required
-                                        />
+                                        <p className="small font-weight-bold-600 mb-0">
+                                            {this.props.chapter_name}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
+                            <div className="col-md-4">
+                                <p className="primary-text mb-2">
+                                    Select student
+                                </p>
+                                <Select
+                                    className="basic-single form-shadow"
+                                    isSearchable={true}
+                                    name="student"
+                                    options={this.state.student_list.map(
+                                        (list) => {
+                                            return {
+                                                value: list,
+                                                label: list,
+                                            };
+                                        }
+                                    )}
+                                    onChange={this.handleSelect}
+                                    required
+                                />
+                            </div>
                         </div>
+                    </div>
+                </div>
 
-                        {/* ----- Main content ----- */}
+                {/* ----- Main content ----- */}
 
-                        <div className="card card-body light-bg shadow-sm">
-                            {/* ----- Table ----- */}
-                            <div className="row justify-content-center mb-4">
-                                <div className="col-md-9">
-                                    <div className="card secondary-bg mb-3">
-                                        <div className="table-responsive">
-                                            <table className="table ">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">
-                                                            Sl.no
-                                                        </th>
-                                                        <th scope="col">
-                                                            Topics
-                                                        </th>
-                                                        <th scope="col">
-                                                            Obtained Marks
-                                                        </th>
-                                                        <th scope="col">
-                                                            Total Marks
-                                                        </th>
-                                                        <th scope="col">
-                                                            Marks per question
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {this.state.topics
-                                                        .length !== 0 ? (
-                                                        this.state.topics.map(
-                                                            (topic, index) => {
-                                                                return (
-                                                                    <tr
-                                                                        key={
-                                                                            index
+                <div className="card card-body light-bg shadow-sm">
+                    {/* ----- Table ----- */}
+                    <div className="row justify-content-center mb-4">
+                        <div className="col-md-9">
+                            <div className="card secondary-bg mb-3">
+                                <div className="table-responsive">
+                                    <table className="table ">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Sl.no</th>
+                                                <th scope="col">Topics</th>
+                                                <th scope="col">
+                                                    Obtained Marks
+                                                </th>
+                                                <th scope="col">Total Marks</th>
+                                                <th scope="col">
+                                                    Marks per question
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {this.state.topics.length !== 0 ? (
+                                                this.state.topics.map(
+                                                    (topic, index) => {
+                                                        return (
+                                                            <tr key={index}>
+                                                                <td>
+                                                                    {index + 1}
+                                                                </td>
+                                                                <td>
+                                                                    {
+                                                                        topic.topic_name
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="text"
+                                                                        name="obtained_marks"
+                                                                        id="obtained_marks"
+                                                                        className="form-control form-control-sm border-secondary"
+                                                                        value={
+                                                                            this
+                                                                                .state
+                                                                                .topic_marks[
+                                                                                topic
+                                                                                    .topic_num
+                                                                            ]
+                                                                                .obtained_marks ||
+                                                                            ""
                                                                         }
-                                                                    >
-                                                                        <td>
-                                                                            {index +
-                                                                                1}
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                topic.topic_name
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            <input
-                                                                                type="text"
-                                                                                name="obtained_marks"
-                                                                                id="obtained_marks"
-                                                                                className="form-control form-control-sm border-secondary"
-                                                                                value={
-                                                                                    this
-                                                                                        .state
-                                                                                        .topic_marks[
-                                                                                        topic
-                                                                                            .topic_num
-                                                                                    ]
-                                                                                        .obtained_marks ||
-                                                                                    ""
-                                                                                }
-                                                                                onChange={(
-                                                                                    event
-                                                                                ) => {
-                                                                                    this.handleObtainedMarks(
-                                                                                        event,
-                                                                                        topic.topic_num
-                                                                                    );
-                                                                                }}
-                                                                                autoComplete="off"
-                                                                            />
-                                                                        </td>
-                                                                        <td>
-                                                                            <input
-                                                                                type="text"
-                                                                                name="total_marks"
-                                                                                id="total_marks"
-                                                                                className="form-control form-control-sm border-secondary"
-                                                                                value={
-                                                                                    this
-                                                                                        .state
-                                                                                        .topic_marks[
-                                                                                        topic
-                                                                                            .topic_num
-                                                                                    ]
-                                                                                        .total_marks ||
-                                                                                    ""
-                                                                                }
-                                                                                onChange={(
-                                                                                    event
-                                                                                ) => {
-                                                                                    this.handleTotalMarks(
-                                                                                        event,
-                                                                                        topic.topic_num
-                                                                                    );
-                                                                                }}
-                                                                                autoComplete="off"
-                                                                            />
-                                                                        </td>
-                                                                        <td>
-                                                                            <input
-                                                                                type="text"
-                                                                                name="each_question_mark"
-                                                                                id="each_question_mark"
-                                                                                className="form-control form-control-sm border-secondary"
-                                                                                value={
-                                                                                    this
-                                                                                        .state
-                                                                                        .topic_marks[
-                                                                                        topic
-                                                                                            .topic_num
-                                                                                    ]
-                                                                                        .each_question_mark ||
-                                                                                    ""
-                                                                                }
-                                                                                onChange={(
-                                                                                    event
-                                                                                ) => {
-                                                                                    this.handleMarksPerQuestion(
-                                                                                        event,
-                                                                                        topic.topic_num
-                                                                                    );
-                                                                                }}
-                                                                                autoComplete="off"
-                                                                            />
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <tr>
-                                                            <td>
-                                                                No data to
-                                                                display...
-                                                            </td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                                    )}
-                                                    <tr>
-                                                        <td></td>
-                                                        <td>Total</td>
-                                                        <td>
-                                                            {
-                                                                this.state
-                                                                    .total_obtained_marks
-                                                            }
-                                                        </td>
-                                                        <td>
-                                                            {
-                                                                this.state
-                                                                    .total_marks
-                                                            }
-                                                        </td>
-                                                        <td></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div className="row justify-content-center">
-                                        <div className="col-md-4">
+                                                                        onChange={(
+                                                                            event
+                                                                        ) => {
+                                                                            this.handleObtainedMarks(
+                                                                                event,
+                                                                                topic.topic_num
+                                                                            );
+                                                                        }}
+                                                                        autoComplete="off"
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="text"
+                                                                        name="total_marks"
+                                                                        id="total_marks"
+                                                                        className="form-control form-control-sm border-secondary"
+                                                                        value={
+                                                                            this
+                                                                                .state
+                                                                                .topic_marks[
+                                                                                topic
+                                                                                    .topic_num
+                                                                            ]
+                                                                                .total_marks ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            event
+                                                                        ) => {
+                                                                            this.handleTotalMarks(
+                                                                                event,
+                                                                                topic.topic_num
+                                                                            );
+                                                                        }}
+                                                                        autoComplete="off"
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="text"
+                                                                        name="each_question_mark"
+                                                                        id="each_question_mark"
+                                                                        className="form-control form-control-sm border-secondary"
+                                                                        value={
+                                                                            this
+                                                                                .state
+                                                                                .topic_marks[
+                                                                                topic
+                                                                                    .topic_num
+                                                                            ]
+                                                                                .each_question_mark ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            event
+                                                                        ) => {
+                                                                            this.handleMarksPerQuestion(
+                                                                                event,
+                                                                                topic.topic_num
+                                                                            );
+                                                                        }}
+                                                                        autoComplete="off"
+                                                                    />
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    }
+                                                )
+                                            ) : (
+                                                <tr>
+                                                    <td>
+                                                        No data to display...
+                                                    </td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                            )}
+                                            <tr>
+                                                <td></td>
+                                                <td>Total</td>
+                                                <td>
+                                                    {
+                                                        this.state
+                                                            .total_obtained_marks
+                                                    }
+                                                </td>
+                                                <td>
+                                                    {this.state.total_marks}
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div className="row justify-content-center">
+                                <div className="col-md-4">
+                                    <button
+                                        className="btn btn-primary btn-sm btn-block shadow-none"
+                                        disabled={
+                                            this.state.topics.length === 0
+                                                ? true
+                                                : false
+                                        }
+                                        onClick={this.handleEvaluate}
+                                    >
+                                        {this.state.showLoader ? (
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                aria-hidden="true"
+                                                className="mr-2"
+                                            />
+                                        ) : (
+                                            ""
+                                        )}
+                                        Evaluate
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ----- Document preview ----- */}
+
+                    <div className="card card-body secondary-bg text-center">
+                        {Object.entries(this.state.answerData).length === 0 ? (
+                            "Student uploads will appear here"
+                        ) : (
+                            <>
+                                <div id="ResumeContainer">
+                                    <Document
+                                        file={
+                                            this.state.answerData
+                                                .answer_file_url
+                                        }
+                                        onLoadSuccess={
+                                            this.onDocumentLoadSuccess
+                                        }
+                                        className={"PDFDocument"}
+                                    >
+                                        <Page
+                                            pageNumber={this.state.pageNumber}
+                                            className={"PDFPage shadow"}
+                                        />
+                                    </Document>
+                                </div>
+                                <p className="my-3">
+                                    Page {this.state.pageNumber} of{" "}
+                                    {this.state.numPages}
+                                </p>
+                                <nav>
+                                    {this.state.numPages > 1 ? (
+                                        <>
                                             <button
-                                                className="btn btn-primary btn-sm btn-block shadow-none"
+                                                className="btn btn-primary btn-sm shadow-none mr-2"
+                                                onClick={this.goToPrevPage}
                                                 disabled={
-                                                    this.state.topics.length ===
-                                                    0
+                                                    this.state.pageNumber === 1
                                                         ? true
                                                         : false
                                                 }
-                                                onClick={this.handleEvaluate}
                                             >
-                                                {this.state.showLoader ? (
-                                                    <Spinner
-                                                        as="span"
-                                                        animation="border"
-                                                        size="sm"
-                                                        role="status"
-                                                        aria-hidden="true"
-                                                        className="mr-2"
-                                                    />
-                                                ) : (
-                                                    ""
-                                                )}
-                                                Evaluate
+                                                Prev
                                             </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* ----- Document preview ----- */}
-
-                            <div className="card card-body secondary-bg text-center">
-                                {Object.entries(this.state.answerData)
-                                    .length === 0 ? (
-                                    "Student uploads will appear here"
-                                ) : (
-                                    <>
-                                        <div id="ResumeContainer">
-                                            <Document
-                                                file={
-                                                    this.state.answerData
-                                                        .answer_file_url
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none"
+                                                onClick={this.goToNextPage}
+                                                disabled={
+                                                    this.state.numPages ===
+                                                    this.state.pageNumber
+                                                        ? true
+                                                        : false
                                                 }
-                                                onLoadSuccess={
-                                                    this.onDocumentLoadSuccess
-                                                }
-                                                className={"PDFDocument"}
                                             >
-                                                <Page
-                                                    pageNumber={
-                                                        this.state.pageNumber
-                                                    }
-                                                    className={"PDFPage shadow"}
-                                                />
-                                            </Document>
-                                        </div>
-                                        <p className="my-3">
-                                            Page {this.state.pageNumber} of{" "}
-                                            {this.state.numPages}
-                                        </p>
-                                        <nav>
-                                            {this.state.numPages > 1 ? (
-                                                <>
-                                                    <button
-                                                        className="btn btn-primary btn-sm shadow-none mr-2"
-                                                        onClick={
-                                                            this.goToPrevPage
-                                                        }
-                                                        disabled={
-                                                            this.state
-                                                                .pageNumber ===
-                                                            1
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        Prev
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-primary btn-sm shadow-none"
-                                                        onClick={
-                                                            this.goToNextPage
-                                                        }
-                                                        disabled={
-                                                            this.state
-                                                                .numPages ===
-                                                            this.state
-                                                                .pageNumber
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        Next
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                ""
-                                            )}
-                                        </nav>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                                                Next
+                                            </button>
+                                        </>
+                                    ) : (
+                                        ""
+                                    )}
+                                </nav>
+                            </>
+                        )}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

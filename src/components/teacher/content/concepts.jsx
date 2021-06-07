@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import CKeditor from "../../common/CKEditor";
 import ReactSwitch from "../../common/switchComponent";
 import { Accordion, Card } from "react-bootstrap";
@@ -26,7 +25,6 @@ class TeacherConcepts extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             showTemplateUploadModal: false,
 
@@ -102,12 +100,6 @@ class TeacherConcepts extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleModal = (image, video, audio) => {
         this.setState({
@@ -1726,13 +1718,11 @@ class TeacherConcepts extends Component {
         let data = [...this.state.concepts];
         let boards = [...this.state.keyboards];
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -1749,12 +1739,6 @@ class TeacherConcepts extends Component {
                             showErrorAlert: false,
                         });
                     }}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
                 />
 
                 {/* Concept Deletion Modal */}
@@ -1801,1057 +1785,954 @@ class TeacherConcepts extends Component {
                     />
                 ) : null}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        <div className="row">
-                            {/* ------------------------------ Terms Column ------------------------------ */}
-                            <div
-                                className={`${
-                                    this.state.showEdit_option
-                                        ? "col-md-9"
-                                        : "col-12"
-                                } mb-4 mb-md-0`}
-                            >
-                                {/* Back button */}
-                                <button
-                                    className="btn btn-primary-invert btn-sm mb-3"
-                                    onClick={this.props.history.goBack}
-                                >
-                                    <i className="fas fa-chevron-left fa-sm"></i>{" "}
-                                    Back
-                                </button>
-
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb mb-3">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/teacher">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        {this.groupId !== undefined ? (
-                                            <>
-                                                <li className="breadcrumb-item">
-                                                    <Link
-                                                        to={`/teacher/group/${this.groupId}`}
-                                                    >
-                                                        {this.props.group_name}
-                                                    </Link>
-                                                </li>
-                                                <li className="breadcrumb-item">
-                                                    <Link
-                                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
-                                                    >
-                                                        {
-                                                            this.props
-                                                                .subject_name
-                                                        }
-                                                    </Link>
-                                                </li>
-                                            </>
-                                        ) : (
-                                            <li className="breadcrumb-item">
-                                                <Link
-                                                    to={`/teacher/subject/${this.subjectId}`}
-                                                >
-                                                    {this.props.subject_name}
-                                                </Link>
-                                            </li>
-                                        )}
+                <div className="row">
+                    {/* ------------------------------ Terms Column ------------------------------ */}
+                    <div
+                        className={`${
+                            this.state.showEdit_option ? "col-md-9" : "col-12"
+                        } mb-4 mb-md-0`}
+                    >
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.groupId !== undefined ? (
+                                    <>
                                         <li className="breadcrumb-item">
                                             <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
+                                                to={`/teacher/group/${this.groupId}`}
                                             >
-                                                {this.props.chapter_name}
+                                                {this.props.group_name}
                                             </Link>
                                         </li>
-                                        <li className="breadcrumb-item active">
-                                            Concepts
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
                                         </li>
-                                    </ol>
-                                </nav>
+                                    </>
+                                ) : (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/teacher/subject/${this.subjectId}`}
+                                        >
+                                            {this.props.subject_name}
+                                        </Link>
+                                    </li>
+                                )}
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.chapter_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Concepts
+                                </li>
+                            </ol>
+                        </nav>
 
-                                {/* Header area */}
-                                <div className="row align-items-center mb-4">
-                                    <div className="col-md-6">
-                                        <h5 className="primary-text mb-0">
-                                            {`Concepts - ${this.props.topic_name}`}
-                                        </h5>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="d-flex flex-wrap justify-content-end">
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none mr-1"
-                                                onClick={this.handlePublish}
-                                            >
-                                                Publish
-                                            </button>
-                                            <a
-                                                href="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/TypeOne/Templates/TeacherConceptsTemplate.xlsx"
-                                                className="btn btn-primary btn-sm shadow-none mr-1"
-                                                download
-                                            >
-                                                Download template
-                                            </a>
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none"
-                                                onClick={
-                                                    this.toggleTemplateModal
-                                                }
-                                            >
-                                                Upload template
-                                            </button>
+                        {/* Header area */}
+                        <div className="row align-items-center mb-4">
+                            <div className="col-md-6">
+                                <h5 className="primary-text mb-0">
+                                    {`Concepts - ${this.props.topic_name}`}
+                                </h5>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="d-flex flex-wrap justify-content-end">
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                        onClick={this.handlePublish}
+                                    >
+                                        Publish
+                                    </button>
+                                    <a
+                                        href="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/TypeOne/Templates/TeacherConceptsTemplate.xlsx"
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                        download
+                                    >
+                                        Download template
+                                    </a>
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        onClick={this.toggleTemplateModal}
+                                    >
+                                        Upload template
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* -------------------- Concepts -------------------- */}
+                        {this.state.concepts.map((concept, c_index) => {
+                            return (
+                                <div className="row mb-3" key={c_index}>
+                                    {/* ---------- Side buttons ---------- */}
+                                    <div className="col-md-1 mb-1 mb-md-0">
+                                        <div className="row">
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                >
+                                                    {c_index <= 8
+                                                        ? `0${c_index + 1}`
+                                                        : c_index + 1}
+                                                </button>
+                                            </div>
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                    onClick={() =>
+                                                        this.editConcept(
+                                                            c_index,
+                                                            concept
+                                                        )
+                                                    }
+                                                >
+                                                    <i className="far fa-edit fa-sm"></i>
+                                                </button>
+                                            </div>
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm mr-1"
+                                                    onClick={() =>
+                                                        this.copyConcept(
+                                                            c_index
+                                                        )
+                                                    }
+                                                >
+                                                    <i className="far fa-copy fa-sm"></i>
+                                                </button>
+                                            </div>
+                                            <div className="col-md-12 col-3">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm"
+                                                    onClick={() =>
+                                                        this.deleteConcept(
+                                                            c_index
+                                                        )
+                                                    }
+                                                >
+                                                    <i className="far fa-trash-alt fa-sm"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* -------------------- Concepts -------------------- */}
-                                {this.state.concepts.map((concept, c_index) => {
-                                    return (
-                                        <div className="row mb-3" key={c_index}>
-                                            {/* ---------- Side buttons ---------- */}
-                                            <div className="col-md-1 mb-1 mb-md-0">
-                                                <div className="row">
-                                                    <div className="col-md-12 col-3 mb-1">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                        >
-                                                            {c_index <= 8
-                                                                ? `0${
-                                                                      c_index +
-                                                                      1
-                                                                  }`
-                                                                : c_index + 1}
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-md-12 col-3 mb-1">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                            onClick={() =>
-                                                                this.editConcept(
-                                                                    c_index,
-                                                                    concept
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="far fa-edit fa-sm"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-md-12 col-3 mb-1">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-light bg-white btn-block shadow-sm mr-1"
-                                                            onClick={() =>
-                                                                this.copyConcept(
-                                                                    c_index
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="far fa-copy fa-sm"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-md-12 col-3">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-light bg-white btn-block shadow-sm"
-                                                            onClick={() =>
-                                                                this.deleteConcept(
-                                                                    c_index
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="far fa-trash-alt fa-sm"></i>
-                                                        </button>
+                                    {/* ---------- Concept preview ---------- */}
+                                    <div className="col-md-11 pl-md-0">
+                                        <ReactCardFlip
+                                            isFlipped={
+                                                this.state.flipState[c_index]
+                                            }
+                                            flipDirection="vertical"
+                                        >
+                                            <div
+                                                className={`card shadow-sm ${
+                                                    this.state.activeConcept ===
+                                                    c_index
+                                                        ? "border-primary"
+                                                        : ""
+                                                }`}
+                                                onClick={() =>
+                                                    this.handleFlip(c_index)
+                                                }
+                                                style={{
+                                                    minHeight: "120px",
+                                                }}
+                                            >
+                                                <div className="card-body">
+                                                    <div className="row">
+                                                        {/* term */}
+                                                        <div className="col-md-11 pr-md-0">
+                                                            <div
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: concept
+                                                                        .content
+                                                                        .terms,
+                                                                }}
+                                                            ></div>
+                                                        </div>
+                                                        {/* File modal button */}
+                                                        <div className="col-1 pl-0 text-right">
+                                                            <button
+                                                                className="btn btn-light bg-white shadow-sm"
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    this.toggleModal(
+                                                                        concept
+                                                                            .content
+                                                                            .images,
+                                                                        concept
+                                                                            .content
+                                                                            .video,
+                                                                        concept
+                                                                            .content
+                                                                            .audio
+                                                                    );
+                                                                    e.stopPropagation();
+                                                                }}
+                                                            >
+                                                                <i className="far fa-folder-open"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            {/* ---------- Concept preview ---------- */}
-                                            <div className="col-md-11 pl-md-0">
-                                                <ReactCardFlip
-                                                    isFlipped={
-                                                        this.state.flipState[
-                                                            c_index
-                                                        ]
-                                                    }
-                                                    flipDirection="vertical"
-                                                >
-                                                    <div
-                                                        className={`card shadow-sm ${
-                                                            this.state
-                                                                .activeConcept ===
-                                                            c_index
-                                                                ? "border-primary"
-                                                                : ""
-                                                        }`}
-                                                        onClick={() =>
-                                                            this.handleFlip(
-                                                                c_index
-                                                            )
-                                                        }
-                                                        style={{
-                                                            minHeight: "120px",
-                                                        }}
-                                                    >
-                                                        <div className="card-body">
-                                                            <div className="row">
-                                                                {/* term */}
-                                                                <div className="col-md-11 pr-md-0">
-                                                                    <div
-                                                                        dangerouslySetInnerHTML={{
-                                                                            __html: concept
-                                                                                .content
-                                                                                .terms,
-                                                                        }}
-                                                                    ></div>
-                                                                </div>
-                                                                {/* File modal button */}
-                                                                <div className="col-1 pl-0 text-right">
-                                                                    <button
-                                                                        className="btn btn-light bg-white shadow-sm"
-                                                                        onClick={(
-                                                                            e
-                                                                        ) => {
-                                                                            this.toggleModal(
-                                                                                concept
-                                                                                    .content
-                                                                                    .images,
-                                                                                concept
-                                                                                    .content
-                                                                                    .video,
-                                                                                concept
-                                                                                    .content
-                                                                                    .audio
-                                                                            );
-                                                                            e.stopPropagation();
-                                                                        }}
-                                                                    >
-                                                                        <i className="far fa-folder-open"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
+                                            <div
+                                                className={`card shadow-sm ${
+                                                    this.state.activeConcept ===
+                                                    c_index
+                                                        ? "border-primary"
+                                                        : ""
+                                                }`}
+                                                onClick={() =>
+                                                    this.handleFlip(c_index)
+                                                }
+                                                style={{
+                                                    minHeight: "120px",
+                                                }}
+                                            >
+                                                <div className="card-body">
+                                                    <div className="row">
+                                                        {/* definition */}
+                                                        <div className="col-md-11 pr-md-0">
+                                                            <div
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: concept
+                                                                        .content
+                                                                        .definition,
+                                                                }}
+                                                            ></div>
+                                                        </div>
+                                                        {/* File modal button */}
+                                                        <div className="col-1 pl-0 text-right">
+                                                            <button
+                                                                className="btn btn-light bg-white shadow-sm"
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    this.toggleModal(
+                                                                        concept
+                                                                            .content
+                                                                            .images,
+                                                                        concept
+                                                                            .content
+                                                                            .video,
+                                                                        concept
+                                                                            .content
+                                                                            .audio
+                                                                    );
+                                                                    e.stopPropagation();
+                                                                }}
+                                                            >
+                                                                <i className="far fa-folder-open"></i>
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                    <div
-                                                        className={`card shadow-sm ${
-                                                            this.state
-                                                                .activeConcept ===
-                                                            c_index
-                                                                ? "border-primary"
-                                                                : ""
-                                                        }`}
-                                                        onClick={() =>
-                                                            this.handleFlip(
-                                                                c_index
-                                                            )
-                                                        }
-                                                        style={{
-                                                            minHeight: "120px",
-                                                        }}
-                                                    >
-                                                        <div className="card-body">
-                                                            <div className="row">
-                                                                {/* definition */}
-                                                                <div className="col-md-11 pr-md-0">
-                                                                    <div
-                                                                        dangerouslySetInnerHTML={{
-                                                                            __html: concept
-                                                                                .content
-                                                                                .definition,
-                                                                        }}
-                                                                    ></div>
-                                                                </div>
-                                                                {/* File modal button */}
-                                                                <div className="col-1 pl-0 text-right">
-                                                                    <button
-                                                                        className="btn btn-light bg-white shadow-sm"
-                                                                        onClick={(
-                                                                            e
-                                                                        ) => {
-                                                                            this.toggleModal(
-                                                                                concept
-                                                                                    .content
-                                                                                    .images,
-                                                                                concept
-                                                                                    .content
-                                                                                    .video,
-                                                                                concept
-                                                                                    .content
-                                                                                    .audio
-                                                                            );
-                                                                            e.stopPropagation();
-                                                                        }}
-                                                                    >
-                                                                        <i className="far fa-folder-open"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </ReactCardFlip>
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        </ReactCardFlip>
+                                    </div>
+                                </div>
+                            );
+                        })}
 
+                        <button
+                            className="btn btn-primary btn-block shadow-none"
+                            onClick={this.handleAddConcept}
+                        >
+                            Add +
+                        </button>
+                    </div>
+
+                    {/* ---------- Settings column ---------- */}
+                    {this.state.showEdit_option ? (
+                        <div className="col-md-3 content-edit">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button
-                                    className="btn btn-primary btn-block shadow-none"
-                                    onClick={this.handleAddConcept}
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handleSubmit}
+                                    disabled={this.state.btnDisabled}
                                 >
-                                    Add +
+                                    Save
+                                </button>
+                                <button
+                                    className="btn btn-link btn-sm shadow-none"
+                                    onClick={() => {
+                                        this.setState({
+                                            showEdit_option: false,
+                                            contentCollapsed: true,
+                                            filesCollapsed: true,
+                                            settingsCollapsed: true,
+                                            activeConcept: "",
+                                        });
+                                    }}
+                                >
+                                    Close
                                 </button>
                             </div>
 
-                            {/* ---------- Settings column ---------- */}
-                            {this.state.showEdit_option ? (
-                                <div className="col-md-3 content-edit">
-                                    <div className="d-flex justify-content-between align-items-center mb-2">
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handleSubmit}
-                                            disabled={this.state.btnDisabled}
-                                        >
-                                            Save
-                                        </button>
-                                        <button
-                                            className="btn btn-link btn-sm shadow-none"
-                                            onClick={() => {
-                                                this.setState({
-                                                    showEdit_option: false,
-                                                    contentCollapsed: true,
-                                                    filesCollapsed: true,
-                                                    settingsCollapsed: true,
-                                                    activeConcept: "",
-                                                });
-                                            }}
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
+                            <Accordion defaultActiveKey="">
+                                {/* ---------- Content ---------- */}
+                                <Card className="shadow-sm mb-2">
+                                    <Accordion.Toggle
+                                        as={Card.Body}
+                                        variant="link"
+                                        eventKey="0"
+                                        className="text-dark"
+                                        style={{ cursor: "default" }}
+                                        onClick={() =>
+                                            this.toggleCollapse("content")
+                                        }
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            Content
+                                            {this.state.contentCollapsed ? (
+                                                <i className="fas fa-angle-right "></i>
+                                            ) : (
+                                                <i className="fas fa-angle-down "></i>
+                                            )}
+                                        </div>
+                                    </Accordion.Toggle>
 
-                                    <Accordion defaultActiveKey="">
-                                        {/* ---------- Content ---------- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="0"
-                                                className="text-dark"
-                                                style={{ cursor: "default" }}
-                                                onClick={() =>
-                                                    this.toggleCollapse(
-                                                        "content"
-                                                    )
-                                                }
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Content
-                                                    {this.state
-                                                        .contentCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
-                                                    )}
-                                                </div>
-                                            </Accordion.Toggle>
+                                    <Accordion.Collapse eventKey="0">
+                                        <Card.Body className="p-3">
+                                            {/* ---------- Terms ---------- */}
+                                            <div className="form-group">
+                                                <label>Terms</label>
+                                                <CKeditor
+                                                    data={
+                                                        data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.terms
+                                                    }
+                                                    onChange={
+                                                        this.onEditorChange
+                                                    }
+                                                />
+                                            </div>
 
-                                            <Accordion.Collapse eventKey="0">
-                                                <Card.Body className="p-3">
-                                                    {/* ---------- Terms ---------- */}
-                                                    <div className="form-group">
-                                                        <label>Terms</label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
-                                                                    this.state
-                                                                        .activeConcept
-                                                                ].content.terms
-                                                            }
-                                                            onChange={
-                                                                this
-                                                                    .onEditorChange
-                                                            }
-                                                        />
+                                            {/* ---------- Definition ---------- */}
+                                            <div className="form-group">
+                                                <label>Definition</label>
+                                                <CKeditor
+                                                    data={
+                                                        data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.definition
+                                                    }
+                                                    onChange={
+                                                        this.handleDefinition
+                                                    }
+                                                />
+                                            </div>
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+
+                                {/* ---------- Image | Video | Audio ---------- */}
+                                <Card className="shadow-sm mb-2">
+                                    <Accordion.Toggle
+                                        as={Card.Body}
+                                        variant="link"
+                                        eventKey="1"
+                                        className="text-dark"
+                                        style={{ cursor: "default" }}
+                                        onClick={() =>
+                                            this.toggleCollapse("files")
+                                        }
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            Image | Video | Audio
+                                            {this.state.filesCollapsed ? (
+                                                <i className="fas fa-angle-right "></i>
+                                            ) : (
+                                                <i className="fas fa-angle-down "></i>
+                                            )}
+                                        </div>
+                                    </Accordion.Toggle>
+
+                                    <Accordion.Collapse eventKey="1">
+                                        <Card.Body className="p-3">
+                                            {/* ---------- Image ---------- */}
+                                            <div className="form-group">
+                                                <div className="row align-items-center mb-2">
+                                                    <div className="col-md-6">
+                                                        <p className="mb-0">
+                                                            Image
+                                                        </p>
                                                     </div>
-
-                                                    {/* ---------- Definition ---------- */}
-                                                    <div className="form-group">
-                                                        <label>
-                                                            Definition
-                                                        </label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
-                                                                    this.state
-                                                                        .activeConcept
-                                                                ].content
-                                                                    .definition
+                                                    <div className="col-md-6 text-right">
+                                                        <button
+                                                            className="btn btn-link btn-sm shadow-none"
+                                                            onClick={
+                                                                this.clearImages
                                                             }
-                                                            onChange={
-                                                                this
-                                                                    .handleDefinition
-                                                            }
-                                                        />
+                                                        >
+                                                            Clear
+                                                        </button>
                                                     </div>
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-
-                                        {/* ---------- Image | Video | Audio ---------- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="1"
-                                                className="text-dark"
-                                                style={{ cursor: "default" }}
-                                                onClick={() =>
-                                                    this.toggleCollapse("files")
-                                                }
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Image | Video | Audio
-                                                    {this.state
-                                                        .filesCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
-                                                    )}
                                                 </div>
-                                            </Accordion.Toggle>
-
-                                            <Accordion.Collapse eventKey="1">
-                                                <Card.Body className="p-3">
-                                                    {/* ---------- Image ---------- */}
-                                                    <div className="form-group">
-                                                        <div className="row align-items-center mb-2">
-                                                            <div className="col-md-6">
-                                                                <p className="mb-0">
-                                                                    Image
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-md-6 text-right">
-                                                                <button
-                                                                    className="btn btn-link btn-sm shadow-none"
-                                                                    onClick={
-                                                                        this
-                                                                            .clearImages
+                                                {data[
+                                                    this.state.activeConcept
+                                                ].content.images.map(
+                                                    (options, image_index) => (
+                                                        <Fragment
+                                                            key={image_index}
+                                                        >
+                                                            <div
+                                                                className="input-group border-secondary mb-1"
+                                                                style={{
+                                                                    borderRadius:
+                                                                        "6px",
+                                                                }}
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control form-control-sm"
+                                                                    id={`image${image_index}`}
+                                                                    name="image"
+                                                                    placeholder={`Image title 0${
+                                                                        image_index +
+                                                                        1
+                                                                    }`}
+                                                                    value={
+                                                                        options.title
                                                                     }
-                                                                >
-                                                                    Clear
-                                                                </button>
+                                                                    onChange={(
+                                                                        event
+                                                                    ) =>
+                                                                        this.handleImageTitle(
+                                                                            image_index,
+                                                                            event
+                                                                        )
+                                                                    }
+                                                                    autoComplete="off"
+                                                                />
+                                                                <div className="input-group-append">
+                                                                    <div
+                                                                        className="btn-group"
+                                                                        role="group"
+                                                                        aria-label="Basic example"
+                                                                    >
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-light btn-sm shadow-none"
+                                                                            onClick={() =>
+                                                                                this.handleDeleteImages(
+                                                                                    image_index
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <i className="fas fa-times fa-sm"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                            <div className="custom-file mb-2">
+                                                                <input
+                                                                    type="file"
+                                                                    className="custom-file-input"
+                                                                    id={`file${image_index}`}
+                                                                    accept="image/*"
+                                                                    aria-describedby="inputGroupFileAddon01"
+                                                                    onChange={(
+                                                                        event
+                                                                    ) =>
+                                                                        this.handleImageFile(
+                                                                            image_index,
+                                                                            event
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        options.file_name !==
+                                                                            "" ||
+                                                                        options.path !==
+                                                                            ""
+                                                                            ? true
+                                                                            : false
+                                                                    }
+                                                                />
+                                                                <label
+                                                                    className="custom-file-label"
+                                                                    htmlFor={`file${image_index}`}
+                                                                >
+                                                                    {options.file_name ===
+                                                                    ""
+                                                                        ? "Choose file"
+                                                                        : options.file_name}
+                                                                </label>
+                                                            </div>
+                                                        </Fragment>
+                                                    )
+                                                )}
+                                                <small
+                                                    className="form-text text-muted mb-2"
+                                                    style={{
+                                                        marginTop: "-8px",
+                                                    }}
+                                                >
+                                                    Select only .png .jpg .jpeg
+                                                    .webp
+                                                </small>
+                                            </div>
+
+                                            {/* ---------- Video ---------- */}
+
+                                            <div className="form-group">
+                                                <div className="row align-items-center mb-2">
+                                                    <div className="col-md-6">
+                                                        <p className="mb-0">
+                                                            Video
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-md-6 text-right">
+                                                        <button
+                                                            className="btn btn-link btn-sm shadow-none"
+                                                            onClick={
+                                                                this.clearVideo
+                                                            }
+                                                        >
+                                                            Clear
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    name="video"
+                                                    id="video"
+                                                    placeholder="Video title"
+                                                    className="form-control form-control-sm border-secondary mb-1"
+                                                    value={
+                                                        data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.video.title
+                                                    }
+                                                    onChange={
+                                                        this.handleVideoTitle
+                                                    }
+                                                    autoComplete="off"
+                                                />
+                                                <div className="custom-file mb-2">
+                                                    <input
+                                                        type="file"
+                                                        className="custom-file-input"
+                                                        id="video"
+                                                        accept="video/*"
+                                                        aria-describedby="inputGroupFileAddon01"
+                                                        onChange={(event) =>
+                                                            this.handleVideoFile(
+                                                                event
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            data[
+                                                                this.state
+                                                                    .activeConcept
+                                                            ].content.video
+                                                                .file_name !==
+                                                                "" ||
+                                                            data[
+                                                                this.state
+                                                                    .activeConcept
+                                                            ].content.video
+                                                                .path !== "" ||
+                                                            data[
+                                                                this.state
+                                                                    .activeConcept
+                                                            ].content.video
+                                                                .url !== ""
+                                                                ? true
+                                                                : false
+                                                        }
+                                                    />
+                                                    <label
+                                                        className="custom-file-label"
+                                                        htmlFor="video"
+                                                    >
                                                         {data[
                                                             this.state
                                                                 .activeConcept
-                                                        ].content.images.map(
-                                                            (
-                                                                options,
-                                                                image_index
-                                                            ) => (
-                                                                <Fragment
-                                                                    key={
-                                                                        image_index
-                                                                    }
-                                                                >
-                                                                    <div
-                                                                        className="input-group border-secondary mb-1"
-                                                                        style={{
-                                                                            borderRadius:
-                                                                                "6px",
-                                                                        }}
-                                                                    >
-                                                                        <input
-                                                                            type="text"
-                                                                            className="form-control form-control-sm"
-                                                                            id={`image${image_index}`}
-                                                                            name="image"
-                                                                            placeholder={`Image title 0${
-                                                                                image_index +
-                                                                                1
-                                                                            }`}
-                                                                            value={
-                                                                                options.title
-                                                                            }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleImageTitle(
-                                                                                    image_index,
-                                                                                    event
-                                                                                )
-                                                                            }
-                                                                            autoComplete="off"
-                                                                        />
-                                                                        <div className="input-group-append">
-                                                                            <div
-                                                                                className="btn-group"
-                                                                                role="group"
-                                                                                aria-label="Basic example"
-                                                                            >
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="btn btn-light btn-sm shadow-none"
-                                                                                    onClick={() =>
-                                                                                        this.handleDeleteImages(
-                                                                                            image_index
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    <i className="fas fa-times fa-sm"></i>
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="custom-file mb-2">
-                                                                        <input
-                                                                            type="file"
-                                                                            className="custom-file-input"
-                                                                            id={`file${image_index}`}
-                                                                            accept="image/*"
-                                                                            aria-describedby="inputGroupFileAddon01"
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleImageFile(
-                                                                                    image_index,
-                                                                                    event
-                                                                                )
-                                                                            }
-                                                                            disabled={
-                                                                                options.file_name !==
-                                                                                    "" ||
-                                                                                options.path !==
-                                                                                    ""
-                                                                                    ? true
-                                                                                    : false
-                                                                            }
-                                                                        />
-                                                                        <label
-                                                                            className="custom-file-label"
-                                                                            htmlFor={`file${image_index}`}
-                                                                        >
-                                                                            {options.file_name ===
-                                                                            ""
-                                                                                ? "Choose file"
-                                                                                : options.file_name}
-                                                                        </label>
-                                                                    </div>
-                                                                </Fragment>
-                                                            )
-                                                        )}
-                                                        <small
-                                                            className="form-text text-muted mb-2"
-                                                            style={{
-                                                                marginTop:
-                                                                    "-8px",
-                                                            }}
-                                                        >
-                                                            Select only .png
-                                                            .jpg .jpeg .webp
-                                                        </small>
-                                                    </div>
+                                                        ].content.video
+                                                            .file_name === ""
+                                                            ? "Choose file"
+                                                            : data[
+                                                                  this.state
+                                                                      .activeConcept
+                                                              ].content.video
+                                                                  .file_name}
+                                                    </label>
+                                                </div>
+                                                <small
+                                                    className="form-text text-muted mb-2"
+                                                    style={{
+                                                        marginTop: "-8px",
+                                                    }}
+                                                >
+                                                    Select only .mpeg .flv .avi
+                                                    .mov .mp4 .mkv
+                                                </small>
 
-                                                    {/* ---------- Video ---------- */}
+                                                <p className="text-center small font-weight-bold mb-2">
+                                                    Or
+                                                </p>
+                                                <input
+                                                    type="url"
+                                                    name="video"
+                                                    placeholder="Paste URL"
+                                                    className="form-control form-control-sm border-secondary mb-1"
+                                                    onChange={(event) =>
+                                                        this.handleVideoUrl(
+                                                            event
+                                                        )
+                                                    }
+                                                    value={
+                                                        data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.video.url
+                                                    }
+                                                    disabled={
+                                                        data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.video
+                                                            .file_name !== "" ||
+                                                        data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.video.path !==
+                                                            ""
+                                                            ? true
+                                                            : false
+                                                    }
+                                                    autoComplete="off"
+                                                />
+                                                <small className="form-text text-muted mb-2">
+                                                    Only https supported video
+                                                </small>
+                                            </div>
 
-                                                    <div className="form-group">
-                                                        <div className="row align-items-center mb-2">
-                                                            <div className="col-md-6">
-                                                                <p className="mb-0">
-                                                                    Video
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-md-6 text-right">
-                                                                <button
-                                                                    className="btn btn-link btn-sm shadow-none"
-                                                                    onClick={
-                                                                        this
-                                                                            .clearVideo
-                                                                    }
-                                                                >
-                                                                    Clear
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <input
-                                                            type="text"
-                                                            name="video"
-                                                            id="video"
-                                                            placeholder="Video title"
-                                                            className="form-control form-control-sm border-secondary mb-1"
-                                                            value={
-                                                                data[
-                                                                    this.state
-                                                                        .activeConcept
-                                                                ].content.video
-                                                                    .title
-                                                            }
-                                                            onChange={
-                                                                this
-                                                                    .handleVideoTitle
-                                                            }
-                                                            autoComplete="off"
-                                                        />
-                                                        <div className="custom-file mb-2">
-                                                            <input
-                                                                type="file"
-                                                                className="custom-file-input"
-                                                                id="video"
-                                                                accept="video/*"
-                                                                aria-describedby="inputGroupFileAddon01"
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleVideoFile(
-                                                                        event
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeConcept
-                                                                    ].content
-                                                                        .video
-                                                                        .file_name !==
-                                                                        "" ||
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeConcept
-                                                                    ].content
-                                                                        .video
-                                                                        .path !==
-                                                                        "" ||
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeConcept
-                                                                    ].content
-                                                                        .video
-                                                                        .url !==
-                                                                        ""
-                                                                        ? true
-                                                                        : false
-                                                                }
-                                                            />
-                                                            <label
-                                                                className="custom-file-label"
-                                                                htmlFor="video"
-                                                            >
-                                                                {data[
-                                                                    this.state
-                                                                        .activeConcept
-                                                                ].content.video
-                                                                    .file_name ===
-                                                                ""
-                                                                    ? "Choose file"
-                                                                    : data[
-                                                                          this
-                                                                              .state
-                                                                              .activeConcept
-                                                                      ].content
-                                                                          .video
-                                                                          .file_name}
-                                                            </label>
-                                                        </div>
-                                                        <small
-                                                            className="form-text text-muted mb-2"
-                                                            style={{
-                                                                marginTop:
-                                                                    "-8px",
-                                                            }}
-                                                        >
-                                                            Select only .mpeg
-                                                            .flv .avi .mov .mp4
-                                                            .mkv
-                                                        </small>
+                                            {/* ---------- Audio ---------- */}
 
-                                                        <p className="text-center small font-weight-bold mb-2">
-                                                            Or
+                                            <div className="form-group">
+                                                <div className="row align-items-center mb-2">
+                                                    <div className="col-md-6">
+                                                        <p className="mb-0">
+                                                            Audio
                                                         </p>
+                                                    </div>
+                                                    <div className="col-md-6 text-right">
+                                                        <button
+                                                            className="btn btn-link btn-sm shadow-none"
+                                                            onClick={
+                                                                this.clearAudios
+                                                            }
+                                                        >
+                                                            Clear
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {data[
+                                                    this.state.activeConcept
+                                                ].content.audio.map(
+                                                    (options, audio_index) => (
+                                                        <Fragment
+                                                            key={audio_index}
+                                                        >
+                                                            <div
+                                                                className="input-group border-secondary mb-1"
+                                                                style={{
+                                                                    borderRadius:
+                                                                        "6px",
+                                                                }}
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control form-control-sm"
+                                                                    id={`audio${audio_index}`}
+                                                                    name="audio"
+                                                                    placeholder={`Audio title 0${
+                                                                        audio_index +
+                                                                        1
+                                                                    }`}
+                                                                    value={
+                                                                        options.title
+                                                                    }
+                                                                    onChange={(
+                                                                        event
+                                                                    ) =>
+                                                                        this.handleAudioTitle(
+                                                                            audio_index,
+                                                                            event
+                                                                        )
+                                                                    }
+                                                                    autoComplete="off"
+                                                                />
+                                                                <div className="input-group-append">
+                                                                    <div
+                                                                        className="btn-group"
+                                                                        role="group"
+                                                                        aria-label="Basic example"
+                                                                    >
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-light btn-sm shadow-none"
+                                                                            onClick={() =>
+                                                                                this.handleDeleteAudio(
+                                                                                    audio_index
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <i className="fas fa-times fa-sm"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="custom-file mb-2">
+                                                                <input
+                                                                    type="file"
+                                                                    className="custom-file-input"
+                                                                    id={`audio${audio_index}`}
+                                                                    accept="audio/*"
+                                                                    aria-describedby="inputGroupFileAddon01"
+                                                                    onChange={(
+                                                                        event
+                                                                    ) =>
+                                                                        this.handleAudioFile(
+                                                                            audio_index,
+                                                                            event
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        options.file_name !==
+                                                                            "" ||
+                                                                        options.path !==
+                                                                            ""
+                                                                            ? true
+                                                                            : false
+                                                                    }
+                                                                />
+                                                                <label
+                                                                    className="custom-file-label"
+                                                                    htmlFor={`audio${audio_index}`}
+                                                                >
+                                                                    {options.file_name ===
+                                                                    ""
+                                                                        ? "Choose file"
+                                                                        : options.file_name}
+                                                                </label>
+                                                            </div>
+                                                        </Fragment>
+                                                    )
+                                                )}
+                                                <small
+                                                    className="form-text text-muted mb-2"
+                                                    style={{
+                                                        marginTop: "-8px",
+                                                    }}
+                                                >
+                                                    Select only .wav .mp3
+                                                </small>
+                                            </div>
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+
+                                {/* ---------- Settings ---------- */}
+                                <Card className="shadow-sm mb-2">
+                                    <Accordion.Toggle
+                                        as={Card.Body}
+                                        variant="link"
+                                        eventKey="2"
+                                        className="text-dark"
+                                        style={{ cursor: "default" }}
+                                        onClick={this.toggleCollapse}
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            Settings
+                                            {this.state.settingsCollapsed ? (
+                                                <i className="fas fa-angle-right "></i>
+                                            ) : (
+                                                <i className="fas fa-angle-down "></i>
+                                            )}
+                                        </div>
+                                    </Accordion.Toggle>
+
+                                    <Accordion.Collapse eventKey="2">
+                                        <Card.Body className="p-3">
+                                            {/* ---------- Virtual keyboard ---------- */}
+                                            <div className="form-group">
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    <span>
+                                                        Virtual Keyboard
+                                                    </span>
+                                                    <ReactSwitch
+                                                        onChange={
+                                                            this
+                                                                .handleVirtualKeyboard
+                                                        }
+                                                        checked={
+                                                            this.state
+                                                                .showVirtual_keyboard
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            {this.state.showVirtual_keyboard ? (
+                                                <div className="form-group">
+                                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                                        All
                                                         <input
-                                                            type="url"
-                                                            name="video"
-                                                            placeholder="Paste URL"
-                                                            className="form-control form-control-sm border-secondary mb-1"
+                                                            type="checkbox"
+                                                            checked={
+                                                                boards[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].all
+                                                            }
                                                             onChange={(event) =>
-                                                                this.handleVideoUrl(
-                                                                    event
+                                                                this.handleSelectAll(
+                                                                    event,
+                                                                    "All"
                                                                 )
                                                             }
-                                                            value={
-                                                                data[
+                                                        />
+                                                    </div>
+                                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                                        Chemistry
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                boards[
                                                                     this.state
                                                                         .activeConcept
-                                                                ].content.video
-                                                                    .url
+                                                                ].chemistry
                                                             }
                                                             disabled={
-                                                                data[
+                                                                boards[
                                                                     this.state
                                                                         .activeConcept
-                                                                ].content.video
-                                                                    .file_name !==
-                                                                    "" ||
-                                                                data[
-                                                                    this.state
-                                                                        .activeConcept
-                                                                ].content.video
-                                                                    .path !== ""
-                                                                    ? true
-                                                                    : false
+                                                                ].all
                                                             }
-                                                            autoComplete="off"
+                                                            onChange={(event) =>
+                                                                this.handleKeyboardOptions(
+                                                                    event,
+                                                                    "Chemistry"
+                                                                )
+                                                            }
                                                         />
-                                                        <small className="form-text text-muted mb-2">
-                                                            Only https supported
-                                                            video
-                                                        </small>
                                                     </div>
-
-                                                    {/* ---------- Audio ---------- */}
-
-                                                    <div className="form-group">
-                                                        <div className="row align-items-center mb-2">
-                                                            <div className="col-md-6">
-                                                                <p className="mb-0">
-                                                                    Audio
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-md-6 text-right">
-                                                                <button
-                                                                    className="btn btn-link btn-sm shadow-none"
-                                                                    onClick={
-                                                                        this
-                                                                            .clearAudios
-                                                                    }
-                                                                >
-                                                                    Clear
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        {data[
-                                                            this.state
-                                                                .activeConcept
-                                                        ].content.audio.map(
-                                                            (
-                                                                options,
-                                                                audio_index
-                                                            ) => (
-                                                                <Fragment
-                                                                    key={
-                                                                        audio_index
-                                                                    }
-                                                                >
-                                                                    <div
-                                                                        className="input-group border-secondary mb-1"
-                                                                        style={{
-                                                                            borderRadius:
-                                                                                "6px",
-                                                                        }}
-                                                                    >
-                                                                        <input
-                                                                            type="text"
-                                                                            className="form-control form-control-sm"
-                                                                            id={`audio${audio_index}`}
-                                                                            name="audio"
-                                                                            placeholder={`Audio title 0${
-                                                                                audio_index +
-                                                                                1
-                                                                            }`}
-                                                                            value={
-                                                                                options.title
-                                                                            }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleAudioTitle(
-                                                                                    audio_index,
-                                                                                    event
-                                                                                )
-                                                                            }
-                                                                            autoComplete="off"
-                                                                        />
-                                                                        <div className="input-group-append">
-                                                                            <div
-                                                                                className="btn-group"
-                                                                                role="group"
-                                                                                aria-label="Basic example"
-                                                                            >
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="btn btn-light btn-sm shadow-none"
-                                                                                    onClick={() =>
-                                                                                        this.handleDeleteAudio(
-                                                                                            audio_index
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    <i className="fas fa-times fa-sm"></i>
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="custom-file mb-2">
-                                                                        <input
-                                                                            type="file"
-                                                                            className="custom-file-input"
-                                                                            id={`audio${audio_index}`}
-                                                                            accept="audio/*"
-                                                                            aria-describedby="inputGroupFileAddon01"
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleAudioFile(
-                                                                                    audio_index,
-                                                                                    event
-                                                                                )
-                                                                            }
-                                                                            disabled={
-                                                                                options.file_name !==
-                                                                                    "" ||
-                                                                                options.path !==
-                                                                                    ""
-                                                                                    ? true
-                                                                                    : false
-                                                                            }
-                                                                        />
-                                                                        <label
-                                                                            className="custom-file-label"
-                                                                            htmlFor={`audio${audio_index}`}
-                                                                        >
-                                                                            {options.file_name ===
-                                                                            ""
-                                                                                ? "Choose file"
-                                                                                : options.file_name}
-                                                                        </label>
-                                                                    </div>
-                                                                </Fragment>
-                                                            )
-                                                        )}
-                                                        <small
-                                                            className="form-text text-muted mb-2"
-                                                            style={{
-                                                                marginTop:
-                                                                    "-8px",
-                                                            }}
-                                                        >
-                                                            Select only .wav
-                                                            .mp3
-                                                        </small>
+                                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                                        Maths
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                boards[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].maths
+                                                            }
+                                                            disabled={
+                                                                boards[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].all
+                                                            }
+                                                            onChange={(event) =>
+                                                                this.handleKeyboardOptions(
+                                                                    event,
+                                                                    "Maths"
+                                                                )
+                                                            }
+                                                        />
                                                     </div>
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-
-                                        {/* ---------- Settings ---------- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="2"
-                                                className="text-dark"
-                                                style={{ cursor: "default" }}
-                                                onClick={this.toggleCollapse}
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Settings
-                                                    {this.state
-                                                        .settingsCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
-                                                    )}
+                                                    <div className="d-flex justify-content-between align-items-center">
+                                                        Physics
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                boards[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].physics
+                                                            }
+                                                            disabled={
+                                                                boards[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].all
+                                                            }
+                                                            onChange={(event) =>
+                                                                this.handleKeyboardOptions(
+                                                                    event,
+                                                                    "Physics"
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </Accordion.Toggle>
+                                            ) : (
+                                                ""
+                                            )}
 
-                                            <Accordion.Collapse eventKey="2">
-                                                <Card.Body className="p-3">
-                                                    {/* ---------- Virtual keyboard ---------- */}
-                                                    <div className="form-group">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <span>
-                                                                Virtual Keyboard
+                                            {/* ---------- Limited ---------- */}
+                                            <div className="form-group">
+                                                <div className="row">
+                                                    <div className="col-md-6">
+                                                        <div className="d-flex align-items-center">
+                                                            <span className="mr-4">
+                                                                Limited
                                                             </span>
                                                             <ReactSwitch
                                                                 onChange={
                                                                     this
-                                                                        .handleVirtualKeyboard
+                                                                        .handleLimited
                                                                 }
                                                                 checked={
-                                                                    this.state
-                                                                        .showVirtual_keyboard
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeConcept
+                                                                    ].settings
+                                                                        .limited
                                                                 }
                                                             />
                                                         </div>
                                                     </div>
-                                                    {this.state
-                                                        .showVirtual_keyboard ? (
-                                                        <div className="form-group">
-                                                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                                                All
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeConcept
-                                                                        ].all
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleSelectAll(
-                                                                            event,
-                                                                            "All"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                                                Chemistry
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeConcept
-                                                                        ]
-                                                                            .chemistry
-                                                                    }
-                                                                    disabled={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeConcept
-                                                                        ].all
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleKeyboardOptions(
-                                                                            event,
-                                                                            "Chemistry"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                                                Maths
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeConcept
-                                                                        ].maths
-                                                                    }
-                                                                    disabled={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeConcept
-                                                                        ].all
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleKeyboardOptions(
-                                                                            event,
-                                                                            "Maths"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between align-items-center">
-                                                                Physics
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeConcept
-                                                                        ]
-                                                                            .physics
-                                                                    }
-                                                                    disabled={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeConcept
-                                                                        ].all
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleKeyboardOptions(
-                                                                            event,
-                                                                            "Physics"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        ""
-                                                    )}
-
-                                                    {/* ---------- Limited ---------- */}
-                                                    <div className="form-group">
-                                                        <div className="row">
-                                                            <div className="col-md-6">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="mr-4">
-                                                                        Limited
-                                                                    </span>
-                                                                    <ReactSwitch
-                                                                        onChange={
-                                                                            this
-                                                                                .handleLimited
-                                                                        }
-                                                                        checked={
-                                                                            data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeConcept
-                                                                            ]
-                                                                                .settings
-                                                                                .limited
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-                                    </Accordion>
-                                </div>
-                            ) : (
-                                ""
-                            )}
+                                                </div>
+                                            </div>
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+                            </Accordion>
                         </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                    </div>
+                    ) : (
+                        ""
+                    )}
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

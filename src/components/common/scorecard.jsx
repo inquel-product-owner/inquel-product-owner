@@ -49,12 +49,7 @@ const ScoreCardTable = (props) => {
                                               />
                                           </td>
                                           <td>
-                                              <div
-                                                  className="input-group input-group-sm border-secondary rounded-lg"
-                                                  style={{
-                                                      overflow: "hidden",
-                                                  }}
-                                              >
+                                              <div className="input-group input-group-sm border-secondary rounded-lg overflow-hidden">
                                                   <input
                                                       type="text"
                                                       name="retake"
@@ -80,12 +75,7 @@ const ScoreCardTable = (props) => {
                                               </div>
                                           </td>
                                           <td>
-                                              <div
-                                                  className="input-group input-group-sm border-secondary rounded-lg"
-                                                  style={{
-                                                      overflow: "hidden",
-                                                  }}
-                                              >
+                                              <div className="input-group input-group-sm border-secondary rounded-lg overflow-hidden">
                                                   <input
                                                       type="text"
                                                       name="reduction"
@@ -111,12 +101,7 @@ const ScoreCardTable = (props) => {
                                               </div>
                                           </td>
                                           <td>
-                                              <div
-                                                  className="input-group input-group-sm border-secondary rounded-lg"
-                                                  style={{
-                                                      overflow: "hidden",
-                                                  }}
-                                              >
+                                              <div className="input-group input-group-sm border-secondary rounded-lg overflow-hidden">
                                                   <input
                                                       type="text"
                                                       name="duration"

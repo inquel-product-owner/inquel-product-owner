@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import CKeditor from "../../common/CKEditor";
 import { Accordion, Card } from "react-bootstrap";
@@ -22,7 +21,6 @@ class TeacherMatch extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showDeleteModal: false,
             showTemplateUploadModal: false,
 
@@ -57,12 +55,6 @@ class TeacherMatch extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     // -------------------------- Template uploading --------------------------
 
@@ -542,13 +534,11 @@ class TeacherMatch extends Component {
     render() {
         let data = [...this.state.match];
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -565,12 +555,6 @@ class TeacherMatch extends Component {
                             showErrorAlert: false,
                         });
                     }}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
                 />
 
                 {/* Match Deletion Modal */}
@@ -604,330 +588,290 @@ class TeacherMatch extends Component {
                     />
                 ) : null}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        <div className="row">
-                            {/* ------------------------------ Match column ------------------------------ */}
-                            <div
-                                className={`${
-                                    this.state.showEdit_option
-                                        ? "col-md-9"
-                                        : "col-12"
-                                } mb-4 mb-md-0`}
-                            >
-                                {/* Back button */}
-                                <button
-                                    className="btn btn-primary-invert btn-sm mb-3"
-                                    onClick={this.props.history.goBack}
-                                >
-                                    <i className="fas fa-chevron-left fa-sm"></i>{" "}
-                                    Back
-                                </button>
-
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb mb-3">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/teacher">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        {this.groupId !== undefined ? (
-                                            <>
-                                                <li className="breadcrumb-item">
-                                                    <Link
-                                                        to={`/teacher/group/${this.groupId}`}
-                                                    >
-                                                        {this.props.group_name}
-                                                    </Link>
-                                                </li>
-                                                <li className="breadcrumb-item">
-                                                    <Link
-                                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
-                                                    >
-                                                        {
-                                                            this.props
-                                                                .subject_name
-                                                        }
-                                                    </Link>
-                                                </li>
-                                            </>
-                                        ) : (
-                                            <li className="breadcrumb-item">
-                                                <Link
-                                                    to={`/teacher/subject/${this.subjectId}`}
-                                                >
-                                                    {this.props.subject_name}
-                                                </Link>
-                                            </li>
-                                        )}
+                <div className="row">
+                    {/* ------------------------------ Match column ------------------------------ */}
+                    <div
+                        className={`${
+                            this.state.showEdit_option ? "col-md-9" : "col-12"
+                        } mb-4 mb-md-0`}
+                    >
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.groupId !== undefined ? (
+                                    <>
                                         <li className="breadcrumb-item">
                                             <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
+                                                to={`/teacher/group/${this.groupId}`}
                                             >
-                                                {this.props.chapter_name}
+                                                {this.props.group_name}
                                             </Link>
                                         </li>
-                                        <li className="breadcrumb-item active">
-                                            Match
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
                                         </li>
-                                    </ol>
-                                </nav>
+                                    </>
+                                ) : (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/teacher/subject/${this.subjectId}`}
+                                        >
+                                            {this.props.subject_name}
+                                        </Link>
+                                    </li>
+                                )}
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.chapter_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Match
+                                </li>
+                            </ol>
+                        </nav>
 
-                                {/* Header area */}
-                                <div className="row align-items-center mb-4">
-                                    <div className="col-md-6">
-                                        <h5 className="primary-text mb-0">
-                                            {`Match - ${this.props.topic_name}`}
-                                        </h5>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="d-flex flex-wrap justify-content-end">
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none mr-1"
-                                                onClick={this.handlePublish}
-                                            >
-                                                Publish
-                                            </button>
-                                            <a
-                                                href="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/Match/Templates/TeacherMatchTemplate.xlsx"
-                                                className="btn btn-primary btn-sm shadow-none mr-1"
-                                                download
-                                            >
-                                                Download template
-                                            </a>
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none"
-                                                onClick={
-                                                    this.toggleTemplateModal
-                                                }
-                                            >
-                                                Upload template
-                                            </button>
+                        {/* Header area */}
+                        <div className="row align-items-center mb-4">
+                            <div className="col-md-6">
+                                <h5 className="primary-text mb-0">
+                                    {`Match - ${this.props.topic_name}`}
+                                </h5>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="d-flex flex-wrap justify-content-end">
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                        onClick={this.handlePublish}
+                                    >
+                                        Publish
+                                    </button>
+                                    <a
+                                        href="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/Match/Templates/TeacherMatchTemplate.xlsx"
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                        download
+                                    >
+                                        Download template
+                                    </a>
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        onClick={this.toggleTemplateModal}
+                                    >
+                                        Upload template
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* -------------------- MCQ -------------------- */}
+                        {this.state.match.map((match, match_index) => {
+                            return (
+                                <div className="row mb-3" key={match_index}>
+                                    {/* ---------- Side buttons ---------- */}
+                                    <div className="col-md-1 mb-1 mb-md-0">
+                                        <div className="row">
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                >
+                                                    {match_index <= 8
+                                                        ? `0${match_index + 1}`
+                                                        : match_index + 1}
+                                                </button>
+                                            </div>
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                    onClick={() =>
+                                                        this.handleEdit(
+                                                            match_index
+                                                        )
+                                                    }
+                                                >
+                                                    <i className="far fa-edit fa-sm"></i>
+                                                </button>
+                                            </div>
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm mr-1"
+                                                    onClick={() =>
+                                                        this.handleCopy(
+                                                            match_index
+                                                        )
+                                                    }
+                                                >
+                                                    <i className="far fa-copy fa-sm"></i>
+                                                </button>
+                                            </div>
+                                            <div className="col-md-12 col-3">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm"
+                                                    onClick={() =>
+                                                        this.handleDelete(
+                                                            match_index
+                                                        )
+                                                    }
+                                                >
+                                                    <i className="far fa-trash-alt fa-sm"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* -------------------- MCQ -------------------- */}
-                                {this.state.match.map((match, match_index) => {
-                                    return (
+                                    {/* ---------- match preview ---------- */}
+                                    <div className="col-md-11 pl-md-0">
                                         <div
-                                            className="row mb-3"
-                                            key={match_index}
+                                            className={`card shadow-sm ${
+                                                this.state.activeMatch ===
+                                                match_index
+                                                    ? "border-primary"
+                                                    : ""
+                                            }`}
                                         >
-                                            {/* ---------- Side buttons ---------- */}
-                                            <div className="col-md-1 mb-1 mb-md-0">
+                                            <div className="card-body">
                                                 <div className="row">
-                                                    <div className="col-md-12 col-3 mb-1">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                        >
-                                                            {match_index <= 8
-                                                                ? `0${
-                                                                      match_index +
-                                                                      1
-                                                                  }`
-                                                                : match_index +
-                                                                  1}
-                                                        </button>
+                                                    {/* ----- Terms & Definition ----- */}
+                                                    <div className="col-md-6 mb-2 mb-md-0">
+                                                        <div className="card bg-light">
+                                                            <div
+                                                                className="card-body py-3"
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: match.match_terms,
+                                                                }}
+                                                            ></div>
+                                                        </div>
                                                     </div>
-                                                    <div className="col-md-12 col-3 mb-1">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                            onClick={() =>
-                                                                this.handleEdit(
-                                                                    match_index
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="far fa-edit fa-sm"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-md-12 col-3 mb-1">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-light bg-white btn-block shadow-sm mr-1"
-                                                            onClick={() =>
-                                                                this.handleCopy(
-                                                                    match_index
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="far fa-copy fa-sm"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-md-12 col-3">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-light bg-white btn-block shadow-sm"
-                                                            onClick={() =>
-                                                                this.handleDelete(
-                                                                    match_index
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="far fa-trash-alt fa-sm"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* ---------- match preview ---------- */}
-                                            <div className="col-md-11 pl-md-0">
-                                                <div
-                                                    className={`card shadow-sm ${
-                                                        this.state
-                                                            .activeMatch ===
-                                                        match_index
-                                                            ? "border-primary"
-                                                            : ""
-                                                    }`}
-                                                >
-                                                    <div className="card-body">
-                                                        <div className="row">
-                                                            {/* ----- Terms & Definition ----- */}
-                                                            <div className="col-md-6 mb-2 mb-md-0">
-                                                                <div className="card bg-light">
-                                                                    <div
-                                                                        className="card-body py-3"
-                                                                        dangerouslySetInnerHTML={{
-                                                                            __html: match.match_terms,
-                                                                        }}
-                                                                    ></div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-md-6">
-                                                                <div className="card bg-light">
-                                                                    <div
-                                                                        className="card-body py-3"
-                                                                        dangerouslySetInnerHTML={{
-                                                                            __html: match.match_definition,
-                                                                        }}
-                                                                    ></div>
-                                                                </div>
-                                                            </div>
+                                                    <div className="col-md-6">
+                                                        <div className="card bg-light">
+                                                            <div
+                                                                className="card-body py-3"
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: match.match_definition,
+                                                                }}
+                                                            ></div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                    </div>
+                                </div>
+                            );
+                        })}
 
+                        <button
+                            className="btn btn-primary btn-block shadow-none"
+                            onClick={this.handleAddMatch}
+                        >
+                            Add +
+                        </button>
+                    </div>
+
+                    {/* ---------- Settings column ---------- */}
+                    {this.state.showEdit_option ? (
+                        <div className="col-md-3 content-edit">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
                                 <button
-                                    className="btn btn-primary btn-block shadow-none"
-                                    onClick={this.handleAddMatch}
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handleSubmit}
                                 >
-                                    Add +
+                                    Save
+                                </button>
+                                <button
+                                    className="btn btn-link btn-sm shadow-none"
+                                    onClick={() => {
+                                        this.setState({
+                                            showEdit_option: false,
+                                            contentCollapsed: true,
+                                            activeMatch: "",
+                                        });
+                                    }}
+                                >
+                                    Close
                                 </button>
                             </div>
 
-                            {/* ---------- Settings column ---------- */}
-                            {this.state.showEdit_option ? (
-                                <div className="col-md-3 content-edit">
-                                    <div className="d-flex justify-content-between align-items-center mb-2">
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handleSubmit}
-                                        >
-                                            Save
-                                        </button>
-                                        <button
-                                            className="btn btn-link btn-sm shadow-none"
-                                            onClick={() => {
-                                                this.setState({
-                                                    showEdit_option: false,
-                                                    contentCollapsed: true,
-                                                    activeMatch: "",
-                                                });
-                                            }}
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
+                            <Accordion defaultActiveKey="">
+                                {/* ----- Content ----- */}
+                                <Card className="shadow-sm mb-2">
+                                    <Accordion.Toggle
+                                        as={Card.Body}
+                                        variant="link"
+                                        eventKey="0"
+                                        className="text-dark"
+                                        style={{ cursor: "default" }}
+                                        onClick={this.toggleCollapse}
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            Content
+                                            {this.state.contentCollapsed ? (
+                                                <i className="fas fa-angle-right "></i>
+                                            ) : (
+                                                <i className="fas fa-angle-down "></i>
+                                            )}
+                                        </div>
+                                    </Accordion.Toggle>
 
-                                    <Accordion defaultActiveKey="">
-                                        {/* ----- Content ----- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="0"
-                                                className="text-dark"
-                                                style={{ cursor: "default" }}
-                                                onClick={this.toggleCollapse}
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Content
-                                                    {this.state
-                                                        .contentCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
-                                                    )}
-                                                </div>
-                                            </Accordion.Toggle>
+                                    <Accordion.Collapse eventKey="0">
+                                        <Card.Body className="p-3">
+                                            {/* ---------- Terms ---------- */}
+                                            <div className="form-group">
+                                                <label>Terms</label>
+                                                <CKeditor
+                                                    data={
+                                                        data[
+                                                            this.state
+                                                                .activeMatch
+                                                        ].match_terms
+                                                    }
+                                                    onChange={this.handleTerms}
+                                                />
+                                            </div>
 
-                                            <Accordion.Collapse eventKey="0">
-                                                <Card.Body className="p-3">
-                                                    {/* ---------- Terms ---------- */}
-                                                    <div className="form-group">
-                                                        <label>Terms</label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
-                                                                    this.state
-                                                                        .activeMatch
-                                                                ].match_terms
-                                                            }
-                                                            onChange={
-                                                                this.handleTerms
-                                                            }
-                                                        />
-                                                    </div>
-
-                                                    {/* ---------- Definition ---------- */}
-                                                    <div className="form-group">
-                                                        <label>
-                                                            Definition
-                                                        </label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
-                                                                    this.state
-                                                                        .activeMatch
-                                                                ]
-                                                                    .match_definition
-                                                            }
-                                                            onChange={
-                                                                this
-                                                                    .handleDefinition
-                                                            }
-                                                        />
-                                                    </div>
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-                                    </Accordion>
-                                </div>
-                            ) : (
-                                ""
-                            )}
+                                            {/* ---------- Definition ---------- */}
+                                            <div className="form-group">
+                                                <label>Definition</label>
+                                                <CKeditor
+                                                    data={
+                                                        data[
+                                                            this.state
+                                                                .activeMatch
+                                                        ].match_definition
+                                                    }
+                                                    onChange={
+                                                        this.handleDefinition
+                                                    }
+                                                />
+                                            </div>
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+                            </Accordion>
                         </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                    </div>
+                    ) : (
+                        ""
+                    )}
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

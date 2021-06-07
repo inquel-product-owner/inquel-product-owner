@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import SideNav from "./shared/sidenav";
-import Header from "./shared/navbar";
+import Wrapper from "./wrapper";
 import { Tabs, Tab } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Loading from "../common/loader";
@@ -13,7 +12,6 @@ class Leaderboard extends Component {
     constructor() {
         super();
         this.state = {
-            showSideNav: false,
             activePage: 1,
             totalCount: 0,
             leaderBoard: [],
@@ -28,12 +26,6 @@ class Leaderboard extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     componentDidMount = () => {
         if (!this.props.location.hash) {
@@ -54,109 +46,77 @@ class Leaderboard extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header name="Leaderboard" togglenav={this.toggleSideNav} />
+            <Wrapper
+                header="Leaderboard"
+                activeLink="leaderboard"
+                history={this.props.history}
+            >
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb">
+                        <li className="breadcrumb-item mb-3">
+                            <Link to="/student">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Leaderboard</li>
+                    </ol>
+                </nav>
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="leaderboard"
-                />
-
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
+                {/* Leaderboard table */}
+                <Tabs
+                    activeKey={
+                        !this.props.location.hash
+                            ? "quiz"
+                            : this.props.location.hash.substring(1)
+                    }
+                    id="uncontrolled-tab-example"
+                    onSelect={this.handleSelect}
                 >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        {/* Breadcrumb */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb">
-                                <li className="breadcrumb-item mb-3">
-                                    <Link to="/student">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Leaderboard
-                                </li>
-                            </ol>
-                        </nav>
-
-                        {/* Leaderboard table */}
-                        <Tabs
-                            activeKey={
-                                !this.props.location.hash
-                                    ? "quiz"
-                                    : this.props.location.hash.substring(1)
-                            }
-                            id="uncontrolled-tab-example"
-                            onSelect={this.handleSelect}
-                        >
-                            {/* Quiz Table */}
-                            <Tab eventKey="quiz" title="Quiz Masters">
-                                <div className="card shadow-sm">
-                                    <LeaderboardTable
-                                        leaderBoard={this.state.leaderBoard}
+                    {/* Quiz Table */}
+                    <Tab eventKey="quiz" title="Quiz Masters">
+                        <div className="card shadow-sm">
+                            <LeaderboardTable
+                                leaderBoard={this.state.leaderBoard}
+                            />
+                            <div className="card-body p-3">
+                                {this.state.totalCount > paginationCount ? (
+                                    <Paginations
+                                        activePage={this.state.activePage}
+                                        totalItemsCount={this.state.totalCount}
+                                        onChange={this.handlePageChange.bind(
+                                            this
+                                        )}
                                     />
-                                    <div className="card-body p-3">
-                                        {this.state.totalCount >
-                                        paginationCount ? (
-                                            <Paginations
-                                                activePage={
-                                                    this.state.activePage
-                                                }
-                                                totalItemsCount={
-                                                    this.state.totalCount
-                                                }
-                                                onChange={this.handlePageChange.bind(
-                                                    this
-                                                )}
-                                            />
-                                        ) : null}
-                                    </div>
-                                </div>
-                            </Tab>
+                                ) : null}
+                            </div>
+                        </div>
+                    </Tab>
 
-                            {/* Course toppers table */}
-                            <Tab eventKey="course" title="Course Toppers">
-                                <div className="card shadow-sm">
-                                    <LeaderboardTable
-                                        leaderBoard={this.state.leaderBoard}
+                    {/* Course toppers table */}
+                    <Tab eventKey="course" title="Course Toppers">
+                        <div className="card shadow-sm">
+                            <LeaderboardTable
+                                leaderBoard={this.state.leaderBoard}
+                            />
+                            <div className="card-body p-3">
+                                {this.state.totalCount > paginationCount ? (
+                                    <Paginations
+                                        activePage={this.state.activePage}
+                                        totalItemsCount={this.state.totalCount}
+                                        onChange={this.handlePageChange.bind(
+                                            this
+                                        )}
                                     />
-                                    <div className="card-body p-3">
-                                        {this.state.totalCount >
-                                        paginationCount ? (
-                                            <Paginations
-                                                activePage={
-                                                    this.state.activePage
-                                                }
-                                                totalItemsCount={
-                                                    this.state.totalCount
-                                                }
-                                                onChange={this.handlePageChange.bind(
-                                                    this
-                                                )}
-                                            />
-                                        ) : null}
-                                    </div>
-                                </div>
-                            </Tab>
-                        </Tabs>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                    </div>
-                </div>
-            </div>
+                                ) : null}
+                            </div>
+                        </div>
+                    </Tab>
+                </Tabs>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { Modal, Alert, Spinner } from "react-bootstrap";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/constant.js";
@@ -343,7 +342,6 @@ class HODGroupConfiguration extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             groupItem: [],
             activeGroupPage: 1,
@@ -368,12 +366,6 @@ class HODGroupConfiguration extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleModal = () => {
         this.setState({
@@ -449,10 +441,11 @@ class HODGroupConfiguration extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header name="Groups" togglenav={this.toggleSideNav} />
-
+            <Wrapper
+                header="Groups"
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -471,12 +464,6 @@ class HODGroupConfiguration extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
                 {/* Add Group modal */}
                 {this.state.showModal ? (
                     <GroupModal
@@ -493,76 +480,56 @@ class HODGroupConfiguration extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-6">
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Group Configuration
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-6 text-right">
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
-                            onClick={this.props.history.goBack}
+                            className="btn btn-primary btn-sm shadow-none"
+                            onClick={this.toggleModal}
                         >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                            Add new
                         </button>
-
-                        <div className="row align-items-center mb-3">
-                            <div className="col-6">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            Group Configuration
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-6 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.toggleModal}
-                                >
-                                    Add new
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="card shadow-sm">
-                            <GroupTable
-                                groupItems={this.state.groupItem}
-                                path={`hod/group/${this.groupId}`}
-                                valid_from={true}
-                                valid_to={true}
-                                teacher={true}
-                                student={true}
-                                details={true}
-                            />
-                            <div className="card-body p-3">
-                                {this.state.totalGroupCount >
-                                paginationCount ? (
-                                    <Paginations
-                                        activePage={this.state.activeGroupPage}
-                                        totalItemsCount={
-                                            this.state.totalGroupCount
-                                        }
-                                        onChange={this.handleGroupPageChange.bind(
-                                            this
-                                        )}
-                                    />
-                                ) : null}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                <div className="card shadow-sm">
+                    <GroupTable
+                        groupItems={this.state.groupItem}
+                        path={`hod/group/${this.groupId}`}
+                        valid_from={true}
+                        valid_to={true}
+                        teacher={true}
+                        student={true}
+                        details={true}
+                    />
+                    <div className="card-body p-3">
+                        {this.state.totalGroupCount > paginationCount ? (
+                            <Paginations
+                                activePage={this.state.activeGroupPage}
+                                totalItemsCount={this.state.totalGroupCount}
+                                onChange={this.handleGroupPageChange.bind(this)}
+                            />
+                        ) : null}
+                    </div>
+                </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

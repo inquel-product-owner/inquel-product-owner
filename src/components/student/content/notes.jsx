@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { Accordion, Card } from "react-bootstrap";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
@@ -18,7 +17,6 @@ class Notes extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             collapsed: [],
             topicEventKey: [],
 
@@ -47,56 +45,62 @@ class Notes extends Component {
         pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
-
     toggleCollapse = (index, chapter_id) => {
-        let collapsed = [...this.state.collapsed];
-        for (let i = 0; i < collapsed.length; i++) {
-            if (i !== index) {
-                collapsed[i] = true;
-            }
-        }
-        collapsed[index] = !collapsed[index];
-
-        let topicName = "";
-        let topic_num = "";
-        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
-            // extract topic name from the current chapter
-            if (this.props.subject_data.chapters[i].chapter_id === chapter_id) {
-                topicName =
-                    this.props.subject_data.chapters[i].topics.length !== 0
-                        ? this.props.subject_data.chapters[i].topics[0]
-                              .chapter_structure[0].topic_name
-                        : "Topic";
-                topic_num =
-                    this.props.subject_data.chapters[i].topics.length !== 0
-                        ? this.props.subject_data.chapters[i].topics[0]
-                              .chapter_structure[0].topic_num
-                        : "1.1";
-            } else {
-                continue;
-            }
-        }
-        this.setState(
-            {
-                collapsed: collapsed,
-                chapterId: chapter_id,
-                topicName: topicName,
-                topic_num: topic_num,
-            },
-            () => {
-                if (collapsed[index] === false) {
-                    this.setState({
-                        page_loading: true,
-                    });
-                    this.loadNotesData();
+        try {
+            let collapsed = [...this.state.collapsed];
+            for (let i = 0; i < collapsed.length; i++) {
+                if (i !== index) {
+                    collapsed[i] = true;
                 }
             }
-        );
+            collapsed[index] = !collapsed[index];
+
+            let topicName = "";
+            let topic_num = "";
+            for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
+                // extract topic name from the current chapter
+                if (
+                    this.props.subject_data.chapters[i].chapter_id ===
+                    chapter_id
+                ) {
+                    topicName =
+                        this.props.subject_data.chapters[i].topics.length !== 0
+                            ? this.props.subject_data.chapters[i].topics[0]
+                                  .topic_name
+                            : "Topic";
+                    topic_num =
+                        this.props.subject_data.chapters[i].topics.length !== 0
+                            ? this.props.subject_data.chapters[i].topics[0]
+                                  .topic_num
+                            : "1.1";
+                } else {
+                    continue;
+                }
+            }
+            this.setState(
+                {
+                    collapsed: collapsed,
+                    chapterId: chapter_id,
+                    topicName: topicName,
+                    topic_num: topic_num,
+                },
+                () => {
+                    if (collapsed[index] === false) {
+                        this.setState({
+                            page_loading: true,
+                        });
+                        this.loadNotesData();
+                    }
+                }
+            );
+        } catch (error) {
+            console.error(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        }
     };
 
     toggleTopicCollapse = (key, chapter_index) => {
@@ -157,33 +161,43 @@ class Notes extends Component {
         let topicEventKey = [];
         let topicName = "";
         let topic_num = "";
-        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
-            // adds collapse state
-            collapsed.push(
-                this.props.subject_data.chapters[i].chapter_id ===
+
+        try {
+            for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
+                // adds collapse state
+                collapsed.push(
+                    this.props.subject_data.chapters[i].chapter_id ===
+                        this.state.chapterId
+                        ? false
+                        : true
+                );
+                topicEventKey.push([]);
+                // extract topic name from the current chapter
+                if (
+                    this.props.subject_data.chapters[i].chapter_id ===
                     this.state.chapterId
-                    ? false
-                    : true
-            );
-            topicEventKey.push([]);
-            // extract topic name from the current chapter
-            if (
-                this.props.subject_data.chapters[i].chapter_id ===
-                this.state.chapterId
-            ) {
-                topicName =
-                    this.props.subject_data.chapters[i].topics.length !== 0
-                        ? this.props.subject_data.chapters[i].topics[0]
-                              .chapter_structure[0].topic_name
-                        : "Topic";
-                topic_num =
-                    this.props.subject_data.chapters[i].topics.length !== 0
-                        ? this.props.subject_data.chapters[i].topics[0]
-                              .chapter_structure[0].topic_num
-                        : "1.1";
-            } else {
-                continue;
+                ) {
+                    topicName =
+                        this.props.subject_data.chapters[i].topics.length !== 0
+                            ? this.props.subject_data.chapters[i].topics[0]
+                                  .topic_name
+                            : "Topic";
+                    topic_num =
+                        this.props.subject_data.chapters[i].topics.length !== 0
+                            ? this.props.subject_data.chapters[i].topics[0]
+                                  .topic_num
+                            : "1.1";
+                } else {
+                    continue;
+                }
             }
+        } catch (error) {
+            console.error(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
         }
 
         this.setState(
@@ -326,13 +340,11 @@ class Notes extends Component {
     render() {
         document.title = `${this.state.topicName} : Notes - Student | IQLabs`;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -351,293 +363,253 @@ class Notes extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/student">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.subject_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Notes</li>
+                    </ol>
+                </nav>
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        {/* Breadcrumb */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/student">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
+                <div className="card shadow-sm">
+                    <div className="card-body">
+                        <div className="row">
+                            {/* ----- Chapter list ----- */}
+                            <div className="col-md-3 mb-2 mb-md-0 border-right">
+                                <div className="card">
+                                    <Accordion
+                                        defaultActiveKey={this.state.chapterId}
                                     >
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Notes
-                                </li>
-                            </ol>
-                        </nav>
-
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                <div className="row">
-                                    {/* ----- Chapter list ----- */}
-                                    <div className="col-md-3 mb-2 mb-md-0 border-right">
-                                        <div className="card">
-                                            <Accordion
-                                                defaultActiveKey={
-                                                    this.state.chapterId
-                                                }
-                                            >
-                                                {this.props.subject_data &&
-                                                Object.keys(this.props.subject_data)
-                                                    .length !== 0
-                                                    ? (
-                                                          this.props.subject_data
-                                                              .chapters || []
-                                                      ).map((data, index) => {
-                                                          return (
-                                                              <Card
-                                                                  className="mb-1"
-                                                                  key={index}
-                                                              >
-                                                                  <Accordion.Toggle
-                                                                      as={
-                                                                          Card.Header
-                                                                      }
-                                                                      eventKey={
-                                                                          data.chapter_id
-                                                                      }
-                                                                      className="pinkrange-bg shadow-sm mb-2"
-                                                                      style={{
-                                                                          borderRadius:
-                                                                              "8px",
-                                                                          cursor: "default",
-                                                                      }}
-                                                                      onClick={() =>
-                                                                          this.toggleCollapse(
-                                                                              index,
-                                                                              data.chapter_id
-                                                                          )
-                                                                      }
-                                                                  >
-                                                                      <div className="row align-items-center">
-                                                                          <div className="col-1">
-                                                                              <span>
-                                                                                  <i
-                                                                                      className={`fas fa-chevron-circle-down ${
-                                                                                          this
-                                                                                              .state
-                                                                                              .collapsed[
-                                                                                              index
-                                                                                          ]
-                                                                                              ? "fa-rotate-270"
-                                                                                              : ""
-                                                                                      }`}
-                                                                                  ></i>
-                                                                              </span>
-                                                                          </div>
-                                                                          <div className="col-10 small font-weight-bold-600">
-                                                                              {
-                                                                                  data.chapter_name
-                                                                              }
-                                                                          </div>
-                                                                      </div>
-                                                                  </Accordion.Toggle>
-
-                                                                  <Accordion.Collapse
-                                                                      eventKey={
-                                                                          data.chapter_id
-                                                                      }
-                                                                  >
-                                                                      <Card>
-                                                                          {/* ----- Topic list ----- */}
-                                                                          {(
-                                                                              data.topics ||
-                                                                              []
-                                                                          ).map(
-                                                                              (
-                                                                                  topic,
-                                                                                  topic_index
-                                                                              ) => {
-                                                                                  return (
-                                                                                      <Accordion
-                                                                                          key={
-                                                                                              topic_index
-                                                                                          }
-                                                                                      >
-                                                                                          {this.topic(
-                                                                                              topic,
-                                                                                              topic_index,
-                                                                                              index
-                                                                                          )}
-                                                                                      </Accordion>
-                                                                                  );
-                                                                              }
-                                                                          )}
-                                                                      </Card>
-                                                                  </Accordion.Collapse>
-                                                              </Card>
-                                                          );
-                                                      })
-                                                    : null}
-                                            </Accordion>
-                                        </div>
-                                    </div>
-
-                                    {/* ----- Notes data ----- */}
-
-                                    <div className="col-md-9 pl-md-0">
-                                        <div className="card">
-                                            <div className="card-body py-0">
-                                                {this.state.notesData &&
-                                                this.state.notesData.length !==
-                                                    0
-                                                    ? this.state.notesData.map(
-                                                          (data, index) => {
-                                                              return data.direct_question_urls !==
-                                                                  undefined ? (
-                                                                  <div
-                                                                      className="text-center"
-                                                                      key={
-                                                                          index
-                                                                      }
-                                                                  >
-                                                                      <div id="ResumeContainer py-3">
-                                                                          <Document
-                                                                              file={
-                                                                                  data
-                                                                                      .direct_question_urls[0]
-                                                                              }
-                                                                              onLoadSuccess={
+                                        {this.props.subject_data &&
+                                        Object.keys(this.props.subject_data)
+                                            .length !== 0
+                                            ? (
+                                                  this.props.subject_data
+                                                      .chapters || []
+                                              ).map((data, index) => {
+                                                  return (
+                                                      <Card
+                                                          className="mb-1"
+                                                          key={index}
+                                                      >
+                                                          <Accordion.Toggle
+                                                              as={Card.Header}
+                                                              eventKey={
+                                                                  data.chapter_id
+                                                              }
+                                                              className="pinkrange-bg shadow-sm mb-2"
+                                                              style={{
+                                                                  borderRadius:
+                                                                      "8px",
+                                                                  cursor: "default",
+                                                              }}
+                                                              onClick={() =>
+                                                                  this.toggleCollapse(
+                                                                      index,
+                                                                      data.chapter_id
+                                                                  )
+                                                              }
+                                                          >
+                                                              <div className="row align-items-center">
+                                                                  <div className="col-1">
+                                                                      <span>
+                                                                          <i
+                                                                              className={`fas fa-chevron-circle-down ${
                                                                                   this
-                                                                                      .onDocumentLoadSuccess
-                                                                              }
-                                                                              className={
-                                                                                  "PDFDocument"
-                                                                              }
-                                                                          >
-                                                                              <Page
-                                                                                  pageNumber={
-                                                                                      this
-                                                                                          .state
-                                                                                          .pageNumber
+                                                                                      .state
+                                                                                      .collapsed[
+                                                                                      index
+                                                                                  ]
+                                                                                      ? "fa-rotate-270"
+                                                                                      : ""
+                                                                              }`}
+                                                                          ></i>
+                                                                      </span>
+                                                                  </div>
+                                                                  <div className="col-10 small font-weight-bold-600">
+                                                                      {
+                                                                          data.chapter_name
+                                                                      }
+                                                                  </div>
+                                                              </div>
+                                                          </Accordion.Toggle>
+
+                                                          <Accordion.Collapse
+                                                              eventKey={
+                                                                  data.chapter_id
+                                                              }
+                                                          >
+                                                              <Card>
+                                                                  {/* ----- Topic list ----- */}
+                                                                  {(
+                                                                      data.topics ||
+                                                                      []
+                                                                  ).map(
+                                                                      (
+                                                                          topic,
+                                                                          topic_index
+                                                                      ) => {
+                                                                          return (
+                                                                              <Accordion
+                                                                                  key={
+                                                                                      topic_index
                                                                                   }
-                                                                                  className={
-                                                                                      "PDFPagee shadow"
-                                                                                  }
-                                                                              />
-                                                                          </Document>
-                                                                      </div>
-                                                                      <p className="my-3">
-                                                                          Page{" "}
-                                                                          {
+                                                                              >
+                                                                                  {this.topic(
+                                                                                      topic,
+                                                                                      topic_index,
+                                                                                      index
+                                                                                  )}
+                                                                              </Accordion>
+                                                                          );
+                                                                      }
+                                                                  )}
+                                                              </Card>
+                                                          </Accordion.Collapse>
+                                                      </Card>
+                                                  );
+                                              })
+                                            : null}
+                                    </Accordion>
+                                </div>
+                            </div>
+
+                            {/* ----- Notes data ----- */}
+
+                            <div className="col-md-9 pl-md-0">
+                                <div className="card">
+                                    <div className="card-body py-0">
+                                        {this.state.notesData &&
+                                        this.state.notesData.length !== 0
+                                            ? this.state.notesData.map(
+                                                  (data, index) => {
+                                                      return data.direct_question_urls !==
+                                                          undefined ? (
+                                                          <div
+                                                              className="text-center"
+                                                              key={index}
+                                                          >
+                                                              <div id="ResumeContainer py-3">
+                                                                  <Document
+                                                                      file={
+                                                                          data
+                                                                              .direct_question_urls[0]
+                                                                      }
+                                                                      onLoadSuccess={
+                                                                          this
+                                                                              .onDocumentLoadSuccess
+                                                                      }
+                                                                      className={
+                                                                          "PDFDocument"
+                                                                      }
+                                                                  >
+                                                                      <Page
+                                                                          pageNumber={
                                                                               this
                                                                                   .state
                                                                                   .pageNumber
-                                                                          }{" "}
-                                                                          of{" "}
-                                                                          {
-                                                                              this
-                                                                                  .state
-                                                                                  .numPages
                                                                           }
-                                                                      </p>
-                                                                      <nav>
-                                                                          {this
-                                                                              .state
-                                                                              .numPages >
-                                                                          1 ? (
-                                                                              <>
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm mr-2"
-                                                                                      onClick={
-                                                                                          this
-                                                                                              .goToPrevPage
-                                                                                      }
-                                                                                      disabled={
-                                                                                          this
-                                                                                              .state
-                                                                                              .pageNumber ===
-                                                                                          1
-                                                                                              ? true
-                                                                                              : false
-                                                                                      }
-                                                                                  >
-                                                                                      Prev
-                                                                                  </button>
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm"
-                                                                                      onClick={
-                                                                                          this
-                                                                                              .goToNextPage
-                                                                                      }
-                                                                                      disabled={
-                                                                                          this
-                                                                                              .state
-                                                                                              .numPages ===
-                                                                                          this
-                                                                                              .state
-                                                                                              .pageNumber
-                                                                                              ? true
-                                                                                              : false
-                                                                                      }
-                                                                                  >
-                                                                                      Next
-                                                                                  </button>
-                                                                              </>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
-                                                                      </nav>
-                                                                  </div>
-                                                              ) : (
-                                                                  <div
-                                                                      key={
-                                                                          index
-                                                                      }
-                                                                  >
-                                                                      <div className="h5 font-weight-bold-600 mb-2">
-                                                                          {
-                                                                              data.notes_name
+                                                                          className={
+                                                                              "PDFPagee shadow"
                                                                           }
-                                                                      </div>
-                                                                      <div
-                                                                          dangerouslySetInnerHTML={{
-                                                                              __html: data.notes_content,
-                                                                          }}
-                                                                      ></div>
-                                                                  </div>
-                                                              );
-                                                          }
-                                                      )
-                                                    : "No content to display..."}
-                                            </div>
-                                        </div>
+                                                                      />
+                                                                  </Document>
+                                                              </div>
+                                                              <p className="my-3">
+                                                                  Page{" "}
+                                                                  {
+                                                                      this.state
+                                                                          .pageNumber
+                                                                  }{" "}
+                                                                  of{" "}
+                                                                  {
+                                                                      this.state
+                                                                          .numPages
+                                                                  }
+                                                              </p>
+                                                              <nav>
+                                                                  {this.state
+                                                                      .numPages >
+                                                                  1 ? (
+                                                                      <>
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm mr-2"
+                                                                              onClick={
+                                                                                  this
+                                                                                      .goToPrevPage
+                                                                              }
+                                                                              disabled={
+                                                                                  this
+                                                                                      .state
+                                                                                      .pageNumber ===
+                                                                                  1
+                                                                                      ? true
+                                                                                      : false
+                                                                              }
+                                                                          >
+                                                                              Prev
+                                                                          </button>
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm"
+                                                                              onClick={
+                                                                                  this
+                                                                                      .goToNextPage
+                                                                              }
+                                                                              disabled={
+                                                                                  this
+                                                                                      .state
+                                                                                      .numPages ===
+                                                                                  this
+                                                                                      .state
+                                                                                      .pageNumber
+                                                                                      ? true
+                                                                                      : false
+                                                                              }
+                                                                          >
+                                                                              Next
+                                                                          </button>
+                                                                      </>
+                                                                  ) : (
+                                                                      ""
+                                                                  )}
+                                                              </nav>
+                                                          </div>
+                                                      ) : (
+                                                          <div key={index}>
+                                                              <div className="h5 font-weight-bold-600 mb-2">
+                                                                  {
+                                                                      data.notes_name
+                                                                  }
+                                                              </div>
+                                                              <div
+                                                                  dangerouslySetInnerHTML={{
+                                                                      __html: data.notes_content,
+                                                                  }}
+                                                              ></div>
+                                                          </div>
+                                                      );
+                                                  }
+                                              )
+                                            : "No content to display..."}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

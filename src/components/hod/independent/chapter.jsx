@@ -389,7 +389,6 @@ class HODSubjectChapter extends Component {
                 header={this.props.subject_name}
                 activeLink="dashboard"
                 history={this.props.history}
-                ref={(ref) => (this.wrapper = ref)}
             >
                 {/* Alert message */}
                 <AlertBox
@@ -438,9 +437,17 @@ class HODSubjectChapter extends Component {
                         <button
                             className="btn btn-primary btn-sm shadow-none"
                             onClick={this.handlePublish}
-                            disabled={this.state.chapters.topics ? false : true}
+                            disabled={
+                                this.state.chapters.topics
+                                    ? this.state.chapters.approve
+                                        ? true
+                                        : false
+                                    : true
+                            }
                         >
-                            Approve
+                            {this.state.chapters.approve
+                                ? "Approved"
+                                : "Approve"}
                         </button>
                     </div>
                 </div>
@@ -481,7 +488,7 @@ class HODSubjectChapter extends Component {
                     </div>
                 </div>
 
-                <div className="card shadow-sm" style={{ overflow: "auto" }}>
+                <div className="card shadow-sm overflow-auto">
                     {/* Course details */}
                     <div style={{ minWidth: "1100px" }}>
                         <div className="card-header tomato-bg primary-text font-weight-bold-600">

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
@@ -21,7 +20,6 @@ class HODSimulationSection extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             sections: [
                 {
                     section_id: "",
@@ -51,12 +49,6 @@ class HODSimulationSection extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     // loads filters data
     loadFilterData = () => {
@@ -434,13 +426,11 @@ class HODSimulationSection extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -459,423 +449,386 @@ class HODSimulationSection extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
+                {/* ----- Breadcrumb ----- */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/hod">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to={`/hod/subject/${this.subjectId}`}>
+                                {this.props.subject_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.simulation_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">
+                            {this.props.paper_name}
+                        </li>
+                    </ol>
+                </nav>
 
                 <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
+                    className="card shadow-sm mb-3"
+                    style={{ overflowX: "auto" }}
                 >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                    <div
+                        className="table-responsive"
+                        style={{ minWidth: "1000px" }}
+                    >
+                        <table className="table table-hover">
+                            <thead className="primary-bg text-white">
+                                <tr style={{ whiteSpace: "nowrap" }}>
+                                    <th scope="col">Section Description</th>
+                                    <th scope="col">Question Type</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Total Questions</th>
+                                    <th scope="col">Any Questions</th>
+                                    <th scope="col">Marks</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.state.sections.length !== 0
+                                    ? this.state.sections.map(
+                                          (section, index) => {
+                                              return (
+                                                  <tr key={index}>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              placeholder={`Section Description ${
+                                                                  index + 1
+                                                              }`}
+                                                              value={
+                                                                  section.section_name
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleInput(
+                                                                      index,
+                                                                      event,
+                                                                      "name"
+                                                                  )
+                                                              }
+                                                              required
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <select
+                                                              name="type"
+                                                              id="type"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleType(
+                                                                      index,
+                                                                      event
+                                                                  )
+                                                              }
+                                                              value={
+                                                                  section.question_type
+                                                              }
+                                                              required
+                                                          >
+                                                              <option value="">
+                                                                  Select type
+                                                              </option>
+                                                              {Object.entries(
+                                                                  this.state
+                                                                      .filters
+                                                              ).length !== 0
+                                                                  ? Object.entries(
+                                                                        this
+                                                                            .state
+                                                                            .filters
+                                                                    ).map(
+                                                                        (
+                                                                            [
+                                                                                key,
+                                                                                value,
+                                                                            ],
+                                                                            q_index
+                                                                        ) => {
+                                                                            return key !==
+                                                                                "attempts" ? (
+                                                                                key ===
+                                                                                "type_1" ? (
+                                                                                    this
+                                                                                        .props
+                                                                                        .profile
+                                                                                        .permissions
+                                                                                        .type_1_q ? (
+                                                                                        <option
+                                                                                            value={
+                                                                                                key
+                                                                                            }
+                                                                                            key={
+                                                                                                q_index
+                                                                                            }
+                                                                                        >
+                                                                                            Type
+                                                                                            1
+                                                                                        </option>
+                                                                                    ) : null
+                                                                                ) : key ===
+                                                                                  "type_2" ? (
+                                                                                    this
+                                                                                        .props
+                                                                                        .profile
+                                                                                        .permissions
+                                                                                        .type_2_q ? (
+                                                                                        <option
+                                                                                            value={
+                                                                                                key
+                                                                                            }
+                                                                                            key={
+                                                                                                q_index
+                                                                                            }
+                                                                                        >
+                                                                                            Type
+                                                                                            2
+                                                                                        </option>
+                                                                                    ) : null
+                                                                                ) : null
+                                                                            ) : null;
+                                                                        }
+                                                                    )
+                                                                  : null}
+                                                          </select>
+                                                      </td>
+                                                      <td>
+                                                          <select
+                                                              name="category"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleCategory(
+                                                                      index,
+                                                                      event
+                                                                  )
+                                                              }
+                                                              value={
+                                                                  section.category
+                                                              }
+                                                              disabled={
+                                                                  section.question_type ===
+                                                                  ""
+                                                                      ? true
+                                                                      : false
+                                                              }
+                                                              required
+                                                          >
+                                                              <option value="">
+                                                                  Select
+                                                                  category
+                                                              </option>
+                                                              {Object.entries(
+                                                                  this.state
+                                                                      .filters
+                                                              ).length !== 0
+                                                                  ? this.state
+                                                                        .filters[
+                                                                        section
+                                                                            .question_type
+                                                                    ] !==
+                                                                    undefined
+                                                                      ? this.state.filters[
+                                                                            section
+                                                                                .question_type
+                                                                        ].category.map(
+                                                                            (
+                                                                                data,
+                                                                                c_index
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        value={
+                                                                                            data ||
+                                                                                            ""
+                                                                                        }
+                                                                                        key={
+                                                                                            c_index
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            data
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )
+                                                                      : null
+                                                                  : null}
+                                                          </select>
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              className="form-control form-control-sm border-secondary"
+                                                              type="text"
+                                                              value={
+                                                                  section.total_questions
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleInput(
+                                                                      index,
+                                                                      event,
+                                                                      "questions"
+                                                                  )
+                                                              }
+                                                              placeholder="Enter total questions"
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              className="form-control form-control-sm border-secondary"
+                                                              type="text"
+                                                              value={
+                                                                  section.any_questions ||
+                                                                  ""
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleInput(
+                                                                      index,
+                                                                      event,
+                                                                      "any_questions"
+                                                                  )
+                                                              }
+                                                              placeholder="Enter any questions"
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              className="form-control form-control-sm border-secondary"
+                                                              type="text"
+                                                              value={
+                                                                  section.marks
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleInput(
+                                                                      index,
+                                                                      event,
+                                                                      "marks"
+                                                                  )
+                                                              }
+                                                              placeholder="Enter marks"
+                                                          />
+                                                      </td>
+                                                      <td className="d-flex justify-content-end">
+                                                          {section.section_id !==
+                                                          "" ? (
+                                                              <Link
+                                                                  to={`${
+                                                                      this.props
+                                                                          .match
+                                                                          .url
+                                                                  }/section/${
+                                                                      section.section_id
+                                                                  }/${
+                                                                      section.question_type ===
+                                                                      "type_1"
+                                                                          ? "type1"
+                                                                          : "type2"
+                                                                  }`}
+                                                              >
+                                                                  <button
+                                                                      className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                      onClick={() => {
+                                                                          storeDispatch(
+                                                                              SECTION,
+                                                                              section.section_name
+                                                                          );
+                                                                          storeDispatch(
+                                                                              TEMP,
+                                                                              section
+                                                                          );
+                                                                      }}
+                                                                  >
+                                                                      Add+
+                                                                  </button>
+                                                              </Link>
+                                                          ) : null}
 
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/hod">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link to={`/hod/subject/${this.subjectId}`}>
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.simulation_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    {this.props.paper_name}
-                                </li>
-                            </ol>
-                        </nav>
+                                                          <Dropdown>
+                                                              <Dropdown.Toggle
+                                                                  variant="white"
+                                                                  className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                              >
+                                                                  <i className="fas fa-ellipsis-v"></i>
+                                                              </Dropdown.Toggle>
 
-                        <div
-                            className="card shadow-sm mb-3"
-                            style={{ overflowX: "auto" }}
-                        >
-                            <div
-                                className="table-responsive"
-                                style={{ minWidth: "1000px" }}
-                            >
-                                <table className="table table-hover">
-                                    <thead className="primary-bg text-white">
-                                        <tr style={{ whiteSpace: "nowrap" }}>
-                                            <th scope="col">
-                                                Section Description
-                                            </th>
-                                            <th scope="col">Question Type</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Total Questions</th>
-                                            <th scope="col">Any Questions</th>
-                                            <th scope="col">Marks</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.state.sections.length !== 0
-                                            ? this.state.sections.map(
-                                                  (section, index) => {
-                                                      return (
-                                                          <tr key={index}>
-                                                              <td>
-                                                                  <input
-                                                                      type="text"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      placeholder={`Section Description ${
-                                                                          index +
-                                                                          1
-                                                                      }`}
-                                                                      value={
-                                                                          section.section_name
-                                                                      }
-                                                                      onChange={(
+                                                              <Dropdown.Menu
+                                                                  className={`${
+                                                                      this.state
+                                                                          .sections
+                                                                          .length <=
+                                                                      2
+                                                                          ? "position-fixed"
+                                                                          : "position-absolute"
+                                                                  }`}
+                                                              >
+                                                                  <Dropdown.Item
+                                                                      onClick={(
                                                                           event
                                                                       ) =>
-                                                                          this.handleInput(
-                                                                              index,
-                                                                              event,
-                                                                              "name"
-                                                                          )
-                                                                      }
-                                                                      required
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <select
-                                                                      name="type"
-                                                                      id="type"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleType(
+                                                                          this.handleSubmit(
                                                                               index,
                                                                               event
                                                                           )
                                                                       }
-                                                                      value={
-                                                                          section.question_type
-                                                                      }
-                                                                      required
                                                                   >
-                                                                      <option value="">
-                                                                          Select
-                                                                          type
-                                                                      </option>
-                                                                      {Object.entries(
-                                                                          this
-                                                                              .state
-                                                                              .filters
-                                                                      )
-                                                                          .length !==
-                                                                      0
-                                                                          ? Object.entries(
-                                                                                this
-                                                                                    .state
-                                                                                    .filters
-                                                                            ).map(
-                                                                                (
-                                                                                    [
-                                                                                        key,
-                                                                                        value,
-                                                                                    ],
-                                                                                    q_index
-                                                                                ) => {
-                                                                                    return key !==
-                                                                                        "attempts" ? (
-                                                                                        key ===
-                                                                                        "type_1" ? (
-                                                                                            this
-                                                                                                .props
-                                                                                                .profile
-                                                                                                .permissions
-                                                                                                .type_1_q ? (
-                                                                                                <option
-                                                                                                    value={
-                                                                                                        key
-                                                                                                    }
-                                                                                                    key={
-                                                                                                        q_index
-                                                                                                    }
-                                                                                                >
-                                                                                                    Type
-                                                                                                    1
-                                                                                                </option>
-                                                                                            ) : null
-                                                                                        ) : key ===
-                                                                                          "type_2" ? (
-                                                                                            this
-                                                                                                .props
-                                                                                                .profile
-                                                                                                .permissions
-                                                                                                .type_2_q ? (
-                                                                                                <option
-                                                                                                    value={
-                                                                                                        key
-                                                                                                    }
-                                                                                                    key={
-                                                                                                        q_index
-                                                                                                    }
-                                                                                                >
-                                                                                                    Type
-                                                                                                    2
-                                                                                                </option>
-                                                                                            ) : null
-                                                                                        ) : null
-                                                                                    ) : null;
-                                                                                }
-                                                                            )
-                                                                          : null}
-                                                                  </select>
-                                                              </td>
-                                                              <td>
-                                                                  <select
-                                                                      name="category"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleCategory(
+                                                                      <i className="far fa-save fa-sm mr-1"></i>{" "}
+                                                                      Save
+                                                                  </Dropdown.Item>
+                                                                  <Dropdown.Item
+                                                                      onClick={() =>
+                                                                          this.handleDelete(
                                                                               index,
-                                                                              event
-                                                                          )
-                                                                      }
-                                                                      value={
-                                                                          section.category
-                                                                      }
-                                                                      disabled={
-                                                                          section.question_type ===
-                                                                          ""
-                                                                              ? true
-                                                                              : false
-                                                                      }
-                                                                      required
-                                                                  >
-                                                                      <option value="">
-                                                                          Select
-                                                                          category
-                                                                      </option>
-                                                                      {Object.entries(
-                                                                          this
-                                                                              .state
-                                                                              .filters
-                                                                      )
-                                                                          .length !==
-                                                                      0
-                                                                          ? this
-                                                                                .state
-                                                                                .filters[
-                                                                                section
-                                                                                    .question_type
-                                                                            ] !==
-                                                                            undefined
-                                                                              ? this.state.filters[
-                                                                                    section
-                                                                                        .question_type
-                                                                                ].category.map(
-                                                                                    (
-                                                                                        data,
-                                                                                        c_index
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <option
-                                                                                                value={
-                                                                                                    data ||
-                                                                                                    ""
-                                                                                                }
-                                                                                                key={
-                                                                                                    c_index
-                                                                                                }
-                                                                                            >
-                                                                                                {
-                                                                                                    data
-                                                                                                }
-                                                                                            </option>
-                                                                                        );
-                                                                                    }
-                                                                                )
-                                                                              : null
-                                                                          : null}
-                                                                  </select>
-                                                              </td>
-                                                              <td>
-                                                                  <input
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      type="text"
-                                                                      value={
-                                                                          section.total_questions
-                                                                      }
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleInput(
-                                                                              index,
-                                                                              event,
-                                                                              "questions"
-                                                                          )
-                                                                      }
-                                                                      placeholder="Enter total questions"
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <input
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      type="text"
-                                                                      value={
-                                                                          section.any_questions ||
-                                                                          ""
-                                                                      }
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleInput(
-                                                                              index,
-                                                                              event,
-                                                                              "any_questions"
-                                                                          )
-                                                                      }
-                                                                      placeholder="Enter any questions"
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <input
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      type="text"
-                                                                      value={
-                                                                          section.marks
-                                                                      }
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleInput(
-                                                                              index,
-                                                                              event,
-                                                                              "marks"
-                                                                          )
-                                                                      }
-                                                                      placeholder="Enter marks"
-                                                                  />
-                                                              </td>
-                                                              <td className="d-flex justify-content-end">
-                                                                  {section.section_id !==
-                                                                  "" ? (
-                                                                      <Link
-                                                                          to={`${
-                                                                              this
-                                                                                  .props
-                                                                                  .match
-                                                                                  .url
-                                                                          }/section/${
                                                                               section.section_id
-                                                                          }/${
-                                                                              section.question_type ===
-                                                                              "type_1"
-                                                                                  ? "type1"
-                                                                                  : "type2"
-                                                                          }`}
-                                                                      >
-                                                                          <button
-                                                                              className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                              onClick={() => {
-                                                                                  storeDispatch(
-                                                                                      SECTION,
-                                                                                      section.section_name
-                                                                                  );
-                                                                                  storeDispatch(
-                                                                                      TEMP,
-                                                                                      section
-                                                                                  );
-                                                                              }}
-                                                                          >
-                                                                              Add+
-                                                                          </button>
-                                                                      </Link>
-                                                                  ) : null}
-
-                                                                  <Dropdown>
-                                                                      <Dropdown.Toggle
-                                                                          variant="white"
-                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
-                                                                      >
-                                                                          <i className="fas fa-ellipsis-v"></i>
-                                                                      </Dropdown.Toggle>
-
-                                                                      <Dropdown.Menu
-                                                                          className={`dropdown-menu-btn ${
-                                                                              this
-                                                                                  .state
-                                                                                  .sections
-                                                                                  .length <=
-                                                                              2
-                                                                                  ? "position-fixed"
-                                                                                  : "position-absolute"
-                                                                          }`}
-                                                                      >
-                                                                          <Dropdown.Item
-                                                                              onClick={(
-                                                                                  event
-                                                                              ) =>
-                                                                                  this.handleSubmit(
-                                                                                      index,
-                                                                                      event
-                                                                                  )
-                                                                              }
-                                                                          >
-                                                                              <i className="far fa-save fa-sm mr-1"></i>{" "}
-                                                                              Save
-                                                                          </Dropdown.Item>
-                                                                          <Dropdown.Item
-                                                                              onClick={() =>
-                                                                                  this.handleDelete(
-                                                                                      index,
-                                                                                      section.section_id
-                                                                                  )
-                                                                              }
-                                                                          >
-                                                                              <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
-                                                                              Delete
-                                                                          </Dropdown.Item>
-                                                                      </Dropdown.Menu>
-                                                                  </Dropdown>
-                                                              </td>
-                                                          </tr>
-                                                      );
-                                                  }
-                                              )
-                                            : ""}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <button
-                            className="btn btn-light bg-white btn-block shadow-sm shadow-none"
-                            onClick={this.handleAdd}
-                        >
-                            Add Section +
-                        </button>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                                                                          )
+                                                                      }
+                                                                  >
+                                                                      <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                      Delete
+                                                                  </Dropdown.Item>
+                                                              </Dropdown.Menu>
+                                                          </Dropdown>
+                                                      </td>
+                                                  </tr>
+                                              );
+                                          }
+                                      )
+                                    : ""}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
+
+                <button
+                    className="btn btn-light bg-white btn-block shadow-sm shadow-none"
+                    onClick={this.handleAdd}
+                >
+                    Add Section +
+                </button>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

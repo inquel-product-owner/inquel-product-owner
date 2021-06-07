@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
+import Wrapper from "../wrapper";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../common/alert";
 import Loading from "../../common/loader";
@@ -18,7 +17,6 @@ class HODSimulationPaperPreview extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             data: [],
 
             errorMsg: "",
@@ -37,12 +35,6 @@ class HODSimulationPaperPreview extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     loadCycleTestData = () => {
         fetch(
@@ -84,13 +76,11 @@ class HODSimulationPaperPreview extends Component {
     render() {
         document.title = `${this.props.simulation_name} - HOD | IQLabs`;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.course_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.course_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -109,121 +99,80 @@ class HODSimulationPaperPreview extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
+                {/* ----- Breadcrumb ----- */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/hod">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.course_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">
+                            {this.props.simulation_name}
+                        </li>
+                    </ol>
+                </nav>
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/hod">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.course_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    {this.props.simulation_name}
-                                </li>
-                            </ol>
-                        </nav>
-
-                        <div className="card shadow-sm">
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead className="primary-bg text-white">
-                                        <tr style={{ whiteSpace: "nowrap" }}>
-                                            <th scope="col">
-                                                Simulation Exams
-                                            </th>
-                                            <th scope="col">Type</th>
-                                            <th scope="col">Duration</th>
-                                            <th scope="col">Total marks</th>
-                                            <th
-                                                scope="col"
-                                                className="text-right"
-                                            >
-                                                Action
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {(this.state.data || []).map(
-                                            (data, index) => {
-                                                return (
-                                                    <tr
-                                                        key={index}
-                                                        style={{
-                                                            whiteSpace:
-                                                                "nowrap",
+                <div className="card shadow-sm">
+                    <div className="table-responsive">
+                        <table className="table">
+                            <thead className="primary-bg text-white">
+                                <tr style={{ whiteSpace: "nowrap" }}>
+                                    <th scope="col">Simulation Exams</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Duration</th>
+                                    <th scope="col">Total marks</th>
+                                    <th scope="col" className="text-right">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(this.state.data || []).map((data, index) => {
+                                    return (
+                                        <tr
+                                            key={index}
+                                            style={{
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            <td>{data.paper_name}</td>
+                                            <td>{data.paper_type}</td>
+                                            <td>{data.time_duration}</td>
+                                            <td>{data.total_marks}</td>
+                                            <td className="text-right">
+                                                <Link
+                                                    to={`${this.props.match.url}/paper/${data.paper_id}`}
+                                                >
+                                                    <button
+                                                        className="btn btn-primary-invert btn-sm shadow-none"
+                                                        onClick={() => {
+                                                            storeDispatch(
+                                                                PAPER,
+                                                                data.paper_name
+                                                            );
                                                         }}
                                                     >
-                                                        <td>
-                                                            {data.paper_name}
-                                                        </td>
-                                                        <td>
-                                                            {data.paper_type}
-                                                        </td>
-                                                        <td>
-                                                            {data.time_duration}
-                                                        </td>
-                                                        <td>
-                                                            {data.total_marks}
-                                                        </td>
-                                                        <td className="text-right">
-                                                            <Link
-                                                                to={`${this.props.match.url}/paper/${data.paper_id}`}
-                                                            >
-                                                                <button
-                                                                    className="btn btn-primary-invert btn-sm shadow-none"
-                                                                    onClick={() => {
-                                                                        storeDispatch(
-                                                                            PAPER,
-                                                                            data.paper_name
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    View
-                                                                </button>
-                                                            </Link>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            }
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                                                        View
+                                                    </button>
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

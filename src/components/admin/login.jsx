@@ -172,10 +172,9 @@ class AdminLogin extends Component {
                                                     Password
                                                 </label>
                                                 <div
-                                                    className="input-group form-shadow"
+                                                    className="input-group form-shadow overflow-hidden"
                                                     style={{
                                                         borderRadius: "6px",
-                                                        overflow: "hidden",
                                                     }}
                                                 >
                                                     <input

@@ -954,7 +954,7 @@ const DiscountTable = (props) => {
                                 <td>{list.fixed_price}</td>
                                 <td>{list.currency}</td>
                                 <td>
-                                    <Dropdown>
+                                    <Dropdown drop="left" key="left">
                                         <Dropdown.Toggle
                                             variant="Secondary"
                                             className="btn btn-outline-secondary btn-sm shadow-none caret-off"
@@ -962,13 +962,7 @@ const DiscountTable = (props) => {
                                             <i className="fas fa-ellipsis-h"></i>
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu
-                                            className={`dropdown-menu-btn ${
-                                                props.state.data.length <= 2
-                                                    ? "position-fixed"
-                                                    : "position-absolute"
-                                            }`}
-                                        >
+                                        <Dropdown.Menu>
                                             <Dropdown.Item
                                                 onClick={() =>
                                                     props.handleEdit(list)

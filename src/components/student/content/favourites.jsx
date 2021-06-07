@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
+import Wrapper from "../wrapper";
 import { Link } from "react-router-dom";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
@@ -18,7 +17,6 @@ class Favourites extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             favouritesData: {},
 
@@ -43,12 +41,6 @@ class Favourites extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleCollapse = (index, chapter_id, chapter_name) => {
         this.setState(
@@ -158,16 +150,20 @@ class Favourites extends Component {
     loopSubjectData = (topic_num) => {
         let topic_name = "";
 
-        this.props.subject_data.chapters.forEach((chapter) => {
-            if (chapter.chapter_id === this.state.chapterId) {
-                chapter.topics.forEach((topic) => {
-                    topic_name = this.getTopicName(
-                        topic.chapter_structure,
-                        topic_num
-                    );
-                });
-            }
-        });
+        try {
+            this.props.subject_data.chapters.forEach((chapter) => {
+                if (chapter.chapter_id === this.state.chapterId) {
+                    topic_name = this.getTopicName(chapter.topics, topic_num);
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        }
 
         return topic_name;
     };
@@ -182,13 +178,11 @@ class Favourites extends Component {
     render() {
         document.title = `${this.state.chapter_name} : Favourites - Student | IQLabs`;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -207,208 +201,171 @@ class Favourites extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
+                {/* ----- Breadcrumb ----- */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/student">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.subject_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Favourites</li>
+                    </ol>
+                </nav>
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                <div className="card shadow-sm">
+                    <div className="card-body">
+                        <div className="row">
+                            {/* ---------- Chapter list ---------- */}
+                            <div className="col-md-3 mb-2 mb-md-0 border-right">
+                                <div className="card">
+                                    {this.props.subject_data &&
+                                    Object.keys(this.props.subject_data)
+                                        .length !== 0
+                                        ? (
+                                              this.props.subject_data
+                                                  .chapters || []
+                                          ).map((data, index) => {
+                                              return (
+                                                  <div
+                                                      className={`card card-body ${
+                                                          this.state
+                                                              .selectedChapter ===
+                                                          `chapter-${index}`
+                                                              ? "pinkrange-bg"
+                                                              : "light-bg"
+                                                      } font-weight-bold-600 primary-text small shadow-sm mb-2`}
+                                                      key={index}
+                                                      onClick={() =>
+                                                          this.toggleCollapse(
+                                                              index,
+                                                              data.chapter_id,
+                                                              data.chapter_name
+                                                          )
+                                                      }
+                                                      style={{
+                                                          paddingBottom: "13px",
+                                                          paddingTop: "13px",
+                                                          cursor: "default",
+                                                      }}
+                                                  >
+                                                      {data.chapter_name}
+                                                  </div>
+                                              );
+                                          })
+                                        : null}
+                                </div>
+                            </div>
 
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/student">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Favourites
-                                </li>
-                            </ol>
-                        </nav>
+                            {/* ---------- Notes data ---------- */}
 
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                <div className="row">
-                                    {/* ---------- Chapter list ---------- */}
-                                    <div className="col-md-3 mb-2 mb-md-0 border-right">
-                                        <div className="card">
-                                            {this.props.subject_data &&
-                                            Object.keys(this.props.subject_data)
-                                                .length !== 0
-                                                ? (
-                                                      this.props.subject_data
-                                                          .chapters || []
-                                                  ).map((data, index) => {
-                                                      return (
-                                                          <div
-                                                              className={`card card-body ${
-                                                                  this.state
-                                                                      .selectedChapter ===
-                                                                  `chapter-${index}`
-                                                                      ? "pinkrange-bg"
-                                                                      : "light-bg"
-                                                              } font-weight-bold-600 primary-text small shadow-sm mb-2`}
-                                                              key={index}
-                                                              onClick={() =>
-                                                                  this.toggleCollapse(
-                                                                      index,
-                                                                      data.chapter_id,
-                                                                      data.chapter_name
-                                                                  )
-                                                              }
-                                                              style={{
-                                                                  paddingBottom:
-                                                                      "13px",
-                                                                  paddingTop:
-                                                                      "13px",
-                                                                  cursor: "default",
-                                                              }}
-                                                          >
-                                                              {
-                                                                  data.chapter_name
-                                                              }
-                                                          </div>
-                                                      );
-                                                  })
-                                                : null}
-                                        </div>
-                                    </div>
-
-                                    {/* ---------- Notes data ---------- */}
-
-                                    <div className="col-md-9 pl-md-0">
-                                        <div className="card card-body py-0">
-                                            {this.state.favouritesData &&
-                                            Object.entries(
-                                                this.state.favouritesData
-                                            ).length !== 0
-                                                ? Object.entries(
-                                                      this.state.favouritesData
-                                                  ).map(
-                                                      ([key, value], index) => {
-                                                          return value.concepts
-                                                              .length !== 0 ||
-                                                              value.questions
+                            <div className="col-md-9 pl-md-0">
+                                <div className="card card-body py-0">
+                                    {this.state.favouritesData &&
+                                    Object.entries(this.state.favouritesData)
+                                        .length !== 0
+                                        ? Object.entries(
+                                              this.state.favouritesData
+                                          ).map(([key, value], index) => {
+                                              return value.concepts.length !==
+                                                  0 ||
+                                                  value.questions.length !==
+                                                      0 ? (
+                                                  <div
+                                                      className="card border-secondary mb-3"
+                                                      key={index}
+                                                  >
+                                                      <div className="card-header font-weight-bold-600 pb-0">
+                                                          {`${key} - ${this.loopSubjectData(
+                                                              key
+                                                          )}`}
+                                                      </div>
+                                                      <div className="card-body">
+                                                          <div className="row">
+                                                              {value.concepts
                                                                   .length !==
-                                                                  0 ? (
-                                                              <div
-                                                                  className="card border-secondary mb-3"
-                                                                  key={index}
-                                                              >
-                                                                  <div className="card-header font-weight-bold-600 pb-0">
-                                                                      {`${key} - ${this.loopSubjectData(
-                                                                          key
-                                                                      )}`}
-                                                                  </div>
-                                                                  <div className="card-body">
-                                                                      <div className="row">
-                                                                          {value
-                                                                              .concepts
-                                                                              .length !==
-                                                                          0 ? (
-                                                                              <div className="col-md-6 mb-2">
-                                                                                  <div className="card light-bg shadow-sm">
-                                                                                      <div className="card-body">
-                                                                                          <div className="row align-items-center pr-2">
-                                                                                              <div className="col-10 primary-text font-weight-bold-600 small">
-                                                                                                  Concept
-                                                                                              </div>
-                                                                                              <div className="col-2">
-                                                                                                  <button
-                                                                                                      className="btn btn-primary btn-sm shadow-none"
-                                                                                                      onClick={() => {
-                                                                                                          this.handleRouting(
-                                                                                                              value.concepts,
-                                                                                                              "concept",
-                                                                                                              key
-                                                                                                          );
-                                                                                                      }}
-                                                                                                  >
-                                                                                                      View
-                                                                                                  </button>
-                                                                                              </div>
-                                                                                          </div>
-                                                                                      </div>
+                                                              0 ? (
+                                                                  <div className="col-md-6 mb-2">
+                                                                      <div className="card light-bg shadow-sm">
+                                                                          <div className="card-body">
+                                                                              <div className="row align-items-center pr-2">
+                                                                                  <div className="col-10 primary-text font-weight-bold-600 small">
+                                                                                      Concept
+                                                                                  </div>
+                                                                                  <div className="col-2">
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm shadow-none"
+                                                                                          onClick={() => {
+                                                                                              this.handleRouting(
+                                                                                                  value.concepts,
+                                                                                                  "concept",
+                                                                                                  key
+                                                                                              );
+                                                                                          }}
+                                                                                      >
+                                                                                          View
+                                                                                      </button>
                                                                                   </div>
                                                                               </div>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
-                                                                          {value
-                                                                              .questions
-                                                                              .length !==
-                                                                          0 ? (
-                                                                              <div className="col-md-6 mb-2">
-                                                                                  <div className="card light-bg shadow-sm">
-                                                                                      <div className="card-body">
-                                                                                          <div className="row align-items-center pr-2">
-                                                                                              <div className="col-10 primary-text font-weight-bold-600 small">
-                                                                                                  Practice
-                                                                                              </div>
-                                                                                              <div className="col-2">
-                                                                                                  <button
-                                                                                                      className="btn btn-primary btn-sm shadow-none"
-                                                                                                      onClick={() => {
-                                                                                                          this.handleRouting(
-                                                                                                              value.questions,
-                                                                                                              "practice",
-                                                                                                              key
-                                                                                                          );
-                                                                                                      }}
-                                                                                                  >
-                                                                                                      View
-                                                                                                  </button>
-                                                                                              </div>
-                                                                                          </div>
-                                                                                      </div>
-                                                                                  </div>
-                                                                              </div>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
+                                                                          </div>
                                                                       </div>
                                                                   </div>
-                                                              </div>
-                                                          ) : (
-                                                              ""
-                                                          );
-                                                      }
-                                                  )
-                                                : "No content to display..."}
-                                        </div>
-                                    </div>
+                                                              ) : (
+                                                                  ""
+                                                              )}
+                                                              {value.questions
+                                                                  .length !==
+                                                              0 ? (
+                                                                  <div className="col-md-6 mb-2">
+                                                                      <div className="card light-bg shadow-sm">
+                                                                          <div className="card-body">
+                                                                              <div className="row align-items-center pr-2">
+                                                                                  <div className="col-10 primary-text font-weight-bold-600 small">
+                                                                                      Practice
+                                                                                  </div>
+                                                                                  <div className="col-2">
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm shadow-none"
+                                                                                          onClick={() => {
+                                                                                              this.handleRouting(
+                                                                                                  value.questions,
+                                                                                                  "practice",
+                                                                                                  key
+                                                                                              );
+                                                                                          }}
+                                                                                      >
+                                                                                          View
+                                                                                      </button>
+                                                                                  </div>
+                                                                              </div>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              ) : (
+                                                                  ""
+                                                              )}
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              ) : (
+                                                  ""
+                                              );
+                                          })
+                                        : "No content to display..."}
                                 </div>
                             </div>
                         </div>
-
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

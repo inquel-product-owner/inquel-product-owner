@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "./wrapper";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Spinner, Modal, Alert } from "react-bootstrap";
@@ -210,7 +209,6 @@ class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             studentItems: this.props.profileData,
             showEditOption: false,
@@ -231,12 +229,6 @@ class Profile extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleModal = () => {
         this.setState({
@@ -398,10 +390,11 @@ class Profile extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header name="My Profile" togglenav={this.toggleSideNav} />
-
+            <Wrapper
+                header="My Profile"
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -420,12 +413,6 @@ class Profile extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
                 {/* Image modal */}
                 {this.state.showModal ? (
                     <ImageUploadModal
@@ -438,279 +425,250 @@ class Profile extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                <div className="row align-items-center mb-3">
+                    <div className="col-8">
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/student">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    My Profile
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-4 text-right">
+                        {!this.state.showEditOption ? (
+                            <button
+                                className="btn btn-primary btn-sm"
+                                onClick={this.toggleEdit}
+                            >
+                                <i className="far fa-edit mr-1"></i>
+                                Edit Profile
+                            </button>
+                        ) : null}
+                    </div>
+                </div>
 
-                        <div className="row align-items-center mb-3">
-                            <div className="col-8">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/student">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            My Profile
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-4 text-right">
-                                {!this.state.showEditOption ? (
+                <div className="row">
+                    <div className="col-md-3 pl-md-4 mb-3 mb-md-0">
+                        <div className="card shadow-sm">
+                            <div className="card-body">
+                                <div style={{ position: "relative" }}>
+                                    <img
+                                        src={
+                                            this.state.studentItems.length !== 0
+                                                ? this.state.studentItems
+                                                      .profile_link !== null
+                                                    ? this.state.studentItems
+                                                          .profile_link
+                                                    : userpic
+                                                : userpic
+                                        }
+                                        alt={this.state.studentItems.full_name}
+                                        className="img-fluid rounded-lg shadow-sm mb-3"
+                                    />
                                     <button
-                                        className="btn btn-primary btn-sm"
-                                        onClick={this.toggleEdit}
+                                        className="btn btn-light secondary-bg borders btn-block btn-sm shadow-none"
+                                        onClick={this.toggleModal}
+                                        style={{
+                                            position: "absolute",
+                                            bottom: "10px",
+                                        }}
                                     >
-                                        <i className="far fa-edit mr-1"></i>
-                                        Edit Profile
+                                        Upload Profile Pic
                                     </button>
-                                ) : null}
+                                </div>
+                                <p className="primary-text font-weight-bold-600 mb-2">
+                                    {this.state.studentItems.full_name} - @
+                                    {this.state.studentItems.username}
+                                </p>
+                                <p className="small mb-0">
+                                    {this.state.studentItems.email}
+                                </p>
                             </div>
                         </div>
-
-                        <div className="row">
-                            <div className="col-md-3 pl-md-4 mb-3 mb-md-0">
-                                <div className="card shadow-sm">
+                    </div>
+                    <div className="col-md-9 pr-md-4">
+                        {this.state.showEditOption ? (
+                            <div className="card shadow-sm">
+                                <form
+                                    onSubmit={this.handleSubmit}
+                                    autoComplete="off"
+                                >
                                     <div className="card-body">
-                                        <div style={{ position: "relative" }}>
-                                            <img
-                                                src={
-                                                    this.state.studentItems
-                                                        .length !== 0
-                                                        ? this.state
-                                                              .studentItems
-                                                              .profile_link !==
-                                                          null
-                                                            ? this.state
-                                                                  .studentItems
-                                                                  .profile_link
-                                                            : userpic
-                                                        : userpic
-                                                }
-                                                alt={
-                                                    this.state.studentItems
-                                                        .full_name
-                                                }
-                                                className="img-fluid rounded-lg shadow-sm mb-3"
-                                            />
-                                            <button
-                                                className="btn btn-light secondary-bg borders btn-block btn-sm shadow-none"
-                                                onClick={this.toggleModal}
-                                                style={{
-                                                    position: "absolute",
-                                                    bottom: "10px",
-                                                }}
-                                            >
-                                                Upload Profile Pic
-                                            </button>
-                                        </div>
-                                        <p className="primary-text font-weight-bold-600 mb-2">
-                                            {this.state.studentItems.full_name}{" "}
-                                            - @
-                                            {this.state.studentItems.username}
-                                        </p>
-                                        <p className="small mb-0">
-                                            {this.state.studentItems.email}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-9 pr-md-4">
-                                {this.state.showEditOption ? (
-                                    <div className="card shadow-sm">
-                                        <form
-                                            onSubmit={this.handleSubmit}
-                                            autoComplete="off"
-                                        >
-                                            <div className="card-body">
-                                                <h6 className="primary-text mb-3">
-                                                    Personal Details
-                                                </h6>
-                                                <div className="row gutters">
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="first_name">
-                                                                First Name
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="first_name"
-                                                                id="first_name"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
+                                        <h6 className="primary-text mb-3">
+                                            Personal Details
+                                        </h6>
+                                        <div className="row gutters">
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="first_name">
+                                                        First Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="first_name"
+                                                        id="first_name"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state
+                                                                .studentItems
+                                                                .first_name
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="last_name">
+                                                        Last Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="last_name"
+                                                        id="last_name"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state
+                                                                .studentItems
+                                                                .last_name
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="username">
+                                                        Username
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="username"
+                                                        id="username"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state
+                                                                .studentItems
+                                                                .username
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="phone_num">
+                                                        Phone
+                                                    </label>
+                                                    <div className="d-flex border-secondary rounded-lg">
+                                                        <div
+                                                            style={{
+                                                                width: "35%",
+                                                            }}
+                                                        >
+                                                            <Select
+                                                                className="basic-single border-right"
+                                                                defaultValue={{
+                                                                    label: this
+                                                                        .state
                                                                         .studentItems
-                                                                        .first_name
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="last_name">
-                                                                Last Name
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="last_name"
-                                                                id="last_name"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
+                                                                        .country_code
+                                                                        ? this
+                                                                              .state
+                                                                              .studentItems
+                                                                              .country_code
+                                                                        : "Country code",
+                                                                    value: this
+                                                                        .state
                                                                         .studentItems
-                                                                        .last_name
+                                                                        .country_code
+                                                                        ? this
+                                                                              .state
+                                                                              .studentItems
+                                                                              .country_code
+                                                                        : "Country code",
+                                                                }}
+                                                                isSearchable={
+                                                                    false
                                                                 }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="username">
-                                                                Username
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="username"
-                                                                id="username"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .studentItems
-                                                                        .username
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="phone_num">
-                                                                Phone
-                                                            </label>
-                                                            <div className="d-flex border-secondary rounded-lg">
-                                                                <div
-                                                                    style={{
-                                                                        width: "35%",
-                                                                    }}
-                                                                >
-                                                                    <Select
-                                                                        className="basic-single border-right"
-                                                                        defaultValue={{
-                                                                            label: this
-                                                                                .state
-                                                                                .studentItems
-                                                                                .country_code
-                                                                                ? this
-                                                                                      .state
-                                                                                      .studentItems
-                                                                                      .country_code
-                                                                                : "Country code",
-                                                                            value: this
-                                                                                .state
-                                                                                .studentItems
-                                                                                .country_code
-                                                                                ? this
-                                                                                      .state
-                                                                                      .studentItems
-                                                                                      .country_code
-                                                                                : "Country code",
-                                                                        }}
-                                                                        isSearchable={
-                                                                            false
-                                                                        }
-                                                                        name="country_code"
-                                                                        options={country.map(
-                                                                            (
+                                                                name="country_code"
+                                                                options={country.map(
+                                                                    (list) => {
+                                                                        return {
+                                                                            value: list.dialCode,
+                                                                            label: this.renderValue(
                                                                                 list
-                                                                            ) => {
-                                                                                return {
-                                                                                    value: list.dialCode,
-                                                                                    label: this.renderValue(
-                                                                                        list
-                                                                                    ),
-                                                                                };
-                                                                            }
-                                                                        )}
-                                                                        onChange={
-                                                                            this
-                                                                                .handleSelect
-                                                                        }
-                                                                        required
-                                                                    />
-                                                                </div>
-                                                                <div>
-                                                                    <input
-                                                                        type="text"
-                                                                        name="phone_num"
-                                                                        id="phone"
-                                                                        className="form-control form-control-lg"
-                                                                        onChange={
-                                                                            this
-                                                                                .handleInput
-                                                                        }
-                                                                        value={
-                                                                            this
-                                                                                .state
-                                                                                .studentItems
-                                                                                .phone_num
-                                                                        }
-                                                                        placeholder="Enter phone number"
-                                                                        required
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="date_of_birth">
-                                                                Date of Birth
-                                                            </label>
-                                                            <input
-                                                                type="date"
-                                                                name="date_of_birth"
-                                                                id="date_of_birth"
-                                                                className="form-control border-secondary"
-                                                                value={dateFormat(
-                                                                    this.state
-                                                                        .studentItems
-                                                                        .date_of_birth,
-                                                                    "yyyy-mm-dd"
+                                                                            ),
+                                                                        };
+                                                                    }
                                                                 )}
                                                                 onChange={
                                                                     this
-                                                                        .handleDate
+                                                                        .handleSelect
                                                                 }
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <input
+                                                                type="text"
+                                                                name="phone_num"
+                                                                id="phone"
+                                                                className="form-control form-control-lg"
+                                                                onChange={
+                                                                    this
+                                                                        .handleInput
+                                                                }
+                                                                value={
+                                                                    this.state
+                                                                        .studentItems
+                                                                        .phone_num
+                                                                }
+                                                                placeholder="Enter phone number"
+                                                                required
                                                             />
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="date_of_birth">
+                                                        Date of Birth
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        name="date_of_birth"
+                                                        id="date_of_birth"
+                                                        className="form-control border-secondary"
+                                                        value={dateFormat(
+                                                            this.state
+                                                                .studentItems
+                                                                .date_of_birth,
+                                                            "yyyy-mm-dd"
+                                                        )}
+                                                        onChange={
+                                                            this.handleDate
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                                {/* <div className="dropdown-divider"></div>
+                                        {/* <div className="dropdown-divider"></div>
 
                                                 <h6 className="primary-text my-3">
                                                     Address
@@ -806,153 +764,137 @@ class Profile extends Component {
                                                     </div>
                                                 </div> */}
 
-                                                <div className="dropdown-divider"></div>
+                                        <div className="dropdown-divider"></div>
 
-                                                <h6 className="primary-text my-3">
-                                                    About Me
-                                                </h6>
-                                                <div className="form-group">
-                                                    <label htmlFor="description">
-                                                        Description
-                                                    </label>
-                                                    <textarea
-                                                        name="description"
-                                                        id="description"
-                                                        rows="4"
-                                                        className="form-control border-secondary"
-                                                        onChange={
-                                                            this.handleInput
-                                                        }
-                                                    >
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .description
-                                                        }
-                                                    </textarea>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col-6">
-                                                        <button
-                                                            className="btn btn-secondary btn-sm btn-block"
-                                                            onClick={
-                                                                this.toggleEdit
-                                                            }
-                                                        >
-                                                            Close
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-6">
-                                                        <button className="btn btn-primary btn-block btn-sm">
-                                                            {this.state
-                                                                .showLoader ? (
-                                                                <Spinner
-                                                                    as="span"
-                                                                    animation="border"
-                                                                    size="sm"
-                                                                    role="status"
-                                                                    aria-hidden="true"
-                                                                    className="mr-2"
-                                                                />
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                            Save
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                        <h6 className="primary-text my-3">
+                                            About Me
+                                        </h6>
+                                        <div className="form-group">
+                                            <label htmlFor="description">
+                                                Description
+                                            </label>
+                                            <textarea
+                                                name="description"
+                                                id="description"
+                                                rows="4"
+                                                className="form-control border-secondary"
+                                                onChange={this.handleInput}
+                                            >
+                                                {
+                                                    this.state.studentItems
+                                                        .description
+                                                }
+                                            </textarea>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-6">
+                                                <button
+                                                    className="btn btn-secondary btn-sm btn-block"
+                                                    onClick={this.toggleEdit}
+                                                >
+                                                    Close
+                                                </button>
                                             </div>
-                                        </form>
+                                            <div className="col-6">
+                                                <button className="btn btn-primary btn-block btn-sm">
+                                                    {this.state.showLoader ? (
+                                                        <Spinner
+                                                            as="span"
+                                                            animation="border"
+                                                            size="sm"
+                                                            role="status"
+                                                            aria-hidden="true"
+                                                            className="mr-2"
+                                                        />
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                ) : (
-                                    // Profile details GET
-                                    <div className="card shadow-sm">
-                                        <div className="card-body">
-                                            <h6 className="primary-text mb-3">
-                                                Personal Details
-                                            </h6>
-                                            <div className="row gutters">
-                                                <div className="col-lg-4 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            First Name
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .first_name
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            Last Name
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .last_name
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            Username
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .username
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            Email
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .email
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            Phone
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .country_code
-                                                        }
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .phone_num
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            Date of Birth
-                                                        </p>
-                                                        {dateFormat(
-                                                            this.state
-                                                                .studentItems
-                                                                .date_of_birth,
-                                                            "dd-mm-yyyy"
-                                                        )}
-                                                    </div>
-                                                </div>
+                                </form>
+                            </div>
+                        ) : (
+                            // Profile details GET
+                            <div className="card shadow-sm">
+                                <div className="card-body">
+                                    <h6 className="primary-text mb-3">
+                                        Personal Details
+                                    </h6>
+                                    <div className="row gutters">
+                                        <div className="col-lg-4 col-sm-6 col-12">
+                                            <div className="form-group">
+                                                <p className="small font-weight-bold-600 mb-2">
+                                                    First Name
+                                                </p>
+                                                {
+                                                    this.state.studentItems
+                                                        .first_name
+                                                }
                                             </div>
+                                        </div>
+                                        <div className="col-lg-4 col-sm-6 col-12">
+                                            <div className="form-group">
+                                                <p className="small font-weight-bold-600 mb-2">
+                                                    Last Name
+                                                </p>
+                                                {
+                                                    this.state.studentItems
+                                                        .last_name
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4 col-sm-6 col-12">
+                                            <div className="form-group">
+                                                <p className="small font-weight-bold-600 mb-2">
+                                                    Username
+                                                </p>
+                                                {
+                                                    this.state.studentItems
+                                                        .username
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4 col-sm-6 col-12">
+                                            <div className="form-group">
+                                                <p className="small font-weight-bold-600 mb-2">
+                                                    Email
+                                                </p>
+                                                {this.state.studentItems.email}
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4 col-sm-6 col-12">
+                                            <div className="form-group">
+                                                <p className="small font-weight-bold-600 mb-2">
+                                                    Phone
+                                                </p>
+                                                {
+                                                    this.state.studentItems
+                                                        .country_code
+                                                }
+                                                {
+                                                    this.state.studentItems
+                                                        .phone_num
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4 col-sm-6 col-12">
+                                            <div className="form-group">
+                                                <p className="small font-weight-bold-600 mb-2">
+                                                    Date of Birth
+                                                </p>
+                                                {dateFormat(
+                                                    this.state.studentItems
+                                                        .date_of_birth,
+                                                    "dd-mm-yyyy"
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                            {/* <div className="dropdown-divider"></div>
+                                    {/* <div className="dropdown-divider"></div>
 
                                             <h6 className="primary-text my-3">
                                                 Address
@@ -1008,25 +950,21 @@ class Profile extends Component {
                                                 </div>
                                             </div> */}
 
-                                            <div className="form-group">
-                                                <p className="small font-weight-bold-600 mb-2">
-                                                    About
-                                                </p>
-                                                {
-                                                    this.state.studentItems
-                                                        .description
-                                                }
-                                            </div>
-                                        </div>
+                                    <div className="form-group">
+                                        <p className="small font-weight-bold-600 mb-2">
+                                            About
+                                        </p>
+                                        {this.state.studentItems.description}
                                     </div>
-                                )}
+                                </div>
                             </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                        )}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

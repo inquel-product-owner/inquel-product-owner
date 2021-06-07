@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { Accordion, Card, Modal, Alert } from "react-bootstrap";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
@@ -144,7 +143,6 @@ class PersonalNotes extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             collapsed: [],
             topicEventKey: [],
@@ -172,50 +170,55 @@ class PersonalNotes extends Component {
         };
     }
 
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
-
     toggleCollapse = (index, chapterId) => {
-        let collapsed = [...this.state.collapsed];
-        for (let i = 0; i < collapsed.length; i++) {
-            if (i !== index) {
-                collapsed[i] = true;
+        try {
+            let collapsed = [...this.state.collapsed];
+            for (let i = 0; i < collapsed.length; i++) {
+                if (i !== index) {
+                    collapsed[i] = true;
+                }
             }
-        }
-        collapsed[index] = !collapsed[index];
+            collapsed[index] = !collapsed[index];
 
-        let topicName = "";
-        let topic_num = "";
-        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
-            // extract topic name from the current chapter
-            if (this.props.subject_data.chapters[i].chapter_id === chapterId) {
-                topicName =
-                    this.props.subject_data.chapters[i].topics.length !== 0
-                        ? this.props.subject_data.chapters[i].topics[0]
-                              .chapter_structure[0].topic_name
-                        : "Topic";
-                topic_num =
-                    this.props.subject_data.chapters[i].topics.length !== 0
-                        ? this.props.subject_data.chapters[i].topics[0]
-                              .chapter_structure[0].topic_num
-                        : "1.1";
-            } else {
-                continue;
+            let topicName = "";
+            let topic_num = "";
+            for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
+                // extract topic name from the current chapter
+                if (
+                    this.props.subject_data.chapters[i].chapter_id === chapterId
+                ) {
+                    topicName =
+                        this.props.subject_data.chapters[i].topics.length !== 0
+                            ? this.props.subject_data.chapters[i].topics[0]
+                                  .topic_name
+                            : "Topic";
+                    topic_num =
+                        this.props.subject_data.chapters[i].topics.length !== 0
+                            ? this.props.subject_data.chapters[i].topics[0]
+                                  .topic_num
+                            : "1.1";
+                } else {
+                    continue;
+                }
             }
+            this.setState(
+                {
+                    collapsed: collapsed,
+                    chapterId: chapterId,
+                    topicName: topicName,
+                    topic_num: topic_num,
+                    page_loading: true,
+                },
+                () => this.loadNotesData()
+            );
+        } catch (error) {
+            console.error(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
         }
-        this.setState(
-            {
-                collapsed: collapsed,
-                chapterId: chapterId,
-                topicName: topicName,
-                topic_num: topic_num,
-                page_loading: true,
-            },
-            () => this.loadNotesData()
-        );
     };
 
     toggleTopicCollapse = (key, chapter_index) => {
@@ -296,28 +299,37 @@ class PersonalNotes extends Component {
         let chapterId = "";
         let topicName = "";
         let topic_num = "";
-        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
-            // adds collapse state
-            collapsed.push(i === 0 ? false : true);
-            topicEventKey.push([]);
+        try {
+            for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
+                // adds collapse state
+                collapsed.push(i === 0 ? false : true);
+                topicEventKey.push([]);
 
-            chapterId = this.props.subject_data.chapters[0].chapter_id;
+                chapterId = this.props.subject_data.chapters[0].chapter_id;
 
-            // extract topic name from the current chapter
-            if (i === 0) {
-                topicName =
-                    this.props.subject_data.chapters[i].topics.length !== 0
-                        ? this.props.subject_data.chapters[i].topics[0]
-                              .chapter_structure[0].topic_name
-                        : "Topic";
-                topic_num =
-                    this.props.subject_data.chapters[i].topics.length !== 0
-                        ? this.props.subject_data.chapters[i].topics[0]
-                              .chapter_structure[0].topic_num
-                        : "1.1";
-            } else {
-                continue;
+                // extract topic name from the current chapter
+                if (i === 0) {
+                    topicName =
+                        this.props.subject_data.chapters[i].topics.length !== 0
+                            ? this.props.subject_data.chapters[i].topics[0]
+                                  .topic_name
+                            : "Topic";
+                    topic_num =
+                        this.props.subject_data.chapters[i].topics.length !== 0
+                            ? this.props.subject_data.chapters[i].topics[0]
+                                  .topic_num
+                            : "1.1";
+                } else {
+                    continue;
+                }
             }
+        } catch (error) {
+            console.error(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
         }
         this.setState(
             {
@@ -462,15 +474,13 @@ class PersonalNotes extends Component {
     };
 
     render() {
-        document.title = `${this.state.topicName}:  Personal Notes - Student | IQLabs`;
+        document.title = `${this.state.topicName} :  Personal Notes - Student | IQLabs`;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -489,12 +499,6 @@ class PersonalNotes extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
                 {/* ----- Personal notes modal ----- */}
                 {this.state.showModal ? (
                     <NotesModal
@@ -510,207 +514,185 @@ class PersonalNotes extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                {/* ----- Breadcrumb ----- */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/student">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.subject_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">
+                            Personal Notes
+                        </li>
+                    </ol>
+                </nav>
 
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/student">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Personal Notes
-                                </li>
-                            </ol>
-                        </nav>
-
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                <div className="row">
-                                    {/* ---------- Chapter list ---------- */}
-                                    <div className="col-md-3 mb-2 mb-md-0 border-right">
-                                        <div className="card">
-                                            <Accordion defaultActiveKey="chapter-0">
-                                                {this.props.subject_data &&
-                                                Object.keys(this.props.subject_data)
-                                                    .length !== 0
-                                                    ? (
-                                                          this.props.subject_data
-                                                              .chapters || []
-                                                      ).map((data, index) => {
-                                                          return (
-                                                              <Card
-                                                                  className="mb-1"
-                                                                  key={index}
-                                                              >
-                                                                  <Accordion.Toggle
-                                                                      as={
-                                                                          Card.Header
+                <div className="card shadow-sm">
+                    <div className="card-body">
+                        <div className="row">
+                            {/* ---------- Chapter list ---------- */}
+                            <div className="col-md-3 mb-2 mb-md-0 border-right">
+                                <div className="card">
+                                    <Accordion defaultActiveKey="chapter-0">
+                                        {this.props.subject_data &&
+                                        Object.keys(this.props.subject_data)
+                                            .length !== 0
+                                            ? (
+                                                  this.props.subject_data
+                                                      .chapters || []
+                                              ).map((data, index) => {
+                                                  return (
+                                                      <Card
+                                                          className="mb-1"
+                                                          key={index}
+                                                      >
+                                                          <Accordion.Toggle
+                                                              as={Card.Header}
+                                                              eventKey={`chapter-${index}`}
+                                                              className="pinkrange-bg shadow-sm mb-2"
+                                                              style={{
+                                                                  borderRadius:
+                                                                      "8px",
+                                                                  cursor: "default",
+                                                              }}
+                                                              onClick={() =>
+                                                                  this.toggleCollapse(
+                                                                      index,
+                                                                      data.chapter_id
+                                                                  )
+                                                              }
+                                                          >
+                                                              <div className="row align-items-center">
+                                                                  <div className="col-1">
+                                                                      <span>
+                                                                          <i
+                                                                              className={`fas fa-chevron-circle-down ${
+                                                                                  this
+                                                                                      .state
+                                                                                      .collapsed[
+                                                                                      index
+                                                                                  ]
+                                                                                      ? "fa-rotate-270"
+                                                                                      : ""
+                                                                              }`}
+                                                                          ></i>
+                                                                      </span>
+                                                                  </div>
+                                                                  <div className="col-10 small font-weight-bold-600">
+                                                                      {
+                                                                          data.chapter_name
                                                                       }
-                                                                      eventKey={`chapter-${index}`}
-                                                                      className="pinkrange-bg shadow-sm mb-2"
-                                                                      style={{
-                                                                          borderRadius:
-                                                                              "8px",
-                                                                          cursor: "default",
-                                                                      }}
-                                                                      onClick={() =>
-                                                                          this.toggleCollapse(
-                                                                              index,
-                                                                              data.chapter_id
-                                                                          )
-                                                                      }
-                                                                  >
-                                                                      <div className="row align-items-center">
-                                                                          <div className="col-1">
-                                                                              <span>
-                                                                                  <i
-                                                                                      className={`fas fa-chevron-circle-down ${
-                                                                                          this
-                                                                                              .state
-                                                                                              .collapsed[
-                                                                                              index
-                                                                                          ]
-                                                                                              ? "fa-rotate-270"
-                                                                                              : ""
-                                                                                      }`}
-                                                                                  ></i>
-                                                                              </span>
-                                                                          </div>
-                                                                          <div className="col-10 small font-weight-bold-600">
-                                                                              {
-                                                                                  data.chapter_name
-                                                                              }
-                                                                          </div>
-                                                                      </div>
-                                                                  </Accordion.Toggle>
+                                                                  </div>
+                                                              </div>
+                                                          </Accordion.Toggle>
 
-                                                                  <Accordion.Collapse
-                                                                      eventKey={`chapter-${index}`}
-                                                                  >
-                                                                      <Card>
-                                                                          {/* ----- Topic list ----- */}
-                                                                          {(
-                                                                              data.topics ||
-                                                                              []
-                                                                          ).map(
-                                                                              (
-                                                                                  topic,
-                                                                                  topic_index
-                                                                              ) => {
-                                                                                  return (
-                                                                                      <Accordion
-                                                                                          key={
-                                                                                              topic_index
-                                                                                          }
-                                                                                      >
-                                                                                          {this.topic(
-                                                                                              topic,
-                                                                                              topic_index,
-                                                                                              index
-                                                                                          )}
-                                                                                      </Accordion>
-                                                                                  );
-                                                                              }
-                                                                          )}
-                                                                      </Card>
-                                                                  </Accordion.Collapse>
+                                                          <Accordion.Collapse
+                                                              eventKey={`chapter-${index}`}
+                                                          >
+                                                              <Card>
+                                                                  {/* ----- Topic list ----- */}
+                                                                  {(
+                                                                      data.topics ||
+                                                                      []
+                                                                  ).map(
+                                                                      (
+                                                                          topic,
+                                                                          topic_index
+                                                                      ) => {
+                                                                          return (
+                                                                              <Accordion
+                                                                                  key={
+                                                                                      topic_index
+                                                                                  }
+                                                                              >
+                                                                                  {this.topic(
+                                                                                      topic,
+                                                                                      topic_index,
+                                                                                      index
+                                                                                  )}
+                                                                              </Accordion>
+                                                                          );
+                                                                      }
+                                                                  )}
                                                               </Card>
-                                                          );
-                                                      })
-                                                    : null}
-                                            </Accordion>
-                                        </div>
-                                    </div>
+                                                          </Accordion.Collapse>
+                                                      </Card>
+                                                  );
+                                              })
+                                            : null}
+                                    </Accordion>
+                                </div>
+                            </div>
 
-                                    {/* ---------- Notes data ---------- */}
+                            {/* ---------- Notes data ---------- */}
 
-                                    <div className="col-md-9 pl-md-0">
-                                        <div className="card card-body py-0">
-                                            {Object.entries(
-                                                this.state.notesData
-                                            ).length !== 0 ? (
-                                                this.state.notesData[
+                            <div className="col-md-9 pl-md-0">
+                                <div className="card card-body py-0">
+                                    {Object.entries(this.state.notesData)
+                                        .length !== 0 ? (
+                                        this.state.notesData[
+                                            this.state.topic_num
+                                        ] &&
+                                        this.state.notesData[
+                                            this.state.topic_num
+                                        ].length !== 0 ? (
+                                            <div className="row">
+                                                {this.state.notesData[
                                                     this.state.topic_num
-                                                ] &&
-                                                this.state.notesData[
-                                                    this.state.topic_num
-                                                ].length !== 0 ? (
-                                                    <div className="row">
-                                                        {this.state.notesData[
-                                                            this.state.topic_num
-                                                        ].map((data, index) => {
-                                                            return (
-                                                                <div
-                                                                    className="col-md-6 mb-3"
-                                                                    key={index}
-                                                                >
-                                                                    <div className="card light-bg shadow-sm">
-                                                                        <div className="card-body">
-                                                                            <div className="row align-items-center pr-2">
-                                                                                <div className="col-10 primary-text font-weight-bold-600 small">
-                                                                                    {
-                                                                                        data.personal_notes_title
-                                                                                    }
-                                                                                </div>
-                                                                                <div className="col-2">
-                                                                                    <button
-                                                                                        className="btn btn-primary btn-sm shadow-none"
-                                                                                        onClick={() =>
-                                                                                            this.toggleModal(
-                                                                                                data
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        View
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
+                                                ].map((data, index) => {
+                                                    return (
+                                                        <div
+                                                            className="col-md-6 mb-3"
+                                                            key={index}
+                                                        >
+                                                            <div className="card light-bg shadow-sm">
+                                                                <div className="card-body">
+                                                                    <div className="row align-items-center pr-2">
+                                                                        <div className="col-10 primary-text font-weight-bold-600 small">
+                                                                            {
+                                                                                data.personal_notes_title
+                                                                            }
+                                                                        </div>
+                                                                        <div className="col-2">
+                                                                            <button
+                                                                                className="btn btn-primary btn-sm shadow-none"
+                                                                                onClick={() =>
+                                                                                    this.toggleModal(
+                                                                                        data
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                View
+                                                                            </button>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                ) : (
-                                                    "No content to display..."
-                                                )
-                                            ) : (
-                                                "No content to display..."
-                                            )}
-                                        </div>
-                                    </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            "No content to display..."
+                                        )
+                                    ) : (
+                                        "No content to display..."
+                                    )}
                                 </div>
                             </div>
                         </div>
-
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

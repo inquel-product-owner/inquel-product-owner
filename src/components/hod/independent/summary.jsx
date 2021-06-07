@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
+import Wrapper from "../wrapper";
 import { Link } from "react-router-dom";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
@@ -17,7 +16,6 @@ class HODSubjectSummary extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             summaryData: "",
 
             errorMsg: "",
@@ -92,13 +90,11 @@ class HODSubjectSummary extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -117,166 +113,120 @@ class HODSubjectSummary extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/hod">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to={`/hod/subject/${this.subjectId}`}>
+                                {this.props.subject_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.chapter_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Summary</li>
+                    </ol>
+                </nav>
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        {/* Breadcrumb */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/hod">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link to={`/hod/subject/${this.subjectId}`}>
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.chapter_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Summary
-                                </li>
-                            </ol>
-                        </nav>
-
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                {this.state.summaryData.length !== 0
-                                    ? this.state.summaryData.map(
-                                          (data, index) => {
-                                              return data.direct_question_urls !==
-                                                  undefined ? (
-                                                  <div
-                                                      className="text-center"
-                                                      key={index}
-                                                  >
-                                                      <div id="ResumeContainer py-3">
-                                                          <Document
-                                                              file={
-                                                                  data
-                                                                      .direct_question_urls[0]
-                                                              }
-                                                              onLoadSuccess={
-                                                                  this
-                                                                      .onDocumentLoadSuccess
-                                                              }
-                                                              className={
-                                                                  "PDFDocument"
-                                                              }
-                                                          >
-                                                              <Page
-                                                                  pageNumber={
-                                                                      this.state
-                                                                          .pageNumber
-                                                                  }
-                                                                  className={
-                                                                      "PDFPagee shadow"
-                                                                  }
-                                                              />
-                                                          </Document>
-                                                      </div>
-                                                      <p className="my-3">
-                                                          Page{" "}
-                                                          {
+                <div className="card shadow-sm">
+                    <div className="card-body">
+                        {this.state.summaryData.length !== 0
+                            ? this.state.summaryData.map((data, index) => {
+                                  return data.direct_question_urls !==
+                                      undefined ? (
+                                      <div className="text-center" key={index}>
+                                          <div id="ResumeContainer py-3">
+                                              <Document
+                                                  file={
+                                                      data
+                                                          .direct_question_urls[0]
+                                                  }
+                                                  onLoadSuccess={
+                                                      this.onDocumentLoadSuccess
+                                                  }
+                                                  className={"PDFDocument"}
+                                              >
+                                                  <Page
+                                                      pageNumber={
+                                                          this.state.pageNumber
+                                                      }
+                                                      className={
+                                                          "PDFPagee shadow"
+                                                      }
+                                                  />
+                                              </Document>
+                                          </div>
+                                          <p className="my-3">
+                                              Page {this.state.pageNumber} of{" "}
+                                              {this.state.numPages}
+                                          </p>
+                                          <nav>
+                                              {this.state.numPages > 1 ? (
+                                                  <>
+                                                      <button
+                                                          className="btn btn-primary btn-sm mr-2"
+                                                          onClick={
+                                                              this.goToPrevPage
+                                                          }
+                                                          disabled={
+                                                              this.state
+                                                                  .pageNumber ===
+                                                              1
+                                                                  ? true
+                                                                  : false
+                                                          }
+                                                      >
+                                                          Prev
+                                                      </button>
+                                                      <button
+                                                          className="btn btn-primary btn-sm"
+                                                          onClick={
+                                                              this.goToNextPage
+                                                          }
+                                                          disabled={
+                                                              this.state
+                                                                  .numPages ===
                                                               this.state
                                                                   .pageNumber
-                                                          }{" "}
-                                                          of{" "}
-                                                          {this.state.numPages}
-                                                      </p>
-                                                      <nav>
-                                                          {this.state.numPages >
-                                                          1 ? (
-                                                              <>
-                                                                  <button
-                                                                      className="btn btn-primary btn-sm mr-2"
-                                                                      onClick={
-                                                                          this
-                                                                              .goToPrevPage
-                                                                      }
-                                                                      disabled={
-                                                                          this
-                                                                              .state
-                                                                              .pageNumber ===
-                                                                          1
-                                                                              ? true
-                                                                              : false
-                                                                      }
-                                                                  >
-                                                                      Prev
-                                                                  </button>
-                                                                  <button
-                                                                      className="btn btn-primary btn-sm"
-                                                                      onClick={
-                                                                          this
-                                                                              .goToNextPage
-                                                                      }
-                                                                      disabled={
-                                                                          this
-                                                                              .state
-                                                                              .numPages ===
-                                                                          this
-                                                                              .state
-                                                                              .pageNumber
-                                                                              ? true
-                                                                              : false
-                                                                      }
-                                                                  >
-                                                                      Next
-                                                                  </button>
-                                                              </>
-                                                          ) : (
-                                                              ""
-                                                          )}
-                                                      </nav>
-                                                  </div>
+                                                                  ? true
+                                                                  : false
+                                                          }
+                                                      >
+                                                          Next
+                                                      </button>
+                                                  </>
                                               ) : (
-                                                  <div key={index}>
-                                                      <div className="h5 font-weight-bold-600 mb-3">
-                                                          {data.summary_name}
-                                                      </div>
-                                                      <div
-                                                          dangerouslySetInnerHTML={{
-                                                              __html: data.summary_content,
-                                                          }}
-                                                      ></div>
-                                                  </div>
-                                              );
-                                          }
-                                      )
-                                    : "No content to display..."}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                                                  ""
+                                              )}
+                                          </nav>
+                                      </div>
+                                  ) : (
+                                      <div key={index}>
+                                          <div className="h5 font-weight-bold-600 mb-3">
+                                              {data.summary_name}
+                                          </div>
+                                          <div
+                                              dangerouslySetInnerHTML={{
+                                                  __html: data.summary_content,
+                                              }}
+                                          ></div>
+                                      </div>
+                                  );
+                              })
+                            : "No content to display..."}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

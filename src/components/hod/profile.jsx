@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "./wrapper";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { Spinner, Modal, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
@@ -283,7 +282,6 @@ class HODProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             hodItems: this.props.profileData,
             showEditOption: false,
@@ -304,12 +302,6 @@ class HODProfile extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleModal = (type) => {
         this.setState({
@@ -513,10 +505,11 @@ class HODProfile extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header name="My Profile" togglenav={this.toggleSideNav} />
-
+            <Wrapper
+                header="My Profile"
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -535,12 +528,6 @@ class HODProfile extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
                 {/* Image modal */}
                 {this.state.showModal ? (
                     <ImageUploadModal
@@ -555,490 +542,522 @@ class HODProfile extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                <div className="row align-items-center mb-3">
+                    <div className="col-8">
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/student">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    My Profile
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-4 text-right">
+                        {!this.state.showEditOption ? (
+                            <button
+                                className="btn btn-primary btn-sm"
+                                onClick={this.toggleEdit}
+                            >
+                                <i className="far fa-edit mr-1"></i>
+                                Edit Profile
+                            </button>
+                        ) : null}
+                    </div>
+                </div>
 
-                        <div className="row align-items-center mb-3">
-                            <div className="col-8">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/student">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            My Profile
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-4 text-right">
-                                {!this.state.showEditOption ? (
-                                    <button
-                                        className="btn btn-primary btn-sm"
-                                        onClick={this.toggleEdit}
-                                    >
-                                        <i className="far fa-edit mr-1"></i>
-                                        Edit Profile
-                                    </button>
-                                ) : null}
-                            </div>
-                        </div>
-
+                <div className="row">
+                    <div className="col-md-3 pl-md-4 mb-3 mb-md-0">
                         <div className="row">
-                            <div className="col-md-3 pl-md-4 mb-3 mb-md-0">
-                                <div className="row">
-                                    <div className="col-lg-12 col-md-6 col-12 mb-3">
-                                        <div className="card shadow-sm">
-                                            <div className="card-body">
-                                                <div
-                                                    style={{
-                                                        position: "relative",
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={
-                                                            this.state.hodItems
-                                                                .length !== 0
-                                                                ? this.state
-                                                                      .hodItems
-                                                                      .profile_link !==
-                                                                  null
-                                                                    ? this.state
-                                                                          .hodItems
-                                                                          .profile_link
-                                                                    : userpic
-                                                                : userpic
-                                                        }
-                                                        alt={
-                                                            this.state.hodItems
-                                                                .full_name
-                                                        }
-                                                        className="img-fluid rounded-lg shadow-sm mb-3"
-                                                    />
-                                                    <button
-                                                        className="btn btn-light secondary-bg borders btn-block btn-sm shadow-none"
-                                                        onClick={() =>
-                                                            this.toggleModal(
-                                                                "profile"
-                                                            )
-                                                        }
-                                                        style={{
-                                                            position:
-                                                                "absolute",
-                                                            bottom: "10px",
-                                                        }}
-                                                    >
-                                                        Upload Profile Pic
-                                                    </button>
-                                                </div>
-                                                <p className="primary-text font-weight-bold-600 mb-2">
-                                                    {
-                                                        this.state.hodItems
-                                                            .full_name
-                                                    }{" "}
-                                                    - @
-                                                    {
-                                                        this.state.hodItems
-                                                            .username
-                                                    }
-                                                </p>
-                                                <p className="small mb-0">
-                                                    {this.state.hodItems.email}
-                                                </p>
-                                            </div>
+                            <div className="col-lg-12 col-md-6 col-12 mb-3">
+                                <div className="card shadow-sm">
+                                    <div className="card-body">
+                                        <div
+                                            style={{
+                                                position: "relative",
+                                            }}
+                                        >
+                                            <img
+                                                src={
+                                                    this.state.hodItems
+                                                        .length !== 0
+                                                        ? this.state.hodItems
+                                                              .profile_link !==
+                                                          null
+                                                            ? this.state
+                                                                  .hodItems
+                                                                  .profile_link
+                                                            : userpic
+                                                        : userpic
+                                                }
+                                                alt={
+                                                    this.state.hodItems
+                                                        .full_name
+                                                }
+                                                className="img-fluid rounded-lg shadow-sm mb-3"
+                                            />
+                                            <button
+                                                className="btn btn-light secondary-bg borders btn-block btn-sm shadow-none"
+                                                onClick={() =>
+                                                    this.toggleModal("profile")
+                                                }
+                                                style={{
+                                                    position: "absolute",
+                                                    bottom: "10px",
+                                                }}
+                                            >
+                                                Upload Profile Pic
+                                            </button>
                                         </div>
-                                    </div>
-                                    <div className="col-lg-12 col-md-6 col-12">
-                                        <div className="card shadow-sm">
-                                            <div className="card-body">
-                                                <h6 className="primary-text mb-3">
-                                                    Permissions
-                                                </h6>
-                                                {this.state.hodItems
-                                                    .permissions !==
-                                                undefined ? (
-                                                    <>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Progressive
-                                                                    Score
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .prog_sco_card ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Type 1
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .type_1_q ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Type 2
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .type_2_q ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Quiz
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .quiz ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Match
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .match ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Notes
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .copy_download ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Summary
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .summary ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Direct
-                                                                    Questions
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .direct_q ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Configure
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .config_course ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Simulation
-                                                                    Exam
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .sim_exam ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-2">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Locking of
-                                                                    Tests
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .lock_test ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="row">
-                                                            <div className="col-10">
-                                                                <p className="small mb-0 font-weight-bold-600">
-                                                                    Mobile App
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-2 text-right">
-                                                                {this.state
-                                                                    .hodItems
-                                                                    .permissions
-                                                                    .android_app ===
-                                                                true ? (
-                                                                    <i className="fas fa-check-circle text-success"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-times-circle text-danger"></i>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                ) : null}
-                                            </div>
-                                        </div>
+                                        <p className="primary-text font-weight-bold-600 mb-2">
+                                            {this.state.hodItems.full_name} - @
+                                            {this.state.hodItems.username}
+                                        </p>
+                                        <p className="small mb-0">
+                                            {this.state.hodItems.email}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-md-9 pr-md-4">
-                                {this.state.showEditOption ? (
-                                    <form
-                                        onSubmit={this.handleSubmit}
-                                        autoComplete="off"
-                                    >
-                                        <div className="card shadow-sm">
-                                            <div className="card-body">
-                                                <h6 className="primary-text mb-3">
-                                                    Personal Details
-                                                </h6>
-                                                <div className="row gutters">
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="first_name">
-                                                                First Name
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="first_name"
-                                                                id="first_name"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .first_name
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
+                            <div className="col-lg-12 col-md-6 col-12">
+                                <div className="card shadow-sm">
+                                    <div className="card-body">
+                                        <h6 className="primary-text mb-3">
+                                            Permissions
+                                        </h6>
+                                        {this.state.hodItems.permissions !==
+                                        undefined ? (
+                                            <>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Progressive Score
+                                                        </p>
                                                     </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="last_name">
-                                                                Last Name
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="last_name"
-                                                                id="last_name"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .last_name
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="username">
-                                                                Username
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="username"
-                                                                id="username"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .username
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="phone_num">
-                                                                Office phone
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="phone_num"
-                                                                id="phone"
-                                                                className="form-control border-secondary"
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                                value={
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .phone_num
-                                                                }
-                                                                placeholder="Enter phone number with country code"
-                                                                required
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="date_of_birth">
-                                                                Date of Birth
-                                                            </label>
-                                                            <input
-                                                                type="date"
-                                                                name="date_of_birth"
-                                                                id="date_of_birth"
-                                                                className="form-control border-secondary"
-                                                                value={dateFormat(
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .date_of_birth,
-                                                                    "yyyy-mm-dd"
-                                                                )}
-                                                                onChange={
-                                                                    this
-                                                                        .handleDate
-                                                                }
-                                                            />
-                                                        </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .prog_sco_card ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
                                                     </div>
                                                 </div>
-
-                                                {/* ----- About description POST ----- */}
-
-                                                <div className="dropdown-divider"></div>
-                                                <h6 className="primary-text my-3">
-                                                    About Me
-                                                </h6>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Type 1
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .type_1_q ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Type 2
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .type_2_q ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Quiz
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .quiz === true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Match
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .match === true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Notes
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .copy_download ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Summary
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .summary ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Direct Questions
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .direct_q ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Configure
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .config_course ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Simulation Exam
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .sim_exam ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-2">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Locking of Tests
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .lock_test ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="row">
+                                                    <div className="col-10">
+                                                        <p className="small mb-0 font-weight-bold-600">
+                                                            Mobile App
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-2 text-right">
+                                                        {this.state.hodItems
+                                                            .permissions
+                                                            .android_app ===
+                                                        true ? (
+                                                            <i className="fas fa-check-circle text-success"></i>
+                                                        ) : (
+                                                            <i className="fas fa-times-circle text-danger"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : null}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-9 pr-md-4">
+                        {this.state.showEditOption ? (
+                            <form
+                                onSubmit={this.handleSubmit}
+                                autoComplete="off"
+                            >
+                                <div className="card shadow-sm">
+                                    <div className="card-body">
+                                        <h6 className="primary-text mb-3">
+                                            Personal Details
+                                        </h6>
+                                        <div className="row gutters">
+                                            <div className="col-lg-4 col-sm-6 col-12">
                                                 <div className="form-group">
-                                                    <label htmlFor="description">
-                                                        Description
+                                                    <label htmlFor="first_name">
+                                                        First Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="first_name"
+                                                        id="first_name"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state.hodItems
+                                                                .first_name
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="last_name">
+                                                        Last Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="last_name"
+                                                        id="last_name"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state.hodItems
+                                                                .last_name
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="username">
+                                                        Username
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="username"
+                                                        id="username"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state.hodItems
+                                                                .username
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="phone_num">
+                                                        Office phone
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="phone_num"
+                                                        id="phone"
+                                                        className="form-control border-secondary"
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                        value={
+                                                            this.state.hodItems
+                                                                .phone_num
+                                                        }
+                                                        placeholder="Enter phone number with country code"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="date_of_birth">
+                                                        Date of Birth
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        name="date_of_birth"
+                                                        id="date_of_birth"
+                                                        className="form-control border-secondary"
+                                                        value={dateFormat(
+                                                            this.state.hodItems
+                                                                .date_of_birth,
+                                                            "yyyy-mm-dd"
+                                                        )}
+                                                        onChange={
+                                                            this.handleDate
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* ----- About description POST ----- */}
+
+                                        <div className="dropdown-divider"></div>
+                                        <h6 className="primary-text my-3">
+                                            About Me
+                                        </h6>
+                                        <div className="form-group">
+                                            <label htmlFor="description">
+                                                Description
+                                            </label>
+                                            <textarea
+                                                name="description"
+                                                id="description"
+                                                rows="4"
+                                                className="form-control border-secondary"
+                                                onChange={this.handleInput}
+                                            >
+                                                {
+                                                    this.state.hodItems
+                                                        .description
+                                                }
+                                            </textarea>
+                                        </div>
+
+                                        {/* ----- Institution details POST ----- */}
+
+                                        <div className="dropdown-divider my-4"></div>
+                                        <h6 className="primary-text mb-3">
+                                            Institution Details
+                                        </h6>
+                                        <div className="row gutters">
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="department_name">
+                                                        Department Name
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="department_name"
+                                                        id="department_name"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state.hodItems
+                                                                .department_name
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="department_details">
+                                                        Department details
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="department_details"
+                                                        id="department_details"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state.hodItems
+                                                                .department_details
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="office_address">
+                                                        Office address
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="office_address"
+                                                        id="office_address"
+                                                        className="form-control border-secondary"
+                                                        value={
+                                                            this.state.hodItems
+                                                                .office_address
+                                                        }
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <label htmlFor="additional_details_1">
+                                                        Additional details 1
                                                     </label>
                                                     <textarea
-                                                        name="description"
-                                                        id="description"
+                                                        name="additional_details_1"
+                                                        id="additional_details_1"
                                                         rows="4"
                                                         className="form-control border-secondary"
                                                         onChange={
@@ -1047,420 +1066,289 @@ class HODProfile extends Component {
                                                     >
                                                         {
                                                             this.state.hodItems
-                                                                .description
+                                                                .additional_details_1
                                                         }
                                                     </textarea>
                                                 </div>
-
-                                                {/* ----- Institution details POST ----- */}
-
-                                                <div className="dropdown-divider my-4"></div>
-                                                <h6 className="primary-text mb-3">
-                                                    Institution Details
-                                                </h6>
-                                                <div className="row gutters">
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="department_name">
-                                                                Department Name
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="department_name"
-                                                                id="department_name"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .department_name
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="department_details">
-                                                                Department
-                                                                details
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="department_details"
-                                                                id="department_details"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .department_details
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="office_address">
-                                                                Office address
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="office_address"
-                                                                id="office_address"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .office_address
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="additional_details_1">
-                                                                Additional
-                                                                details 1
-                                                            </label>
-                                                            <textarea
-                                                                name="additional_details_1"
-                                                                id="additional_details_1"
-                                                                rows="4"
-                                                                className="form-control border-secondary"
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            >
-                                                                {
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .additional_details_1
-                                                                }
-                                                            </textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="additional_details_2">
-                                                                Additional
-                                                                details 2
-                                                            </label>
-                                                            <textarea
-                                                                name="additional_details_2"
-                                                                id="additional_details_2"
-                                                                rows="4"
-                                                                className="form-control border-secondary"
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            >
-                                                                {
-                                                                    this.state
-                                                                        .hodItems
-                                                                        .additional_details_2
-                                                                }
-                                                            </textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col-6">
-                                                        <button
-                                                            className="btn btn-secondary btn-sm btn-block shadow-none"
-                                                            onClick={
-                                                                this.toggleEdit
-                                                            }
-                                                        >
-                                                            Close
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-6">
-                                                        <button className="btn btn-primary btn-block btn-sm shadow-none">
-                                                            {this.state
-                                                                .showLoader ? (
-                                                                <Spinner
-                                                                    as="span"
-                                                                    animation="border"
-                                                                    size="sm"
-                                                                    role="status"
-                                                                    aria-hidden="true"
-                                                                    className="mr-2"
-                                                                />
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                            Save
-                                                        </button>
-                                                    </div>
-                                                </div>
                                             </div>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    // ---------- Profile details GET ----------
-                                    <>
-                                        {/* ----- Personal details card ----- */}
-
-                                        <div className="card shadow-sm mb-3">
-                                            <div className="card-body">
-                                                <h6 className="primary-text mb-3">
-                                                    Personal Details
-                                                </h6>
-                                                <div className="row gutters">
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <p className="small font-weight-bold-600 mb-2">
-                                                                First Name
-                                                            </p>
-                                                            {
-                                                                this.state
-                                                                    .hodItems
-                                                                    .first_name
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <p className="small font-weight-bold-600 mb-2">
-                                                                Last Name
-                                                            </p>
-                                                            {
-                                                                this.state
-                                                                    .hodItems
-                                                                    .last_name
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <p className="small font-weight-bold-600 mb-2">
-                                                                Username
-                                                            </p>
-                                                            {
-                                                                this.state
-                                                                    .hodItems
-                                                                    .username
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <p className="small font-weight-bold-600 mb-2">
-                                                                Email
-                                                            </p>
-                                                            {
-                                                                this.state
-                                                                    .hodItems
-                                                                    .email
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <p className="small font-weight-bold-600 mb-2">
-                                                                Phone
-                                                            </p>
-                                                            {
-                                                                this.state
-                                                                    .hodItems
-                                                                    .country_code
-                                                            }
-                                                            {
-                                                                this.state
-                                                                    .hodItems
-                                                                    .phone_num
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-lg-4 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <p className="small font-weight-bold-600 mb-2">
-                                                                Date of Birth
-                                                            </p>
-                                                            {dateFormat(
-                                                                this.state
-                                                                    .hodItems
-                                                                    .date_of_birth,
-                                                                "dd-mm-yyyy"
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-
+                                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                                 <div className="form-group">
-                                                    <p className="small font-weight-bold-600 mb-2">
-                                                        About
-                                                    </p>
-                                                    {
-                                                        this.state.hodItems
-                                                            .description
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* ----- Institution details card ----- */}
-
-                                        <div className="card shadow-sm mb-3">
-                                            <div className="card-body">
-                                                <h6 className="primary-text mb-3">
-                                                    Institution Details
-                                                </h6>
-                                                <div className="row mb-3">
-                                                    <div className="col-3 font-weight-bold-600 small">
-                                                        Department Name
-                                                    </div>
-                                                    <div className="col-1">
-                                                        :
-                                                    </div>
-                                                    <div className="col-8">
-                                                        {
-                                                            this.state.hodItems
-                                                                .department_name
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="row mb-3">
-                                                    <div className="col-3 font-weight-bold-600 small">
-                                                        Department details
-                                                    </div>
-                                                    <div className="col-1">
-                                                        :
-                                                    </div>
-                                                    <div className="col-8">
-                                                        {
-                                                            this.state.hodItems
-                                                                .department_details
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="row mb-3">
-                                                    <div className="col-3 font-weight-bold-600 small">
-                                                        Office address
-                                                    </div>
-                                                    <div className="col-1">
-                                                        :
-                                                    </div>
-                                                    <div className="col-8">
-                                                        {
-                                                            this.state.hodItems
-                                                                .office_address
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="row mb-3">
-                                                    <div className="col-3 font-weight-bold-600 small">
-                                                        Additional details 1
-                                                    </div>
-                                                    <div className="col-1">
-                                                        :
-                                                    </div>
-                                                    <div className="col-8">
-                                                        {
-                                                            this.state.hodItems
-                                                                .additional_details_1
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col-3 font-weight-bold-600 small">
+                                                    <label htmlFor="additional_details_2">
                                                         Additional details 2
-                                                    </div>
-                                                    <div className="col-1">
-                                                        :
-                                                    </div>
-                                                    <div className="col-8">
+                                                    </label>
+                                                    <textarea
+                                                        name="additional_details_2"
+                                                        id="additional_details_2"
+                                                        rows="4"
+                                                        className="form-control border-secondary"
+                                                        onChange={
+                                                            this.handleInput
+                                                        }
+                                                    >
                                                         {
                                                             this.state.hodItems
                                                                 .additional_details_2
                                                         }
-                                                    </div>
+                                                    </textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-6">
+                                                <button
+                                                    className="btn btn-secondary btn-sm btn-block shadow-none"
+                                                    onClick={this.toggleEdit}
+                                                >
+                                                    Close
+                                                </button>
+                                            </div>
+                                            <div className="col-6">
+                                                <button className="btn btn-primary btn-block btn-sm shadow-none">
+                                                    {this.state.showLoader ? (
+                                                        <Spinner
+                                                            as="span"
+                                                            animation="border"
+                                                            size="sm"
+                                                            role="status"
+                                                            aria-hidden="true"
+                                                            className="mr-2"
+                                                        />
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        ) : (
+                            // ---------- Profile details GET ----------
+                            <>
+                                {/* ----- Personal details card ----- */}
+
+                                <div className="card shadow-sm mb-3">
+                                    <div className="card-body">
+                                        <h6 className="primary-text mb-3">
+                                            Personal Details
+                                        </h6>
+                                        <div className="row gutters">
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <p className="small font-weight-bold-600 mb-2">
+                                                        First Name
+                                                    </p>
+                                                    {
+                                                        this.state.hodItems
+                                                            .first_name
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <p className="small font-weight-bold-600 mb-2">
+                                                        Last Name
+                                                    </p>
+                                                    {
+                                                        this.state.hodItems
+                                                            .last_name
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <p className="small font-weight-bold-600 mb-2">
+                                                        Username
+                                                    </p>
+                                                    {
+                                                        this.state.hodItems
+                                                            .username
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <p className="small font-weight-bold-600 mb-2">
+                                                        Email
+                                                    </p>
+                                                    {this.state.hodItems.email}
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <p className="small font-weight-bold-600 mb-2">
+                                                        Phone
+                                                    </p>
+                                                    {
+                                                        this.state.hodItems
+                                                            .country_code
+                                                    }
+                                                    {
+                                                        this.state.hodItems
+                                                            .phone_num
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="col-lg-4 col-sm-6 col-12">
+                                                <div className="form-group">
+                                                    <p className="small font-weight-bold-600 mb-2">
+                                                        Date of Birth
+                                                    </p>
+                                                    {dateFormat(
+                                                        this.state.hodItems
+                                                            .date_of_birth,
+                                                        "dd-mm-yyyy"
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* ----- Watermark image card ----- */}
+                                        <div className="form-group">
+                                            <p className="small font-weight-bold-600 mb-2">
+                                                About
+                                            </p>
+                                            {this.state.hodItems.description}
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        <div className="card shadow-sm">
-                                            <div className="card-body">
-                                                <div className="row align-items-center mb-3">
-                                                    <div className="col-6">
-                                                        <h6 className="primary-text">
-                                                            Watermark Image
-                                                        </h6>
-                                                    </div>
-                                                    <div className="col-6 text-right">
-                                                        <button
-                                                            className="btn btn-primary btn-sm shadow-none"
-                                                            onClick={() =>
-                                                                this.toggleModal(
-                                                                    "watermark"
-                                                                )
-                                                            }
-                                                        >
-                                                            Upload Watermark
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                {this.state.hodItems
-                                                    .watermark_image !== null &&
-                                                this.state.hodItems
-                                                    .watermark_image !== "" ? (
-                                                    <>
-                                                        <div className="row mb-2">
-                                                            <div className="col-md-4 col-sm-8 col-12">
-                                                                <img
-                                                                    src={
-                                                                        this
-                                                                            .state
-                                                                            .hodItems
-                                                                            .watermark_image
-                                                                    }
-                                                                    alt={
-                                                                        this
-                                                                            .state
-                                                                            .hodItems
-                                                                            .full_name
-                                                                    }
-                                                                    className="img-fluid"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <button
-                                                            className="btn btn-outline-light text-dark btn-sm"
-                                                            onClick={
-                                                                this
-                                                                    .handleWatermarkDelete
-                                                            }
-                                                        >
-                                                            Delete watermark
-                                                            image
-                                                        </button>
-                                                    </>
-                                                ) : null}
+                                {/* ----- Institution details card ----- */}
+
+                                <div className="card shadow-sm mb-3">
+                                    <div className="card-body">
+                                        <h6 className="primary-text mb-3">
+                                            Institution Details
+                                        </h6>
+                                        <div className="row mb-3">
+                                            <div className="col-3 font-weight-bold-600 small">
+                                                Department Name
+                                            </div>
+                                            <div className="col-1">:</div>
+                                            <div className="col-8">
+                                                {
+                                                    this.state.hodItems
+                                                        .department_name
+                                                }
                                             </div>
                                         </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                                        <div className="row mb-3">
+                                            <div className="col-3 font-weight-bold-600 small">
+                                                Department details
+                                            </div>
+                                            <div className="col-1">:</div>
+                                            <div className="col-8">
+                                                {
+                                                    this.state.hodItems
+                                                        .department_details
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="row mb-3">
+                                            <div className="col-3 font-weight-bold-600 small">
+                                                Office address
+                                            </div>
+                                            <div className="col-1">:</div>
+                                            <div className="col-8">
+                                                {
+                                                    this.state.hodItems
+                                                        .office_address
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="row mb-3">
+                                            <div className="col-3 font-weight-bold-600 small">
+                                                Additional details 1
+                                            </div>
+                                            <div className="col-1">:</div>
+                                            <div className="col-8">
+                                                {
+                                                    this.state.hodItems
+                                                        .additional_details_1
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-3 font-weight-bold-600 small">
+                                                Additional details 2
+                                            </div>
+                                            <div className="col-1">:</div>
+                                            <div className="col-8">
+                                                {
+                                                    this.state.hodItems
+                                                        .additional_details_2
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ----- Watermark image card ----- */}
+
+                                <div className="card shadow-sm">
+                                    <div className="card-body">
+                                        <div className="row align-items-center mb-3">
+                                            <div className="col-6">
+                                                <h6 className="primary-text">
+                                                    Watermark Image
+                                                </h6>
+                                            </div>
+                                            <div className="col-6 text-right">
+                                                <button
+                                                    className="btn btn-primary btn-sm shadow-none"
+                                                    onClick={() =>
+                                                        this.toggleModal(
+                                                            "watermark"
+                                                        )
+                                                    }
+                                                >
+                                                    Upload Watermark
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {this.state.hodItems.watermark_image !==
+                                            null &&
+                                        this.state.hodItems.watermark_image !==
+                                            "" ? (
+                                            <>
+                                                <div className="row mb-2">
+                                                    <div className="col-md-4 col-sm-8 col-12">
+                                                        <img
+                                                            src={
+                                                                this.state
+                                                                    .hodItems
+                                                                    .watermark_image
+                                                            }
+                                                            alt={
+                                                                this.state
+                                                                    .hodItems
+                                                                    .full_name
+                                                            }
+                                                            className="img-fluid"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    className="btn btn-outline-light text-dark btn-sm"
+                                                    onClick={
+                                                        this
+                                                            .handleWatermarkDelete
+                                                    }
+                                                >
+                                                    Delete watermark image
+                                                </button>
+                                            </>
+                                        ) : null}
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

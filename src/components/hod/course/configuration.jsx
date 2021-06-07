@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import Select from "react-select";
@@ -795,7 +794,6 @@ class HODCourseConfig extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             chapters: [],
             semesters: [],
             simulation_exam: [],
@@ -847,12 +845,6 @@ class HODCourseConfig extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     // ----- Data loading from the API -----
 
@@ -1435,17 +1427,15 @@ class HODCourseConfig extends Component {
     render() {
         const data = this.state.courseData;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={
-                        this.subjectId
-                            ? this.props.subject_name
-                            : this.props.course_name
-                    }
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={
+                    this.subjectId
+                        ? this.props.subject_name
+                        : this.props.course_name
+                }
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -1462,12 +1452,6 @@ class HODCourseConfig extends Component {
                             showErrorAlert: false,
                         });
                     }}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
                 />
 
                 {/* Scorecard modal */}
@@ -1552,635 +1536,643 @@ class HODCourseConfig extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        <div className="form-row">
-                            {/* ----- Content card ----- */}
-                            <div className="col-md-4">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb mb-3">
+                <div className="form-row">
+                    {/* ----- Content card ----- */}
+                    <div className="col-md-4">
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.subjectId !== undefined ? (
+                                    <>
                                         <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.subject_name}
                                             </Link>
                                         </li>
-                                        {this.subjectId !== undefined ? (
-                                            <>
-                                                <li className="breadcrumb-item">
-                                                    <Link
-                                                        to="#"
-                                                        onClick={
-                                                            this.props.history
-                                                                .goBack
-                                                        }
-                                                    >
-                                                        {
-                                                            this.props
-                                                                .subject_name
-                                                        }
-                                                    </Link>
-                                                </li>
-                                                <li className="breadcrumb-item active">
-                                                    Course configuration
-                                                </li>
-                                            </>
-                                        ) : (
-                                            <li className="breadcrumb-item active">
-                                                <span>Course:</span>
-                                                {this.props.course_name}
-                                            </li>
-                                        )}
-                                    </ol>
-                                </nav>
+                                        <li className="breadcrumb-item active">
+                                            Course configuration
+                                        </li>
+                                    </>
+                                ) : (
+                                    <li className="breadcrumb-item active">
+                                        <span>Course:</span>
+                                        {this.props.course_name}
+                                    </li>
+                                )}
+                            </ol>
+                        </nav>
 
-                                <div className="card shadow-sm mb-3">
-                                    <div className="card-header font-weight-bold-600">
-                                        Items ready for course creation
-                                    </div>
-                                    <div className="card-body pt-2">
-                                        {/* chapters */}
-                                        <div className="form-row">
-                                            {this.state.chapters.length !== 0
-                                                ? this.state.chapters.map(
-                                                      (item, index) => {
-                                                          return !this.state.chapter_ids.includes(
-                                                              item.chapter_id
-                                                          ) ? (
-                                                              <div
-                                                                  className="col-6 mb-2"
-                                                                  key={index}
+                        <div className="card shadow-sm mb-3">
+                            <div className="card-header font-weight-bold-600">
+                                Items ready for course creation
+                            </div>
+                            <div className="card-body pt-2">
+                                {/* chapters */}
+                                <div className="form-row">
+                                    {this.state.chapters.length !== 0
+                                        ? this.state.chapters.map(
+                                              (item, index) => {
+                                                  return !this.state.chapter_ids.includes(
+                                                      item.chapter_id
+                                                  ) ? (
+                                                      <div
+                                                          className="col-6 mb-2"
+                                                          key={index}
+                                                      >
+                                                          <Dropdown>
+                                                              <Dropdown.Toggle
+                                                                  variant="white"
+                                                                  className="card card-body secondary-bg shadow-none p-2 caret-off w-100"
+                                                                  onDragStart={(
+                                                                      e
+                                                                  ) =>
+                                                                      this.handleDragStart(
+                                                                          e,
+                                                                          item,
+                                                                          "chapter"
+                                                                      )
+                                                                  }
+                                                                  draggable
                                                               >
-                                                                  <Dropdown>
-                                                                      <Dropdown.Toggle
-                                                                          variant="white"
-                                                                          className="card card-body secondary-bg shadow-none p-2 caret-off w-100"
+                                                                  <div className="small primary-text text-center text-wrap font-weight-bold-600 w-100">
+                                                                      {
+                                                                          item.chapter_name
+                                                                      }
+                                                                  </div>
+                                                              </Dropdown.Toggle>
+
+                                                              <Dropdown.Menu>
+                                                                  {item.content_exists ? (
+                                                                      <div
+                                                                          className="dropdown-item"
+                                                                          style={{
+                                                                              cursor: "move",
+                                                                          }}
                                                                           onDragStart={(
                                                                               e
                                                                           ) =>
                                                                               this.handleDragStart(
                                                                                   e,
                                                                                   item,
-                                                                                  "chapter"
+                                                                                  "content"
                                                                               )
                                                                           }
                                                                           draggable
                                                                       >
-                                                                          <div className="small primary-text text-center text-wrap font-weight-bold-600 w-100">
-                                                                              {
-                                                                                  item.chapter_name
-                                                                              }
-                                                                          </div>
-                                                                      </Dropdown.Toggle>
-
-                                                                      <Dropdown.Menu>
-                                                                          {item.content_exists ? (
-                                                                              <div
-                                                                                  className="dropdown-item"
-                                                                                  style={{
-                                                                                      cursor: "move",
-                                                                                  }}
-                                                                                  onDragStart={(
-                                                                                      e
-                                                                                  ) =>
-                                                                                      this.handleDragStart(
-                                                                                          e,
-                                                                                          item,
-                                                                                          "content"
-                                                                                      )
-                                                                                  }
-                                                                                  draggable
-                                                                              >
-                                                                                  Content
-                                                                              </div>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
-                                                                          {item.quiz_exists ? (
-                                                                              <div
-                                                                                  className="dropdown-item"
-                                                                                  style={{
-                                                                                      cursor: "move",
-                                                                                  }}
-                                                                                  onDragStart={(
-                                                                                      e
-                                                                                  ) =>
-                                                                                      this.handleDragStart(
-                                                                                          e,
-                                                                                          item,
-                                                                                          "quiz"
-                                                                                      )
-                                                                                  }
-                                                                                  draggable
-                                                                              >
-                                                                                  Quiz
-                                                                              </div>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
-                                                                      </Dropdown.Menu>
-                                                                  </Dropdown>
-                                                              </div>
-                                                          ) : (
-                                                              ""
-                                                          );
-                                                      }
-                                                  )
-                                                : ""}
-                                        </div>
-
-                                        <div className="dropdown-divider mb-3"></div>
-
-                                        {/* semesters */}
-                                        <div className="form-row">
-                                            {this.state.semesters.length !== 0
-                                                ? this.state.semesters.map(
-                                                      (item, index) => {
-                                                          return !this.state.semester_ids.includes(
-                                                              item.semester_id
-                                                          ) ? (
-                                                              <div
-                                                                  className="col-6 mb-2"
-                                                                  key={index}
-                                                              >
-                                                                  <div
-                                                                      className="card card-body secondary-bg p-2 w-100"
-                                                                      style={{
-                                                                          cursor: "move",
-                                                                      }}
-                                                                      onDragStart={(
-                                                                          e
-                                                                      ) =>
-                                                                          this.handleDragStart(
-                                                                              e,
-                                                                              item,
-                                                                              "semester"
-                                                                          )
-                                                                      }
-                                                                      draggable
-                                                                  >
-                                                                      <div className="small primary-text text-center text-wrap font-weight-bold-600 w-100">
-                                                                          {
-                                                                              item.semester_name
-                                                                          }
+                                                                          Content
                                                                       </div>
-                                                                  </div>
-                                                              </div>
-                                                          ) : (
-                                                              ""
-                                                          );
-                                                      }
-                                                  )
-                                                : ""}
-                                        </div>
-
-                                        {/* simulation */}
-                                        <div className="form-row">
-                                            {this.state.simulation_exam
-                                                .length !== 0
-                                                ? this.state.simulation_exam.map(
-                                                      (item, index) => {
-                                                          return !this.state.simulation_ids.includes(
-                                                              item.simulation_id
-                                                          ) ? (
-                                                              <div
-                                                                  className="col-6 mb-2"
-                                                                  key={index}
-                                                              >
-                                                                  <div
-                                                                      className="card card-body secondary-bg p-2 w-100"
-                                                                      style={{
-                                                                          cursor: "move",
-                                                                      }}
-                                                                      onDragStart={(
-                                                                          e
-                                                                      ) =>
-                                                                          this.handleDragStart(
-                                                                              e,
-                                                                              item,
-                                                                              "simulation"
-                                                                          )
-                                                                      }
-                                                                      draggable
-                                                                  >
-                                                                      <div className="small primary-text text-center text-wrap font-weight-bold-600 w-100">
-                                                                          {
-                                                                              item.simulation_name
+                                                                  ) : (
+                                                                      ""
+                                                                  )}
+                                                                  {item.quiz_exists ? (
+                                                                      <div
+                                                                          className="dropdown-item"
+                                                                          style={{
+                                                                              cursor: "move",
+                                                                          }}
+                                                                          onDragStart={(
+                                                                              e
+                                                                          ) =>
+                                                                              this.handleDragStart(
+                                                                                  e,
+                                                                                  item,
+                                                                                  "quiz"
+                                                                              )
                                                                           }
+                                                                          draggable
+                                                                      >
+                                                                          Quiz
                                                                       </div>
-                                                                  </div>
+                                                                  ) : (
+                                                                      ""
+                                                                  )}
+                                                              </Dropdown.Menu>
+                                                          </Dropdown>
+                                                      </div>
+                                                  ) : (
+                                                      ""
+                                                  );
+                                              }
+                                          )
+                                        : ""}
+                                </div>
+
+                                <div className="dropdown-divider mb-3"></div>
+
+                                {/* semesters */}
+                                <div className="form-row">
+                                    {this.state.semesters.length !== 0
+                                        ? this.state.semesters.map(
+                                              (item, index) => {
+                                                  return !this.state.semester_ids.includes(
+                                                      item.semester_id
+                                                  ) ? (
+                                                      <div
+                                                          className="col-6 mb-2"
+                                                          key={index}
+                                                      >
+                                                          <div
+                                                              className="card card-body secondary-bg p-2 w-100"
+                                                              style={{
+                                                                  cursor: "move",
+                                                              }}
+                                                              onDragStart={(
+                                                                  e
+                                                              ) =>
+                                                                  this.handleDragStart(
+                                                                      e,
+                                                                      item,
+                                                                      "semester"
+                                                                  )
+                                                              }
+                                                              draggable
+                                                          >
+                                                              <div className="small primary-text text-center text-wrap font-weight-bold-600 w-100">
+                                                                  {
+                                                                      item.semester_name
+                                                                  }
                                                               </div>
-                                                          ) : (
-                                                              ""
-                                                          );
-                                                      }
-                                                  )
-                                                : ""}
+                                                          </div>
+                                                      </div>
+                                                  ) : (
+                                                      ""
+                                                  );
+                                              }
+                                          )
+                                        : ""}
+                                </div>
+
+                                {/* simulation */}
+                                <div className="form-row">
+                                    {this.state.simulation_exam.length !== 0
+                                        ? this.state.simulation_exam.map(
+                                              (item, index) => {
+                                                  return !this.state.simulation_ids.includes(
+                                                      item.simulation_id
+                                                  ) ? (
+                                                      <div
+                                                          className="col-6 mb-2"
+                                                          key={index}
+                                                      >
+                                                          <div
+                                                              className="card card-body secondary-bg p-2 w-100"
+                                                              style={{
+                                                                  cursor: "move",
+                                                              }}
+                                                              onDragStart={(
+                                                                  e
+                                                              ) =>
+                                                                  this.handleDragStart(
+                                                                      e,
+                                                                      item,
+                                                                      "simulation"
+                                                                  )
+                                                              }
+                                                              draggable
+                                                          >
+                                                              <div className="small primary-text text-center text-wrap font-weight-bold-600 w-100">
+                                                                  {
+                                                                      item.simulation_name
+                                                                  }
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  ) : (
+                                                      ""
+                                                  );
+                                              }
+                                          )
+                                        : ""}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ----- Course config card ----- */}
+                    <div className="col-md-8">
+                        <div className="card card-body shadow-sm">
+                            {/* Course title & board */}
+                            <div className="form-row mb-3">
+                                <div className="col-md-6">
+                                    <label
+                                        htmlFor="course_name"
+                                        className="primary-text font-weight-bold-600"
+                                    >
+                                        Course Title
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="course_name"
+                                        id="course_name"
+                                        className="form-control form-control-lg borders"
+                                        placeholder="Enter course title"
+                                        value={
+                                            this.state.courseData.course_name
+                                        }
+                                        onChange={(event) =>
+                                            this.handleInput(event, "title")
+                                        }
+                                        autoComplete="off"
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <div className="form-row align-items-center">
+                                        <div className="col-6">
+                                            <label
+                                                htmlFor="board"
+                                                className="primary-text font-weight-bold-600"
+                                            >
+                                                Board
+                                            </label>
+                                            <Select
+                                                className="basic-single borders w-100"
+                                                placeholder="Select board"
+                                                isSearchable={true}
+                                                name="board"
+                                                id="board"
+                                                value={
+                                                    this.state.configData.board
+                                                        ? Object.entries(
+                                                              this.state
+                                                                  .configData
+                                                                  .board
+                                                          ).map(
+                                                              ([
+                                                                  key,
+                                                                  value,
+                                                              ]) => {
+                                                                  return this
+                                                                      .state
+                                                                      .courseData
+                                                                      .board ===
+                                                                      key
+                                                                      ? {
+                                                                            label: value,
+                                                                            value: key,
+                                                                        }
+                                                                      : "";
+                                                              }
+                                                          )
+                                                        : ""
+                                                }
+                                                options={
+                                                    this.state.configData.board
+                                                        ? Object.entries(
+                                                              this.state
+                                                                  .configData
+                                                                  .board
+                                                          ).map(
+                                                              ([
+                                                                  key,
+                                                                  value,
+                                                              ]) => {
+                                                                  return {
+                                                                      label: value,
+                                                                      value: key,
+                                                                  };
+                                                              }
+                                                          )
+                                                        : ""
+                                                }
+                                                onChange={(event) =>
+                                                    this.handleInput(
+                                                        event,
+                                                        "board"
+                                                    )
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                        <div className="col-6">
+                                            <label
+                                                htmlFor="type"
+                                                className="primary-text font-weight-bold-600"
+                                            >
+                                                Type
+                                            </label>
+                                            <Select
+                                                className="basic-single borders w-100"
+                                                placeholder="Select type"
+                                                isSearchable={true}
+                                                name="type"
+                                                id="type"
+                                                value={
+                                                    this.state.configData.type
+                                                        ? Object.entries(
+                                                              this.state
+                                                                  .configData
+                                                                  .type
+                                                          ).map(
+                                                              ([
+                                                                  key,
+                                                                  value,
+                                                              ]) => {
+                                                                  return this
+                                                                      .state
+                                                                      .courseData
+                                                                      .type ===
+                                                                      key
+                                                                      ? {
+                                                                            label: value,
+                                                                            value: key,
+                                                                        }
+                                                                      : "";
+                                                              }
+                                                          )
+                                                        : ""
+                                                }
+                                                options={
+                                                    this.state.configData.type
+                                                        ? Object.entries(
+                                                              this.state
+                                                                  .configData
+                                                                  .type
+                                                          ).map(
+                                                              ([
+                                                                  key,
+                                                                  value,
+                                                              ]) => {
+                                                                  return {
+                                                                      label: value,
+                                                                      value: key,
+                                                                  };
+                                                              }
+                                                          )
+                                                        : ""
+                                                }
+                                                onChange={(event) =>
+                                                    this.handleInput(
+                                                        event,
+                                                        "type"
+                                                    )
+                                                }
+                                                required
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* ----- Course config card ----- */}
-                            <div className="col-md-8">
-                                <div className="card card-body shadow-sm">
-                                    {/* Course title & board */}
-                                    <div className="form-row mb-3">
-                                        <div className="col-md-6">
-                                            <label
-                                                htmlFor="course_name"
-                                                className="primary-text font-weight-bold-600"
+                            {/* Scorecard, type, limited, quick pass and unit */}
+                            <div className="row mb-3">
+                                <div className="col-md-5">
+                                    <div className="form-row align-items-center">
+                                        <div className="col-7">
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none btn-block"
+                                                onClick={() => {
+                                                    this.setState({
+                                                        showScorecardModal:
+                                                            !this.state
+                                                                .showScorecardModal,
+                                                    });
+                                                }}
                                             >
-                                                Course Title
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="course_name"
-                                                id="course_name"
-                                                className="form-control form-control-lg borders"
-                                                placeholder="Enter course title"
-                                                value={
-                                                    this.state.courseData
-                                                        .course_name
-                                                }
-                                                onChange={(event) =>
-                                                    this.handleInput(
-                                                        event,
-                                                        "title"
-                                                    )
-                                                }
-                                                autoComplete="off"
-                                            />
+                                                Score configuration
+                                            </button>
                                         </div>
-                                        <div className="col-md-6">
-                                            <div className="form-row align-items-center">
-                                                <div className="col-6">
-                                                    <label
-                                                        htmlFor="board"
-                                                        className="primary-text font-weight-bold-600"
-                                                    >
-                                                        Board
-                                                    </label>
-                                                    <Select
-                                                        className="basic-single borders w-100"
-                                                        placeholder="Select board"
-                                                        isSearchable={true}
-                                                        name="board"
-                                                        id="board"
-                                                        value={
-                                                            this.state
-                                                                .configData
-                                                                .board
-                                                                ? Object.entries(
-                                                                      this.state
-                                                                          .configData
-                                                                          .board
-                                                                  ).map(
-                                                                      ([
-                                                                          key,
-                                                                          value,
-                                                                      ]) => {
-                                                                          return this
-                                                                              .state
-                                                                              .courseData
-                                                                              .board ===
-                                                                              key
-                                                                              ? {
-                                                                                    label: value,
-                                                                                    value: key,
-                                                                                }
-                                                                              : "";
-                                                                      }
-                                                                  )
-                                                                : ""
-                                                        }
-                                                        options={
-                                                            this.state
-                                                                .configData
-                                                                .board
-                                                                ? Object.entries(
-                                                                      this.state
-                                                                          .configData
-                                                                          .board
-                                                                  ).map(
-                                                                      ([
-                                                                          key,
-                                                                          value,
-                                                                      ]) => {
-                                                                          return {
-                                                                              label: value,
-                                                                              value: key,
-                                                                          };
-                                                                      }
-                                                                  )
-                                                                : ""
-                                                        }
-                                                        onChange={(event) =>
-                                                            this.handleInput(
-                                                                event,
-                                                                "board"
-                                                            )
-                                                        }
-                                                        required
-                                                    />
-                                                </div>
-                                                <div className="col-6">
-                                                    <label
-                                                        htmlFor="type"
-                                                        className="primary-text font-weight-bold-600"
-                                                    >
-                                                        Type
-                                                    </label>
-                                                    <Select
-                                                        className="basic-single borders w-100"
-                                                        placeholder="Select type"
-                                                        isSearchable={true}
-                                                        name="type"
-                                                        id="type"
-                                                        value={
-                                                            this.state
-                                                                .configData.type
-                                                                ? Object.entries(
-                                                                      this.state
-                                                                          .configData
-                                                                          .type
-                                                                  ).map(
-                                                                      ([
-                                                                          key,
-                                                                          value,
-                                                                      ]) => {
-                                                                          return this
-                                                                              .state
-                                                                              .courseData
-                                                                              .type ===
-                                                                              key
-                                                                              ? {
-                                                                                    label: value,
-                                                                                    value: key,
-                                                                                }
-                                                                              : "";
-                                                                      }
-                                                                  )
-                                                                : ""
-                                                        }
-                                                        options={
-                                                            this.state
-                                                                .configData.type
-                                                                ? Object.entries(
-                                                                      this.state
-                                                                          .configData
-                                                                          .type
-                                                                  ).map(
-                                                                      ([
-                                                                          key,
-                                                                          value,
-                                                                      ]) => {
-                                                                          return {
-                                                                              label: value,
-                                                                              value: key,
-                                                                          };
-                                                                      }
-                                                                  )
-                                                                : ""
-                                                        }
-                                                        onChange={(event) =>
-                                                            this.handleInput(
-                                                                event,
-                                                                "type"
-                                                            )
-                                                        }
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
+                                        <div className="col-5">
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none btn-block"
+                                                onClick={() => {
+                                                    this.setState({
+                                                        showDetailsModal: true,
+                                                    });
+                                                }}
+                                            >
+                                                Course Details
+                                            </button>
                                         </div>
                                     </div>
-
-                                    {/* Scorecard, type, limited, quick pass and unit */}
-                                    <div className="row mb-3">
-                                        <div className="col-md-5">
-                                            <div className="form-row align-items-center">
-                                                <div className="col-7">
-                                                    <button
-                                                        className="btn btn-primary btn-sm shadow-none btn-block"
-                                                        onClick={() => {
-                                                            this.setState({
-                                                                showScorecardModal:
-                                                                    !this.state
-                                                                        .showScorecardModal,
-                                                            });
-                                                        }}
-                                                    >
-                                                        Score configuration
-                                                    </button>
-                                                </div>
-                                                <div className="col-5">
-                                                    <button
-                                                        className="btn btn-primary btn-sm shadow-none btn-block"
-                                                        onClick={() => {
-                                                            this.setState({
-                                                                showDetailsModal: true,
-                                                            });
-                                                        }}
-                                                    >
-                                                        Course Details
-                                                    </button>
-                                                </div>
+                                </div>
+                                <div className="col-md-7">
+                                    <div className="form-row align-items-center">
+                                        <div className="col-4">
+                                            <div className="d-flex align-items-center justify-content-end">
+                                                <span className="mr-2">
+                                                    Limited
+                                                </span>
+                                                <ReactSwitch
+                                                    checked={
+                                                        this.state.courseData
+                                                            .limited
+                                                    }
+                                                    onChange={(event) =>
+                                                        this.handleInput(
+                                                            event,
+                                                            "limited"
+                                                        )
+                                                    }
+                                                />
                                             </div>
                                         </div>
-                                        <div className="col-md-7">
-                                            <div className="form-row align-items-center">
-                                                <div className="col-4">
-                                                    <div className="d-flex align-items-center justify-content-end">
-                                                        <span className="mr-2">
-                                                            Limited
-                                                        </span>
-                                                        <ReactSwitch
-                                                            checked={
-                                                                this.state
-                                                                    .courseData
-                                                                    .limited
-                                                            }
-                                                            onChange={(event) =>
-                                                                this.handleInput(
-                                                                    event,
-                                                                    "limited"
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-4">
-                                                    <button
-                                                        className="btn bg-primary btn-sm text-white btn-block shadow-none"
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                showNotesModal: true,
-                                                            })
-                                                        }
-                                                    >
-                                                        Quick Pass Tips
-                                                    </button>
-                                                </div>
-                                                <div className="col-4">
-                                                    <button
-                                                        className="btn bg-primary btn-sm text-white btn-block shadow-none"
-                                                        onClick={
-                                                            this.handleAddUnit
-                                                        }
-                                                    >
-                                                        Add Unit
-                                                    </button>
-                                                </div>
-                                            </div>
+                                        <div className="col-4">
+                                            <button
+                                                className="btn bg-primary btn-sm text-white btn-block shadow-none"
+                                                onClick={() =>
+                                                    this.setState({
+                                                        showNotesModal: true,
+                                                    })
+                                                }
+                                            >
+                                                Quick Pass Tips
+                                            </button>
+                                        </div>
+                                        <div className="col-4">
+                                            <button
+                                                className="btn bg-primary btn-sm text-white btn-block shadow-none"
+                                                onClick={this.handleAddUnit}
+                                            >
+                                                Add Unit
+                                            </button>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
 
-                                    {/* Content drop area */}
-                                    <div className="border mb-3">
-                                        <div className="card-header small font-weight-bold border-bottom">
-                                            <div className="row align-items-center">
-                                                <div className="col-2">
-                                                    Sl. No.
-                                                </div>
-                                                <div className="col-7">
-                                                    Course Structure
-                                                </div>
-                                                <div className="col-2">
-                                                    Weightage
-                                                </div>
-                                                <div className="col-1"></div>
-                                            </div>
+                            {/* Content drop area */}
+                            <div className="border mb-3">
+                                <div className="card-header small font-weight-bold border-bottom">
+                                    <div className="row align-items-center">
+                                        <div className="col-2">Sl. No.</div>
+                                        <div className="col-7">
+                                            Course Structure
                                         </div>
+                                        <div className="col-2">Weightage</div>
+                                        <div className="col-1"></div>
+                                    </div>
+                                </div>
+                                <div
+                                    className="card-body position-relative py-2"
+                                    style={{ minHeight: "300px" }}
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={(e) => this.handleDrop(e)}
+                                >
+                                    {Object.entries(data.course_structure)
+                                        .length === 0 &&
+                                    data.simulation_exam.length === 0 ? (
                                         <div
-                                            className="card-body position-relative py-2"
-                                            style={{ minHeight: "300px" }}
-                                            onDragOver={(e) =>
-                                                e.preventDefault()
-                                            }
-                                            onDrop={(e) => this.handleDrop(e)}
+                                            id="drop-here"
+                                            className="text-muted user-select-none"
+                                            draggable={false}
                                         >
+                                            Add unit to drop items here...
+                                        </div>
+                                    ) : (
+                                        <>
                                             {Object.entries(
                                                 data.course_structure
-                                            ).length === 0 &&
-                                            data.simulation_exam.length ===
-                                                0 ? (
-                                                <div
-                                                    id="drop-here"
-                                                    className="text-muted"
-                                                    style={{
-                                                        userSelect: "none",
-                                                    }}
-                                                    draggable={false}
-                                                >
-                                                    Add unit to drop items
-                                                    here...
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    {Object.entries(
-                                                        data.course_structure
-                                                    ).map(
-                                                        (
-                                                            [key, value],
-                                                            index
-                                                        ) => {
-                                                            return (
-                                                                <div
-                                                                    className="mb-3"
-                                                                    key={index}
+                                            ).map(([key, value], index) => {
+                                                return (
+                                                    <div
+                                                        className="mb-3"
+                                                        key={index}
+                                                    >
+                                                        {/* ----- Unit list ----- */}
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-2"></div>
+                                                            <div className="col-7 d-flex align-items-center text-muted font-weight-bold-600">
+                                                                {this.state
+                                                                    .activeUnit ===
+                                                                    key &&
+                                                                this.state
+                                                                    .showUnitForm ? (
+                                                                    <>
+                                                                        <div>
+                                                                            <input
+                                                                                type="text"
+                                                                                name="unit_name"
+                                                                                id="unit_name"
+                                                                                className="form-control form-control-sm border"
+                                                                                value={
+                                                                                    value.unit_name
+                                                                                }
+                                                                                onChange={(
+                                                                                    event
+                                                                                ) => {
+                                                                                    this.handleUnitInput(
+                                                                                        event,
+                                                                                        key
+                                                                                    );
+                                                                                }}
+                                                                                autoComplete="off"
+                                                                            />
+                                                                        </div>
+                                                                        <span
+                                                                            className="ml-3 small"
+                                                                            style={{
+                                                                                cursor: "pointer",
+                                                                            }}
+                                                                            onClick={() => {
+                                                                                this.toggleUnitForm(
+                                                                                    key
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <i className="far fa-save fa-sm"></i>
+                                                                        </span>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <div>
+                                                                            {
+                                                                                value.unit_name
+                                                                            }
+                                                                        </div>
+                                                                        <span
+                                                                            className="ml-3 small"
+                                                                            style={{
+                                                                                cursor: "pointer",
+                                                                            }}
+                                                                            onClick={() => {
+                                                                                this.toggleUnitForm(
+                                                                                    key
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <i className="far fa-edit fa-sm"></i>
+                                                                        </span>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                            <div className="col-2"></div>
+                                                            <div className="col-1">
+                                                                <span
+                                                                    className="text-muted"
+                                                                    style={{
+                                                                        cursor: "pointer",
+                                                                    }}
+                                                                    onClick={() => {
+                                                                        this.handleRemoveUnit(
+                                                                            key
+                                                                        );
+                                                                    }}
                                                                 >
-                                                                    {/* ----- Unit list ----- */}
-                                                                    <div className="row align-items-center mb-2">
-                                                                        <div className="col-2"></div>
-                                                                        <div className="col-7 d-flex align-items-center text-muted font-weight-bold-600">
-                                                                            {this
-                                                                                .state
-                                                                                .activeUnit ===
-                                                                                key &&
-                                                                            this
-                                                                                .state
-                                                                                .showUnitForm ? (
-                                                                                <>
-                                                                                    <div>
-                                                                                        <input
-                                                                                            type="text"
-                                                                                            name="unit_name"
-                                                                                            id="unit_name"
-                                                                                            className="form-control form-control-sm border"
-                                                                                            value={
-                                                                                                value.unit_name
-                                                                                            }
-                                                                                            onChange={(
-                                                                                                event
-                                                                                            ) => {
-                                                                                                this.handleUnitInput(
-                                                                                                    event,
-                                                                                                    key
-                                                                                                );
-                                                                                            }}
-                                                                                            autoComplete="off"
-                                                                                        />
-                                                                                    </div>
-                                                                                    <span
-                                                                                        className="ml-3 small"
-                                                                                        style={{
-                                                                                            cursor: "pointer",
-                                                                                        }}
-                                                                                        onClick={() => {
-                                                                                            this.toggleUnitForm(
-                                                                                                key
-                                                                                            );
-                                                                                        }}
-                                                                                    >
-                                                                                        <i className="far fa-save fa-sm"></i>
-                                                                                    </span>
-                                                                                </>
-                                                                            ) : (
-                                                                                <>
-                                                                                    <div>
-                                                                                        {
-                                                                                            value.unit_name
-                                                                                        }
-                                                                                    </div>
-                                                                                    <span
-                                                                                        className="ml-3 small"
-                                                                                        style={{
-                                                                                            cursor: "pointer",
-                                                                                        }}
-                                                                                        onClick={() => {
-                                                                                            this.toggleUnitForm(
-                                                                                                key
-                                                                                            );
-                                                                                        }}
-                                                                                    >
-                                                                                        <i className="far fa-edit fa-sm"></i>
-                                                                                    </span>
-                                                                                </>
+                                                                    <i className="fas fa-minus-circle"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Chapter and Semester list */}
+                                                        {value.content.map(
+                                                            (
+                                                                item,
+                                                                cs_index
+                                                            ) => {
+                                                                return (
+                                                                    <div
+                                                                        className="row align-items-center mb-1"
+                                                                        key={
+                                                                            cs_index
+                                                                        }
+                                                                    >
+                                                                        <div className="col-2 small primary-text font-weight-bold-600">
+                                                                            {cs_index +
+                                                                                1}
+                                                                        </div>
+                                                                        <div className="col-7 small primary-text font-weight-bold-600">
+                                                                            {this.getContentName(
+                                                                                item.chapter_id
+                                                                                    ? item.chapter_id
+                                                                                    : item.semester_id,
+                                                                                item.chapter_id
+                                                                                    ? "chapter"
+                                                                                    : "semester"
                                                                             )}
                                                                         </div>
-                                                                        <div className="col-2"></div>
+                                                                        <div className="col-2 small primary-text font-weight-bold-600">
+                                                                            {item.chapter_id
+                                                                                ? this.getChapterWeightage(
+                                                                                      item.chapter_id
+                                                                                  )
+                                                                                : "-"}
+                                                                        </div>
                                                                         <div className="col-1">
                                                                             <span
-                                                                                className="text-muted"
+                                                                                className="primary-text"
                                                                                 style={{
                                                                                     cursor: "pointer",
                                                                                 }}
                                                                                 onClick={() => {
-                                                                                    this.handleRemoveUnit(
-                                                                                        key
+                                                                                    this.handleRemoveContent(
+                                                                                        key,
+                                                                                        cs_index,
+                                                                                        item.chapter_id
+                                                                                            ? item.chapter_id
+                                                                                            : item.semester_id,
+                                                                                        item.chapter_id
+                                                                                            ? "chapter"
+                                                                                            : "semester"
                                                                                     );
                                                                                 }}
                                                                             >
@@ -2188,179 +2180,115 @@ class HODCourseConfig extends Component {
                                                                             </span>
                                                                         </div>
                                                                     </div>
+                                                                );
+                                                            }
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
 
-                                                                    {/* Chapter and Semester list */}
-                                                                    {value.content.map(
-                                                                        (
-                                                                            item,
-                                                                            cs_index
-                                                                        ) => {
-                                                                            return (
-                                                                                <div
-                                                                                    className="row align-items-center mb-1"
-                                                                                    key={
-                                                                                        cs_index
-                                                                                    }
-                                                                                >
-                                                                                    <div className="col-2 small primary-text font-weight-bold-600">
-                                                                                        {cs_index +
-                                                                                            1}
-                                                                                    </div>
-                                                                                    <div className="col-7 small primary-text font-weight-bold-600">
-                                                                                        {this.getContentName(
-                                                                                            item.chapter_id
-                                                                                                ? item.chapter_id
-                                                                                                : item.semester_id,
-                                                                                            item.chapter_id
-                                                                                                ? "chapter"
-                                                                                                : "semester"
-                                                                                        )}
-                                                                                    </div>
-                                                                                    <div className="col-2 small primary-text font-weight-bold-600">
-                                                                                        {item.chapter_id
-                                                                                            ? this.getChapterWeightage(
-                                                                                                  item.chapter_id
-                                                                                              )
-                                                                                            : "-"}
-                                                                                    </div>
-                                                                                    <div className="col-1">
-                                                                                        <span
-                                                                                            className="primary-text"
-                                                                                            style={{
-                                                                                                cursor: "pointer",
-                                                                                            }}
-                                                                                            onClick={() => {
-                                                                                                this.handleRemoveContent(
-                                                                                                    key,
-                                                                                                    cs_index,
-                                                                                                    item.chapter_id
-                                                                                                        ? item.chapter_id
-                                                                                                        : item.semester_id,
-                                                                                                    item.chapter_id
-                                                                                                        ? "chapter"
-                                                                                                        : "semester"
-                                                                                                );
-                                                                                            }}
-                                                                                        >
-                                                                                            <i className="fas fa-minus-circle"></i>
-                                                                                        </span>
-                                                                                    </div>
-                                                                                </div>
-                                                                            );
-                                                                        }
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )}
-
-                                                    {/* Simulation list */}
-                                                    {data.simulation_exam.map(
-                                                        (item, se_index) => {
-                                                            return (
-                                                                <div
-                                                                    className="row align-items-center mb-1"
-                                                                    key={
-                                                                        se_index
-                                                                    }
-                                                                >
-                                                                    <div className="col-2"></div>
-                                                                    <div className="col-7 primary-text small font-weight-bold-600">
-                                                                        {this.getContentName(
+                                            {/* Simulation list */}
+                                            {data.simulation_exam.map(
+                                                (item, se_index) => {
+                                                    return (
+                                                        <div
+                                                            className="row align-items-center mb-1"
+                                                            key={se_index}
+                                                        >
+                                                            <div className="col-2"></div>
+                                                            <div className="col-7 primary-text small font-weight-bold-600">
+                                                                {this.getContentName(
+                                                                    item.simulation_id,
+                                                                    "simulation"
+                                                                )}
+                                                            </div>
+                                                            <div className="col-2 primary-text small font-weight-bold-600">
+                                                                -
+                                                            </div>
+                                                            <div className="col-1">
+                                                                <span
+                                                                    className="primary-text"
+                                                                    style={{
+                                                                        cursor: "pointer",
+                                                                    }}
+                                                                    onClick={() => {
+                                                                        this.handleRemoveContent(
+                                                                            "NODATA",
+                                                                            se_index,
                                                                             item.simulation_id,
                                                                             "simulation"
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="col-2 primary-text small font-weight-bold-600">
-                                                                        -
-                                                                    </div>
-                                                                    <div className="col-1">
-                                                                        <span
-                                                                            className="primary-text"
-                                                                            style={{
-                                                                                cursor: "pointer",
-                                                                            }}
-                                                                            onClick={() => {
-                                                                                this.handleRemoveContent(
-                                                                                    "NODATA",
-                                                                                    se_index,
-                                                                                    item.simulation_id,
-                                                                                    "simulation"
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            <i className="fas fa-minus-circle"></i>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )}
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Save & review */}
-                                    <div className="d-flex justify-content-between">
-                                        <div>
-                                            {this.state.course_id !== "" ? (
-                                                <button
-                                                    className="btn btn-primary btn-sm shadow-none px-3"
-                                                    onClick={() => {
-                                                        this.setState({
-                                                            showImageModal: true,
-                                                        });
-                                                    }}
-                                                >
-                                                    Upload Image
-                                                </button>
-                                            ) : (
-                                                ""
-                                            )}
-                                        </div>
-                                        <div>
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none mr-1"
-                                                onClick={this.handleSubmit}
-                                            >
-                                                {this.state.course_id === ""
-                                                    ? "Save"
-                                                    : "Update"}
-                                            </button>
-                                            <Link
-                                                to={`/hod/course/${this.state.course_id}`}
-                                                onClick={() => {
-                                                    storeDispatch(
-                                                        COURSE,
-                                                        this.state.courseData
-                                                            .course_name
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <i className="fas fa-minus-circle"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
                                                     );
-                                                }}
-                                            >
-                                                <button
-                                                    className="btn btn-primary btn-sm shadow-none"
-                                                    disabled={
-                                                        this.state.course_id ===
-                                                        ""
-                                                            ? true
-                                                            : false
-                                                    }
-                                                >
-                                                    Review
-                                                </button>
-                                            </Link>
-                                        </div>
-                                    </div>
+                                                }
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Save & review */}
+                            <div className="d-flex justify-content-between">
+                                <div>
+                                    {this.state.course_id !== "" ? (
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none px-3"
+                                            onClick={() => {
+                                                this.setState({
+                                                    showImageModal: true,
+                                                });
+                                            }}
+                                        >
+                                            Upload Image
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
+                                <div>
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                        onClick={this.handleSubmit}
+                                    >
+                                        {this.state.course_id === ""
+                                            ? "Save"
+                                            : "Update"}
+                                    </button>
+                                    <Link
+                                        to={`/hod/course/${this.state.course_id}`}
+                                        onClick={() => {
+                                            storeDispatch(
+                                                COURSE,
+                                                this.state.courseData
+                                                    .course_name
+                                            );
+                                        }}
+                                    >
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            disabled={
+                                                this.state.course_id === ""
+                                                    ? true
+                                                    : false
+                                            }
+                                        >
+                                            Review
+                                        </button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }
