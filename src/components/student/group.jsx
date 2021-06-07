@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Wrapper from "./wrapper";
 import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
@@ -8,7 +7,6 @@ import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import Slider from "react-slick";
 import { connect } from "react-redux";
-import { waterMark } from "../common/function/watermark";
 import storeDispatch from "../../redux/dispatch";
 import { SUBJECT } from "../../redux/action";
 
@@ -21,7 +19,6 @@ class Group extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             subjectItems: [],
 
             errorMsg: "",
@@ -38,12 +35,6 @@ class Group extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     componentDidMount = () => {
         document.title = `${this.props.group_name} - Student | IQLabs`;
@@ -113,19 +104,12 @@ class Group extends Component {
             ],
         };
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.group_name}
-                    togglenav={this.toggleSideNav}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
+            <Wrapper
+                header={this.props.group_name}
+                activeLink="dashboard"
+                history={this.props.history}
+                waterMark={this.props.profile}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -144,118 +128,102 @@ class Group extends Component {
                     }}
                 />
 
-                <div
-                    className={`section content pb-0 ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                    style={waterMark(this.props.profile)}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/student">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">
+                            <span className="font-weight-bold-600">
+                                Group:{" "}
+                            </span>
+                            {this.props.group_name}
+                        </li>
+                    </ol>
+                </nav>
 
-                        {/* Breadcrumb */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/student">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    <span className="font-weight-bold-600">
-                                        Group:{" "}
-                                    </span>
-                                    {this.props.group_name}
-                                </li>
-                            </ol>
-                        </nav>
-
-                        {/* Assigned subjects */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <h5>Subjects</h5>
-                            </div>
-                            <div className="card-body">
-                                {this.state.subjectItems &&
-                                this.state.subjectItems.length > 0 ? (
-                                    <Slider {...settings}>
-                                        {(this.state.subjectItems || []).map(
-                                            (data, index) => {
-                                                return (
+                {/* Assigned subjects */}
+                <div className="card shadow-sm mb-4">
+                    <div className="card-header">
+                        <h5>Subjects</h5>
+                    </div>
+                    <div className="card-body">
+                        {this.state.subjectItems &&
+                        this.state.subjectItems.length > 0 ? (
+                            <Slider {...settings}>
+                                {(this.state.subjectItems || []).map(
+                                    (data, index) => {
+                                        return (
+                                            <div
+                                                className="px-3"
+                                                data-index={index}
+                                                key={index}
+                                            >
+                                                <div className="card">
+                                                    <img
+                                                        src={courseimg}
+                                                        className="card-img-top"
+                                                        alt="Course"
+                                                    />
                                                     <div
-                                                        className="px-3"
-                                                        data-index={index}
-                                                        key={index}
+                                                        className="text-right mt-2"
+                                                        style={{
+                                                            position:
+                                                                "absolute",
+                                                            right: "5px",
+                                                        }}
                                                     >
-                                                        <div className="card">
-                                                            <img
-                                                                src={courseimg}
-                                                                className="card-img-top"
-                                                                alt="Course"
-                                                            />
-                                                            <div
-                                                                className="text-right mt-2"
-                                                                style={{
-                                                                    position:
-                                                                        "absolute",
-                                                                    right: "5px",
-                                                                }}
-                                                            >
-                                                                <button className="btn btn-primary-invert btn-sm">
-                                                                    <i className="far fa-heart"></i>
-                                                                </button>
-                                                            </div>
-                                                            <Link
-                                                                to={`/student/subject/${data.id}`}
-                                                                className="text-decoration-none"
-                                                                onClick={() =>
-                                                                    storeDispatch(
-                                                                        SUBJECT,
-                                                                        data.subject_name
-                                                                    )
-                                                                }
-                                                            >
-                                                                <div
-                                                                    className="card-body primary-bg text-white p-2"
-                                                                    style={{
-                                                                        cursor: "pointer",
-                                                                    }}
-                                                                >
-                                                                    <div className="row">
-                                                                        <div className="col-9">
-                                                                            {
-                                                                                data.subject_name
-                                                                            }
-                                                                        </div>
-                                                                        <div className="col-3 text-right">
-                                                                            4.{" "}
-                                                                            <span className="small">
-                                                                                <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </Link>
-                                                        </div>
+                                                        <button className="btn btn-primary-invert btn-sm">
+                                                            <i className="far fa-heart"></i>
+                                                        </button>
                                                     </div>
-                                                );
-                                            }
-                                        )}
-                                    </Slider>
-                                ) : null}
-                            </div>
-                        </div>
+                                                    <Link
+                                                        to={`/student/subject/${data.id}`}
+                                                        className="text-decoration-none"
+                                                        onClick={() =>
+                                                            storeDispatch(
+                                                                SUBJECT,
+                                                                data.subject_name
+                                                            )
+                                                        }
+                                                    >
+                                                        <div
+                                                            className="card-body primary-bg text-white p-2"
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <div className="row">
+                                                                <div className="col-9">
+                                                                    {
+                                                                        data.subject_name
+                                                                    }
+                                                                </div>
+                                                                <div className="col-3 text-right">
+                                                                    4.{" "}
+                                                                    <span className="small">
+                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                )}
+                            </Slider>
+                        ) : null}
                     </div>
                 </div>
+
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}
-            </div>
+            </Wrapper>
         );
     }
 }

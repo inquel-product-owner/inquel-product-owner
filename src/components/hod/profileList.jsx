@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from "react";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Wrapper from "./wrapper";
 import { Link } from "react-router-dom";
 import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
@@ -735,7 +734,6 @@ class HODTeacherStudentList extends Component {
             totalTeacherCount: 0,
             activeStudentPage: 1,
             totalStudentCount: 0,
-            showSideNav: false,
 
             activeTab: "teacher",
             showTeacherModal: false,
@@ -764,12 +762,6 @@ class HODTeacherStudentList extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     handleSelect = (key) => {
         this.setState({ activeTab: key });
@@ -977,17 +969,15 @@ class HODTeacherStudentList extends Component {
                 ? "Teacher List - HOD | IQLabs"
                 : "Student List - HOD | IQLabs";
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={
-                        this.state.activeTab === "teacher"
-                            ? "Teacher List"
-                            : "Student List"
-                    }
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={
+                    this.state.activeTab === "teacher"
+                        ? "Teacher List"
+                        : "Student List"
+                }
+                activeLink="profiles"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -1004,12 +994,6 @@ class HODTeacherStudentList extends Component {
                             showErrorAlert: false,
                         });
                     }}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="profiles"
                 />
 
                 {/* Teacher create modal */}
@@ -1092,146 +1076,127 @@ class HODTeacherStudentList extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-6">
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    {this.state.activeTab === "teacher"
+                                        ? "Teacher"
+                                        : "Student"}
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6 d-flex justify-content-end">
                         <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
+                            className="btn btn-primary btn-sm shadow-none mr-1"
+                            onClick={this.handleAdd}
                         >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                            Add New
                         </button>
-
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            {this.state.activeTab === "teacher"
-                                                ? "Teacher"
-                                                : "Student"}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 d-flex justify-content-end">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                    onClick={this.handleAdd}
-                                >
-                                    Add New
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                    onClick={this.handleDelete}
-                                >
-                                    Delete
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                    onClick={this.handleEnableDisable}
-                                >
-                                    Enable / Disable
-                                </button>
-                                <Dropdown>
-                                    <Dropdown.Toggle
-                                        variant="primary"
-                                        id="dropdown-basic"
-                                        className="btn-sm shadow-none"
-                                    >
-                                        Notify
-                                    </Dropdown.Toggle>
-
-                                    <Dropdown.Menu className="dropdown-menu-btn">
-                                        <Dropdown.Item>
-                                            Notify All
-                                        </Dropdown.Item>
-                                        <div className="dropdown-divider"></div>
-                                        <Dropdown.Item>
-                                            Notify Selected
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <Tabs
-                            activeKey={
-                                !this.props.location.hash
-                                    ? "teacher"
-                                    : this.props.location.hash.substring(1)
-                            }
-                            id="uncontrolled-tab-example"
-                            onSelect={this.handleSelect}
+                        <button
+                            className="btn btn-primary btn-sm shadow-none mr-1"
+                            onClick={this.handleDelete}
                         >
-                            <Tab eventKey="teacher" title="Teacher">
-                                <div className="card shadow-sm">
-                                    <TeacherTable
-                                        teacherItems={this.state.teacherItems}
-                                        path="hod"
-                                        handleTeacherId={this.handleTeacherId}
-                                    />
-                                    <div className="card-body p-3">
-                                        {this.state.totalTeacherCount >
-                                        paginationCount ? (
-                                            <Paginations
-                                                activePage={
-                                                    this.state.activeTeacherPage
-                                                }
-                                                totalItemsCount={
-                                                    this.state.totalTeacherCount
-                                                }
-                                                onChange={this.handleTeacherPageChange.bind(
-                                                    this
-                                                )}
-                                            />
-                                        ) : null}
-                                    </div>
-                                </div>
-                            </Tab>
+                            Delete
+                        </button>
+                        <button
+                            className="btn btn-primary btn-sm shadow-none mr-1"
+                            onClick={this.handleEnableDisable}
+                        >
+                            Enable / Disable
+                        </button>
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="primary"
+                                id="dropdown-basic"
+                                className="btn-sm shadow-none"
+                            >
+                                Notify
+                            </Dropdown.Toggle>
 
-                            <Tab eventKey="student" title="Student">
-                                <div className="card shadow-sm">
-                                    <StudentTable
-                                        studentItems={this.state.studentItems}
-                                        path="hod"
-                                        group={true}
-                                        handleStudentId={this.handleStudentId}
-                                    />
-                                    <div className="card-body p-3">
-                                        {this.state.totalStudentCount >
-                                        paginationCount ? (
-                                            <Paginations
-                                                activePage={
-                                                    this.state.activeStudentPage
-                                                }
-                                                totalItemsCount={
-                                                    this.state.totalStudentCount
-                                                }
-                                                onChange={this.handleStudentPageChange.bind(
-                                                    this
-                                                )}
-                                            />
-                                        ) : null}
-                                    </div>
-                                </div>
-                            </Tab>
-                        </Tabs>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                            <Dropdown.Menu className="dropdown-menu-down dropdown-menu-down-btn">
+                                <Dropdown.Item>Notify All</Dropdown.Item>
+                                <div className="dropdown-divider"></div>
+                                <Dropdown.Item>Notify Selected</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
                 </div>
-            </div>
+
+                <Tabs
+                    activeKey={
+                        !this.props.location.hash
+                            ? "teacher"
+                            : this.props.location.hash.substring(1)
+                    }
+                    id="uncontrolled-tab-example"
+                    onSelect={this.handleSelect}
+                >
+                    <Tab eventKey="teacher" title="Teacher">
+                        <div className="card shadow-sm">
+                            <TeacherTable
+                                teacherItems={this.state.teacherItems}
+                                path="hod"
+                                handleTeacherId={this.handleTeacherId}
+                            />
+                            <div className="card-body p-3">
+                                {this.state.totalTeacherCount >
+                                paginationCount ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeTeacherPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalTeacherCount
+                                        }
+                                        onChange={this.handleTeacherPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
+                    </Tab>
+
+                    <Tab eventKey="student" title="Student">
+                        <div className="card shadow-sm">
+                            <StudentTable
+                                studentItems={this.state.studentItems}
+                                path="hod"
+                                group={true}
+                                handleStudentId={this.handleStudentId}
+                            />
+                            <div className="card-body p-3">
+                                {this.state.totalStudentCount >
+                                paginationCount ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeStudentPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalStudentCount
+                                        }
+                                        onChange={this.handleStudentPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
+                    </Tab>
+                </Tabs>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

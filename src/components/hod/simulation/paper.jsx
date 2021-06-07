@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
@@ -19,7 +18,6 @@ class HODSimulationPaper extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             papers: [],
             simulationData: [
                 {
@@ -47,12 +45,6 @@ class HODSimulationPaper extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     loadSimulationData = () => {
         fetch(
@@ -420,13 +412,11 @@ class HODSimulationPaper extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -445,311 +435,279 @@ class HODSimulationPaper extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
+                {/* ----- Breadcrumb ----- */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-6">
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    {this.props.simulation_name}
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6 text-right">
                         <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
+                            className="btn btn-primary btn-sm shadow-none"
+                            onClick={this.handlePublish}
+                            disabled={
+                                this.state.simulationData.length !== 0
+                                    ? this.state.simulationData[0].paper_id ===
+                                      ""
+                                        ? true
+                                        : false
+                                    : true
+                            }
                         >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                            Publish
                         </button>
-
-                        {/* ----- Breadcrumb ----- */}
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            {this.props.simulation_name}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.handlePublish}
-                                    disabled={
-                                        this.state.simulationData.length !== 0
-                                            ? this.state.simulationData[0]
-                                                  .paper_id === ""
-                                                ? true
-                                                : false
-                                            : true
-                                    }
-                                >
-                                    Publish
-                                </button>
-                            </div>
-                        </div>
-
-                        <div
-                            className="card shadow-sm mb-3"
-                            style={{ overflowX: "auto" }}
-                        >
-                            <div
-                                className="table-responsive"
-                                style={{ minWidth: "1000px" }}
-                            >
-                                <table className="table table-hover">
-                                    <thead className="primary-bg text-white">
-                                        <tr style={{ whiteSpace: "nowrap" }}>
-                                            <th scope="col">
-                                                Simulation Exams
-                                            </th>
-                                            <th scope="col">Papers</th>
-                                            <th scope="col">Total Marks</th>
-                                            <th scope="col">Time Duration</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.state.simulationData.length !== 0
-                                            ? this.state.simulationData.map(
-                                                  (item, index) => {
-                                                      return (
-                                                          <tr key={index}>
-                                                              <td>
-                                                                  <input
-                                                                      type="text"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      placeholder={`Simulation exam paper ${
-                                                                          index +
-                                                                          1
-                                                                      }`}
-                                                                      value={
-                                                                          item.paper_name
-                                                                      }
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleInput(
-                                                                              index,
-                                                                              event,
-                                                                              "name"
-                                                                          )
-                                                                      }
-                                                                      autoFocus
-                                                                      required
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <select
-                                                                      name="type"
-                                                                      id="type"
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleInput(
-                                                                              index,
-                                                                              event,
-                                                                              "paper"
-                                                                          )
-                                                                      }
-                                                                      value={
-                                                                          item.paper_type
-                                                                      }
-                                                                      required
-                                                                  >
-                                                                      <option value="">
-                                                                          Select
-                                                                          paper
-                                                                      </option>
-                                                                      {this
-                                                                          .state
-                                                                          .papers
-                                                                          .length !==
-                                                                      0
-                                                                          ? this.state.papers.map(
-                                                                                (
-                                                                                    data,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <option
-                                                                                            value={
-                                                                                                data
-                                                                                            }
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                        >
-                                                                                            {
-                                                                                                data
-                                                                                            }
-                                                                                        </option>
-                                                                                    );
-                                                                                }
-                                                                            )
-                                                                          : null}
-                                                                  </select>
-                                                              </td>
-                                                              <td>
-                                                                  <input
-                                                                      className="form-control form-control-sm border-secondary"
-                                                                      type="text"
-                                                                      value={
-                                                                          item.total_marks
-                                                                      }
-                                                                      onChange={(
-                                                                          event
-                                                                      ) =>
-                                                                          this.handleInput(
-                                                                              index,
-                                                                              event,
-                                                                              "marks"
-                                                                          )
-                                                                      }
-                                                                      placeholder="Enter total marks"
-                                                                  />
-                                                              </td>
-                                                              <td>
-                                                                  <div
-                                                                      className="input-group input-group-sm border-secondary rounded-lg"
-                                                                      style={{
-                                                                          overflow:
-                                                                              "hidden",
-                                                                      }}
-                                                                  >
-                                                                      <input
-                                                                          className="form-control form-control-sm"
-                                                                          type="text"
-                                                                          value={
-                                                                              item.time_duration
-                                                                          }
-                                                                          onChange={(
-                                                                              event
-                                                                          ) =>
-                                                                              this.handleInput(
-                                                                                  index,
-                                                                                  event,
-                                                                                  "duration"
-                                                                              )
-                                                                          }
-                                                                          placeholder="Duration (Minutes)"
-                                                                      />
-                                                                      <div className="input-group-prepend">
-                                                                          <span className="input-group-text border-0">
-                                                                              Minutes
-                                                                          </span>
-                                                                      </div>
-                                                                  </div>
-                                                              </td>
-                                                              <td className="d-flex justify-content-end">
-                                                                  {item.paper_id !==
-                                                                  "" ? (
-                                                                      <Link
-                                                                          to={`${this.props.match.url}/paper/${item.paper_id}`}
-                                                                      >
-                                                                          <button
-                                                                              className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                              onClick={() => {
-                                                                                  storeDispatch(
-                                                                                      PAPER,
-                                                                                      item.paper_name
-                                                                                  );
-                                                                              }}
-                                                                          >
-                                                                              Add
-                                                                              +
-                                                                          </button>
-                                                                      </Link>
-                                                                  ) : null}
-
-                                                                  <Dropdown>
-                                                                      <Dropdown.Toggle
-                                                                          variant="white"
-                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
-                                                                      >
-                                                                          <i className="fas fa-ellipsis-v"></i>
-                                                                      </Dropdown.Toggle>
-
-                                                                      <Dropdown.Menu
-                                                                          className={`dropdown-menu-btn ${
-                                                                              this
-                                                                                  .state
-                                                                                  .simulationData
-                                                                                  .length <=
-                                                                              2
-                                                                                  ? "position-fixed"
-                                                                                  : "position-absolute"
-                                                                          }`}
-                                                                      >
-                                                                          <Dropdown.Item
-                                                                              onClick={(
-                                                                                  event
-                                                                              ) =>
-                                                                                  this.handleSubmit(
-                                                                                      index,
-                                                                                      event
-                                                                                  )
-                                                                              }
-                                                                          >
-                                                                              <i className="far fa-save fa-sm mr-1"></i>{" "}
-                                                                              Save
-                                                                          </Dropdown.Item>
-                                                                          <Dropdown.Item
-                                                                              onClick={() =>
-                                                                                  this.handleDelete(
-                                                                                      index,
-                                                                                      item.paper_id
-                                                                                  )
-                                                                              }
-                                                                          >
-                                                                              <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
-                                                                              Delete
-                                                                          </Dropdown.Item>
-                                                                      </Dropdown.Menu>
-                                                                  </Dropdown>
-                                                              </td>
-                                                          </tr>
-                                                      );
-                                                  }
-                                              )
-                                            : ""}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <button
-                            className="btn btn-light bg-white btn-block shadow-sm shadow-none"
-                            onClick={this.handleAdd}
-                        >
-                            Add Paper +
-                        </button>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                <div
+                    className="card shadow-sm mb-3"
+                    style={{ overflowX: "auto" }}
+                >
+                    <div
+                        className="table-responsive"
+                        style={{ minWidth: "1000px" }}
+                    >
+                        <table className="table table-hover">
+                            <thead className="primary-bg text-white">
+                                <tr style={{ whiteSpace: "nowrap" }}>
+                                    <th scope="col">Simulation Exams</th>
+                                    <th scope="col">Papers</th>
+                                    <th scope="col">Total Marks</th>
+                                    <th scope="col">Time Duration</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.state.simulationData.length !== 0
+                                    ? this.state.simulationData.map(
+                                          (item, index) => {
+                                              return (
+                                                  <tr key={index}>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              placeholder={`Simulation exam paper ${
+                                                                  index + 1
+                                                              }`}
+                                                              value={
+                                                                  item.paper_name
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleInput(
+                                                                      index,
+                                                                      event,
+                                                                      "name"
+                                                                  )
+                                                              }
+                                                              autoFocus
+                                                              required
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <select
+                                                              name="type"
+                                                              id="type"
+                                                              className="form-control form-control-sm border-secondary"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleInput(
+                                                                      index,
+                                                                      event,
+                                                                      "paper"
+                                                                  )
+                                                              }
+                                                              value={
+                                                                  item.paper_type
+                                                              }
+                                                              required
+                                                          >
+                                                              <option value="">
+                                                                  Select paper
+                                                              </option>
+                                                              {this.state.papers
+                                                                  .length !== 0
+                                                                  ? this.state.papers.map(
+                                                                        (
+                                                                            data,
+                                                                            index
+                                                                        ) => {
+                                                                            return (
+                                                                                <option
+                                                                                    value={
+                                                                                        data
+                                                                                    }
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        data
+                                                                                    }
+                                                                                </option>
+                                                                            );
+                                                                        }
+                                                                    )
+                                                                  : null}
+                                                          </select>
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              className="form-control form-control-sm border-secondary"
+                                                              type="text"
+                                                              value={
+                                                                  item.total_marks
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleInput(
+                                                                      index,
+                                                                      event,
+                                                                      "marks"
+                                                                  )
+                                                              }
+                                                              placeholder="Enter total marks"
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <div
+                                                              className="input-group input-group-sm border-secondary rounded-lg"
+                                                              style={{
+                                                                  overflow:
+                                                                      "hidden",
+                                                              }}
+                                                          >
+                                                              <input
+                                                                  className="form-control form-control-sm"
+                                                                  type="text"
+                                                                  value={
+                                                                      item.time_duration
+                                                                  }
+                                                                  onChange={(
+                                                                      event
+                                                                  ) =>
+                                                                      this.handleInput(
+                                                                          index,
+                                                                          event,
+                                                                          "duration"
+                                                                      )
+                                                                  }
+                                                                  placeholder="Duration (Minutes)"
+                                                              />
+                                                              <div className="input-group-prepend">
+                                                                  <span className="input-group-text border-0">
+                                                                      Minutes
+                                                                  </span>
+                                                              </div>
+                                                          </div>
+                                                      </td>
+                                                      <td className="d-flex justify-content-end">
+                                                          {item.paper_id !==
+                                                          "" ? (
+                                                              <Link
+                                                                  to={`${this.props.match.url}/paper/${item.paper_id}`}
+                                                              >
+                                                                  <button
+                                                                      className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                      onClick={() => {
+                                                                          storeDispatch(
+                                                                              PAPER,
+                                                                              item.paper_name
+                                                                          );
+                                                                      }}
+                                                                  >
+                                                                      Add +
+                                                                  </button>
+                                                              </Link>
+                                                          ) : null}
+
+                                                          <Dropdown>
+                                                              <Dropdown.Toggle
+                                                                  variant="white"
+                                                                  className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                              >
+                                                                  <i className="fas fa-ellipsis-v"></i>
+                                                              </Dropdown.Toggle>
+
+                                                              <Dropdown.Menu
+                                                                  className={`${
+                                                                      this.state
+                                                                          .simulationData
+                                                                          .length <=
+                                                                      2
+                                                                          ? "position-fixed"
+                                                                          : "position-absolute"
+                                                                  }`}
+                                                              >
+                                                                  <Dropdown.Item
+                                                                      onClick={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleSubmit(
+                                                                              index,
+                                                                              event
+                                                                          )
+                                                                      }
+                                                                  >
+                                                                      <i className="far fa-save fa-sm mr-1"></i>{" "}
+                                                                      Save
+                                                                  </Dropdown.Item>
+                                                                  <Dropdown.Item
+                                                                      onClick={() =>
+                                                                          this.handleDelete(
+                                                                              index,
+                                                                              item.paper_id
+                                                                          )
+                                                                      }
+                                                                  >
+                                                                      <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                      Delete
+                                                                  </Dropdown.Item>
+                                                              </Dropdown.Menu>
+                                                          </Dropdown>
+                                                      </td>
+                                                  </tr>
+                                              );
+                                          }
+                                      )
+                                    : ""}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <button
+                    className="btn btn-light bg-white btn-block shadow-sm shadow-none"
+                    onClick={this.handleAdd}
+                >
+                    Add Paper +
+                </button>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

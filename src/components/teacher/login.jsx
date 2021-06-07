@@ -96,7 +96,7 @@ class TeacherLogin extends Component {
                                 this.setState({
                                     errorMsg: "Something went wrong!",
                                     showErrorAlert: true,
-                                    page_loading: false,
+                                    showLoader: false,
                                 });
                             });
                         // Logout the admin if he is logged in
@@ -124,7 +124,7 @@ class TeacherLogin extends Component {
                                 this.setState({
                                     errorMsg: "Something went wrong!",
                                     showErrorAlert: true,
-                                    page_loading: false,
+                                    showLoader: false,
                                 });
                             });
                     } else {
@@ -143,7 +143,7 @@ class TeacherLogin extends Component {
                 this.setState({
                     errorMsg: "Something went wrong!",
                     showErrorAlert: true,
-                    page_loading: false,
+                    showLoader: false,
                 });
             });
     };

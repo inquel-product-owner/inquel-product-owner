@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
@@ -17,7 +16,6 @@ class HODSubjectMatch extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             match: [],
 
             errorMsg: "",
@@ -37,12 +35,6 @@ class HODSubjectMatch extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     // -------------------------- Load match data --------------------------
 
@@ -136,13 +128,11 @@ class HODSubjectMatch extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -161,117 +151,89 @@ class HODSubjectMatch extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
+                {/* ----- Breadcrumb ----- */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/hod">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to={`/hod/subject/${this.subjectId}`}>
+                                {this.props.subject_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.chapter_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Match</li>
+                    </ol>
+                </nav>
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                {/* Header area */}
+                <h5 className="primary-text mb-4">
+                    {`Match - ${this.props.topic_name}`}
+                </h5>
 
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/hod">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link to={`/hod/subject/${this.subjectId}`}>
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.chapter_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Match
-                                </li>
-                            </ol>
-                        </nav>
+                {this.state.match.length !== 0
+                    ? this.state.match.map((match, match_index) => {
+                          return (
+                              <div
+                                  className="d-flex align-items-start mb-3"
+                                  key={match_index}
+                              >
+                                  <div
+                                      className="bg-white small font-weight-bold-600 rounded-lg shadow-sm text-nowrap user-select-none mr-2"
+                                      style={{
+                                          paddingTop: "8px",
+                                          paddingBottom: "8px",
+                                          paddingLeft: "12px",
+                                          paddingRight: "12px",
+                                      }}
+                                  >
+                                      {match_index <= 8
+                                          ? `0${match_index + 1}`
+                                          : match_index + 1}
+                                  </div>
 
-                        {/* Header area */}
-                        <h5 className="primary-text mb-4">
-                            {`Match - ${this.props.topic_name}`}
-                        </h5>
-
-                        {this.state.match.length !== 0
-                            ? this.state.match.map((match, match_index) => {
-                                  return (
-                                      <div
-                                          className="d-flex align-items-start mb-3"
-                                          key={match_index}
-                                      >
-                                          <div
-                                              className="bg-white small font-weight-bold-600 rounded-lg shadow-sm text-nowrap mr-2"
-                                              style={{
-                                                  paddingTop: "8px",
-                                                  paddingBottom: "8px",
-                                                  paddingLeft: "12px",
-                                                  paddingRight: "12px",
-                                                  userSelect: "none",
-                                              }}
-                                          >
-                                              {match_index <= 8
-                                                  ? `0${match_index + 1}`
-                                                  : match_index + 1}
-                                          </div>
-
-                                          <div className="card shadow-sm w-100">
-                                              <div className="card-body">
-                                                  <div className="row">
-                                                      {/* ----- Terms & Definition ----- */}
-                                                      <div className="col-md-6 mb-2 mb-md-0">
-                                                          <div className="card bg-light">
-                                                              <div
-                                                                  className="card-body py-3"
-                                                                  dangerouslySetInnerHTML={{
-                                                                      __html: match.match_terms,
-                                                                  }}
-                                                              ></div>
-                                                          </div>
-                                                      </div>
-                                                      <div className="col-md-6">
-                                                          <div className="card bg-light">
-                                                              <div
-                                                                  className="card-body py-3"
-                                                                  dangerouslySetInnerHTML={{
-                                                                      __html: match.match_definition,
-                                                                  }}
-                                                              ></div>
-                                                          </div>
-                                                      </div>
+                                  <div className="card shadow-sm w-100">
+                                      <div className="card-body">
+                                          <div className="row">
+                                              {/* ----- Terms & Definition ----- */}
+                                              <div className="col-md-6 mb-2 mb-md-0">
+                                                  <div className="card bg-light">
+                                                      <div
+                                                          className="card-body py-3"
+                                                          dangerouslySetInnerHTML={{
+                                                              __html: match.match_terms,
+                                                          }}
+                                                      ></div>
+                                                  </div>
+                                              </div>
+                                              <div className="col-md-6">
+                                                  <div className="card bg-light">
+                                                      <div
+                                                          className="card-body py-3"
+                                                          dangerouslySetInnerHTML={{
+                                                              __html: match.match_definition,
+                                                          }}
+                                                      ></div>
                                                   </div>
                                               </div>
                                           </div>
                                       </div>
-                                  );
-                              })
-                            : "No content to display..."}
+                                  </div>
+                              </div>
+                          );
+                      })
+                    : "No content to display..."}
 
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                    </div>
-                </div>
-            </div>
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

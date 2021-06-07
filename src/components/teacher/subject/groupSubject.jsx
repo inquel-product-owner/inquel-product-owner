@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
@@ -18,9 +17,8 @@ import {
     SemesterModal,
     Scorecard,
 } from "./contentManagementModal";
-import { waterMark } from "../../common/function/watermark";
 import storeDispatch from "../../../redux/dispatch";
-import { CHAPTER, SEMESTER } from "../../../redux/action";
+import { CHAPTER, RESPONSE, SEMESTER } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -32,7 +30,6 @@ class TeacherSubject extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showScorecardModal: false,
 
             showChapterModal: false,
@@ -68,12 +65,6 @@ class TeacherSubject extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleChapterModal = () => {
         this.setState({
@@ -135,6 +126,7 @@ class TeacherSubject extends Component {
                         permissions: result.data.permissions,
                         page_loading: false,
                     });
+                    storeDispatch(RESPONSE, result.data);
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -248,13 +240,12 @@ class TeacherSubject extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* ----- Navbar ----- */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+                waterMark={this.props.profile}
+            >
                 {/* ----- Alert message ----- */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -271,12 +262,6 @@ class TeacherSubject extends Component {
                             showErrorAlert: false,
                         });
                     }}
-                />
-
-                {/* ----- Sidebar ----- */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
                 />
 
                 {/* ----- Chapter modal ----- */}
@@ -369,213 +354,152 @@ class TeacherSubject extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                    style={waterMark(this.props.profile)}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
+                {/* Header area */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-6">
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.group_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    <span>Subject:</span>
+                                    {this.props.subject_name}
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6 text-right">
                         <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
+                            className="btn btn-primary btn-sm shadow-none"
+                            onClick={this.toggleScorecardModal}
                         >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                            Subject scorecard
                         </button>
+                    </div>
+                </div>
 
-                        {/* Header area */}
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/teacher">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.group_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            <span>Subject:</span>
-                                            {this.props.subject_name}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.toggleScorecardModal}
-                                >
-                                    Subject score config
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="card shadow-sm mb-3">
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead className="primary-bg text-white">
-                                        <tr>
-                                            <th scope="col">
-                                                Chapter structure
-                                            </th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">Weightage</th>
-                                            <th scope="col">Summary</th>
-                                            <th
-                                                scope="col"
-                                                className="text-right"
-                                            >
-                                                Add content
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {/* Assigned chapter list to a semester */}
-                                        {this.state.semesterItems.length !== 0
-                                            ? this.state.semesterItems.map(
-                                                  (data, index) => {
-                                                      return (
-                                                          <React.Fragment
-                                                              key={index}
-                                                          >
-                                                              {this.state.subjectItems.map(
-                                                                  (
-                                                                      chapter,
-                                                                      index
-                                                                  ) => {
-                                                                      return data.chapters.includes(
-                                                                          chapter.chapter_id
-                                                                      ) ? (
-                                                                          <ChapterList
-                                                                              key={
-                                                                                  index
-                                                                              }
-                                                                              chapter={
-                                                                                  chapter
-                                                                              }
-                                                                              dispatchChapter={
-                                                                                  this
-                                                                                      .dispatchChapter
-                                                                              }
-                                                                              toggleChapter_EditModal={
-                                                                                  this
-                                                                                      .toggleChapter_EditModal
-                                                                              }
-                                                                              url={
-                                                                                  this
-                                                                                      .props
-                                                                                      .match
-                                                                                      .url
-                                                                              }
-                                                                              permissions={
-                                                                                  this
-                                                                                      .state
-                                                                                      .permissions
-                                                                              }
-                                                                          />
-                                                                      ) : null;
-                                                                  }
-                                                              )}
-                                                              {/* ----- Semester list ----- */}
-                                                              <tr key={index}>
-                                                                  <td>
-                                                                      {
-                                                                          data.semester_name
+                <div className="card shadow-sm mb-3">
+                    <div className="table-responsive">
+                        <table className="table">
+                            <thead className="primary-bg text-white">
+                                <tr>
+                                    <th scope="col">Chapter structure</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Weightage</th>
+                                    <th scope="col">Summary</th>
+                                    <th scope="col" className="text-right">
+                                        Add content
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {/* Assigned chapter list to a semester */}
+                                {this.state.semesterItems.length !== 0
+                                    ? this.state.semesterItems.map(
+                                          (data, index) => {
+                                              return (
+                                                  <React.Fragment key={index}>
+                                                      {this.state.subjectItems.map(
+                                                          (chapter, index) => {
+                                                              return data.chapters.includes(
+                                                                  chapter.chapter_id
+                                                              ) ? (
+                                                                  <ChapterList
+                                                                      key={
+                                                                          index
                                                                       }
-                                                                  </td>
-                                                                  <td></td>
-                                                                  <td></td>
-                                                                  <td></td>
-                                                                  <td className="d-flex justify-content-end">
-                                                                      {/* checks if both the permission exist */}
-                                                                      {data.auto_test_perm ===
-                                                                          true &&
-                                                                      data.direct_perm ===
-                                                                          true ? (
-                                                                          // checks if auto content is available
-                                                                          data.auto_test_question ===
-                                                                          true ? (
-                                                                              <Link
-                                                                                  to={`${this.props.match.url}/semester/${data.semester_id}`}
-                                                                              >
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm shadow-none"
-                                                                                      onClick={() =>
-                                                                                          this.dispatchSemester(
-                                                                                              data.semester_name
-                                                                                          )
-                                                                                      }
-                                                                                  >
-                                                                                      Auto
-                                                                                  </button>
-                                                                              </Link>
-                                                                          ) : // or if direct content is available
-                                                                          data.direct_question ===
-                                                                            true ? (
-                                                                              <Link
-                                                                                  to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
-                                                                              >
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm shadow-none ml-2"
-                                                                                      onClick={() =>
-                                                                                          this.dispatchSemester(
-                                                                                              data.semester_name
-                                                                                          )
-                                                                                      }
-                                                                                  >
-                                                                                      Direct
-                                                                                      Test
-                                                                                  </button>
-                                                                              </Link>
-                                                                          ) : (
-                                                                              // or display both the button
-                                                                              <>
-                                                                                  <Link
-                                                                                      to={`${this.props.match.url}/semester/${data.semester_id}`}
-                                                                                  >
-                                                                                      <button
-                                                                                          className="btn btn-primary btn-sm shadow-none"
-                                                                                          onClick={() =>
-                                                                                              this.dispatchSemester(
-                                                                                                  data.semester_name
-                                                                                              )
-                                                                                          }
-                                                                                      >
-                                                                                          Auto
-                                                                                      </button>
-                                                                                  </Link>
-                                                                                  <Link
-                                                                                      to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
-                                                                                  >
-                                                                                      <button
-                                                                                          className="btn btn-primary btn-sm shadow-none ml-2"
-                                                                                          onClick={() =>
-                                                                                              this.dispatchSemester(
-                                                                                                  data.semester_name
-                                                                                              )
-                                                                                          }
-                                                                                      >
-                                                                                          Direct
-                                                                                          Test
-                                                                                      </button>
-                                                                                  </Link>
-                                                                              </>
-                                                                          )
-                                                                      ) : // checks if auto permission exist
-                                                                      data.auto_test_perm ===
-                                                                        true ? (
+                                                                      chapter={
+                                                                          chapter
+                                                                      }
+                                                                      dispatchChapter={
+                                                                          this
+                                                                              .dispatchChapter
+                                                                      }
+                                                                      toggleChapter_EditModal={
+                                                                          this
+                                                                              .toggleChapter_EditModal
+                                                                      }
+                                                                      url={
+                                                                          this
+                                                                              .props
+                                                                              .match
+                                                                              .url
+                                                                      }
+                                                                      permissions={
+                                                                          this
+                                                                              .state
+                                                                              .permissions
+                                                                      }
+                                                                  />
+                                                              ) : null;
+                                                          }
+                                                      )}
+                                                      {/* ----- Semester list ----- */}
+                                                      <tr key={index}>
+                                                          <td>
+                                                              {
+                                                                  data.semester_name
+                                                              }
+                                                          </td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td className="d-flex justify-content-end">
+                                                              {/* checks if both the permission exist */}
+                                                              {data.auto_test_perm ===
+                                                                  true &&
+                                                              data.direct_perm ===
+                                                                  true ? (
+                                                                  // checks if auto content is available
+                                                                  data.auto_test_question ===
+                                                                  true ? (
+                                                                      <Link
+                                                                          to={`${this.props.match.url}/semester/${data.semester_id}`}
+                                                                      >
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm shadow-none"
+                                                                              onClick={() =>
+                                                                                  this.dispatchSemester(
+                                                                                      data.semester_name
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              Auto
+                                                                          </button>
+                                                                      </Link>
+                                                                  ) : // or if direct content is available
+                                                                  data.direct_question ===
+                                                                    true ? (
+                                                                      <Link
+                                                                          to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
+                                                                      >
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm shadow-none ml-2"
+                                                                              onClick={() =>
+                                                                                  this.dispatchSemester(
+                                                                                      data.semester_name
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              Direct
+                                                                              Test
+                                                                          </button>
+                                                                      </Link>
+                                                                  ) : (
+                                                                      // or display both the button
+                                                                      <>
                                                                           <Link
                                                                               to={`${this.props.match.url}/semester/${data.semester_id}`}
                                                                           >
@@ -590,9 +514,6 @@ class TeacherSubject extends Component {
                                                                                   Auto
                                                                               </button>
                                                                           </Link>
-                                                                      ) : // checks if direct permission exist
-                                                                      data.direct_perm ===
-                                                                        true ? (
                                                                           <Link
                                                                               to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
                                                                           >
@@ -608,100 +529,132 @@ class TeacherSubject extends Component {
                                                                                   Test
                                                                               </button>
                                                                           </Link>
-                                                                      ) : (
-                                                                          // or else prints nothing
-                                                                          ""
-                                                                      )}
-                                                                      <Dropdown>
-                                                                          <Dropdown.Toggle
-                                                                              variant="white"
-                                                                              className="btn btn-link btn-sm shadow-none caret-off ml-2"
-                                                                          >
-                                                                              <i className="fas fa-ellipsis-v"></i>
-                                                                          </Dropdown.Toggle>
+                                                                      </>
+                                                                  )
+                                                              ) : // checks if auto permission exist
+                                                              data.auto_test_perm ===
+                                                                true ? (
+                                                                  <Link
+                                                                      to={`${this.props.match.url}/semester/${data.semester_id}`}
+                                                                  >
+                                                                      <button
+                                                                          className="btn btn-primary btn-sm shadow-none"
+                                                                          onClick={() =>
+                                                                              this.dispatchSemester(
+                                                                                  data.semester_name
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          Auto
+                                                                      </button>
+                                                                  </Link>
+                                                              ) : // checks if direct permission exist
+                                                              data.direct_perm ===
+                                                                true ? (
+                                                                  <Link
+                                                                      to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
+                                                                  >
+                                                                      <button
+                                                                          className="btn btn-primary btn-sm shadow-none ml-2"
+                                                                          onClick={() =>
+                                                                              this.dispatchSemester(
+                                                                                  data.semester_name
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          Direct
+                                                                          Test
+                                                                      </button>
+                                                                  </Link>
+                                                              ) : (
+                                                                  // or else prints nothing
+                                                                  ""
+                                                              )}
+                                                              <Dropdown>
+                                                                  <Dropdown.Toggle
+                                                                      variant="white"
+                                                                      className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                  >
+                                                                      <i className="fas fa-ellipsis-v"></i>
+                                                                  </Dropdown.Toggle>
 
-                                                                          <Dropdown.Menu className="dropdown-menu-btn">
-                                                                              <Dropdown.Item
-                                                                                  onClick={() =>
-                                                                                      this.toggleSemester_EditModal(
-                                                                                          data
-                                                                                      )
-                                                                                  }
-                                                                              >
-                                                                                  <i className="far fa-edit fa-sm mr-1"></i>{" "}
-                                                                                  Edit
-                                                                              </Dropdown.Item>
-                                                                              <Dropdown.Item
-                                                                                  onClick={() =>
-                                                                                      this.toggleSemester_DeleteModal(
-                                                                                          data
-                                                                                      )
-                                                                                  }
-                                                                              >
-                                                                                  <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
-                                                                                  Delete
-                                                                              </Dropdown.Item>
-                                                                          </Dropdown.Menu>
-                                                                      </Dropdown>
-                                                                  </td>
-                                                              </tr>
-                                                          </React.Fragment>
-                                                      );
-                                                  }
-                                              )
-                                            : null}
-                                        {/* ----- Unassigned chapter list ----- */}
-                                        {this.state.subjectItems.length !== 0
-                                            ? this.state.subjectItems.map(
-                                                  (chapter, index) => {
-                                                      return !this.state.semester_chapters.includes(
-                                                          chapter.chapter_id
-                                                      ) ? (
-                                                          <ChapterList
-                                                              key={index}
-                                                              chapter={chapter}
-                                                              dispatchChapter={
-                                                                  this
-                                                                      .dispatchChapter
-                                                              }
-                                                              toggleChapter_EditModal={
-                                                                  this
-                                                                      .toggleChapter_EditModal
-                                                              }
-                                                              url={
-                                                                  this.props
-                                                                      .match.url
-                                                              }
-                                                              permissions={
-                                                                  this.state
-                                                                      .permissions
-                                                              }
-                                                          />
-                                                      ) : null;
-                                                  }
-                                              )
-                                            : null}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <button
-                            className="btn btn-tomato btn-block shadow-sm mb-2"
-                            onClick={this.toggleChapterModal}
-                        >
-                            Add Chapter
-                        </button>
-                        <button
-                            className="btn btn-tomato btn-block shadow-sm"
-                            onClick={this.toggleSemesterModal}
-                        >
-                            Add Semester Exam
-                        </button>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                                                                  <Dropdown.Menu className="dropdown-menu-down dropdown-menu-down-btn">
+                                                                      <Dropdown.Item
+                                                                          onClick={() =>
+                                                                              this.toggleSemester_EditModal(
+                                                                                  data
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <i className="far fa-edit fa-sm mr-1"></i>{" "}
+                                                                          Edit
+                                                                      </Dropdown.Item>
+                                                                      <Dropdown.Item
+                                                                          onClick={() =>
+                                                                              this.toggleSemester_DeleteModal(
+                                                                                  data
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                          Delete
+                                                                      </Dropdown.Item>
+                                                                  </Dropdown.Menu>
+                                                              </Dropdown>
+                                                          </td>
+                                                      </tr>
+                                                  </React.Fragment>
+                                              );
+                                          }
+                                      )
+                                    : null}
+                                {/* ----- Unassigned chapter list ----- */}
+                                {this.state.subjectItems.length !== 0
+                                    ? this.state.subjectItems.map(
+                                          (chapter, index) => {
+                                              return !this.state.semester_chapters.includes(
+                                                  chapter.chapter_id
+                                              ) ? (
+                                                  <ChapterList
+                                                      key={index}
+                                                      chapter={chapter}
+                                                      dispatchChapter={
+                                                          this.dispatchChapter
+                                                      }
+                                                      toggleChapter_EditModal={
+                                                          this
+                                                              .toggleChapter_EditModal
+                                                      }
+                                                      url={this.props.match.url}
+                                                      permissions={
+                                                          this.state.permissions
+                                                      }
+                                                  />
+                                              ) : null;
+                                          }
+                                      )
+                                    : null}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
+
+                <button
+                    className="btn btn-tomato btn-block shadow-sm mb-2"
+                    onClick={this.toggleChapterModal}
+                >
+                    Add Chapter
+                </button>
+                <button
+                    className="btn btn-tomato btn-block shadow-sm"
+                    onClick={this.toggleSemesterModal}
+                >
+                    Add Semester Exam
+                </button>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

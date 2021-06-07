@@ -11,6 +11,8 @@ import AlertBox from "../common/alert";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import { GROUP } from "../../redux/action";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "../common/ErrorFallback";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -110,383 +112,394 @@ class Dashboard extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Welcome */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-body text-center p-4">
-                                <h3 className="primary-text mb-0">
-                                    WELCOME BACK
-                                </h3>
+                        <ErrorBoundary
+                            FallbackComponent={ErrorFallback}
+                            onReset={() => window.location.reload()}
+                        >
+                            {/* Welcome */}
+                            <div className="card shadow-sm mb-4">
+                                <div className="card-body text-center p-4">
+                                    <h3 className="primary-text mb-0">
+                                        WELCOME BACK
+                                    </h3>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Continue learning */}
-                        <h6 className="primary-text mb-3">Continue learning</h6>
-                        <div className="row mb-4">
-                            <div className="col-md-2">
-                                <div
-                                    className="card light-bg shadow-sm"
-                                    style={{
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <div className="card-body p-3">
-                                        <img
-                                            src={courseimg}
-                                            className="img-fluid rounded shadow-sm mb-2"
-                                            alt="Course"
-                                        />
-                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                            Course
-                                        </p>
+                            {/* Continue learning */}
+                            <h6 className="primary-text mb-3">
+                                Continue learning
+                            </h6>
+                            <div className="row mb-4">
+                                <div className="col-md-2">
+                                    <div
+                                        className="card light-bg shadow-sm"
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        <div className="card-body p-3">
+                                            <img
+                                                src={courseimg}
+                                                className="img-fluid rounded shadow-sm mb-2"
+                                                alt="Course"
+                                            />
+                                            <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                                Course
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-2">
+                                    <div
+                                        className="card light-bg shadow-sm"
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        <div className="card-body p-3">
+                                            <img
+                                                src={courseimg}
+                                                className="img-fluid rounded shadow-sm mb-2"
+                                                alt="Course"
+                                            />
+                                            <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                                Course
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-2">
+                                    <div
+                                        className="card light-bg shadow-sm"
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        <div className="card-body p-3">
+                                            <img
+                                                src={courseimg}
+                                                className="img-fluid rounded shadow-sm mb-2"
+                                                alt="Course"
+                                            />
+                                            <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                                Course
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-2">
+                                    <div
+                                        className="card light-bg shadow-sm"
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        <div className="card-body p-3">
+                                            <img
+                                                src={courseimg}
+                                                className="img-fluid rounded shadow-sm mb-2"
+                                                alt="Course"
+                                            />
+                                            <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                                Course
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-2">
+                                    <div
+                                        className="card light-bg shadow-sm"
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        <div className="card-body p-3">
+                                            <img
+                                                src={courseimg}
+                                                className="img-fluid rounded shadow-sm mb-2"
+                                                alt="Course"
+                                            />
+                                            <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                                Course
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-2">
+                                    <div
+                                        className="card light-bg shadow-sm"
+                                        style={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        <div className="card-body p-3">
+                                            <img
+                                                src={courseimg}
+                                                className="img-fluid rounded shadow-sm mb-2"
+                                                alt="Course"
+                                            />
+                                            <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                                Course
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-md-2">
-                                <div
-                                    className="card light-bg shadow-sm"
-                                    style={{
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <div className="card-body p-3">
-                                        <img
-                                            src={courseimg}
-                                            className="img-fluid rounded shadow-sm mb-2"
-                                            alt="Course"
-                                        />
-                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                            Course
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div
-                                    className="card light-bg shadow-sm"
-                                    style={{
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <div className="card-body p-3">
-                                        <img
-                                            src={courseimg}
-                                            className="img-fluid rounded shadow-sm mb-2"
-                                            alt="Course"
-                                        />
-                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                            Course
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div
-                                    className="card light-bg shadow-sm"
-                                    style={{
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <div className="card-body p-3">
-                                        <img
-                                            src={courseimg}
-                                            className="img-fluid rounded shadow-sm mb-2"
-                                            alt="Course"
-                                        />
-                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                            Course
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div
-                                    className="card light-bg shadow-sm"
-                                    style={{
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <div className="card-body p-3">
-                                        <img
-                                            src={courseimg}
-                                            className="img-fluid rounded shadow-sm mb-2"
-                                            alt="Course"
-                                        />
-                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                            Course
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
-                                <div
-                                    className="card light-bg shadow-sm"
-                                    style={{
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <div className="card-body p-3">
-                                        <img
-                                            src={courseimg}
-                                            className="img-fluid rounded shadow-sm mb-2"
-                                            alt="Course"
-                                        />
-                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                            Course
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* Group section */}
-                        {this.props.profile &&
-                        Object.entries(this.props.profile).length !== 0 ? (
-                            this.props.profile.is_independent_student ===
-                            false ? (
-                                <div className="card shadow-sm mb-4">
-                                    <div className="card-header">
-                                        <h5>Group</h5>
-                                    </div>
-                                    <div className="card-body">
-                                        {this.state.groupData !== "" ? (
-                                            <div className="table-responsive">
-                                                <table className="table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Group name</th>
-                                                            <th>
-                                                                Group
-                                                                description
-                                                            </th>
-                                                            <th>View</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                {
-                                                                    this.state
-                                                                        .groupData
-                                                                        .group_name
-                                                                }
-                                                            </td>
-                                                            <td>
-                                                                {
-                                                                    this.state
-                                                                        .groupData
-                                                                        .group_description
-                                                                }
-                                                            </td>
-                                                            <td>
-                                                                <Link
-                                                                    to={`/student/group/${this.state.groupData.id}`}
-                                                                >
-                                                                    <button
-                                                                        className="btn btn-primary btn-sm shadow-none"
-                                                                        onClick={() =>
-                                                                            storeDispatch(
-                                                                                GROUP,
-                                                                                this
-                                                                                    .state
-                                                                                    .groupData
-                                                                                    .group_name
-                                                                            )
-                                                                        }
+                            {/* Group section */}
+                            {this.props.profile &&
+                            Object.entries(this.props.profile).length !== 0 ? (
+                                this.props.profile.is_independent_student ===
+                                false ? (
+                                    <div className="card shadow-sm mb-4">
+                                        <div className="card-header">
+                                            <h5>Group</h5>
+                                        </div>
+                                        <div className="card-body">
+                                            {this.state.groupData !== "" ? (
+                                                <div className="table-responsive">
+                                                    <table className="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    Group name
+                                                                </th>
+                                                                <th>
+                                                                    Group
+                                                                    description
+                                                                </th>
+                                                                <th>View</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    {
+                                                                        this
+                                                                            .state
+                                                                            .groupData
+                                                                            .group_name
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    {
+                                                                        this
+                                                                            .state
+                                                                            .groupData
+                                                                            .group_description
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    <Link
+                                                                        to={`/student/group/${this.state.groupData.id}`}
                                                                     >
-                                                                        <i className="fas fa-eye"></i>
-                                                                    </button>
-                                                                </Link>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        ) : (
-                                            "No data to display..."
-                                        )}
+                                                                        <button
+                                                                            className="btn btn-primary btn-sm shadow-none"
+                                                                            onClick={() =>
+                                                                                storeDispatch(
+                                                                                    GROUP,
+                                                                                    this
+                                                                                        .state
+                                                                                        .groupData
+                                                                                        .group_name
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <i className="fas fa-eye"></i>
+                                                                        </button>
+                                                                    </Link>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            ) : (
+                                                "No data to display..."
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                ) : (
+                                    ""
+                                )
                             ) : (
                                 ""
-                            )
-                        ) : (
-                            ""
-                        )}
+                            )}
 
-                        {/* Courses */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <div className="row align-items-center">
-                                    <div className="col-md-3">
-                                        <h5>Courses</h5>
-                                    </div>
-                                    <div className="col-md-9 text-right">
-                                        <Link to="">
-                                            <button className="btn btn-primary btn-sm">
-                                                View all
-                                            </button>
-                                        </Link>
+                            {/* Courses */}
+                            <div className="card shadow-sm mb-4">
+                                <div className="card-header">
+                                    <div className="row align-items-center">
+                                        <div className="col-md-3">
+                                            <h5>Courses</h5>
+                                        </div>
+                                        <div className="col-md-9 text-right">
+                                            <Link to="">
+                                                <button className="btn btn-primary btn-sm">
+                                                    View all
+                                                </button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="card-body">
+                                    <CarouselCard />
+                                </div>
                             </div>
-                            <div className="card-body">
-                                <CarouselCard />
-                            </div>
-                        </div>
 
-                        {/* What to learn next */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <div className="row align-items-center">
-                                    <div className="col-md-3">
-                                        <h5>What to learn next</h5>
-                                    </div>
-                                    <div className="col-md-9 text-right">
-                                        <Link to="">
-                                            <button className="btn btn-primary btn-sm">
-                                                View all
-                                            </button>
-                                        </Link>
+                            {/* What to learn next */}
+                            <div className="card shadow-sm mb-4">
+                                <div className="card-header">
+                                    <div className="row align-items-center">
+                                        <div className="col-md-3">
+                                            <h5>What to learn next</h5>
+                                        </div>
+                                        <div className="col-md-9 text-right">
+                                            <Link to="">
+                                                <button className="btn btn-primary btn-sm">
+                                                    View all
+                                                </button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="card-body">
+                                    <CarouselCard />
+                                </div>
                             </div>
-                            <div className="card-body">
-                                <CarouselCard />
-                            </div>
-                        </div>
 
-                        {/* Topics recommended */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <h5>Topic Recommended For You</h5>
-                            </div>
-                            <div className="card-body">
-                                <div className="row mb-3">
-                                    <div className="col-md-3 mb-3">
-                                        <Link
-                                            to=""
-                                            className="text-decoration-none"
-                                        >
-                                            <div className="card primary-bg text-white">
-                                                <div className="card-body text-center p-3">
-                                                    Topics 01
+                            {/* Topics recommended */}
+                            <div className="card shadow-sm mb-4">
+                                <div className="card-header">
+                                    <h5>Topic Recommended For You</h5>
+                                </div>
+                                <div className="card-body">
+                                    <div className="row mb-3">
+                                        <div className="col-md-3 mb-3">
+                                            <Link
+                                                to=""
+                                                className="text-decoration-none"
+                                            >
+                                                <div className="card primary-bg text-white">
+                                                    <div className="card-body text-center p-3">
+                                                        Topics 01
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </Link>
+                                            </Link>
+                                        </div>
+                                        <div className="col-md-3 mb-3">
+                                            <Link
+                                                to=""
+                                                className="text-decoration-none"
+                                            >
+                                                <div className="card primary-bg text-white">
+                                                    <div className="card-body text-center p-3">
+                                                        Topics 02
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                        <div className="col-md-3 mb-3">
+                                            <Link
+                                                to=""
+                                                className="text-decoration-none"
+                                            >
+                                                <div className="card primary-bg text-white">
+                                                    <div className="card-body text-center p-3">
+                                                        Topics 03
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                        <div className="col-md-3 mb-3">
+                                            <Link
+                                                to=""
+                                                className="text-decoration-none"
+                                            >
+                                                <div className="card primary-bg text-white">
+                                                    <div className="card-body text-center p-3">
+                                                        Topics 04
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                        <div className="col-md-3 mb-3">
+                                            <Link
+                                                to=""
+                                                className="text-decoration-none"
+                                            >
+                                                <div className="card primary-bg text-white">
+                                                    <div className="card-body text-center p-3">
+                                                        Topics 05
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                        <div className="col-md-3 mb-3">
+                                            <Link
+                                                to=""
+                                                className="text-decoration-none"
+                                            >
+                                                <div className="card primary-bg text-white">
+                                                    <div className="card-body text-center p-3">
+                                                        Topics 06
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                        <div className="col-md-3 mb-3">
+                                            <Link
+                                                to=""
+                                                className="text-decoration-none"
+                                            >
+                                                <div className="card primary-bg text-white">
+                                                    <div className="card-body text-center p-3">
+                                                        Topics 07
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                        <div className="col-md-3 mb-3">
+                                            <Link
+                                                to=""
+                                                className="text-decoration-none"
+                                            >
+                                                <div className="card primary-bg text-white">
+                                                    <div className="card-body text-center p-3">
+                                                        Topics 08
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
                                     </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Link
-                                            to=""
-                                            className="text-decoration-none"
-                                        >
-                                            <div className="card primary-bg text-white">
-                                                <div className="card-body text-center p-3">
-                                                    Topics 02
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Link
-                                            to=""
-                                            className="text-decoration-none"
-                                        >
-                                            <div className="card primary-bg text-white">
-                                                <div className="card-body text-center p-3">
-                                                    Topics 03
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Link
-                                            to=""
-                                            className="text-decoration-none"
-                                        >
-                                            <div className="card primary-bg text-white">
-                                                <div className="card-body text-center p-3">
-                                                    Topics 04
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Link
-                                            to=""
-                                            className="text-decoration-none"
-                                        >
-                                            <div className="card primary-bg text-white">
-                                                <div className="card-body text-center p-3">
-                                                    Topics 05
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Link
-                                            to=""
-                                            className="text-decoration-none"
-                                        >
-                                            <div className="card primary-bg text-white">
-                                                <div className="card-body text-center p-3">
-                                                    Topics 06
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Link
-                                            to=""
-                                            className="text-decoration-none"
-                                        >
-                                            <div className="card primary-bg text-white">
-                                                <div className="card-body text-center p-3">
-                                                    Topics 07
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <Link
-                                            to=""
-                                            className="text-decoration-none"
-                                        >
-                                            <div className="card primary-bg text-white">
-                                                <div className="card-body text-center p-3">
-                                                    Topics 08
-                                                </div>
-                                            </div>
-                                        </Link>
+                                    <div className="text-center">
+                                        <button className="btn btn-primary btn-sm">
+                                            View all topics
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="text-center">
-                                    <button className="btn btn-primary btn-sm">
-                                        View all topics
-                                    </button>
-                                </div>
                             </div>
-                        </div>
 
-                        {/* Featured */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <div className="row align-items-center">
-                                    <div className="col-md-3">
-                                        <h5>Featured</h5>
-                                    </div>
-                                    <div className="col-md-9 text-right">
-                                        <Link to="">
-                                            <button className="btn btn-primary btn-sm">
-                                                View all
-                                            </button>
-                                        </Link>
+                            {/* Featured */}
+                            <div className="card shadow-sm mb-4">
+                                <div className="card-header">
+                                    <div className="row align-items-center">
+                                        <div className="col-md-3">
+                                            <h5>Featured</h5>
+                                        </div>
+                                        <div className="col-md-9 text-right">
+                                            <Link to="">
+                                                <button className="btn btn-primary btn-sm">
+                                                    View all
+                                                </button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="card-body">
+                                    <CarouselCard />
+                                </div>
                             </div>
-                            <div className="card-body">
-                                <CarouselCard />
-                            </div>
-                        </div>
+                        </ErrorBoundary>
                     </div>
 
                     <div className="light-bg p-3">

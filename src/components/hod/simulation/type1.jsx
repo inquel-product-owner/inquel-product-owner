@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import CKeditor, { OptionEditor } from "../../common/CKEditor";
 import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -26,7 +25,6 @@ class HODSimulationType1 extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showMCQDelete_Modal: false,
 
             errorMsg: "",
@@ -94,12 +92,6 @@ class HODSimulationType1 extends Component {
         };
         this.section = this.props.temp;
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     // -------------------------- Question data loading --------------------------
 
@@ -561,7 +553,7 @@ class HODSimulationType1 extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.data.msg,
+                        errorMsg: result.data.msg ?result.data.msg:'',
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -1314,13 +1306,11 @@ class HODSimulationType1 extends Component {
     render() {
         let data = [...this.state.questions];
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -1337,12 +1327,6 @@ class HODSimulationType1 extends Component {
                             showErrorAlert: false,
                         });
                     }}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
                 />
 
                 {/* Image lightbox */}
@@ -1378,827 +1362,557 @@ class HODSimulationType1 extends Component {
                     />
                 ) : null}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        <div className="row">
-                            {/* ------------------------------ MCQ Column ------------------------------ */}
-                            <div
-                                className={`${
-                                    this.state.showEdit_option
-                                        ? "col-md-9"
-                                        : "col-12"
-                                } mb-4 mb-md-0`}
-                            >
-                                {/* Back button */}
-                                <button
-                                    className="btn btn-primary-invert btn-sm mb-3"
-                                    onClick={this.props.history.goBack}
-                                >
-                                    <i className="fas fa-chevron-left fa-sm"></i>{" "}
-                                    Back
-                                </button>
+                <div className="row">
+                    {/* ------------------------------ MCQ Column ------------------------------ */}
+                    <div
+                        className={`${
+                            this.state.showEdit_option ? "col-md-9" : "col-12"
+                        } mb-4 mb-md-0`}
+                    >
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link to={`/hod/subject/${this.subjectId}`}>
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to={`/hod/subject/${this.subjectId}/simulation/${this.simulationId}`}
+                                    >
+                                        {this.props.simulation_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.paper_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    {this.props.section_name}
+                                </li>
+                            </ol>
+                        </nav>
 
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb mb-3">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/hod/subject/${this.subjectId}`}
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/hod/subject/${this.subjectId}/simulation/${this.simulationId}`}
-                                            >
-                                                {this.props.simulation_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.paper_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            {this.props.section_name}
-                                        </li>
-                                    </ol>
-                                </nav>
+                        {/* Header area */}
+                        <h5 className="primary-text mb-4">
+                            Type 1 - {this.section.category}
+                        </h5>
 
-                                {/* Header area */}
-                                <h5 className="primary-text mb-4">
-                                    Type 1 - {this.section.category}
-                                </h5>
+                        {/* -------------------- MCQ -------------------- */}
+                        {this.state.questions.map((question, q_index) => {
+                            return (
+                                <div className="row mb-3" key={q_index}>
+                                    {/* ---------- Side buttons ---------- */}
+                                    <div className="col-md-1 mb-1 mb-md-0">
+                                        <div className="row">
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                >
+                                                    {question.index ? (
+                                                        question.index
+                                                    ) : (
+                                                        <i className="fas fa-ellipsis-h"></i>
+                                                    )}
+                                                </button>
+                                            </div>
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <OverlayTrigger
+                                                    key="right"
+                                                    placement="right"
+                                                    overlay={
+                                                        <Tooltip id="tooltip">
+                                                            Edit
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                        onClick={() =>
+                                                            this.handleEdit(
+                                                                q_index
+                                                            )
+                                                        }
+                                                    >
+                                                        <i className="far fa-edit fa-sm"></i>
+                                                    </button>
+                                                </OverlayTrigger>
+                                            </div>
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <OverlayTrigger
+                                                    key="right"
+                                                    placement="right"
+                                                    overlay={
+                                                        <Tooltip id="tooltip">
+                                                            Copy
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-light bg-white btn-block shadow-sm mr-1"
+                                                        onClick={() =>
+                                                            this.handleCopy(
+                                                                q_index
+                                                            )
+                                                        }
+                                                    >
+                                                        <i className="far fa-copy fa-sm"></i>
+                                                    </button>
+                                                </OverlayTrigger>
+                                            </div>
+                                            <div className="col-md-12 col-3 mb-1">
+                                                <OverlayTrigger
+                                                    key="right"
+                                                    placement="right"
+                                                    overlay={
+                                                        <Tooltip id="tooltip">
+                                                            Delete
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-light bg-white btn-block shadow-sm"
+                                                        onClick={() =>
+                                                            this.handleDelete(
+                                                                q_index
+                                                            )
+                                                        }
+                                                    >
+                                                        <i className="far fa-trash-alt fa-sm"></i>
+                                                    </button>
+                                                </OverlayTrigger>
+                                            </div>
+                                            {question.pair_question_id ===
+                                            "NOPAIR" ? (
+                                                <div className="col-md-12 col-3">
+                                                    <OverlayTrigger
+                                                        key="right"
+                                                        placement="right"
+                                                        overlay={
+                                                            <Tooltip id="tooltip">
+                                                                Pair question
+                                                            </Tooltip>
+                                                        }
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-light bg-white btn-block shadow-sm"
+                                                            onClick={() =>
+                                                                this.handlePair(
+                                                                    question,
+                                                                    q_index
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                question.question_random_id ===
+                                                                ""
+                                                                    ? true
+                                                                    : false
+                                                            }
+                                                        >
+                                                            <i className="fas fa-plus fa-sm"></i>
+                                                        </button>
+                                                    </OverlayTrigger>
+                                                </div>
+                                            ) : (
+                                                ""
+                                            )}
+                                        </div>
+                                    </div>
 
-                                {/* -------------------- MCQ -------------------- */}
-                                {this.state.questions.map(
-                                    (question, q_index) => {
-                                        return (
-                                            <div
-                                                className="row mb-3"
-                                                key={q_index}
-                                            >
-                                                {/* ---------- Side buttons ---------- */}
-                                                <div className="col-md-1 mb-1 mb-md-0">
-                                                    <div className="row">
-                                                        <div className="col-md-12 col-3 mb-1">
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                            >
-                                                                {question.index ? (
-                                                                    question.index
-                                                                ) : (
-                                                                    <i className="fas fa-ellipsis-h"></i>
+                                    {/* ---------- Question preview ---------- */}
+                                    <div className="col-md-11 pl-md-0">
+                                        <div
+                                            className={`card shadow-sm ${
+                                                this.state.activeQuestion ===
+                                                q_index
+                                                    ? "border-primary"
+                                                    : ""
+                                            }`}
+                                        >
+                                            <div className="card-body">
+                                                <div className="d-flex">
+                                                    {/* Questions & options */}
+                                                    <div className="w-100">
+                                                        <div
+                                                            className="pb-2"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: question.question,
+                                                            }}
+                                                        ></div>
+
+                                                        {this.section
+                                                            .category ===
+                                                        "MCQ" ? (
+                                                            <div className="row">
+                                                                {question.content.options.map(
+                                                                    (
+                                                                        options,
+                                                                        index
+                                                                    ) => {
+                                                                        return (
+                                                                            <div
+                                                                                className="col-md-6"
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                            >
+                                                                                <div className="form-group">
+                                                                                    <div
+                                                                                        className={`card shadow-sm ${
+                                                                                            options.correct
+                                                                                                ? "success-bg"
+                                                                                                : "bg-light"
+                                                                                        }`}
+                                                                                    >
+                                                                                        <div className="card-body small font-weight-bold-600 pt-3 pb-0">
+                                                                                            <div
+                                                                                                dangerouslySetInnerHTML={{
+                                                                                                    __html:
+                                                                                                        options.content !==
+                                                                                                        ""
+                                                                                                            ? `<div class="mb-3">${options.content}</div>`
+                                                                                                            : `<p class="text-muted">Option 0${
+                                                                                                                  index +
+                                                                                                                  1
+                                                                                                              }</p>`,
+                                                                                                }}
+                                                                                            ></div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    }
                                                                 )}
-                                                            </button>
-                                                        </div>
-                                                        <div className="col-md-12 col-3 mb-1">
-                                                            <OverlayTrigger
-                                                                key="right"
-                                                                placement="right"
-                                                                overlay={
-                                                                    <Tooltip id="tooltip">
-                                                                        Edit
-                                                                    </Tooltip>
-                                                                }
-                                                            >
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                                    onClick={() =>
-                                                                        this.handleEdit(
-                                                                            q_index
-                                                                        )
+                                                            </div>
+                                                        ) : (
+                                                            ""
+                                                        )}
+                                                        {this.section
+                                                            .category ===
+                                                        "Fill In" ? (
+                                                            <div className="row">
+                                                                {question.content.fillin_answer.map(
+                                                                    (
+                                                                        fill_in,
+                                                                        index
+                                                                    ) => {
+                                                                        return (
+                                                                            <div
+                                                                                className="col-md-6"
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                            >
+                                                                                <div className="form-group">
+                                                                                    <div className="card shadow-sm bg-light">
+                                                                                        <div className="card-body small font-weight-bold-600 py-3">
+                                                                                            {fill_in !==
+                                                                                            "" ? (
+                                                                                                fill_in
+                                                                                            ) : (
+                                                                                                <span className="text-muted">{`Answer 0${
+                                                                                                    index +
+                                                                                                    1
+                                                                                                }`}</span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
                                                                     }
-                                                                >
-                                                                    <i className="far fa-edit fa-sm"></i>
-                                                                </button>
-                                                            </OverlayTrigger>
-                                                        </div>
-                                                        <div className="col-md-12 col-3 mb-1">
-                                                            <OverlayTrigger
-                                                                key="right"
-                                                                placement="right"
-                                                                overlay={
-                                                                    <Tooltip id="tooltip">
-                                                                        Copy
-                                                                    </Tooltip>
-                                                                }
-                                                            >
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-1"
-                                                                    onClick={() =>
-                                                                        this.handleCopy(
-                                                                            q_index
-                                                                        )
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            ""
+                                                        )}
+                                                        {this.section
+                                                            .category ===
+                                                        "True or False" ? (
+                                                            <div className="row">
+                                                                {question.content.boolean_question.map(
+                                                                    (
+                                                                        boolean,
+                                                                        index
+                                                                    ) => {
+                                                                        return (
+                                                                            <div
+                                                                                className="col-md-6"
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                            >
+                                                                                <div className="form-group">
+                                                                                    <div
+                                                                                        className={`card shadow-sm ${
+                                                                                            boolean.correct
+                                                                                                ? "success-bg"
+                                                                                                : "bg-light"
+                                                                                        }`}
+                                                                                    >
+                                                                                        <div className="card-body small font-weight-bold-600 py-3">
+                                                                                            {
+                                                                                                boolean.content
+                                                                                            }
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
                                                                     }
-                                                                >
-                                                                    <i className="far fa-copy fa-sm"></i>
-                                                                </button>
-                                                            </OverlayTrigger>
-                                                        </div>
-                                                        <div className="col-md-12 col-3 mb-1">
-                                                            <OverlayTrigger
-                                                                key="right"
-                                                                placement="right"
-                                                                overlay={
-                                                                    <Tooltip id="tooltip">
-                                                                        Delete
-                                                                    </Tooltip>
-                                                                }
-                                                            >
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn btn-light bg-white btn-block shadow-sm"
-                                                                    onClick={() =>
-                                                                        this.handleDelete(
-                                                                            q_index
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="far fa-trash-alt fa-sm"></i>
-                                                                </button>
-                                                            </OverlayTrigger>
-                                                        </div>
-                                                        {question.pair_question_id ===
-                                                        "NOPAIR" ? (
-                                                            <div className="col-md-12 col-3">
-                                                                <OverlayTrigger
-                                                                    key="right"
-                                                                    placement="right"
-                                                                    overlay={
-                                                                        <Tooltip id="tooltip">
-                                                                            Pair
-                                                                            question
-                                                                        </Tooltip>
-                                                                    }
-                                                                >
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn btn-light bg-white btn-block shadow-sm"
-                                                                        onClick={() =>
-                                                                            this.handlePair(
-                                                                                question,
-                                                                                q_index
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            question.question_random_id ===
-                                                                            ""
-                                                                                ? true
-                                                                                : false
-                                                                        }
-                                                                    >
-                                                                        <i className="fas fa-plus fa-sm"></i>
-                                                                    </button>
-                                                                </OverlayTrigger>
+                                                                )}
                                                             </div>
                                                         ) : (
                                                             ""
                                                         )}
                                                     </div>
-                                                </div>
-
-                                                {/* ---------- Question preview ---------- */}
-                                                <div className="col-md-11 pl-md-0">
-                                                    <div
-                                                        className={`card shadow-sm ${
-                                                            this.state
-                                                                .activeQuestion ===
-                                                            q_index
-                                                                ? "border-primary"
-                                                                : ""
-                                                        }`}
-                                                    >
-                                                        <div className="card-body">
-                                                            <div className="d-flex">
-                                                                {/* Questions & options */}
-                                                                <div className="w-100">
-                                                                    <div
-                                                                        className="pb-2"
-                                                                        dangerouslySetInnerHTML={{
-                                                                            __html: question.question,
-                                                                        }}
-                                                                    ></div>
-
-                                                                    {this
-                                                                        .section
-                                                                        .category ===
-                                                                    "MCQ" ? (
-                                                                        <div className="row">
-                                                                            {question.content.options.map(
-                                                                                (
-                                                                                    options,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <div
-                                                                                            className="col-md-6"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                        >
-                                                                                            <div className="form-group">
-                                                                                                <div
-                                                                                                    className={`card shadow-sm ${
-                                                                                                        options.correct
-                                                                                                            ? "success-bg"
-                                                                                                            : "bg-light"
-                                                                                                    }`}
-                                                                                                >
-                                                                                                    <div className="card-body small font-weight-bold-600 pt-3 pb-0">
-                                                                                                        <div
-                                                                                                            dangerouslySetInnerHTML={{
-                                                                                                                __html:
-                                                                                                                    options.content !==
-                                                                                                                    ""
-                                                                                                                        ? `<div class="mb-3">${options.content}</div>`
-                                                                                                                        : `<p class="text-muted">Option 0${
-                                                                                                                              index +
-                                                                                                                              1
-                                                                                                                          }</p>`,
-                                                                                                            }}
-                                                                                                        ></div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
-                                                                    {this
-                                                                        .section
-                                                                        .category ===
-                                                                    "Fill In" ? (
-                                                                        <div className="row">
-                                                                            {question.content.fillin_answer.map(
-                                                                                (
-                                                                                    fill_in,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <div
-                                                                                            className="col-md-6"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                        >
-                                                                                            <div className="form-group">
-                                                                                                <div className="card shadow-sm bg-light">
-                                                                                                    <div className="card-body small font-weight-bold-600 py-3">
-                                                                                                        {fill_in !==
-                                                                                                        "" ? (
-                                                                                                            fill_in
-                                                                                                        ) : (
-                                                                                                            <span className="text-muted">{`Answer 0${
-                                                                                                                index +
-                                                                                                                1
-                                                                                                            }`}</span>
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
-                                                                    {this
-                                                                        .section
-                                                                        .category ===
-                                                                    "True or False" ? (
-                                                                        <div className="row">
-                                                                            {question.content.boolean_question.map(
-                                                                                (
-                                                                                    boolean,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <div
-                                                                                            className="col-md-6"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                        >
-                                                                                            <div className="form-group">
-                                                                                                <div
-                                                                                                    className={`card shadow-sm ${
-                                                                                                        boolean.correct
-                                                                                                            ? "success-bg"
-                                                                                                            : "bg-light"
-                                                                                                    }`}
-                                                                                                >
-                                                                                                    <div className="card-body small font-weight-bold-600 py-3">
-                                                                                                        {
-                                                                                                            boolean.content
-                                                                                                        }
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
-                                                                </div>
-                                                                {/* ----- image preview ----- */}
-                                                                {question
-                                                                    .content
-                                                                    .images[0]
-                                                                    .path !==
-                                                                    "" ||
-                                                                question.content
-                                                                    .images[1]
-                                                                    .path !==
-                                                                    "" ||
-                                                                question.content
-                                                                    .images[2]
-                                                                    .path !==
-                                                                    "" ||
-                                                                question.content
-                                                                    .images[3]
-                                                                    .path !==
-                                                                    "" ? (
-                                                                    <div className="ml-3">
-                                                                        {question.content.images.map(
-                                                                            (
-                                                                                images,
+                                                    {/* ----- image preview ----- */}
+                                                    {question.content.images[0]
+                                                        .path !== "" ||
+                                                    question.content.images[1]
+                                                        .path !== "" ||
+                                                    question.content.images[2]
+                                                        .path !== "" ||
+                                                    question.content.images[3]
+                                                        .path !== "" ? (
+                                                        <div className="ml-3">
+                                                            {question.content.images.map(
+                                                                (
+                                                                    images,
+                                                                    index
+                                                                ) => {
+                                                                    return images.path !==
+                                                                        "" ? (
+                                                                        <div
+                                                                            key={
                                                                                 index
-                                                                            ) => {
-                                                                                return images.path !==
-                                                                                    "" ? (
-                                                                                    <div
-                                                                                        key={
-                                                                                            index
-                                                                                        }
-                                                                                        className="card preview-img-circle shadow-sm"
-                                                                                        style={{
-                                                                                            backgroundImage: `url(${images.path})`,
-                                                                                        }}
-                                                                                        onClick={() =>
-                                                                                            this.changeImage(
-                                                                                                question
-                                                                                                    .content
-                                                                                                    .images,
-                                                                                                images.path
-                                                                                            )
-                                                                                        }
-                                                                                    ></div>
-                                                                                ) : (
-                                                                                    ""
-                                                                                );
                                                                             }
-                                                                        )}
-                                                                    </div>
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-                                )}
-
-                                <button
-                                    className="btn btn-primary btn-block shadow-none"
-                                    onClick={this.handleAdd}
-                                >
-                                    Add +
-                                </button>
-                            </div>
-
-                            {/* ---------- Settings column ---------- */}
-                            {this.state.showEdit_option ? (
-                                <div className="col-md-3 content-edit">
-                                    <div className="d-flex justify-content-between align-items-center mb-2">
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handleSubmit}
-                                        >
-                                            Save
-                                        </button>
-                                        <button
-                                            className="btn btn-link btn-sm shadow-none"
-                                            onClick={() => {
-                                                this.setState({
-                                                    showEdit_option: false,
-                                                    contentCollapsed: true,
-                                                    filesCollapsed: true,
-                                                    propertiesCollapsed: true,
-                                                    activeQuestion: "",
-                                                });
-                                            }}
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
-
-                                    <Accordion defaultActiveKey="">
-                                        {/* ---------- Content ---------- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="0"
-                                                className="text-dark"
-                                                style={{ cursor: "default" }}
-                                                onClick={() =>
-                                                    this.toggleCollapse(
-                                                        "content"
-                                                    )
-                                                }
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Content
-                                                    {this.state
-                                                        .contentCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
-                                                    )}
-                                                </div>
-                                            </Accordion.Toggle>
-
-                                            <Accordion.Collapse eventKey="0">
-                                                <Card.Body className="p-3">
-                                                    {/* ---------- Questions ---------- */}
-                                                    <div className="form-group">
-                                                        <label>
-                                                            Add Questions
-                                                        </label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].question
-                                                            }
-                                                            onChange={
-                                                                this
-                                                                    .onEditorChange
-                                                            }
-                                                        />
-                                                    </div>
-
-                                                    {/* ---------- Options ---------- */}
-                                                    <label>Answers</label>
-                                                    {this.section.category ===
-                                                    "MCQ" ? (
-                                                        <div className="form-group row align-items-center">
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].content.options.map(
-                                                                (
-                                                                    options,
-                                                                    index
-                                                                ) => (
-                                                                    <Fragment
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <div className="col-10 mb-2 pr-0">
-                                                                            <div
-                                                                                className="d-flex border-secondary"
-                                                                                style={{
-                                                                                    borderRadius:
-                                                                                        "4px",
-                                                                                }}
-                                                                            >
-                                                                                <div className="w-100">
-                                                                                    <OptionEditor
-                                                                                        data={
-                                                                                            options.content
-                                                                                        }
-                                                                                        onChange={(
-                                                                                            event
-                                                                                        ) =>
-                                                                                            this.handleOptionChange(
-                                                                                                index,
-                                                                                                event
-                                                                                            )
-                                                                                        }
-                                                                                    />
-                                                                                </div>
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                    onClick={() =>
-                                                                                        this.handleRemoveOptionFields(
-                                                                                            index
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    -
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="col-2 mb-2">
-                                                                            <p
-                                                                                className={`mb-0 text-right ${
-                                                                                    options.correct
-                                                                                        ? "text-success"
-                                                                                        : "text-muted"
-                                                                                }`}
-                                                                                onClick={() =>
-                                                                                    this.correctOption(
-                                                                                        index
-                                                                                    )
-                                                                                }
-                                                                                style={{
-                                                                                    cursor: "pointer",
-                                                                                }}
-                                                                            >
-                                                                                <i className="fas fa-check-circle"></i>
-                                                                            </p>
-                                                                        </div>
-                                                                    </Fragment>
-                                                                )
-                                                            )}
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].content.options
-                                                                .length <
-                                                            this
-                                                                .option_limit ? (
-                                                                <div className="form-group col-12 mb-0">
-                                                                    <button
-                                                                        className="btn btn-light btn-block border-secondary btn-sm"
-                                                                        onClick={
-                                                                            this
-                                                                                .handleAddOptionFields
-                                                                        }
-                                                                    >
-                                                                        Add +
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                        </div>
-                                                    ) : this.section
-                                                          .category ===
-                                                      "Fill In" ? (
-                                                        // Fill in answers
-                                                        <div className="form-group row">
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].content.fillin_answer.map(
-                                                                (
-                                                                    answer,
-                                                                    index
-                                                                ) => (
-                                                                    <Fragment
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <div className="col-12 mb-2">
-                                                                            <div
-                                                                                className="input-group border-secondary"
-                                                                                style={{
-                                                                                    borderRadius:
-                                                                                        "6px",
-                                                                                }}
-                                                                            >
-                                                                                <input
-                                                                                    type="text"
-                                                                                    className="form-control form-control-sm"
-                                                                                    id={`answer${index}`}
-                                                                                    name="answer"
-                                                                                    placeholder={`Answer 0${
-                                                                                        index +
-                                                                                        1
-                                                                                    }`}
-                                                                                    value={
-                                                                                        answer
-                                                                                    }
-                                                                                    onChange={(
-                                                                                        event
-                                                                                    ) =>
-                                                                                        this.handleAnswerChange(
-                                                                                            index,
-                                                                                            event
-                                                                                        )
-                                                                                    }
-                                                                                    autoComplete="off"
-                                                                                    required
-                                                                                />
-                                                                                <div className="input-group-append">
-                                                                                    <div
-                                                                                        className="btn-group"
-                                                                                        role="group"
-                                                                                        aria-label="Basic example"
-                                                                                    >
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                            onClick={() =>
-                                                                                                this.handleRemoveAnswerFields(
-                                                                                                    index
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            -
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </Fragment>
-                                                                )
-                                                            )}
-                                                            <div className="form-group col-12 mb-0">
-                                                                <button
-                                                                    className="btn btn-light btn-block border-secondary btn-sm"
-                                                                    onClick={
-                                                                        this
-                                                                            .handleAddAnswerFields
-                                                                    }
-                                                                >
-                                                                    Add +
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : this.section
-                                                          .category ===
-                                                      "True or False" ? (
-                                                        // true or false
-                                                        <div className="form-group row align-items-center">
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].content.boolean_question.map(
-                                                                (
-                                                                    boolean,
-                                                                    index
-                                                                ) => (
-                                                                    <Fragment
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <div className="col-10 mb-2 pr-0">
-                                                                            <input
-                                                                                type="text"
-                                                                                className="form-control form-control-sm border-secondary"
-                                                                                id={`option${index}`}
-                                                                                name="option"
-                                                                                placeholder={`Option 0${
-                                                                                    index +
-                                                                                    1
-                                                                                }`}
-                                                                                value={
-                                                                                    boolean.content
-                                                                                }
-                                                                                disabled
-                                                                                autoComplete="off"
-                                                                                required
-                                                                            />
-                                                                        </div>
-                                                                        <div className="col-2 mb-2">
-                                                                            <p
-                                                                                className={`mb-0 text-right ${
-                                                                                    boolean.correct
-                                                                                        ? "text-success"
-                                                                                        : "text-muted"
-                                                                                }`}
-                                                                                onClick={() =>
-                                                                                    this.correctBoolean(
-                                                                                        index
-                                                                                    )
-                                                                                }
-                                                                                style={{
-                                                                                    cursor: "pointer",
-                                                                                }}
-                                                                            >
-                                                                                <i className="fas fa-check-circle"></i>
-                                                                            </p>
-                                                                        </div>
-                                                                    </Fragment>
-                                                                )
+                                                                            className="card preview-img-circle shadow-sm"
+                                                                            style={{
+                                                                                backgroundImage: `url(${images.path})`,
+                                                                            }}
+                                                                            onClick={() =>
+                                                                                this.changeImage(
+                                                                                    question
+                                                                                        .content
+                                                                                        .images,
+                                                                                    images.path
+                                                                                )
+                                                                            }
+                                                                        ></div>
+                                                                    ) : (
+                                                                        ""
+                                                                    );
+                                                                }
                                                             )}
                                                         </div>
                                                     ) : (
                                                         ""
                                                     )}
-
-                                                    {/* ---------- Explanation ---------- */}
-                                                    <div className="form-group">
-                                                        <label>
-                                                            Explanation
-                                                        </label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].content
-                                                                    .explanation
-                                                            }
-                                                            onChange={
-                                                                this
-                                                                    .handleExplanation
-                                                            }
-                                                        />
-                                                    </div>
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-
-                                        {/* ---------- Image ---------- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="1"
-                                                className="text-dark"
-                                                style={{ cursor: "default" }}
-                                                onClick={() =>
-                                                    this.toggleCollapse("files")
-                                                }
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Image
-                                                    {this.state
-                                                        .filesCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
-                                                    )}
                                                 </div>
-                                            </Accordion.Toggle>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
 
-                                            <Accordion.Collapse eventKey="1">
-                                                <Card.Body className="p-3">
-                                                    {/* ---------- Image ---------- */}
-                                                    <div className="form-group">
-                                                        <div className="row align-items-center mb-2">
-                                                            <div className="col-md-6">
-                                                                <p className="mb-0">
-                                                                    Image
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-md-6 text-right">
-                                                                <button
-                                                                    className="btn btn-link btn-sm shadow-none"
-                                                                    onClick={
-                                                                        this
-                                                                            .clearImages
-                                                                    }
-                                                                >
-                                                                    Clear
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        {data[
+                        <button
+                            className="btn btn-primary btn-block shadow-none"
+                            onClick={this.handleAdd}
+                        >
+                            Add +
+                        </button>
+                    </div>
+
+                    {/* ---------- Settings column ---------- */}
+                    {this.state.showEdit_option ? (
+                        <div className="col-md-3 content-edit">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handleSubmit}
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    className="btn btn-link btn-sm shadow-none"
+                                    onClick={() => {
+                                        this.setState({
+                                            showEdit_option: false,
+                                            contentCollapsed: true,
+                                            filesCollapsed: true,
+                                            propertiesCollapsed: true,
+                                            activeQuestion: "",
+                                        });
+                                    }}
+                                >
+                                    Close
+                                </button>
+                            </div>
+
+                            <Accordion defaultActiveKey="">
+                                {/* ---------- Content ---------- */}
+                                <Card className="shadow-sm mb-2">
+                                    <Accordion.Toggle
+                                        as={Card.Body}
+                                        variant="link"
+                                        eventKey="0"
+                                        className="text-dark"
+                                        style={{ cursor: "default" }}
+                                        onClick={() =>
+                                            this.toggleCollapse("content")
+                                        }
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            Content
+                                            {this.state.contentCollapsed ? (
+                                                <i className="fas fa-angle-right "></i>
+                                            ) : (
+                                                <i className="fas fa-angle-down "></i>
+                                            )}
+                                        </div>
+                                    </Accordion.Toggle>
+
+                                    <Accordion.Collapse eventKey="0">
+                                        <Card.Body className="p-3">
+                                            {/* ---------- Questions ---------- */}
+                                            <div className="form-group">
+                                                <label>Add Questions</label>
+                                                <CKeditor
+                                                    data={
+                                                        data[
                                                             this.state
                                                                 .activeQuestion
-                                                        ].content.images.map(
-                                                            (
-                                                                options,
-                                                                image_index
-                                                            ) => (
-                                                                <Fragment
-                                                                    key={
-                                                                        image_index
-                                                                    }
-                                                                >
+                                                        ].question
+                                                    }
+                                                    onChange={
+                                                        this.onEditorChange
+                                                    }
+                                                />
+                                            </div>
+
+                                            {/* ---------- Options ---------- */}
+                                            <label>Answers</label>
+                                            {this.section.category === "MCQ" ? (
+                                                <div className="form-group row align-items-center">
+                                                    {data[
+                                                        this.state
+                                                            .activeQuestion
+                                                    ].content.options.map(
+                                                        (options, index) => (
+                                                            <Fragment
+                                                                key={index}
+                                                            >
+                                                                <div className="col-10 mb-2 pr-0">
                                                                     <div
-                                                                        className="input-group border-secondary mb-1"
+                                                                        className="d-flex border-secondary"
+                                                                        style={{
+                                                                            borderRadius:
+                                                                                "4px",
+                                                                        }}
+                                                                    >
+                                                                        <div className="w-100">
+                                                                            <OptionEditor
+                                                                                data={
+                                                                                    options.content
+                                                                                }
+                                                                                onChange={(
+                                                                                    event
+                                                                                ) =>
+                                                                                    this.handleOptionChange(
+                                                                                        index,
+                                                                                        event
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                        </div>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                            onClick={() =>
+                                                                                this.handleRemoveOptionFields(
+                                                                                    index
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            -
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-2 mb-2">
+                                                                    <p
+                                                                        className={`mb-0 text-right ${
+                                                                            options.correct
+                                                                                ? "text-success"
+                                                                                : "text-muted"
+                                                                        }`}
+                                                                        onClick={() =>
+                                                                            this.correctOption(
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                        style={{
+                                                                            cursor: "pointer",
+                                                                        }}
+                                                                    >
+                                                                        <i className="fas fa-check-circle"></i>
+                                                                    </p>
+                                                                </div>
+                                                            </Fragment>
+                                                        )
+                                                    )}
+                                                    {data[
+                                                        this.state
+                                                            .activeQuestion
+                                                    ].content.options.length <
+                                                    this.option_limit ? (
+                                                        <div className="form-group col-12 mb-0">
+                                                            <button
+                                                                className="btn btn-light btn-block border-secondary btn-sm"
+                                                                onClick={
+                                                                    this
+                                                                        .handleAddOptionFields
+                                                                }
+                                                            >
+                                                                Add +
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                </div>
+                                            ) : this.section.category ===
+                                              "Fill In" ? (
+                                                // Fill in answers
+                                                <div className="form-group row">
+                                                    {data[
+                                                        this.state
+                                                            .activeQuestion
+                                                    ].content.fillin_answer.map(
+                                                        (answer, index) => (
+                                                            <Fragment
+                                                                key={index}
+                                                            >
+                                                                <div className="col-12 mb-2">
+                                                                    <div
+                                                                        className="input-group border-secondary"
                                                                         style={{
                                                                             borderRadius:
                                                                                 "6px",
@@ -2207,24 +1921,25 @@ class HODSimulationType1 extends Component {
                                                                         <input
                                                                             type="text"
                                                                             className="form-control form-control-sm"
-                                                                            id={`image${image_index}`}
-                                                                            name="image"
-                                                                            placeholder={`Image title 0${
-                                                                                image_index +
+                                                                            id={`answer${index}`}
+                                                                            name="answer"
+                                                                            placeholder={`Answer 0${
+                                                                                index +
                                                                                 1
                                                                             }`}
                                                                             value={
-                                                                                options.title
+                                                                                answer
                                                                             }
                                                                             onChange={(
                                                                                 event
                                                                             ) =>
-                                                                                this.handleImageTitle(
-                                                                                    image_index,
+                                                                                this.handleAnswerChange(
+                                                                                    index,
                                                                                     event
                                                                                 )
                                                                             }
                                                                             autoComplete="off"
+                                                                            required
                                                                         />
                                                                         <div className="input-group-append">
                                                                             <div
@@ -2234,148 +1949,332 @@ class HODSimulationType1 extends Component {
                                                                             >
                                                                                 <button
                                                                                     type="button"
-                                                                                    className="btn btn-light btn-sm shadow-none"
+                                                                                    className="btn btn-light btn-sm shadow-none font-weight-bold"
                                                                                     onClick={() =>
-                                                                                        this.handleDeleteImages(
-                                                                                            image_index
+                                                                                        this.handleRemoveAnswerFields(
+                                                                                            index
                                                                                         )
                                                                                     }
                                                                                 >
-                                                                                    <i className="fas fa-times fa-sm"></i>
+                                                                                    -
                                                                                 </button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div className="custom-file mb-2">
-                                                                        <input
-                                                                            type="file"
-                                                                            className="custom-file-input"
-                                                                            id={`file${image_index}`}
-                                                                            accept="image/*"
-                                                                            aria-describedby="inputGroupFileAddon01"
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleImageFile(
-                                                                                    image_index,
-                                                                                    event
-                                                                                )
-                                                                            }
-                                                                            disabled={
-                                                                                options.file_name !==
-                                                                                    "" ||
-                                                                                options.path !==
-                                                                                    ""
-                                                                                    ? true
-                                                                                    : false
-                                                                            }
-                                                                        />
-                                                                        <label
-                                                                            className="custom-file-label"
-                                                                            htmlFor={`file${image_index}`}
-                                                                        >
-                                                                            {options.file_name ===
-                                                                            ""
-                                                                                ? "Choose file"
-                                                                                : options.file_name}
-                                                                        </label>
-                                                                    </div>
-                                                                </Fragment>
-                                                            )
-                                                        )}
-                                                        <small
-                                                            className="form-text text-muted mb-2"
-                                                            style={{
-                                                                marginTop:
-                                                                    "-8px",
-                                                            }}
+                                                                </div>
+                                                            </Fragment>
+                                                        )
+                                                    )}
+                                                    <div className="form-group col-12 mb-0">
+                                                        <button
+                                                            className="btn btn-light btn-block border-secondary btn-sm"
+                                                            onClick={
+                                                                this
+                                                                    .handleAddAnswerFields
+                                                            }
                                                         >
-                                                            Select only .png
-                                                            .jpg .jpeg .webp
-                                                        </small>
+                                                            Add +
+                                                        </button>
                                                     </div>
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-
-                                        {/* ---------- Properties ---------- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="2"
-                                                className="text-dark"
-                                                style={{ cursor: "default" }}
-                                                onClick={() =>
-                                                    this.toggleCollapse(
-                                                        "properties"
-                                                    )
-                                                }
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Properties
-                                                    {this.state
-                                                        .propertiesCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
+                                                </div>
+                                            ) : this.section.category ===
+                                              "True or False" ? (
+                                                // true or false
+                                                <div className="form-group row align-items-center">
+                                                    {data[
+                                                        this.state
+                                                            .activeQuestion
+                                                    ].content.boolean_question.map(
+                                                        (boolean, index) => (
+                                                            <Fragment
+                                                                key={index}
+                                                            >
+                                                                <div className="col-10 mb-2 pr-0">
+                                                                    <input
+                                                                        type="text"
+                                                                        className="form-control form-control-sm border-secondary"
+                                                                        id={`option${index}`}
+                                                                        name="option"
+                                                                        placeholder={`Option 0${
+                                                                            index +
+                                                                            1
+                                                                        }`}
+                                                                        value={
+                                                                            boolean.content
+                                                                        }
+                                                                        disabled
+                                                                        autoComplete="off"
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <div className="col-2 mb-2">
+                                                                    <p
+                                                                        className={`mb-0 text-right ${
+                                                                            boolean.correct
+                                                                                ? "text-success"
+                                                                                : "text-muted"
+                                                                        }`}
+                                                                        onClick={() =>
+                                                                            this.correctBoolean(
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                        style={{
+                                                                            cursor: "pointer",
+                                                                        }}
+                                                                    >
+                                                                        <i className="fas fa-check-circle"></i>
+                                                                    </p>
+                                                                </div>
+                                                            </Fragment>
+                                                        )
                                                     )}
                                                 </div>
-                                            </Accordion.Toggle>
+                                            ) : (
+                                                ""
+                                            )}
 
-                                            <Accordion.Collapse eventKey="2">
-                                                <Card.Body className="p-3">
-                                                    {/* ---------- Chapter selection ---------- */}
-                                                    <Select
-                                                        className="basic-single border-secondary"
-                                                        placeholder="Select chapter"
-                                                        isSearchable={true}
-                                                        name="chapter"
-                                                        id="chapter"
-                                                        value={this.state.chapterData.map(
-                                                            (list) => {
-                                                                return data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].properties
-                                                                    .chapter_id ===
-                                                                    list.chapter_id
-                                                                    ? {
-                                                                          value: list.chapter_id,
-                                                                          label: list.chapter_name,
-                                                                      }
-                                                                    : "";
+                                            {/* ---------- Explanation ---------- */}
+                                            <div className="form-group">
+                                                <label>Explanation</label>
+                                                <CKeditor
+                                                    data={
+                                                        data[
+                                                            this.state
+                                                                .activeQuestion
+                                                        ].content.explanation
+                                                    }
+                                                    onChange={
+                                                        this.handleExplanation
+                                                    }
+                                                />
+                                            </div>
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+
+                                {/* ---------- Image ---------- */}
+                                <Card className="shadow-sm mb-2">
+                                    <Accordion.Toggle
+                                        as={Card.Body}
+                                        variant="link"
+                                        eventKey="1"
+                                        className="text-dark"
+                                        style={{ cursor: "default" }}
+                                        onClick={() =>
+                                            this.toggleCollapse("files")
+                                        }
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            Image
+                                            {this.state.filesCollapsed ? (
+                                                <i className="fas fa-angle-right "></i>
+                                            ) : (
+                                                <i className="fas fa-angle-down "></i>
+                                            )}
+                                        </div>
+                                    </Accordion.Toggle>
+
+                                    <Accordion.Collapse eventKey="1">
+                                        <Card.Body className="p-3">
+                                            {/* ---------- Image ---------- */}
+                                            <div className="form-group">
+                                                <div className="row align-items-center mb-2">
+                                                    <div className="col-md-6">
+                                                        <p className="mb-0">
+                                                            Image
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-md-6 text-right">
+                                                        <button
+                                                            className="btn btn-link btn-sm shadow-none"
+                                                            onClick={
+                                                                this.clearImages
                                                             }
-                                                        )}
-                                                        options={this.state.chapterData.map(
-                                                            (list) => {
-                                                                return {
-                                                                    value: list.chapter_id,
-                                                                    label: list.chapter_name,
-                                                                };
-                                                            }
-                                                        )}
-                                                        onChange={(event) =>
-                                                            this.handleProperties(
-                                                                event
-                                                            )
-                                                        }
-                                                        required
-                                                    />
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-                                    </Accordion>
-                                </div>
-                            ) : (
-                                ""
-                            )}
+                                                        >
+                                                            Clear
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {data[
+                                                    this.state.activeQuestion
+                                                ].content.images.map(
+                                                    (options, image_index) => (
+                                                        <Fragment
+                                                            key={image_index}
+                                                        >
+                                                            <div
+                                                                className="input-group border-secondary mb-1"
+                                                                style={{
+                                                                    borderRadius:
+                                                                        "6px",
+                                                                }}
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control form-control-sm"
+                                                                    id={`image${image_index}`}
+                                                                    name="image"
+                                                                    placeholder={`Image title 0${
+                                                                        image_index +
+                                                                        1
+                                                                    }`}
+                                                                    value={
+                                                                        options.title
+                                                                    }
+                                                                    onChange={(
+                                                                        event
+                                                                    ) =>
+                                                                        this.handleImageTitle(
+                                                                            image_index,
+                                                                            event
+                                                                        )
+                                                                    }
+                                                                    autoComplete="off"
+                                                                />
+                                                                <div className="input-group-append">
+                                                                    <div
+                                                                        className="btn-group"
+                                                                        role="group"
+                                                                        aria-label="Basic example"
+                                                                    >
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-light btn-sm shadow-none"
+                                                                            onClick={() =>
+                                                                                this.handleDeleteImages(
+                                                                                    image_index
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <i className="fas fa-times fa-sm"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="custom-file mb-2">
+                                                                <input
+                                                                    type="file"
+                                                                    className="custom-file-input"
+                                                                    id={`file${image_index}`}
+                                                                    accept="image/*"
+                                                                    aria-describedby="inputGroupFileAddon01"
+                                                                    onChange={(
+                                                                        event
+                                                                    ) =>
+                                                                        this.handleImageFile(
+                                                                            image_index,
+                                                                            event
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        options.file_name !==
+                                                                            "" ||
+                                                                        options.path !==
+                                                                            ""
+                                                                            ? true
+                                                                            : false
+                                                                    }
+                                                                />
+                                                                <label
+                                                                    className="custom-file-label"
+                                                                    htmlFor={`file${image_index}`}
+                                                                >
+                                                                    {options.file_name ===
+                                                                    ""
+                                                                        ? "Choose file"
+                                                                        : options.file_name}
+                                                                </label>
+                                                            </div>
+                                                        </Fragment>
+                                                    )
+                                                )}
+                                                <small
+                                                    className="form-text text-muted mb-2"
+                                                    style={{
+                                                        marginTop: "-8px",
+                                                    }}
+                                                >
+                                                    Select only .png .jpg .jpeg
+                                                    .webp
+                                                </small>
+                                            </div>
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+
+                                {/* ---------- Properties ---------- */}
+                                <Card className="shadow-sm mb-2">
+                                    <Accordion.Toggle
+                                        as={Card.Body}
+                                        variant="link"
+                                        eventKey="2"
+                                        className="text-dark"
+                                        style={{ cursor: "default" }}
+                                        onClick={() =>
+                                            this.toggleCollapse("properties")
+                                        }
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            Properties
+                                            {this.state.propertiesCollapsed ? (
+                                                <i className="fas fa-angle-right "></i>
+                                            ) : (
+                                                <i className="fas fa-angle-down "></i>
+                                            )}
+                                        </div>
+                                    </Accordion.Toggle>
+
+                                    <Accordion.Collapse eventKey="2">
+                                        <Card.Body className="p-3">
+                                            {/* ---------- Chapter selection ---------- */}
+                                            <Select
+                                                className="basic-single border-secondary"
+                                                placeholder="Select chapter"
+                                                isSearchable={true}
+                                                name="chapter"
+                                                id="chapter"
+                                                value={this.state.chapterData.map(
+                                                    (list) => {
+                                                        return data[
+                                                            this.state
+                                                                .activeQuestion
+                                                        ].properties
+                                                            .chapter_id ===
+                                                            list.chapter_id
+                                                            ? {
+                                                                  value: list.chapter_id,
+                                                                  label: list.chapter_name,
+                                                              }
+                                                            : "";
+                                                    }
+                                                )}
+                                                options={this.state.chapterData.map(
+                                                    (list) => {
+                                                        return {
+                                                            value: list.chapter_id,
+                                                            label: list.chapter_name,
+                                                        };
+                                                    }
+                                                )}
+                                                onChange={(event) =>
+                                                    this.handleProperties(event)
+                                                }
+                                                required
+                                            />
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+                            </Accordion>
                         </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                    </div>
+                    ) : (
+                        ""
+                    )}
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

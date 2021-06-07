@@ -9,6 +9,8 @@ import { connect } from "react-redux";
 import { QuestionDataFormat } from "../../common/function/dataFormating";
 import storeDispatch from "../../../redux/dispatch";
 import { EXAMDATA } from "../../../redux/action";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "../../common/ErrorFallback";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -873,9 +875,7 @@ class SemesterAutoExam extends Component {
                                             false ? (
                                                 <div
                                                     id="drop-here"
-                                                    style={{
-                                                        userSelect: "none",
-                                                    }}
+                                                    className="user-select-none"
                                                     draggable={false}
                                                 >
                                                     <i className="fas fa-arrows-alt mr-2"></i>{" "}
@@ -1212,127 +1212,142 @@ class SemesterAutoExam extends Component {
 
                 <div className="exam-section">
                     <div className="container-fluid">
-                        {/* Header */}
-                        <div className="card card-body secondary-bg primary-text font-weight-bold-600 small mb-4 py-2">
-                            <div className="row align-items-center">
-                                <div className="col-md-7">
-                                    {semesterExam.length !== 0
-                                        ? semesterExam.section_description
-                                        : ""}
-                                </div>
-                                <div className="col-md-5">
-                                    <div className="row align-items-center">
-                                        <div className="col-md-3">
-                                            Attempt{" "}
-                                            {this.state.examInfo.attempt ||
-                                                0 + 1}
-                                        </div>
-                                        <div className="col-md-3">
-                                            {
-                                                this.state.semesterExamItem
-                                                    .total_questions
-                                            }{" "}
-                                            Questions
-                                        </div>
-                                        <div className="col-md-3">
-                                            Total marks:{" "}
-                                            {
-                                                this.state.semesterExamItem
-                                                    .total_marks
-                                            }
-                                        </div>
-                                        <div className="col-md-3">
-                                            <div className="bg-warning text-center rounded py-2">
-                                                {this.state.time.h}:
-                                                {this.state.time.m}:
-                                                {this.state.time.s}
+                        <ErrorBoundary
+                            FallbackComponent={ErrorFallback}
+                            onReset={() => window.location.reload()}
+                        >
+                            {/* Header */}
+                            <div className="card card-body secondary-bg primary-text font-weight-bold-600 small mb-4 py-2">
+                                <div className="row align-items-center">
+                                    <div className="col-md-7">
+                                        {semesterExam.length !== 0
+                                            ? semesterExam.section_description
+                                            : ""}
+                                    </div>
+                                    <div className="col-md-5">
+                                        <div className="row align-items-center">
+                                            <div className="col-md-3">
+                                                Attempt{" "}
+                                                {this.state.examInfo.attempt ||
+                                                    0 + 1}
+                                            </div>
+                                            <div className="col-md-3">
+                                                {
+                                                    this.state.semesterExamItem
+                                                        .total_questions
+                                                }{" "}
+                                                Questions
+                                            </div>
+                                            <div className="col-md-3">
+                                                Total marks:{" "}
+                                                {
+                                                    this.state.semesterExamItem
+                                                        .total_marks
+                                                }
+                                            </div>
+                                            <div className="col-md-3">
+                                                <div className="bg-warning text-center rounded py-2">
+                                                    {this.state.time.h}:
+                                                    {this.state.time.m}:
+                                                    {this.state.time.s}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* ---------- Q&A ---------- */}
-                        {(questionSection || []).map((data, index) => {
-                            return data.type === "type_1"
-                                ? this.typeOneRender(data, index, answerSection)
-                                : this.typeTwoRender(
-                                      data,
-                                      index,
-                                      answerSection
-                                  );
-                        })}
+                            {/* ---------- Q&A ---------- */}
+                            {(questionSection || []).map((data, index) => {
+                                return data.type === "type_1"
+                                    ? this.typeOneRender(
+                                          data,
+                                          index,
+                                          answerSection
+                                      )
+                                    : this.typeTwoRender(
+                                          data,
+                                          index,
+                                          answerSection
+                                      );
+                            })}
 
-                        {/* ----- Navigation ----- */}
-                        <div className="row align-items-center">
-                            <div className="col-3">
-                                {this.state.currentSectionIndex !== 0 ? (
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none"
-                                        onClick={this.handlePrev}
-                                    >
-                                        <i className="fas fa-angle-left mr-1"></i>
-                                        {this.state.semesterExamItem.auto_test
-                                            ? this.state.semesterExamItem
-                                                  .auto_test[
-                                                  this.state
-                                                      .currentSectionIndex - 1
-                                              ]
+                            {/* ----- Navigation ----- */}
+                            <div className="row align-items-center">
+                                <div className="col-3">
+                                    {this.state.currentSectionIndex !== 0 ? (
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            onClick={this.handlePrev}
+                                        >
+                                            <i className="fas fa-angle-left mr-1"></i>
+                                            {this.state.semesterExamItem
+                                                .auto_test
                                                 ? this.state.semesterExamItem
                                                       .auto_test[
                                                       this.state
                                                           .currentSectionIndex -
                                                           1
-                                                  ].section_description
-                                                : ""
-                                            : ""}
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                            </div>
-                            <div className="col-6">
-                                {this.state.currentSectionIndex ===
-                                this.state.questionSection.length - 1 ? (
-                                    <button
-                                        className="btn btn-primary btn-block shadow-none"
-                                        onClick={this.handleSubmit}
-                                    >
-                                        Submit
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                            </div>
-                            <div className="col-3 text-right">
-                                {this.state.currentSectionIndex <
-                                this.state.questionSection.length - 1 ? (
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none"
-                                        onClick={this.handleNext}
-                                    >
-                                        {this.state.semesterExamItem.auto_test
-                                            ? this.state.semesterExamItem
-                                                  .auto_test[
-                                                  this.state
-                                                      .currentSectionIndex + 1
-                                              ]
+                                                  ]
+                                                    ? this.state
+                                                          .semesterExamItem
+                                                          .auto_test[
+                                                          this.state
+                                                              .currentSectionIndex -
+                                                              1
+                                                      ].section_description
+                                                    : ""
+                                                : ""}
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
+                                <div className="col-6">
+                                    {this.state.currentSectionIndex ===
+                                    this.state.questionSection.length - 1 ? (
+                                        <button
+                                            className="btn btn-primary btn-block shadow-none"
+                                            onClick={this.handleSubmit}
+                                        >
+                                            Submit
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
+                                <div className="col-3 text-right">
+                                    {this.state.currentSectionIndex <
+                                    this.state.questionSection.length - 1 ? (
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            onClick={this.handleNext}
+                                        >
+                                            {this.state.semesterExamItem
+                                                .auto_test
                                                 ? this.state.semesterExamItem
                                                       .auto_test[
                                                       this.state
                                                           .currentSectionIndex +
                                                           1
-                                                  ].section_description
-                                                : ""
-                                            : ""}
-                                        <i className="fas fa-angle-right ml-2"></i>
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
+                                                  ]
+                                                    ? this.state
+                                                          .semesterExamItem
+                                                          .auto_test[
+                                                          this.state
+                                                              .currentSectionIndex +
+                                                              1
+                                                      ].section_description
+                                                    : ""
+                                                : ""}
+                                            <i className="fas fa-angle-right ml-2"></i>
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        </ErrorBoundary>
                     </div>
                 </div>
 

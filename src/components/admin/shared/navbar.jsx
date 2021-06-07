@@ -150,7 +150,7 @@ class Header extends Component {
                                         </span>
                                     </Dropdown.Toggle>
 
-                                    <Dropdown.Menu>
+                                    <Dropdown.Menu className="dropdown-menu-down">
                                         <Dropdown.Header className="d-block d-md-none font-weight-bold-600 text-center">
                                             Hi,{" "}
                                             <span className="primary-text">

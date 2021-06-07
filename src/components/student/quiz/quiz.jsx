@@ -6,6 +6,8 @@ import Loading from "../../common/loader";
 import { connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
 import { TEMP } from "../../../redux/action";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "../../common/ErrorFallback";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -154,37 +156,44 @@ class Quiz extends Component {
 
                 <div className="exam-section">
                     <div className="container">
-                        <div className="card card-body shadow-sm">
-                            <div
-                                className="light-bg p-3 p-md-4 p-md-mb-0"
-                                style={{ minHeight: "70vh" }}
-                            >
-                                {/* ----- Header ----- */}
-                                <div className="row align-items-center mb-5">
-                                    <div className="col-lg-4 col-sm-6 order-2 order-lg-1 mb-3 mb-sm-0">
-                                        <div className="d-inline primary-bg px-4 py-2 rounded-pill text-white">
-                                            Total points:{" "}
-                                            {this.state.quiz.total_points || 0}
+                        <ErrorBoundary
+                            FallbackComponent={ErrorFallback}
+                            onReset={() => window.location.reload()}
+                        >
+                            <div className="card card-body shadow-sm">
+                                <div
+                                    className="light-bg p-3 p-md-4 p-md-mb-0"
+                                    style={{ minHeight: "70vh" }}
+                                >
+                                    {/* ----- Header ----- */}
+                                    <div className="row align-items-center mb-5">
+                                        <div className="col-lg-4 col-sm-6 order-2 order-lg-1 mb-3 mb-sm-0">
+                                            <div className="d-inline primary-bg px-4 py-2 rounded-pill text-white">
+                                                Total points:{" "}
+                                                {this.state.quiz.total_points ||
+                                                    0}
+                                            </div>
+                                        </div>
+                                        <div className="col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
+                                            <h3 className="text-center primary-text mb-0">
+                                                Select Level
+                                            </h3>
+                                        </div>
+                                        <div className="col-lg-4 col-sm-6 order-3 text-right">
+                                            <div className="d-inline primary-bg px-4 py-2 rounded-pill text-white">
+                                                Scored points:{" "}
+                                                {this.state.quiz
+                                                    .scored_points || 0}
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
-                                        <h3 className="text-center primary-text mb-0">
-                                            Select Level
-                                        </h3>
-                                    </div>
-                                    <div className="col-lg-4 col-sm-6 order-3 text-right">
-                                        <div className="d-inline primary-bg px-4 py-2 rounded-pill text-white">
-                                            Scored points:{" "}
-                                            {this.state.quiz.scored_points || 0}
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div className="row">
-                                    {Object.entries(this.state.quiz).length !==
-                                    0
-                                        ? (this.state.quiz.levels || []).map(
-                                              (level, index) => {
+                                    <div className="row">
+                                        {Object.entries(this.state.quiz)
+                                            .length !== 0
+                                            ? (
+                                                  this.state.quiz.levels || []
+                                              ).map((level, index) => {
                                                   return (
                                                       <div
                                                           className="col-md-4"
@@ -247,14 +256,15 @@ class Quiz extends Component {
                                                           </div>
                                                       </div>
                                                   );
-                                              }
-                                          )
-                                        : ""}
+                                              })
+                                            : ""}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </ErrorBoundary>
                     </div>
                 </div>
+
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}
             </>

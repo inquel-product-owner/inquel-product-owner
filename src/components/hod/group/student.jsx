@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/constant.js";
@@ -11,7 +10,6 @@ import StudentTable from "../../table/student";
 import AlertBox from "../../common/alert";
 import { UserRemoveModal } from "../../common/modal/userManagementModal";
 import { connect } from "react-redux";
-import { waterMark } from "../../common/function/watermark";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -140,6 +138,7 @@ class StudentAssignModal extends Component {
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
+                scrollable
             >
                 <Modal.Header closeButton>Assign Student</Modal.Header>
                 <Modal.Body>
@@ -167,6 +166,7 @@ class StudentAssignModal extends Component {
                     >
                         {this.state.successMsg}
                     </Alert>
+
                     <div className="table-responsive">
                         <table className="table">
                             <thead className="primary-text">
@@ -185,19 +185,29 @@ class StudentAssignModal extends Component {
                                                 return (
                                                     <tr key={index}>
                                                         <td className="text-center">
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                value={list.id}
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleInputChange(
-                                                                        index,
+                                                            <div className="custom-control custom-checkbox">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    name="enable"
+                                                                    value={
+                                                                        list.id
+                                                                    }
+                                                                    className="custom-control-input"
+                                                                    id={`check${index}`}
+                                                                    onChange={(
                                                                         event
-                                                                    )
-                                                                }
-                                                            />
+                                                                    ) =>
+                                                                        this.handleInputChange(
+                                                                            index,
+                                                                            event
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <label
+                                                                    className="custom-control-label"
+                                                                    htmlFor={`check${index}`}
+                                                                ></label>
+                                                            </div>
                                                         </td>
                                                         <td>
                                                             {list.full_name}
@@ -251,7 +261,6 @@ class HODGroupStudents extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showStudentModal: false,
             showStudent_RemoveModal: false,
             studentItem: [],
@@ -274,12 +283,6 @@ class HODGroupStudents extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleStudentModal = () => {
         this.setState({
@@ -373,13 +376,12 @@ class HODGroupStudents extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.group_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.group_name}
+                activeLink="dashboard"
+                history={this.props.history}
+                waterMark={this.props.profile}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -396,12 +398,6 @@ class HODGroupStudents extends Component {
                             showErrorAlert: false,
                         });
                     }}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
                 />
 
                 {/* Student assign modal */}
@@ -433,115 +429,88 @@ class HODGroupStudents extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                    style={waterMark(this.props.profile)}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-2"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        {/* Filter area */}
-                        <div className="row align-items-center">
-                            <div className="col-md-6">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.group_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            Student
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6">
-                                <div className="d-flex flex-wrap justify-content-end mb-4">
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.toggleStudentModal}
+                {/* Filter area */}
+                <div className="row align-items-center">
+                    <div className="col-md-6">
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
                                     >
-                                        Add New
-                                    </button>
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.handleRemove}
-                                    >
-                                        Remove
-                                    </button>
-                                    <Dropdown>
-                                        <Dropdown.Toggle
-                                            variant="primary"
-                                            id="dropdown-basic"
-                                            className="btn-sm shadow-none"
-                                        >
-                                            Notify
-                                        </Dropdown.Toggle>
+                                        {this.props.group_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Student
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6">
+                        <div className="d-flex flex-wrap justify-content-end mb-4">
+                            <button
+                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                onClick={this.toggleStudentModal}
+                            >
+                                Add New
+                            </button>
+                            <button
+                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                onClick={this.handleRemove}
+                            >
+                                Remove
+                            </button>
+                            <Dropdown>
+                                <Dropdown.Toggle
+                                    variant="primary"
+                                    id="dropdown-basic"
+                                    className="btn-sm shadow-none"
+                                >
+                                    Notify
+                                </Dropdown.Toggle>
 
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item>
-                                                Notify All
-                                            </Dropdown.Item>
-                                            <div className="dropdown-divider"></div>
-                                            <Dropdown.Item>
-                                                Notify Selected
-                                            </Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </div>
-                            </div>
+                                <Dropdown.Menu className="dropdown-menu-down dropdown-menu-down-btn">
+                                    <Dropdown.Item>Notify All</Dropdown.Item>
+                                    <div className="dropdown-divider"></div>
+                                    <Dropdown.Item>
+                                        Notify Selected
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </div>
-
-                        {/* Student list */}
-                        <div className="card shadow-sm">
-                            <StudentTable
-                                studentItems={this.state.studentItem}
-                                path={`hod/group/${this.groupId}`}
-                                category={true}
-                                handleStudentId={this.handleStudentId}
-                            />
-                            <div className="card-body p-3">
-                                {this.state.totalStudentCount >
-                                paginationCount ? (
-                                    <Paginations
-                                        activePage={
-                                            this.state.activeStudentPage
-                                        }
-                                        totalItemsCount={
-                                            this.state.totalStudentCount
-                                        }
-                                        onChange={this.handleStudentPageChange.bind(
-                                            this
-                                        )}
-                                    />
-                                ) : null}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                {/* Student list */}
+                <div className="card shadow-sm">
+                    <StudentTable
+                        studentItems={this.state.studentItem}
+                        path={`hod/group/${this.groupId}`}
+                        handleStudentId={this.handleStudentId}
+                    />
+                    <div className="card-body p-3">
+                        {this.state.totalStudentCount > paginationCount ? (
+                            <Paginations
+                                activePage={this.state.activeStudentPage}
+                                totalItemsCount={this.state.totalStudentCount}
+                                onChange={this.handleStudentPageChange.bind(
+                                    this
+                                )}
+                            />
+                        ) : null}
+                    </div>
+                </div>
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

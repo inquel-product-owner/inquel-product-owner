@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
+import Wrapper from "../wrapper";
 import { Card, Accordion, Modal, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
@@ -700,7 +699,6 @@ class HODCourse extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             type: "",
             selectedData: "",
@@ -724,12 +722,6 @@ class HODCourse extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     loadCourseData = () => {
         fetch(`${this.url}/hod/course/${this.courseId}/review/`, {
@@ -863,19 +855,11 @@ class HODCourse extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.course_name}
-                    togglenav={this.toggleSideNav}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
+            <Wrapper
+                header={this.props.course_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -939,159 +923,123 @@ class HODCourse extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6 mb-2 mb-md-0">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            <span>Course:</span>
-                                            {this.props.course_name}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 d-flex justify-content-end">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.handlePublish}
-                                >
-                                    <i className="fas fa-share-square mr-1"></i>{" "}
-                                    Publish
-                                </button>
-                                {this.state.data.publish === false ? (
-                                    <Link to={`${this.props.match.url}/edit`}>
-                                        <button className="btn btn-primary btn-sm shadow-none ml-1">
-                                            <i className="fas fa-edit mr-1"></i>{" "}
-                                            Edit
-                                        </button>
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-6 mb-2 mb-md-0">
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
                                     </Link>
-                                ) : (
-                                    ""
-                                )}
-
-                                <Dropdown>
-                                    <Dropdown.Toggle
-                                        variant="Secondary"
-                                        className="btn btn-primary btn-sm shadow-none caret-off ml-1"
-                                    >
-                                        <i className="fas fa-ellipsis-h"></i>
-                                    </Dropdown.Toggle>
-
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item
-                                            onClick={() => {
-                                                this.setState({
-                                                    showModal: true,
-                                                    type: "scorecard",
-                                                });
-                                            }}
-                                        >
-                                            Scorecard
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => {
-                                                this.setState({
-                                                    showModal: true,
-                                                    type: "detail",
-                                                });
-                                            }}
-                                        >
-                                            Course Detail
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => {
-                                                this.setState({
-                                                    showModal: true,
-                                                    type: "quickpass",
-                                                });
-                                            }}
-                                        >
-                                            Quick Pass
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        {/* Course details */}
-                        <div
-                            className="card shadow-sm"
-                            style={{ overflow: "auto" }}
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    <span>Course:</span>
+                                    {this.props.course_name}
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6 d-flex justify-content-end">
+                        <button
+                            className="btn btn-primary btn-sm shadow-none"
+                            onClick={this.handlePublish}
                         >
-                            <div style={{ minWidth: "900px" }}>
-                                <div className="card-header primary-bg text-white">
-                                    <div className="row align-items-center">
-                                        <div className="col-6">
-                                            Course Structure
-                                        </div>
-                                        <div className="col-6 pl-0">
-                                            <div className="row align-items-center small">
-                                                <div className="col-3">
-                                                    Weightage
-                                                </div>
-                                                <div className="col-3">
-                                                    Summary
-                                                </div>
-                                                <div className="col-3">
-                                                    Notes
-                                                </div>
-                                                <div className="col-3">
-                                                    Next topic
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="card-body p-3">
-                                    {/* ----- Unit list ----- */}
-                                    {Object.entries(this.state.data).length !==
-                                    0 ? (
-                                        <UnitListRender
-                                            data={this.state.data}
-                                            chapterEventKey={
-                                                this.state.chapterEventKey
-                                            }
-                                            topicEventKey={
-                                                this.state.topicEventKey
-                                            }
-                                            toggleChapterCollapse={
-                                                this.toggleChapterCollapse
-                                            }
-                                            toggleTopicCollapse={
-                                                this.toggleTopicCollapse
-                                            }
-                                            {...this.props}
-                                        />
-                                    ) : null}
-                                </div>
-                            </div>
-                        </div>
+                            <i className="fas fa-share-square mr-1"></i> Publish
+                        </button>
+                        {this.state.data.publish === false ? (
+                            <Link to={`${this.props.match.url}/edit`}>
+                                <button className="btn btn-primary btn-sm shadow-none ml-1">
+                                    <i className="fas fa-edit mr-1"></i> Edit
+                                </button>
+                            </Link>
+                        ) : (
+                            ""
+                        )}
 
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="Secondary"
+                                className="btn btn-primary btn-sm shadow-none caret-off ml-1"
+                            >
+                                <i className="fas fa-ellipsis-h"></i>
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu className="dropdown-menu-down-btn dropdown-menu-down">
+                                <Dropdown.Item
+                                    onClick={() => {
+                                        this.setState({
+                                            showModal: true,
+                                            type: "scorecard",
+                                        });
+                                    }}
+                                >
+                                    Scorecard
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    onClick={() => {
+                                        this.setState({
+                                            showModal: true,
+                                            type: "detail",
+                                        });
+                                    }}
+                                >
+                                    Course Detail
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    onClick={() => {
+                                        this.setState({
+                                            showModal: true,
+                                            type: "quickpass",
+                                        });
+                                    }}
+                                >
+                                    Quick Pass
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
                 </div>
-            </div>
+
+                {/* Course details */}
+                <div className="card shadow-sm overflow-auto">
+                    <div style={{ minWidth: "900px" }}>
+                        <div className="card-header primary-bg text-white">
+                            <div className="row align-items-center">
+                                <div className="col-6">Course Structure</div>
+                                <div className="col-6 pl-0">
+                                    <div className="row align-items-center small">
+                                        <div className="col-3">Weightage</div>
+                                        <div className="col-3">Summary</div>
+                                        <div className="col-3">Notes</div>
+                                        <div className="col-3">Next topic</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="card-body p-3">
+                            {/* ----- Unit list ----- */}
+                            {Object.entries(this.state.data).length !== 0 ? (
+                                <UnitListRender
+                                    data={this.state.data}
+                                    chapterEventKey={this.state.chapterEventKey}
+                                    topicEventKey={this.state.topicEventKey}
+                                    toggleChapterCollapse={
+                                        this.toggleChapterCollapse
+                                    }
+                                    toggleTopicCollapse={
+                                        this.toggleTopicCollapse
+                                    }
+                                    {...this.props}
+                                />
+                            ) : null}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

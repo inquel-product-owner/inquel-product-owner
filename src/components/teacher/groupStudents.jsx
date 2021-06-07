@@ -1,8 +1,7 @@
 import React, { Component } from "react";
+import Wrapper from "./wrapper";
 import { Dropdown } from "react-bootstrap";
 import { connect } from "react-redux";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
@@ -10,7 +9,6 @@ import Loading from "../common/loader";
 import Paginations from "../common/pagination";
 import StudentTable from "../table/student";
 import AlertBox from "../common/alert";
-import { waterMark } from "../common/function/watermark";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -21,7 +19,6 @@ class TeacherGroupStudents extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             studentItem: [],
             selectedStudent: [],
             activeStudentPage: 1,
@@ -42,12 +39,6 @@ class TeacherGroupStudents extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     loadStudentData = () => {
         fetch(
@@ -118,13 +109,12 @@ class TeacherGroupStudents extends Component {
     render() {
         document.title = this.props.group_name + " - Teacher | IQLabs";
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.group_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.group_name}
+                activeLink="dashboard"
+                history={this.props.history}
+                waterMark={this.props.profile}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -143,108 +133,77 @@ class TeacherGroupStudents extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
+                {/* Filter area */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-6">
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.group_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Student Profiles
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6">
+                        <div className="d-flex flex-wrap justify-content-end">
+                            <Dropdown>
+                                <Dropdown.Toggle
+                                    variant="primary"
+                                    id="dropdown-basic"
+                                    className="btn-sm shadow-none"
+                                >
+                                    Notify
+                                </Dropdown.Toggle>
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                    style={waterMark(this.props.profile)}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        {/* Filter area */}
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/teacher">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.group_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            Student Profiles
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6">
-                                <div className="d-flex flex-wrap justify-content-end">
-                                    <Dropdown>
-                                        <Dropdown.Toggle
-                                            variant="primary"
-                                            id="dropdown-basic"
-                                            className="btn-sm shadow-none"
-                                        >
-                                            Notify
-                                        </Dropdown.Toggle>
-
-                                        <Dropdown.Menu className="dropdown-menu-btn">
-                                            <Dropdown.Item>
-                                                Notify All
-                                            </Dropdown.Item>
-                                            <div className="dropdown-divider"></div>
-                                            <Dropdown.Item>
-                                                Notify Selected
-                                            </Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </div>
-                            </div>
+                                <Dropdown.Menu className="dropdown-menu-down dropdown-menu-down-btn">
+                                    <Dropdown.Item>Notify All</Dropdown.Item>
+                                    <div className="dropdown-divider"></div>
+                                    <Dropdown.Item>
+                                        Notify Selected
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </div>
-
-                        {/* Student list */}
-                        <div className="card shadow-sm">
-                            <StudentTable
-                                studentItems={this.state.studentItem}
-                                path={`teacher/group/${this.groupId}`}
-                                handleStudentId={this.handleStudentId}
-                            />
-                            <div className="card-body p-3">
-                                {this.state.totalStudentCount >
-                                paginationCount ? (
-                                    <Paginations
-                                        activePage={
-                                            this.state.activeStudentPage
-                                        }
-                                        totalItemsCount={
-                                            this.state.totalStudentCount
-                                        }
-                                        onChange={this.handleStudentPageChange.bind(
-                                            this
-                                        )}
-                                    />
-                                ) : null}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                {/* Student list */}
+                <div className="card shadow-sm">
+                    <StudentTable
+                        studentItems={this.state.studentItem}
+                        path={`teacher/group/${this.groupId}`}
+                        handleStudentId={this.handleStudentId}
+                    />
+                    <div className="card-body p-3">
+                        {this.state.totalStudentCount > paginationCount ? (
+                            <Paginations
+                                activePage={this.state.activeStudentPage}
+                                totalItemsCount={this.state.totalStudentCount}
+                                onChange={this.handleStudentPageChange.bind(
+                                    this
+                                )}
+                            />
+                        ) : null}
+                    </div>
+                </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

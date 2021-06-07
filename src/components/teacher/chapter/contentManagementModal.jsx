@@ -8,7 +8,7 @@ export class TopicModal extends Component {
         super(props);
         this.state = {
             topic_name: "",
-            chapters: this.props.chapters,
+            topics: this.props.topics,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -33,57 +33,89 @@ export class TopicModal extends Component {
             showSuccessAlert: false,
         });
 
-        const chapters = this.state.chapters;
+        const topics = this.state.topics;
+        let body = {};
 
-        function formatData(arr, parentId, topic_name, ancestor) {
+        // function formatData(arr, parentId, topic_name, ancestor) {
+        //     arr.forEach((i) => {
+        //         if (i.topic_num === parentId) {
+        //             i.child = [
+        //                 ...i.child,
+        //                 {
+        //                     topic_name: topic_name,
+        //                     topic_num: `${parentId}.${i.child.length + 1}`,
+        //                     parent_id: parentId,
+        //                     next_topic: "",
+        //                     child: [],
+        //                     ancestor: ancestor,
+        //                 },
+        //             ];
+        //         } else {
+        //             formatData(i.child, parentId, topic_name, ancestor);
+        //         }
+        //     });
+        //     return arr;
+        // }
+
+        function getKeyIndex(data) {
+            let index = 1;
+
+            if (data.length > 0) {
+                let topic_num = data[data.length - 1].topic_num;
+                let split = topic_num.split(".");
+                index = Number(split[split.length - 1]) + 1;
+            }
+
+            return index;
+        }
+
+        function formatData(arr, parentId, ancestor, chapterId, topic_name) {
             arr.forEach((i) => {
                 if (i.topic_num === parentId) {
-                    i.child = [
-                        ...i.child,
-                        {
-                            topic_name: topic_name,
-                            topic_num: `${parentId}.${i.child.length + 1}`,
-                            parent_id: parentId,
-                            next_topic: "",
-                            child: [],
-                            ancestor: ancestor,
-                        },
-                    ];
+                    body["chapter_id"] = chapterId;
+                    body["topic_name"] = topic_name;
+                    body["topic_num"] = `${parentId}.${getKeyIndex(i.child)}`;
+                    body["parent_id"] = parentId;
+                    body["ancestor"] = ancestor;
                 } else {
-                    formatData(i.child, parentId, topic_name, ancestor);
+                    formatData(
+                        i.child,
+                        parentId,
+                        ancestor,
+                        chapterId,
+                        topic_name
+                    );
                 }
             });
-            return arr;
+            return body;
         }
 
         if (Number.isInteger(this.props.activeTopic)) {
-            chapters.chapter_structure.push({
-                topic_name: this.state.topic_name,
-                topic_num: `${this.props.activeTopic}.${
-                    chapters.chapter_structure.length + 1
-                }`,
-                parent_id: this.props.activeTopic.toString(),
-                next_topic: "",
-                child: [],
-                ancestor: `${this.props.activeTopic}.${
-                    chapters.chapter_structure.length + 1
-                }`,
-            });
+            body["chapter_id"] = this.props.chapterId;
+            body["topic_name"] = this.state.topic_name;
+            body["topic_num"] = `${this.props.activeTopic}.${getKeyIndex(
+                topics
+            )}`;
+            body["parent_id"] = "";
+            body["ancestor"] = "";
         } else {
-            chapters.chapter_structure = formatData(
-                chapters.chapter_structure,
+            body = formatData(
+                topics,
                 this.props.activeTopic,
-                this.state.topic_name,
-                this.props.ancestor
+                this.props.ancestor,
+                this.props.chapterId,
+                this.state.topic_name
             );
         }
+
+        console.log(body);
 
         fetch(
             `${this.url}/teacher/subject/${this.props.subjectId}/chapter/topics/`,
             {
                 headers: this.headers,
                 method: "POST",
-                body: JSON.stringify(chapters),
+                body: JSON.stringify(body),
             }
         )
             .then((res) => res.json())

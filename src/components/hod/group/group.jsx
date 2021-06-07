@@ -1,8 +1,7 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/constant";
@@ -16,7 +15,6 @@ import {
     MultiContentDeleteModal,
 } from "../../common/modal/contentManagementModal";
 import { connect } from "react-redux";
-import { waterMark } from "../../common/function/watermark";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -290,7 +288,6 @@ class HODGroup extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             showSubject_DeleteModal: false,
             showSubject_DisableModal: false,
@@ -317,12 +314,6 @@ class HODGroup extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleModal = () => {
         this.setState({
@@ -428,13 +419,12 @@ class HODGroup extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.group_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.group_name}
+                activeLink="dashboard"
+                history={this.props.history}
+                waterMark={this.props.profile}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -453,12 +443,6 @@ class HODGroup extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
                 {/* Subject create modal */}
                 {this.state.showModal ? (
                     <SubjectModal
@@ -466,8 +450,10 @@ class HODGroup extends Component {
                         onHide={this.toggleModal}
                         groupId={this.groupId}
                         formSubmission={this.formSubmission}
-                        category={this.props.profile.category}
-                        sub_category={this.props.profile.sub_category}
+                        category={this.props.profile.permissions.category}
+                        sub_category={
+                            this.props.profile.permissions.sub_category
+                        }
                     />
                 ) : (
                     ""
@@ -521,123 +507,101 @@ class HODGroup extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                    style={waterMark(this.props.profile)}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-2"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        <div className="row align-items-center mb-3 mt-2">
-                            <div className="col-6">
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            <span>Group:</span>
-                                            {this.props.group_name} -{" "}
-                                            {this.state.groupItem.level
-                                                ? this.state.groupItem.level
-                                                : ""}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-6 text-right">
-                                <Link to={`${this.props.match.url}/student`}>
-                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                        Student
-                                    </button>
-                                </Link>
-                                <Link to={`${this.props.match.url}/teacher`}>
-                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                        Teacher
-                                    </button>
-                                </Link>
-                                <Link to={`${this.props.match.url}/details`}>
-                                    <button className="btn btn-primary btn-sm shadow-none">
-                                        Details
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <div className="row align-items-center">
-                                    <div className="col-md-3">
-                                        <h5 className="mb-0">Subjects</h5>
-                                    </div>
-                                    <div className="col-md-9 text-right">
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-1"
-                                            onClick={this.toggleModal}
-                                        >
-                                            Add new
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-1"
-                                            onClick={this.handleDelete}
-                                        >
-                                            Delete
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-1"
-                                            onClick={this.handleEnable}
-                                        >
-                                            Enable
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handleDisable}
-                                        >
-                                            Disable
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <SubjectTable
-                                subjectItems={this.state.subjectItems}
-                                path={`hod/group/${this.groupId}`}
-                                check={true}
-                                status={true}
-                                subject={true}
-                                handleSubjectId={this.handleSubjectId}
-                            />
-                            <div className="card-body p-3">
-                                {this.state.totalSubjectCount >
-                                paginationCount ? (
-                                    <Paginations
-                                        activePage={
-                                            this.state.activeSubjectPage
-                                        }
-                                        totalItemsCount={
-                                            this.state.totalSubjectCount
-                                        }
-                                        onChange={this.handleSubjectPageChange.bind(
-                                            this
-                                        )}
-                                    />
-                                ) : null}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                <div className="row align-items-center mb-3 mt-2">
+                    <div className="col-6">
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    <span>Group:</span>
+                                    {this.props.group_name} -{" "}
+                                    {this.state.groupItem.level
+                                        ? this.state.groupItem.level
+                                        : ""}
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-6 text-right">
+                        <Link to={`${this.props.match.url}/student`}>
+                            <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                Student
+                            </button>
+                        </Link>
+                        <Link to={`${this.props.match.url}/teacher`}>
+                            <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                Teacher
+                            </button>
+                        </Link>
+                        <Link to={`${this.props.match.url}/details`}>
+                            <button className="btn btn-primary btn-sm shadow-none">
+                                Details
+                            </button>
+                        </Link>
                     </div>
                 </div>
-            </div>
+                <div className="card shadow-sm mb-4">
+                    <div className="card-header">
+                        <div className="row align-items-center">
+                            <div className="col-md-3">
+                                <h5 className="mb-0">Subjects</h5>
+                            </div>
+                            <div className="col-md-9 text-right">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.toggleModal}
+                                >
+                                    Add new
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.handleDelete}
+                                >
+                                    Delete
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.handleEnable}
+                                >
+                                    Enable
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handleDisable}
+                                >
+                                    Disable
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <SubjectTable
+                        subjectItems={this.state.subjectItems}
+                        path={`hod/group/${this.groupId}`}
+                        check={true}
+                        status={true}
+                        subject={true}
+                        handleSubjectId={this.handleSubjectId}
+                    />
+                    <div className="card-body p-3">
+                        {this.state.totalSubjectCount > paginationCount ? (
+                            <Paginations
+                                activePage={this.state.activeSubjectPage}
+                                totalItemsCount={this.state.totalSubjectCount}
+                                onChange={this.handleSubjectPageChange.bind(
+                                    this
+                                )}
+                            />
+                        ) : null}
+                    </div>
+                </div>
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

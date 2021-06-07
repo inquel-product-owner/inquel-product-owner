@@ -1,8 +1,7 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
@@ -21,7 +20,6 @@ class TeacherSemesterDirect extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -57,12 +55,6 @@ class TeacherSemesterDirect extends Component {
         };
         pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     loadSemesterData = () => {
         fetch(
@@ -470,13 +462,11 @@ class TeacherSemesterDirect extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -495,257 +485,215 @@ class TeacherSemesterDirect extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
+                <div className="row mb-4">
+                    <div className="col-md-6">
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link to={`/teacher/group/${this.groupId}`}>
+                                        {this.props.group_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    {this.props.semester_name}
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6 text-right">
+                        <Link to={`${this.props.match.url}/evaluation`}>
+                            <button className="btn btn-primary btn-sm">
+                                Evaluate Student
+                            </button>
+                        </Link>
                         <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
+                            className="btn btn-primary btn-sm shadow-none ml-1"
+                            onClick={this.handlePublish}
+                            disabled={this.state.isFileUploaded ? false : true}
                         >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                            Publish
                         </button>
+                    </div>
+                </div>
 
-                        <div className="row mb-4">
-                            <div className="col-md-6">
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb mb-3">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/teacher">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/teacher/group/${this.groupId}`}
-                                            >
-                                                {this.props.group_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            {this.props.semester_name}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 text-right">
-                                <Link to={`${this.props.match.url}/evaluation`}>
-                                    <button className="btn btn-primary btn-sm">
-                                        Evaluate Student
-                                    </button>
-                                </Link>
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none ml-1"
-                                    onClick={this.handlePublish}
-                                    disabled={
-                                        this.state.isFileUploaded ? false : true
-                                    }
+                {/* Header configuration */}
+                <div className="row justify-content-center mb-3">
+                    <div className="col-md-3">
+                        <div className="form-group">
+                            <label htmlFor="date">Exam Date:</label>
+                            <input
+                                type="date"
+                                name="exam_date"
+                                id="exam_date"
+                                className="form-control form-shadow"
+                                value={dateFormat(
+                                    this.state.exam_date,
+                                    "yyyy-mm-dd"
+                                )}
+                                min={this.state.valid_from}
+                                max={this.state.valid_to}
+                                onChange={this.handleDate}
+                            />
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="form-group">
+                            <label htmlFor="starts_at">Starts at:</label>
+                            <input
+                                type="time"
+                                name="starts_at"
+                                id="starts_at"
+                                className="form-control form-shadow"
+                                value={this.state.starts_at}
+                                onChange={this.handleTime}
+                            />
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="form-group">
+                            <label htmlFor="ends_at">Ends at:</label>
+                            <input
+                                type="time"
+                                name="ends_at"
+                                id="ends_at"
+                                className="form-control form-shadow"
+                                value={this.state.ends_at}
+                                onChange={this.handleTime}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="card light-bg shadow-sm">
+                    <div className="card-body">
+                        <div className="row justify-content-center">
+                            <div className="col-md-4">
+                                <div className="custom-file">
+                                    <input
+                                        type="file"
+                                        className="custom-file-input"
+                                        id="question"
+                                        accept=".pdf"
+                                        aria-describedby="inputGroupFileAddon01"
+                                        onChange={(event) =>
+                                            this.handleFile(event)
+                                        }
+                                    />
+                                    <label
+                                        className="custom-file-label mb-0"
+                                        htmlFor="question"
+                                    >
+                                        {this.state.pdf.file_name === null
+                                            ? "Choose file"
+                                            : this.state.pdf.file_name}
+                                    </label>
+                                </div>
+                                <small
+                                    id="passwordHelpBlock"
+                                    className="form-text text-muted mb-2"
                                 >
-                                    Publish
+                                    Select only pdf format & Max file upload
+                                    size is 5MB
+                                </small>
+
+                                <button
+                                    className="btn btn-primary btn-block btn-sm shadow-none"
+                                    onClick={this.handleSubmit}
+                                    disabled={this.state.btnDisabled}
+                                >
+                                    {this.state.showLoader ? (
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                            className="mr-2"
+                                        />
+                                    ) : (
+                                        ""
+                                    )}
+                                    Save
                                 </button>
                             </div>
                         </div>
-
-                        {/* Header configuration */}
-                        <div className="row justify-content-center mb-3">
-                            <div className="col-md-3">
-                                <div className="form-group">
-                                    <label htmlFor="date">Exam Date:</label>
-                                    <input
-                                        type="date"
-                                        name="exam_date"
-                                        id="exam_date"
-                                        className="form-control form-shadow"
-                                        value={dateFormat(
-                                            this.state.exam_date,
-                                            "yyyy-mm-dd"
-                                        )}
-                                        min={this.state.valid_from}
-                                        max={this.state.valid_to}
-                                        onChange={this.handleDate}
-                                    />
+                    </div>
+                    <div className="card-body secondary-bg primary-text text-center">
+                        {this.state.path === null ? (
+                            "Your uploads will appear here"
+                        ) : (
+                            <>
+                                <div id="ResumeContainer">
+                                    <Document
+                                        file={this.state.path}
+                                        onLoadSuccess={
+                                            this.onDocumentLoadSuccess
+                                        }
+                                        className={"PDFDocument"}
+                                    >
+                                        <Page
+                                            pageNumber={this.state.pageNumber}
+                                            className={"PDFPagee shadow"}
+                                        />
+                                    </Document>
                                 </div>
-                            </div>
-                            <div className="col-md-3">
-                                <div className="form-group">
-                                    <label htmlFor="starts_at">
-                                        Starts at:
-                                    </label>
-                                    <input
-                                        type="time"
-                                        name="starts_at"
-                                        id="starts_at"
-                                        className="form-control form-shadow"
-                                        value={this.state.starts_at}
-                                        onChange={this.handleTime}
-                                    />
-                                </div>
-                            </div>
-                            <div className="col-md-3">
-                                <div className="form-group">
-                                    <label htmlFor="ends_at">Ends at:</label>
-                                    <input
-                                        type="time"
-                                        name="ends_at"
-                                        id="ends_at"
-                                        className="form-control form-shadow"
-                                        value={this.state.ends_at}
-                                        onChange={this.handleTime}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card light-bg shadow-sm">
-                            <div className="card-body">
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <div className="custom-file">
-                                            <input
-                                                type="file"
-                                                className="custom-file-input"
-                                                id="question"
-                                                accept=".pdf"
-                                                aria-describedby="inputGroupFileAddon01"
-                                                onChange={(event) =>
-                                                    this.handleFile(event)
+                                <p className="my-3">
+                                    Page {this.state.pageNumber} of{" "}
+                                    {this.state.numPages}
+                                </p>
+                                <nav>
+                                    {this.state.numPages > 1 ? (
+                                        <>
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none mr-2"
+                                                onClick={this.goToPrevPage}
+                                                disabled={
+                                                    this.state.pageNumber === 1
+                                                        ? true
+                                                        : false
                                                 }
-                                            />
-                                            <label
-                                                className="custom-file-label mb-0"
-                                                htmlFor="question"
                                             >
-                                                {this.state.pdf.file_name ===
-                                                null
-                                                    ? "Choose file"
-                                                    : this.state.pdf.file_name}
-                                            </label>
-                                        </div>
-                                        <small
-                                            id="passwordHelpBlock"
-                                            className="form-text text-muted mb-2"
-                                        >
-                                            Select only pdf format & Max file
-                                            upload size is 5MB
-                                        </small>
-
-                                        <button
-                                            className="btn btn-primary btn-block btn-sm shadow-none"
-                                            onClick={this.handleSubmit}
-                                            disabled={this.state.btnDisabled}
-                                        >
-                                            {this.state.showLoader ? (
-                                                <Spinner
-                                                    as="span"
-                                                    animation="border"
-                                                    size="sm"
-                                                    role="status"
-                                                    aria-hidden="true"
-                                                    className="mr-2"
-                                                />
-                                            ) : (
-                                                ""
-                                            )}
-                                            Save
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-body secondary-bg primary-text text-center">
-                                {this.state.path === null ? (
-                                    "Your uploads will appear here"
-                                ) : (
-                                    <>
-                                        <div id="ResumeContainer">
-                                            <Document
-                                                file={this.state.path}
-                                                onLoadSuccess={
-                                                    this.onDocumentLoadSuccess
+                                                Prev
+                                            </button>
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none"
+                                                onClick={this.goToNextPage}
+                                                disabled={
+                                                    this.state.numPages ===
+                                                    this.state.pageNumber
+                                                        ? true
+                                                        : false
                                                 }
-                                                className={"PDFDocument"}
                                             >
-                                                <Page
-                                                    pageNumber={
-                                                        this.state.pageNumber
-                                                    }
-                                                    className={
-                                                        "PDFPagee shadow"
-                                                    }
-                                                />
-                                            </Document>
-                                        </div>
-                                        <p className="my-3">
-                                            Page {this.state.pageNumber} of{" "}
-                                            {this.state.numPages}
-                                        </p>
-                                        <nav>
-                                            {this.state.numPages > 1 ? (
-                                                <>
-                                                    <button
-                                                        className="btn btn-primary btn-sm shadow-none mr-2"
-                                                        onClick={
-                                                            this.goToPrevPage
-                                                        }
-                                                        disabled={
-                                                            this.state
-                                                                .pageNumber ===
-                                                            1
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        Prev
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-primary btn-sm shadow-none"
-                                                        onClick={
-                                                            this.goToNextPage
-                                                        }
-                                                        disabled={
-                                                            this.state
-                                                                .numPages ===
-                                                            this.state
-                                                                .pageNumber
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        Next
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                ""
-                                            )}
-                                        </nav>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                                                Next
+                                            </button>
+                                        </>
+                                    ) : (
+                                        ""
+                                    )}
+                                </nav>
+                            </>
+                        )}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

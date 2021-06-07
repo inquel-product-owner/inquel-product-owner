@@ -21,6 +21,8 @@ import { createElement } from "@syncfusion/ej2-base";
 import { DropDownList } from "@syncfusion/ej2-dropdowns";
 import "../../table/material.css";
 import "./planner.css";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "../../common/ErrorFallback";
 
 class StudyPlanner extends Component {
     constructor(props) {
@@ -181,37 +183,44 @@ class StudyPlanner extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <ScheduleComponent
-                            currentView="Month"
-                            rowAutoHeight={true}
-                            ref={(schedule) => (this.scheduleObj = schedule)}
-                            popupOpen={this.onPopupOpen.bind(this)}
-                            eventSettings={{
-                                dataSource: this.data,
-                                fields: this.fields,
-                                enableTooltip: true,
-                            }}
-                            quickInfoOnSelectionEnd={true}
-                            actionBegin={this.actionBegin.bind(this)}
+                        <ErrorBoundary
+                            FallbackComponent={ErrorFallback}
+                            onReset={() => window.location.reload()}
                         >
-                            <ViewsDirective>
-                                <ViewDirective option="Day" />
-                                <ViewDirective option="Week" />
-                                <ViewDirective option="Month" />
-                                <ViewDirective option="Agenda" />
-                            </ViewsDirective>
-                            <Inject
-                                services={[
-                                    Day,
-                                    Week,
-                                    WorkWeek,
-                                    Month,
-                                    Agenda,
-                                    Resize,
-                                    DragAndDrop,
-                                ]}
-                            />
-                        </ScheduleComponent>
+                            <ScheduleComponent
+                                currentView="Month"
+                                rowAutoHeight={true}
+                                ref={(schedule) =>
+                                    (this.scheduleObj = schedule)
+                                }
+                                popupOpen={this.onPopupOpen.bind(this)}
+                                eventSettings={{
+                                    dataSource: this.data,
+                                    fields: this.fields,
+                                    enableTooltip: true,
+                                }}
+                                quickInfoOnSelectionEnd={true}
+                                actionBegin={this.actionBegin.bind(this)}
+                            >
+                                <ViewsDirective>
+                                    <ViewDirective option="Day" />
+                                    <ViewDirective option="Week" />
+                                    <ViewDirective option="Month" />
+                                    <ViewDirective option="Agenda" />
+                                </ViewsDirective>
+                                <Inject
+                                    services={[
+                                        Day,
+                                        Week,
+                                        WorkWeek,
+                                        Month,
+                                        Agenda,
+                                        Resize,
+                                        DragAndDrop,
+                                    ]}
+                                />
+                            </ScheduleComponent>
+                        </ErrorBoundary>
 
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { Accordion, Card } from "react-bootstrap";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
@@ -17,7 +16,6 @@ class HODCourseNotes extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             chapterEventKey: [],
             topicEventKey: [],
 
@@ -45,12 +43,6 @@ class HODCourseNotes extends Component {
         };
         pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     // loads notes data
     loadNotesData = async () => {
@@ -108,13 +100,11 @@ class HODCourseNotes extends Component {
                                     if (
                                         item.chapter_id === this.state.chapterId
                                     ) {
-                                        topicName = item.chapter_structure
-                                            ? item.chapter_structure[0]
-                                                  .topic_name
+                                        topicName = item.topics
+                                            ? item.topics[0].topic_name
                                             : "Topic";
-                                        topic_num = item.chapter_structure
-                                            ? item.chapter_structure[0]
-                                                  .topic_num
+                                        topic_num = item.topics
+                                            ? item.topics[0].topic_num
                                             : "1.1";
                                     }
                                 });
@@ -153,63 +143,79 @@ class HODCourseNotes extends Component {
     };
 
     toggleChapterCollapse = (key) => {
-        let chapterEventKey = "";
-        if (this.state.chapterEventKey !== key) {
-            chapterEventKey = key;
-        }
-
-        let topicName = "";
-        let topic_num = "";
-        (this.state.data || []).forEach((unit) => {
-            (unit.chapters || []).forEach((chapter) => {
-                if (chapter.chapter_id === key) {
-                    topicName = chapter.chapter_structure
-                        ? chapter.chapter_structure[0].topic_name
-                        : "Topic";
-                    topic_num = chapter.chapter_structure
-                        ? chapter.chapter_structure[0].topic_num
-                        : "1.1";
-                }
-            });
-        });
-        this.setState(
-            {
-                chapterEventKey: chapterEventKey,
-                chapterId: key,
-                topicName: topicName,
-                topic_num: topic_num,
-            },
-            () => {
-                if (this.state.chapterEventKey === key) {
-                    this.setState({
-                        page_loading: true,
-                    });
-                    this.loadNotesData();
-                }
+        try {
+            let chapterEventKey = "";
+            if (this.state.chapterEventKey !== key) {
+                chapterEventKey = key;
             }
-        );
+
+            let topicName = "";
+            let topic_num = "";
+            (this.state.data || []).forEach((unit) => {
+                (unit.chapters || []).forEach((chapter) => {
+                    if (chapter.chapter_id === key) {
+                        topicName = chapter.topics
+                            ? chapter.topics[0].topic_name
+                            : "Topic";
+                        topic_num = chapter.topics
+                            ? chapter.topics[0].topic_num
+                            : "1.1";
+                    }
+                });
+            });
+            this.setState(
+                {
+                    chapterEventKey: chapterEventKey,
+                    chapterId: key,
+                    topicName: topicName,
+                    topic_num: topic_num,
+                },
+                () => {
+                    if (this.state.chapterEventKey === key) {
+                        this.setState({
+                            page_loading: true,
+                        });
+                        this.loadNotesData();
+                    }
+                }
+            );
+        } catch (error) {
+            console.error(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+            });
+        }
     };
 
     toggleTopicCollapse = (key, unit_index, chapter_index) => {
-        let topicEventKey = this.state.topicEventKey;
-        if (
-            topicEventKey.length !== 0 &&
-            topicEventKey[unit_index] &&
-            topicEventKey[unit_index][chapter_index]
-        ) {
-            if (topicEventKey[unit_index][chapter_index].includes(key)) {
-                topicEventKey[unit_index][chapter_index].splice(
-                    topicEventKey[unit_index][chapter_index].indexOf(key),
-                    1
-                );
-            } else {
-                topicEventKey[unit_index][chapter_index].push(key);
+        try {
+            let topicEventKey = this.state.topicEventKey;
+            if (
+                topicEventKey.length !== 0 &&
+                topicEventKey[unit_index] &&
+                topicEventKey[unit_index][chapter_index]
+            ) {
+                if (topicEventKey[unit_index][chapter_index].includes(key)) {
+                    topicEventKey[unit_index][chapter_index].splice(
+                        topicEventKey[unit_index][chapter_index].indexOf(key),
+                        1
+                    );
+                } else {
+                    topicEventKey[unit_index][chapter_index].push(key);
+                }
             }
-        }
 
-        this.setState({
-            topicEventKey: topicEventKey,
-        });
+            this.setState({
+                topicEventKey: topicEventKey,
+            });
+        } catch (error) {
+            console.error(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+            });
+        }
     };
 
     // loads data on selecting a topic
@@ -338,13 +344,11 @@ class HODCourseNotes extends Component {
     render() {
         document.title = `${this.state.topicName} : Notes - HOD | IQLabs`;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.course_name}
-                    togglenav={this.toggleSideNav}
-                />
-
+            <Wrapper
+                header={this.props.course_name}
+                activeLink="dashboard"
+                history={this.props.history}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -363,303 +367,261 @@ class HODCourseNotes extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/student">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                {this.props.course_name}
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Notes</li>
+                    </ol>
+                </nav>
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                <div className="card shadow-sm">
+                    <div className="card-body">
+                        <div className="row">
+                            {/* ----- Chapter list ----- */}
+                            <div className="col-md-3 mb-2 mb-md-0 border-right">
+                                <Accordion
+                                    defaultActiveKey={this.state.chapterId}
+                                >
+                                    {(this.state.data || []).map(
+                                        (unit, unit_index) => {
+                                            return (
+                                                <fieldset
+                                                    className="border-primary mb-2"
+                                                    key={unit_index}
+                                                >
+                                                    <legend className="primary-bg text-white">
+                                                        {unit.unit_name}
+                                                    </legend>
+                                                    {/* ----- Chapter list ----- */}
+                                                    {(unit.chapters || []).map(
+                                                        (
+                                                            chapter,
+                                                            chapter_index
+                                                        ) => {
+                                                            return (
+                                                                <Card
+                                                                    className="mb-1"
+                                                                    key={
+                                                                        chapter_index
+                                                                    }
+                                                                >
+                                                                    <Accordion.Toggle
+                                                                        as={
+                                                                            Card.Header
+                                                                        }
+                                                                        eventKey={
+                                                                            chapter.chapter_id
+                                                                        }
+                                                                        className="pinkrange-bg shadow-sm mb-2"
+                                                                        style={{
+                                                                            borderRadius:
+                                                                                "8px",
+                                                                            cursor: "default",
+                                                                        }}
+                                                                        onClick={() =>
+                                                                            this.toggleChapterCollapse(
+                                                                                chapter.chapter_id
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <div className="row align-items-center">
+                                                                            <div className="col-1">
+                                                                                <span>
+                                                                                    <i
+                                                                                        className={`fas fa-chevron-circle-down ${
+                                                                                            this
+                                                                                                .state
+                                                                                                .chapterEventKey ===
+                                                                                            chapter.chapter_id
+                                                                                                ? ""
+                                                                                                : "fa-rotate-270"
+                                                                                        }`}
+                                                                                    ></i>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="col-10 small font-weight-bold-600">
+                                                                                {
+                                                                                    chapter.chapter_name
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </Accordion.Toggle>
 
-                        {/* Breadcrumb */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/student">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.course_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Notes
-                                </li>
-                            </ol>
-                        </nav>
-
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                <div className="row">
-                                    {/* ----- Chapter list ----- */}
-                                    <div className="col-md-3 mb-2 mb-md-0 border-right">
-                                        <Accordion
-                                            defaultActiveKey={
-                                                this.state.chapterId
-                                            }
-                                        >
-                                            {(this.state.data || []).map(
-                                                (unit, unit_index) => {
-                                                    return (
-                                                        <fieldset
-                                                            className="border-primary mb-2"
-                                                            key={unit_index}
-                                                        >
-                                                            <legend className="primary-bg text-white">
-                                                                {unit.unit_name}
-                                                            </legend>
-                                                            {/* ----- Chapter list ----- */}
-                                                            {(
-                                                                unit.chapters ||
-                                                                []
-                                                            ).map(
-                                                                (
-                                                                    chapter,
-                                                                    chapter_index
-                                                                ) => {
-                                                                    return (
-                                                                        <Card
-                                                                            className="mb-1"
-                                                                            key={
-                                                                                chapter_index
-                                                                            }
-                                                                        >
-                                                                            <Accordion.Toggle
-                                                                                as={
-                                                                                    Card.Header
+                                                                    <Accordion.Collapse
+                                                                        eventKey={
+                                                                            chapter.chapter_id
+                                                                        }
+                                                                    >
+                                                                        <Card>
+                                                                            {chapter.topics.map(
+                                                                                (
+                                                                                    topics,
+                                                                                    topic_index
+                                                                                ) => {
+                                                                                    return (
+                                                                                        <Accordion
+                                                                                            key={
+                                                                                                topic_index
+                                                                                            }
+                                                                                        >
+                                                                                            {this.topic(
+                                                                                                topics,
+                                                                                                topic_index,
+                                                                                                chapter_index,
+                                                                                                unit_index
+                                                                                            )}
+                                                                                        </Accordion>
+                                                                                    );
                                                                                 }
-                                                                                eventKey={
-                                                                                    chapter.chapter_id
-                                                                                }
-                                                                                className="pinkrange-bg shadow-sm mb-2"
-                                                                                style={{
-                                                                                    borderRadius:
-                                                                                        "8px",
-                                                                                    cursor: "default",
-                                                                                }}
-                                                                                onClick={() =>
-                                                                                    this.toggleChapterCollapse(
-                                                                                        chapter.chapter_id
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                <div className="row align-items-center">
-                                                                                    <div className="col-1">
-                                                                                        <span>
-                                                                                            <i
-                                                                                                className={`fas fa-chevron-circle-down ${
-                                                                                                    this
-                                                                                                        .state
-                                                                                                        .chapterEventKey ===
-                                                                                                    chapter.chapter_id
-                                                                                                        ? ""
-                                                                                                        : "fa-rotate-270"
-                                                                                                }`}
-                                                                                            ></i>
-                                                                                        </span>
-                                                                                    </div>
-                                                                                    <div className="col-10 small font-weight-bold-600">
-                                                                                        {
-                                                                                            chapter.chapter_name
-                                                                                        }
-                                                                                    </div>
-                                                                                </div>
-                                                                            </Accordion.Toggle>
-
-                                                                            <Accordion.Collapse
-                                                                                eventKey={
-                                                                                    chapter.chapter_id
-                                                                                }
-                                                                            >
-                                                                                <Card>
-                                                                                    {chapter.chapter_structure.map(
-                                                                                        (
-                                                                                            topics,
-                                                                                            topic_index
-                                                                                        ) => {
-                                                                                            return (
-                                                                                                <Accordion
-                                                                                                    key={
-                                                                                                        topic_index
-                                                                                                    }
-                                                                                                >
-                                                                                                    {this.topic(
-                                                                                                        topics,
-                                                                                                        topic_index,
-                                                                                                        chapter_index,
-                                                                                                        unit_index
-                                                                                                    )}
-                                                                                                </Accordion>
-                                                                                            );
-                                                                                        }
-                                                                                    )}
-                                                                                </Card>
-                                                                            </Accordion.Collapse>
+                                                                            )}
                                                                         </Card>
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </fieldset>
-                                                    );
-                                                }
-                                            )}
-                                        </Accordion>
-                                    </div>
+                                                                    </Accordion.Collapse>
+                                                                </Card>
+                                                            );
+                                                        }
+                                                    )}
+                                                </fieldset>
+                                            );
+                                        }
+                                    )}
+                                </Accordion>
+                            </div>
 
-                                    {/* ----- Notes data ----- */}
+                            {/* ----- Notes data ----- */}
 
-                                    <div className="col-md-9 pl-md-0">
-                                        <div className="card">
-                                            <div className="card-body">
-                                                {this.state.notesData.length !==
-                                                0
-                                                    ? this.state.notesData.map(
-                                                          (data, index) => {
-                                                              return data.direct_question_urls !==
-                                                                  undefined ? (
-                                                                  <div
-                                                                      className="text-center"
-                                                                      key={
-                                                                          index
+                            <div className="col-md-9 pl-md-0">
+                                <div className="card">
+                                    <div className="card-body">
+                                        {this.state.notesData.length !== 0
+                                            ? this.state.notesData.map(
+                                                  (data, index) => {
+                                                      return data.direct_question_urls !==
+                                                          undefined ? (
+                                                          <div
+                                                              className="text-center"
+                                                              key={index}
+                                                          >
+                                                              <div id="ResumeContainer py-3">
+                                                                  <Document
+                                                                      file={
+                                                                          data
+                                                                              .direct_question_urls[0]
+                                                                      }
+                                                                      onLoadSuccess={
+                                                                          this
+                                                                              .onDocumentLoadSuccess
+                                                                      }
+                                                                      className={
+                                                                          "PDFDocument"
                                                                       }
                                                                   >
-                                                                      <div id="ResumeContainer py-3">
-                                                                          <Document
-                                                                              file={
-                                                                                  data
-                                                                                      .direct_question_urls[0]
-                                                                              }
-                                                                              onLoadSuccess={
-                                                                                  this
-                                                                                      .onDocumentLoadSuccess
-                                                                              }
-                                                                              className={
-                                                                                  "PDFDocument"
-                                                                              }
-                                                                          >
-                                                                              <Page
-                                                                                  pageNumber={
-                                                                                      this
-                                                                                          .state
-                                                                                          .pageNumber
-                                                                                  }
-                                                                                  className={
-                                                                                      "PDFPagee shadow"
-                                                                                  }
-                                                                              />
-                                                                          </Document>
-                                                                      </div>
-                                                                      <p className="my-3">
-                                                                          Page{" "}
-                                                                          {
+                                                                      <Page
+                                                                          pageNumber={
                                                                               this
                                                                                   .state
                                                                                   .pageNumber
-                                                                          }{" "}
-                                                                          of{" "}
-                                                                          {
-                                                                              this
-                                                                                  .state
-                                                                                  .numPages
                                                                           }
-                                                                      </p>
-                                                                      <nav>
-                                                                          {this
-                                                                              .state
-                                                                              .numPages >
-                                                                          1 ? (
-                                                                              <>
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm mr-2"
-                                                                                      onClick={
-                                                                                          this
-                                                                                              .goToPrevPage
-                                                                                      }
-                                                                                      disabled={
-                                                                                          this
-                                                                                              .state
-                                                                                              .pageNumber ===
-                                                                                          1
-                                                                                              ? true
-                                                                                              : false
-                                                                                      }
-                                                                                  >
-                                                                                      Prev
-                                                                                  </button>
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm"
-                                                                                      onClick={
-                                                                                          this
-                                                                                              .goToNextPage
-                                                                                      }
-                                                                                      disabled={
-                                                                                          this
-                                                                                              .state
-                                                                                              .numPages ===
-                                                                                          this
-                                                                                              .state
-                                                                                              .pageNumber
-                                                                                              ? true
-                                                                                              : false
-                                                                                      }
-                                                                                  >
-                                                                                      Next
-                                                                                  </button>
-                                                                              </>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
-                                                                      </nav>
-                                                                  </div>
-                                                              ) : (
-                                                                  <div
-                                                                      key={
-                                                                          index
-                                                                      }
-                                                                  >
-                                                                      <div className="h5 font-weight-bold-600 mb-2">
-                                                                          {
-                                                                              data.notes_name
+                                                                          className={
+                                                                              "PDFPagee shadow"
                                                                           }
-                                                                      </div>
-                                                                      <div
-                                                                          dangerouslySetInnerHTML={{
-                                                                              __html: data.notes_content,
-                                                                          }}
-                                                                      ></div>
-                                                                  </div>
-                                                              );
-                                                          }
-                                                      )
-                                                    : "No content to display..."}
-                                            </div>
-                                        </div>
+                                                                      />
+                                                                  </Document>
+                                                              </div>
+                                                              <p className="my-3">
+                                                                  Page{" "}
+                                                                  {
+                                                                      this.state
+                                                                          .pageNumber
+                                                                  }{" "}
+                                                                  of{" "}
+                                                                  {
+                                                                      this.state
+                                                                          .numPages
+                                                                  }
+                                                              </p>
+                                                              <nav>
+                                                                  {this.state
+                                                                      .numPages >
+                                                                  1 ? (
+                                                                      <>
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm mr-2"
+                                                                              onClick={
+                                                                                  this
+                                                                                      .goToPrevPage
+                                                                              }
+                                                                              disabled={
+                                                                                  this
+                                                                                      .state
+                                                                                      .pageNumber ===
+                                                                                  1
+                                                                                      ? true
+                                                                                      : false
+                                                                              }
+                                                                          >
+                                                                              Prev
+                                                                          </button>
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm"
+                                                                              onClick={
+                                                                                  this
+                                                                                      .goToNextPage
+                                                                              }
+                                                                              disabled={
+                                                                                  this
+                                                                                      .state
+                                                                                      .numPages ===
+                                                                                  this
+                                                                                      .state
+                                                                                      .pageNumber
+                                                                                      ? true
+                                                                                      : false
+                                                                              }
+                                                                          >
+                                                                              Next
+                                                                          </button>
+                                                                      </>
+                                                                  ) : (
+                                                                      ""
+                                                                  )}
+                                                              </nav>
+                                                          </div>
+                                                      ) : (
+                                                          <div key={index}>
+                                                              <div className="h5 font-weight-bold-600 mb-2">
+                                                                  {
+                                                                      data.notes_name
+                                                                  }
+                                                              </div>
+                                                              <div
+                                                                  dangerouslySetInnerHTML={{
+                                                                      __html: data.notes_content,
+                                                                  }}
+                                                              ></div>
+                                                          </div>
+                                                      );
+                                                  }
+                                              )
+                                            : "No content to display..."}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

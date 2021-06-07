@@ -98,7 +98,7 @@ export function ChapterList(props) {
                     </button>
                 </Link>
 
-                <Dropdown>
+                <Dropdown drop="left" key="left">
                     <Dropdown.Toggle
                         variant="white"
                         className="btn btn-link btn-sm shadow-none caret-off ml-2"
@@ -107,7 +107,7 @@ export function ChapterList(props) {
                         <i className="fas fa-ellipsis-v"></i>
                     </Dropdown.Toggle>
 
-                    <Dropdown.Menu className="dropdown-menu-btn">
+                    <Dropdown.Menu>
                         <Dropdown.Item
                             onClick={() =>
                                 props.toggleChapter_EditModal(props.chapter)

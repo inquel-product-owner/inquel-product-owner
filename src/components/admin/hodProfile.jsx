@@ -15,39 +15,211 @@ import AlertBox from "../common/alert";
 import storeDispatch from "../../redux/dispatch";
 import { TEMP } from "../../redux/action";
 
+const ConfigurationSection = (props) => {
+    function customDataValidation(data) {
+        let state = false;
+        if (data) {
+            state = data;
+        }
+        return state;
+    }
+
+    return (
+        <>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Progressive Score
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.prog_sco_card
+                        )}
+                        onChange={() => props.handleSwitch("prog_sco_card")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Type 1
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.type_1_q
+                        )}
+                        onChange={() => props.handleSwitch("type_1_q")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Type 2
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.type_2_q
+                        )}
+                        onChange={() => props.handleSwitch("type_2_q")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Quiz
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(props.permissions.quiz)}
+                        onChange={() => props.handleSwitch("quiz")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Match
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(props.permissions.match)}
+                        onChange={() => props.handleSwitch("match")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Notes
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.copy_download
+                        )}
+                        onChange={() => props.handleSwitch("copy_download")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Summary
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.summary
+                        )}
+                        onChange={() => props.handleSwitch("summary")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Direct Questions
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.direct_q
+                        )}
+                        onChange={() => props.handleSwitch("direct_q")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Course Config
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.config_course
+                        )}
+                        onChange={() => props.handleSwitch("config_course")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Simulation Exam
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.sim_exam
+                        )}
+                        onChange={() => props.handleSwitch("sim_exam")}
+                    />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Locking of Tests
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.lock_test
+                        )}
+                        onChange={() => props.handleSwitch("lock_test")}
+                    />
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-9">
+                    <p className="primary-text small mb-0 font-weight-bold-600">
+                        Mobile App
+                    </p>
+                </div>
+                <div className="col-3 text-right">
+                    <ReactSwitch
+                        checked={customDataValidation(
+                            props.permissions.android_app
+                        )}
+                        onChange={() => props.handleSwitch("android_app")}
+                    />
+                </div>
+            </div>
+        </>
+    );
+};
+
 class AdminHodProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             activeGroupPage: 1,
             totalGroupCount: 0,
+
             hodItems: [],
             group: [],
-            permissions: [],
+            permissions: {},
             category: [],
             subcategory: [],
             discipline: [],
             board: [],
-
-            selectedCategory: "",
-            selectedSubcategory: "",
-            selectedDiscipline: "",
-            selectedBoard: "",
-            selectedValid_from: "",
-            selectedValid_to: "",
-
-            progressivescore: false,
-            type1: false,
-            type2: false,
-            quiz: false,
-            match: false,
-            notesdownload: false,
-            summary: false,
-            directquestion: false,
-            configure: false,
-            simulationexam: false,
-            lockingoftest: false,
-            mobileapp: false,
 
             subcategory_loading: false,
             discipline_loading: false,
@@ -69,124 +241,6 @@ class AdminHodProfile extends Component {
         };
     }
 
-    handleConfiguration = () => {
-        this.setState({
-            showConfigLoader: true,
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-
-        if (this.state.hodItems.is_active) {
-            fetch(`${this.url}/hod/${this.hodId}/`, {
-                headers: this.headers,
-                method: "PUT",
-                body: JSON.stringify({
-                    prog_sco_card: this.state.progressivescore,
-                    type_1_q: this.state.type1,
-                    type_2_q: this.state.type2,
-                    direct_q: this.state.directquestion,
-                    quiz: this.state.quiz,
-                    match: this.state.match,
-                    config_course: this.state.configure,
-                    sim_exam: this.state.simulationexam,
-                    lock_test: this.state.lockingoftest,
-                    copy_download: this.state.notesdownload,
-                    android_app: this.state.mobileapp,
-                    summary: this.state.summary,
-                }),
-            })
-                .then((res) => res.json())
-                .then((result) => {
-                    if (result.sts === true) {
-                        this.setState(
-                            {
-                                showConfigLoader: false,
-                                successMsg: result.msg,
-                                showSuccessAlert: true,
-                                page_loading: true,
-                            },
-                            () => {
-                                this.loadHodData();
-                            }
-                        );
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                            showErrorAlert: true,
-                            showConfigLoader: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                    this.setState({
-                        errorMsg: "Something went wrong!",
-                        showErrorAlert: true,
-                        showConfigLoader: false,
-                    });
-                });
-        } else {
-            this.setState({
-                errorMsg: "Cannot update inactive HOD!",
-                showErrorAlert: true,
-                showConfigLoader: false,
-            });
-        }
-    };
-
-    handleDetails = () => {
-        this.setState({
-            page_loading: true,
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-
-        if (this.state.hodItems.is_active) {
-            fetch(`${this.url}/hod/${this.hodId}/`, {
-                headers: this.headers,
-                method: "PUT",
-                body: JSON.stringify({
-                    category: this.state.selectedCategory,
-                    sub_category: this.state.selectedSubcategory,
-                    discipline: this.state.selectedDiscipline,
-                    board: this.state.selectedBoard,
-                    valid_from: this.state.selectedValid_from,
-                    valid_to: this.state.selectedValid_to,
-                }),
-            })
-                .then((res) => res.json())
-                .then((result) => {
-                    if (result.sts === true) {
-                        this.setState({
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                        });
-                        this.loadHodData();
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                            showErrorAlert: true,
-                            page_loading: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                    this.setState({
-                        errorMsg: "Something went wrong!",
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                });
-        } else {
-            this.setState({
-                errorMsg: "Cannot update inactive HOD!",
-                showErrorAlert: true,
-                page_loading: false,
-            });
-        }
-    };
-
     loadHodData = () => {
         fetch(`${this.url}/hod/${this.hodId}/`, {
             headers: this.headers,
@@ -195,38 +249,30 @@ class AdminHodProfile extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                    this.setState({
-                        hodItems: result.data,
-                        permissions: result.data.permissions[0],
-                        selectedCategory: result.data.permissions[0].category,
-                        selectedSubcategory:
-                            result.data.permissions[0].sub_category,
-                        selectedDiscipline:
-                            result.data.permissions[0].discipline,
-                        selectedBoard: result.data.permissions[0].board,
-                        selectedValid_from: dateFormat(
-                            result.data.permissions[0].valid_from,
-                            "yyyy-mm-dd '00:00:00'"
-                        ),
-                        selectedValid_to: dateFormat(
-                            result.data.permissions[0].valid_to,
-                            "yyyy-mm-dd '00:00:00'"
-                        ),
-                        progressivescore:
-                            result.data.permissions[0].prog_sco_card,
-                        type1: result.data.permissions[0].type_1_q,
-                        type2: result.data.permissions[0].type_2_q,
-                        directquestion: result.data.permissions[0].direct_q,
-                        quiz: result.data.permissions[0].quiz,
-                        match: result.data.permissions[0].match,
-                        configure: result.data.permissions[0].config_course,
-                        summary: result.data.permissions[0].summary,
-                        simulationexam: result.data.permissions[0].sim_exam,
-                        lockingoftest: result.data.permissions[0].lock_test,
-                        notesdownload: result.data.permissions[0].copy_download,
-                        mobileapp: result.data.permissions[0].android_app,
-                        page_loading: false,
-                    });
+                    let permissions = result.data.permissions[0] || {};
+                    permissions["valid_from"] = dateFormat(
+                        result.data.permissions[0].valid_from,
+                        "yyyy-mm-dd '00:00:00'"
+                    );
+                    permissions["valid_to"] = dateFormat(
+                        result.data.permissions[0].valid_to,
+                        "yyyy-mm-dd '00:00:00'"
+                    );
+                    this.setState(
+                        {
+                            hodItems: result.data,
+                            permissions: permissions,
+                            page_loading: false,
+                        },
+                        () => {
+                            this.handleCategory({
+                                value: result.data.permissions[0].category,
+                            });
+                            this.handleSubcategory({
+                                value: result.data.permissions[0].sub_category,
+                            });
+                        }
+                    );
                     storeDispatch(TEMP, result.data);
                 } else {
                     this.setState({
@@ -314,14 +360,12 @@ class AdminHodProfile extends Component {
     };
 
     handleCategory = (event) => {
+        let permissions = this.state.permissions;
+        permissions.category = event.value;
         this.setState({
-            selectedCategory: event.value,
-        });
-        this.setState({
+            permissions: permissions,
             subcategory: [],
             discipline: [],
-            selectedSubcategory: "",
-            selectedDiscipline: "",
             subcategory_loading: true,
         });
 
@@ -355,18 +399,17 @@ class AdminHodProfile extends Component {
     };
 
     handleSubcategory = (event) => {
+        let permissions = this.state.permissions;
+        permissions.sub_category = event.value;
         this.setState({
-            selectedSubcategory: event.value,
-        });
-        this.setState({
+            permissions: permissions,
             discipline: [],
-            selectedDiscipline: "",
             discipline_loading: true,
         });
 
         if (event.value !== "") {
             fetch(
-                `${this.url}/data/filter/?category=${this.state.selectedCategory}&sub_category=${event.value}`,
+                `${this.url}/data/filter/?category=${permissions.category}&sub_category=${event.value}`,
                 {
                     headers: this.headers,
                     method: "GET",
@@ -397,94 +440,96 @@ class AdminHodProfile extends Component {
     };
 
     handleDiscipline = (event) => {
+        let permissions = this.state.permissions;
+        permissions.discipline = event.value;
         this.setState({
-            selectedDiscipline: event.value,
+            permissions: permissions,
         });
     };
 
     handleBoard = (event) => {
+        let permissions = this.state.permissions;
+        permissions.board = event.value;
         this.setState({
-            selectedBoard: event.value,
+            permissions: permissions,
         });
     };
 
     handleValid_from = (event) => {
+        let permissions = this.state.permissions;
+        permissions.valid_from = event.value`${dateFormat(
+            event.target.value,
+            "yyyy-mm-dd"
+        )} 00:00:00`;
         this.setState({
-            selectedValid_from: `${dateFormat(
-                event.target.value,
-                "yyyy-mm-dd"
-            )} 00:00:00`,
+            permissions: permissions,
         });
     };
 
     handleValid_to = (event) => {
+        let permissions = this.state.permissions;
+        permissions.valid_to = `${dateFormat(
+            event.target.value,
+            "yyyy-mm-dd"
+        )} 00:00:00`;
         this.setState({
-            selectedValid_to: `${dateFormat(
-                event.target.value,
-                "yyyy-mm-dd"
-            )} 00:00:00`,
+            permissions: permissions,
         });
     };
 
-    handlePSChange = () => {
+    handleDetails = () => {
         this.setState({
-            progressivescore: !this.state.progressivescore,
+            page_loading: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
-    };
-    handleType1Change = () => {
-        this.setState({
-            type1: !this.state.type1,
-        });
-    };
-    handleType2Change = () => {
-        this.setState({
-            type2: !this.state.type2,
-        });
-    };
-    handleQuizChange = () => {
-        this.setState({
-            quiz: !this.state.quiz,
-        });
-    };
-    handleMatchChange = () => {
-        this.setState({
-            match: !this.state.match,
-        });
-    };
-    handleNotesChange = () => {
-        this.setState({
-            notesdownload: !this.state.notesdownload,
-        });
-    };
-    handleSummaryChange = () => {
-        this.setState({
-            summary: !this.state.summary,
-        });
-    };
-    handleDQChange = () => {
-        this.setState({
-            directquestion: !this.state.directquestion,
-        });
-    };
-    handleConfigureChange = () => {
-        this.setState({
-            configure: !this.state.configure,
-        });
-    };
-    handleSimulationChange = () => {
-        this.setState({
-            simulationexam: !this.state.simulationexam,
-        });
-    };
-    handleLockingoftestChange = () => {
-        this.setState({
-            lockingoftest: !this.state.lockingoftest,
-        });
-    };
-    handleMobileappChange = () => {
-        this.setState({
-            mobileapp: !this.state.mobileapp,
-        });
+
+        if (this.state.hodItems.is_active) {
+            let permissions = this.state.permissions;
+            fetch(`${this.url}/hod/${this.hodId}/`, {
+                headers: this.headers,
+                method: "PUT",
+                body: JSON.stringify({
+                    category: permissions.category,
+                    sub_category: permissions.sub_category,
+                    discipline: permissions.discipline,
+                    board: permissions.board,
+                    valid_from: permissions.valid_from,
+                    valid_to: permissions.valid_to,
+                }),
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            page_loading: true,
+                        });
+                        this.loadHodData();
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                });
+        } else {
+            this.setState({
+                errorMsg: "Cannot update inactive HOD!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        }
     };
 
     handleGroupPageChange(pageNumber) {
@@ -495,6 +540,81 @@ class AdminHodProfile extends Component {
             }
         );
     }
+
+    handleSwitch = (type) => {
+        let permissions = this.state.permissions;
+        permissions[type] = !permissions[type];
+
+        this.setState({
+            permissions: permissions,
+        });
+    };
+
+    handleConfiguration = () => {
+        this.setState({
+            showConfigLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
+        if (this.state.hodItems.is_active) {
+            let permissions = this.state.permissions;
+            fetch(`${this.url}/hod/${this.hodId}/`, {
+                headers: this.headers,
+                method: "PUT",
+                body: JSON.stringify({
+                    prog_sco_card: permissions.prog_sco_card,
+                    type_1_q: permissions.type_1_q,
+                    type_2_q: permissions.type_2_q,
+                    direct_q: permissions.direct_q,
+                    quiz: permissions.quiz,
+                    match: permissions.match,
+                    config_course: permissions.config_course,
+                    sim_exam: permissions.sim_exam,
+                    lock_test: permissions.lock_test,
+                    copy_download: permissions.copy_download,
+                    android_app: permissions.android_app,
+                    summary: permissions.summary,
+                }),
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState(
+                            {
+                                showConfigLoader: false,
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                                page_loading: true,
+                            },
+                            () => {
+                                this.loadHodData();
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            showConfigLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        showConfigLoader: false,
+                    });
+                });
+        } else {
+            this.setState({
+                errorMsg: "Cannot update inactive HOD!",
+                showErrorAlert: true,
+                showConfigLoader: false,
+            });
+        }
+    };
 
     render() {
         return (
@@ -672,61 +792,6 @@ class AdminHodProfile extends Component {
 
                             <div className="col-md-2 col-sm-4 col-6 mb-4">
                                 <p className="mb-1 font-weight-bold-600">
-                                    Category
-                                </p>
-                                <p className="text-break mb-0">
-                                    {this.state.permissions.category}
-                                </p>
-                            </div>
-                            <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                <p className="mb-1 font-weight-bold-600">
-                                    Sub category
-                                </p>
-                                <p className="text-break mb-0">
-                                    {this.state.permissions.sub_category}
-                                </p>
-                            </div>
-                            <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                <p className="mb-1 font-weight-bold-600">
-                                    Discipline
-                                </p>
-                                <p className="text-break mb-0">
-                                    {this.state.permissions.discipline}
-                                </p>
-                            </div>
-                            <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                <p className="mb-1 font-weight-bold-600">
-                                    Board / University
-                                </p>
-                                <p className="text-break mb-0">
-                                    {this.state.permissions.board}
-                                </p>
-                            </div>
-                            <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                <p className="mb-1 font-weight-bold-600">
-                                    Valid From
-                                </p>
-                                <p className="text-break mb-0">
-                                    {dateFormat(
-                                        this.state.permissions.valid_from,
-                                        "dd/mm/yyyy"
-                                    )}
-                                </p>
-                            </div>
-                            <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                <p className="mb-1 font-weight-bold-600">
-                                    Valid To
-                                </p>
-                                <p className="text-break mb-0">
-                                    {dateFormat(
-                                        this.state.permissions.valid_to,
-                                        "dd/mm/yyyy"
-                                    )}
-                                </p>
-                            </div>
-
-                            <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                <p className="mb-1 font-weight-bold-600">
                                     Address
                                 </p>
                                 <p className="text-break mb-0">
@@ -886,7 +951,7 @@ class AdminHodProfile extends Component {
                             <div className="card-header pb-0">
                                 <div className="row align-items-center">
                                     <div className="col-6">
-                                        <h6 className="font-weight-bold mb-0">
+                                        <h6 className="font-weight-bold-600 mb-0">
                                             Details
                                         </h6>
                                     </div>
@@ -904,7 +969,7 @@ class AdminHodProfile extends Component {
                                 <div className="form-group">
                                     <label
                                         htmlFor="category"
-                                        className="primary-text font-weight-bold"
+                                        className="primary-text font-weight-bold-600"
                                     >
                                         Category
                                     </label>
@@ -913,8 +978,23 @@ class AdminHodProfile extends Component {
                                         placeholder="Select category"
                                         isSearchable={true}
                                         name="category"
+                                        value={this.state.category.map(
+                                            (list) => {
+                                                return this.state.permissions
+                                                    .category
+                                                    ? this.state.permissions
+                                                          .category ===
+                                                      list.code
+                                                        ? {
+                                                              value: list.code,
+                                                              label: list.title,
+                                                          }
+                                                        : ""
+                                                    : "";
+                                            }
+                                        )}
                                         options={this.state.category.map(
-                                            function (list) {
+                                            (list) => {
                                                 return {
                                                     value: list.code,
                                                     label: list.title,
@@ -928,25 +1008,35 @@ class AdminHodProfile extends Component {
                                 <div className="form-group">
                                     <label
                                         htmlFor="subcategory"
-                                        className="primary-text font-weight-bold"
+                                        className="primary-text font-weight-bold-600"
                                     >
                                         Sub Category
                                     </label>
                                     <Select
                                         className="basic-single form-shadow"
                                         placeholder="Select subcategory"
-                                        isDisabled={
-                                            this.state.selectedCategory === ""
-                                                ? true
-                                                : false
-                                        }
                                         isLoading={
                                             this.state.subcategory_loading
                                                 ? true
                                                 : false
                                         }
                                         isSearchable={true}
-                                        name="subcategory"
+                                        name="sub_category"
+                                        value={this.state.subcategory.map(
+                                            (list) => {
+                                                return this.state.permissions
+                                                    .sub_category
+                                                    ? this.state.permissions
+                                                          .sub_category ===
+                                                      list.code
+                                                        ? {
+                                                              value: list.code,
+                                                              label: list.title,
+                                                          }
+                                                        : ""
+                                                    : "";
+                                            }
+                                        )}
                                         options={this.state.subcategory.map(
                                             function (list) {
                                                 return {
@@ -962,19 +1052,13 @@ class AdminHodProfile extends Component {
                                 <div className="form-group">
                                     <label
                                         htmlFor="discipline"
-                                        className="primary-text font-weight-bold"
+                                        className="primary-text font-weight-bold-600"
                                     >
                                         Discipline
                                     </label>
                                     <Select
                                         className="basic-single form-shadow"
                                         placeholder="Select discipline"
-                                        isDisabled={
-                                            this.state.selectedSubcategory ===
-                                            ""
-                                                ? true
-                                                : false
-                                        }
                                         isLoading={
                                             this.state.discipline_loading
                                                 ? true
@@ -982,6 +1066,20 @@ class AdminHodProfile extends Component {
                                         }
                                         isSearchable={true}
                                         name="discipline"
+                                        value={Object.entries(
+                                            this.state.discipline
+                                        ).map(([key, value]) => {
+                                            return this.state.permissions
+                                                .discipline
+                                                ? this.state.permissions
+                                                      .discipline === key
+                                                    ? {
+                                                          value: key,
+                                                          label: value,
+                                                      }
+                                                    : ""
+                                                : "";
+                                        })}
                                         options={Object.entries(
                                             this.state.discipline
                                         ).map(([key, value]) => {
@@ -997,7 +1095,7 @@ class AdminHodProfile extends Component {
                                 <div className="form-group">
                                     <label
                                         htmlFor="board"
-                                        className="primary-text font-weight-bold"
+                                        className="primary-text font-weight-bold-600"
                                     >
                                         Board / University
                                     </label>
@@ -1006,6 +1104,17 @@ class AdminHodProfile extends Component {
                                         placeholder="Select board"
                                         isSearchable={true}
                                         name="board"
+                                        value={this.state.board.map((list) => {
+                                            return this.state.permissions.board
+                                                ? this.state.permissions
+                                                      .board === list.code
+                                                    ? {
+                                                          value: list.code,
+                                                          label: list.title,
+                                                      }
+                                                    : ""
+                                                : "";
+                                        })}
                                         options={this.state.board.map(function (
                                             list
                                         ) {
@@ -1021,7 +1130,7 @@ class AdminHodProfile extends Component {
                                 <div className="form-group">
                                     <label
                                         htmlFor="valid_from"
-                                        className="primary-text font-weight-bold"
+                                        className="primary-text font-weight-bold-600"
                                     >
                                         Valid From
                                     </label>
@@ -1030,13 +1139,22 @@ class AdminHodProfile extends Component {
                                         name="valid_from"
                                         id="valid_from"
                                         className="form-control form-shadow"
+                                        value={
+                                            this.state.permissions.valid_from
+                                                ? dateFormat(
+                                                      this.state.permissions
+                                                          .valid_from,
+                                                      "yyyy-mm-dd"
+                                                  )
+                                                : ""
+                                        }
                                         onChange={this.handleValid_from}
                                     />
                                 </div>
                                 <div className="form-group mb-0">
                                     <label
                                         htmlFor="valid_to"
-                                        className="primary-text font-weight-bold"
+                                        className="primary-text font-weight-bold-600"
                                     >
                                         Valid To
                                     </label>
@@ -1045,6 +1163,15 @@ class AdminHodProfile extends Component {
                                         name="valid_to"
                                         id="valid_to"
                                         className="form-control form-shadow"
+                                        value={
+                                            this.state.permissions.valid_to
+                                                ? dateFormat(
+                                                      this.state.permissions
+                                                          .valid_to,
+                                                      "yyyy-mm-dd"
+                                                  )
+                                                : ""
+                                        }
                                         onChange={this.handleValid_to}
                                     />
                                 </div>
@@ -1057,7 +1184,7 @@ class AdminHodProfile extends Component {
                             <div className="card-header pb-0">
                                 <div className="row align-items-center">
                                     <div className="col-6">
-                                        <h6 className="font-weight-bold mb-0">
+                                        <h6 className="font-weight-bold-600 mb-0">
                                             Configuration
                                         </h6>
                                     </div>
@@ -1084,172 +1211,10 @@ class AdminHodProfile extends Component {
                                 </div>
                             </div>
                             <div className="card-body">
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Progressive Score
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={
-                                                this.state.progressivescore
-                                            }
-                                            onChange={this.handlePSChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Type 1
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.type1}
-                                            onChange={this.handleType1Change}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Type 2
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.type2}
-                                            onChange={this.handleType2Change}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Quiz
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.quiz}
-                                            onChange={this.handleQuizChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Match
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.match}
-                                            onChange={this.handleMatchChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Notes
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.notesdownload}
-                                            onChange={this.handleNotesChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Summary
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.summary}
-                                            onChange={this.handleSummaryChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Direct Questions
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.directquestion}
-                                            onChange={this.handleDQChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Configure
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.configure}
-                                            onChange={
-                                                this.handleConfigureChange
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Simulation Exam
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.simulationexam}
-                                            onChange={
-                                                this.handleSimulationChange
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Locking of Tests
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.lockingoftest}
-                                            onChange={
-                                                this.handleLockingoftestChange
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-9">
-                                        <p className="primary-text small mb-0 font-weight-bold">
-                                            Mobile App
-                                        </p>
-                                    </div>
-                                    <div className="col-3 text-right">
-                                        <ReactSwitch
-                                            checked={this.state.mobileapp}
-                                            onChange={
-                                                this.handleMobileappChange
-                                            }
-                                        />
-                                    </div>
-                                </div>
+                                <ConfigurationSection
+                                    permissions={this.state.permissions || {}}
+                                    handleSwitch={this.handleSwitch}
+                                />
                             </div>
                         </div>
                     </div>
