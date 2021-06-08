@@ -1883,6 +1883,9 @@ class TeacherConcepts extends Component {
                                                 <button
                                                     type="button"
                                                     className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                    style={{
+                                                        cursor: "default",
+                                                    }}
                                                 >
                                                     {c_index <= 8
                                                         ? `0${c_index + 1}`
@@ -1911,6 +1914,12 @@ class TeacherConcepts extends Component {
                                                         this.copyConcept(
                                                             c_index
                                                         )
+                                                    }
+                                                    disabled={
+                                                        concept.concepts_random_id ===
+                                                        ""
+                                                            ? true
+                                                            : false
                                                     }
                                                 >
                                                     <i className="far fa-copy fa-sm"></i>

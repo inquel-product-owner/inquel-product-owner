@@ -686,6 +686,9 @@ class TeacherMatch extends Component {
                                                 <button
                                                     type="button"
                                                     className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                    style={{
+                                                        cursor: "default",
+                                                    }}
                                                 >
                                                     {match_index <= 8
                                                         ? `0${match_index + 1}`
@@ -713,6 +716,11 @@ class TeacherMatch extends Component {
                                                         this.handleCopy(
                                                             match_index
                                                         )
+                                                    }
+                                                    disabled={
+                                                        match.match_id === ""
+                                                            ? true
+                                                            : false
                                                     }
                                                 >
                                                     <i className="far fa-copy fa-sm"></i>

@@ -553,7 +553,7 @@ class HODSimulationType1 extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.data.msg ?result.data.msg:'',
+                        errorMsg: result.data.msg ? result.data.msg : "",
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -1419,6 +1419,9 @@ class HODSimulationType1 extends Component {
                                                 <button
                                                     type="button"
                                                     className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                    style={{
+                                                        cursor: "default",
+                                                    }}
                                                 >
                                                     {question.index ? (
                                                         question.index
@@ -1467,6 +1470,12 @@ class HODSimulationType1 extends Component {
                                                             this.handleCopy(
                                                                 q_index
                                                             )
+                                                        }
+                                                        disabled={
+                                                            question.question_random_id ===
+                                                            ""
+                                                                ? true
+                                                                : false
                                                         }
                                                     >
                                                         <i className="far fa-copy fa-sm"></i>

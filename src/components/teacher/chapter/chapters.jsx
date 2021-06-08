@@ -19,7 +19,7 @@ import {
     QuizModal,
 } from "./contentManagementModal";
 import storeDispatch from "../../../redux/dispatch";
-import { CHAPTER, CYCLE, QUIZ, RESPONSE, TOPIC } from "../../../redux/action";
+import { CHAPTER, CYCLE, QUIZ, TOPIC } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_data: state.storage.response,
@@ -193,6 +193,7 @@ class TeacherChapters extends Component {
                         next_topic: result.data.topics_list
                             ? result.data.topics_list
                             : [],
+                        publish: result.data.publish || false,
                         page_loading: false,
                     });
                 } else {
@@ -294,16 +295,13 @@ class TeacherChapters extends Component {
     getChapterIndex = () => {
         const chapters = [...this.props.subject_data.results];
         let index = 0;
-        let status = false;
         for (let i = 0; i < chapters.length; i++) {
             if (chapters[i].chapter_id === this.state.chapterId) {
                 index = i + 1;
-                status = chapters[i].publish;
             }
         }
         this.setState({
             chapterIndex: index,
-            publish: status,
         });
     };
 
@@ -724,37 +722,6 @@ class TeacherChapters extends Component {
         });
     };
 
-    loadSubjectData = () => {
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    this.setState({
-                        page_loading: false,
-                    });
-                    storeDispatch(RESPONSE, result.data);
-                    this.getChapterIndex();
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
-            });
-    };
-
     handlePublish = () => {
         this.setState({
             showErrorAlert: false,
@@ -782,7 +749,7 @@ class TeacherChapters extends Component {
                         showSuccessAlert: true,
                         page_loading: false,
                     });
-                    this.loadSubjectData();
+                    this.loadTopicData();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
