@@ -241,20 +241,23 @@ class DiscountModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
-                        let appendObj = {
-                            ALL: "All",
-                        };
                         this.setState({
                             discipline: Object.assign(
-                                appendObj,
+                                {
+                                    ALL: "All",
+                                },
                                 result.data.DISCIPLINE
                             ),
                             levels: Object.assign(
-                                appendObj,
+                                {
+                                    ALL: "All",
+                                },
                                 result.data.LEVELS
                             ),
                             subjects: Object.assign(
-                                appendObj,
+                                {
+                                    ALL: "All",
+                                },
                                 result.data.SUBJECTS
                             ),
                             content_loading: false,

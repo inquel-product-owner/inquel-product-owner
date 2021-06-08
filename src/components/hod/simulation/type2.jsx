@@ -1688,6 +1688,9 @@ class HODSimulationType2 extends Component {
                                                     <button
                                                         type="button"
                                                         className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                        style={{
+                                                            cursor: "default",
+                                                        }}
                                                     >
                                                         {question.index ? (
                                                             question.index
@@ -1736,6 +1739,12 @@ class HODSimulationType2 extends Component {
                                                                 this.copyQuestions(
                                                                     q_index
                                                                 )
+                                                            }
+                                                            disabled={
+                                                                question.question_random_id ===
+                                                                ""
+                                                                    ? true
+                                                                    : false
                                                             }
                                                         >
                                                             <i className="far fa-copy fa-sm"></i>
@@ -1914,6 +1923,9 @@ class HODSimulationType2 extends Component {
                                                                     <button
                                                                         type="button"
                                                                         className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                                        style={{
+                                                                            cursor: "default",
+                                                                        }}
                                                                     >
                                                                         {question.index ? (
                                                                             `${
@@ -1969,6 +1981,12 @@ class HODSimulationType2 extends Component {
                                                                                     q_index,
                                                                                     sub_index
                                                                                 )
+                                                                            }
+                                                                            disabled={
+                                                                                sub_question.sub_question_id ===
+                                                                                ""
+                                                                                    ? true
+                                                                                    : false
                                                                             }
                                                                         >
                                                                             <i className="far fa-copy fa-sm"></i>
