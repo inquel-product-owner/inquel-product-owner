@@ -58,7 +58,7 @@ class SideNav extends Component {
                         <Dropdown.Toggle
                             variant="white"
                             className={`btn sidebar-btn btn-sm shadow-none caret-off ${
-                                active === "course" ? "active" : ""
+                                active === "data" ? "active" : ""
                             }`}
                         >
                             <i className="fas fa-database"></i>

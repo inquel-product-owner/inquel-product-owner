@@ -1133,7 +1133,7 @@ class AdminDiscountConfiguration extends Component {
             <Wrapper
                 history={this.props.history}
                 header="Discount Configuration"
-                activeLink="course"
+                activeLink="data"
             >
                 {/* Alert message */}
                 <AlertBox

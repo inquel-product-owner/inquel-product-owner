@@ -35,7 +35,7 @@ function AccountNavbar() {
                             Study Guide
                         </Dropdown.Toggle>
 
-                        <Dropdown.Menu>
+                        <Dropdown.Menu className="dropdown-menu-down">
                             <Dropdown.Item as={Link} to="">
                                 Link one
                             </Dropdown.Item>
@@ -59,9 +59,6 @@ function AccountNavbar() {
                         <button className="btn btn-primary btn-sm">
                             <i className="fas fa-cart-plus"></i>
                         </button>
-                    </Nav.Link>
-                    <Nav.Link as={Link} to="/">
-                        Help?
                     </Nav.Link>
                 </Nav>
             </Navbar.Collapse>
