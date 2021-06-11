@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { Alert, Spinner } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import Footer from "./shared/footer";
-import AccountNavbar from "./shared/accountNavbar";
+import Footer from "../home/shared/footer";
+import TopNavbar from "../home/shared/navbar";
 import { ForgotPasswordModal } from "../common/forgotPassword";
 import storeDispatch from "../../redux/dispatch";
 import { PROFILE } from "../../redux/action/index.js";
@@ -167,7 +167,7 @@ class StudentLogin extends Component {
             localStorage.getItem("Authorization") &&
             localStorage.getItem("is_student")
         ) {
-            return <Redirect to="/student" />;
+            return <Redirect to="/dashboard" />;
         }
         return (
             <>
@@ -181,12 +181,17 @@ class StudentLogin extends Component {
                     ""
                 )}
 
-                <AccountNavbar />
+                <TopNavbar />
 
-                <div className="login">
-                    <div className="container">
-                        <div className="row justify-content-center align-items-center page-row">
-                            <div className="col-md-5">
+                <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{
+                        minHeight: "80vh",
+                    }}
+                >
+                    <div className="container py-5">
+                        <div className="row justify-content-center align-items-center">
+                            <div className="col-lg-4 col-md-6">
                                 <div className="card shadow py-2">
                                     <div className="card-body ">
                                         <h4 className="primary-text">
@@ -230,7 +235,7 @@ class StudentLogin extends Component {
                                                     required
                                                 />
                                             </div>
-                                            <div className="form-group mb-4">
+                                            <div className="form-group">
                                                 <label htmlFor="password">
                                                     Password
                                                 </label>
@@ -330,7 +335,7 @@ class StudentLogin extends Component {
                                         <p className="text-center small mb-0">
                                             Don't have an account?{" "}
                                             <Link
-                                                to="/student/register"
+                                                to="/register"
                                                 className="primary-text font-weight-bold"
                                             >
                                                 Join Inquel Online Learning

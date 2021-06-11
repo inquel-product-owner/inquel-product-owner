@@ -13,7 +13,7 @@ class SideNav extends Component {
                 }`}
             >
                 <div style={{ height: "80%" }}>
-                    <Link to="/student">
+                    <Link to="/dashboard">
                         <OverlayTrigger
                             key="right"
                             placement="right"
@@ -25,13 +25,13 @@ class SideNav extends Component {
                                 } btn-sm mb-3`}
                             >
                                 <i
-                                    className="fas fa-home"
+                                    className="fas fa-tachometer-alt"
                                     style={{ marginLeft: "-1.5px" }}
                                 ></i>
                             </button>
                         </OverlayTrigger>
                     </Link>
-                    <Link to="/student/leaderboard">
+                    <Link to="/dashboard/leaderboard">
                         <OverlayTrigger
                             key="right"
                             placement="right"
@@ -51,7 +51,7 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
-                    <Link to="/student/study-planner">
+                    <Link to="/dashboard/study-planner">
                         <OverlayTrigger
                             key="right"
                             placement="right"
@@ -68,13 +68,47 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
+                    <Link to="/dashboard/quiz">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={
+                                <Tooltip id="tooltip">Quiz</Tooltip>
+                            }
+                        >
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "quiz" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i className="fas fa-puzzle-piece"></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
+                    <Link to="/dashboard/catalog">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={
+                                <Tooltip id="tooltip">Course Catalog</Tooltip>
+                            }
+                        >
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "course" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i className="fas fa-graduation-cap" style={{marginLeft:'-2px'}}></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
                 </div>
 
                 <div
                     className="d-flex flex-column justify-content-end"
                     style={{ height: "20%" }}
                 >
-                    <Link to="/student">
+                    <Link to="/dashboard">
                         <OverlayTrigger
                             key="right"
                             placement="right"
@@ -88,7 +122,7 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
-                    <Link to="/student">
+                    <Link to="/dashboard">
                         <OverlayTrigger
                             key="right"
                             placement="right"

@@ -5,8 +5,8 @@ import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
-import TeacherTable from "../table/teacher";
-import StudentTable from "../table/student";
+import TeacherTable from "../common/table/teacher";
+import StudentTable from "../common/table/student";
 import Paginations from "../common/pagination";
 import AlertBox from "../common/alert";
 import {
@@ -243,7 +243,7 @@ class AddStudentModal extends Component {
                                     />
                                     <label
                                         className="custom-control-label"
-                                        for="customCheck1"
+                                        htmlFor="customCheck1"
                                     >
                                         I agree to the{" "}
                                         <Link
@@ -513,7 +513,7 @@ class AddTeacherModal extends Component {
                             />
                             <label
                                 className="custom-control-label"
-                                for="customCheck1"
+                                htmlFor="customCheck1"
                             >
                                 I agree to the{" "}
                                 <Link

@@ -70,7 +70,7 @@ class EmailVerify extends Component {
                                                     Your account is verified!
                                                 </p>
                                                 <Link
-                                                    to="/student/login"
+                                                    to="/login"
                                                     style={{
                                                         textDecoration: "none",
                                                     }}

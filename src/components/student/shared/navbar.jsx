@@ -71,7 +71,7 @@ class Header extends Component {
 
     render() {
         if (this.state.isLoggedOut) {
-            return <Redirect to="/student/login" />;
+            return <Redirect to="/login" />;
         }
         return (
             <>
@@ -157,12 +157,20 @@ class Header extends Component {
                                                     : ""}
                                             </span>
                                         </Dropdown.Header>
+                                        <Dropdown.Item as={Link} to="/">
+                                            <i className="fas fa-home fa-sm mr-2"></i>{" "}
+                                            Home Page
+                                        </Dropdown.Item>
                                         <Dropdown.Item
                                             as={Link}
-                                            to="/student/profile"
+                                            to="/dashboard/profile"
                                         >
-                                            <i className="fas fa-user mr-2"></i>{" "}
+                                            <i className="fas fa-user fa-sm mr-2"></i>{" "}
                                             My Profile
+                                        </Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="/cart">
+                                            <i className="fas fa-shopping-cart fa-sm mr-2"></i>{" "}
+                                            Cart
                                         </Dropdown.Item>
                                         <Dropdown.Divider />
                                         <Dropdown.Item

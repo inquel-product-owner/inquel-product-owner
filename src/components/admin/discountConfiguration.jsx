@@ -410,7 +410,6 @@ class DiscountModal extends Component {
                 size="xl"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
-                scrollable
             >
                 <Modal.Header closeButton>Discount Configuration</Modal.Header>
                 <Modal.Body>

@@ -6,7 +6,7 @@ import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/constant.js";
 import Loading from "../../common/loader";
 import Paginations from "../../common/pagination";
-import StudentTable from "../../table/student";
+import StudentTable from "../../common/table/student";
 import AlertBox from "../../common/alert";
 import { UserRemoveModal } from "../../common/modal/userManagementModal";
 import { connect } from "react-redux";

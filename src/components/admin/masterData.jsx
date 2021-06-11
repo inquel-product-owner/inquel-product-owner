@@ -489,7 +489,6 @@ class AdminMasterData extends Component {
             showEditModal: false,
             showDeleteModal: false,
 
-            activeTab: "categories",
             selectedCategory: "",
             selectedSubcategory: "",
             contentAddingType: "",
@@ -724,10 +723,6 @@ class AdminMasterData extends Component {
         }, 1000);
     };
 
-    toggleTab = (key) => {
-        this.setState({ activeTab: key });
-    };
-
     handleEdit = (code, title, type) => {
         let temp = {
             code: code,
@@ -820,10 +815,7 @@ class AdminMasterData extends Component {
                     </ol>
                 </nav>
 
-                <Tabs
-                    activeKey={this.state.activeTab}
-                    onSelect={this.toggleTab}
-                >
+                <Tabs defaultActiveKey="categories" id="uncontrolled-tab-example">
                     {/* master filter */}
                     <Tab eventKey="categories" title="Categories">
                         <div className="form-row">

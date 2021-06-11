@@ -7,7 +7,7 @@ import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import Paginations from "../common/pagination";
-import StudentTable from "../table/student";
+import StudentTable from "../common/table/student";
 import AlertBox from "../common/alert";
 
 const mapStateToProps = (state) => ({

@@ -1,7 +1,9 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 
-import LandingPage from "./landingPage";
+// -------------------- Landing page Imports --------------------
+
+import Home from "./home";
 
 // -------------------- Admin Imports --------------------
 
@@ -10,10 +12,10 @@ import AdminLogin from "./admin/login";
 import AdminHODAndStudentList from "./admin/profileList";
 import AdminStudentProfile from "./admin/studentProfile";
 
-import AdminHodProfile from "./admin/hodProfile";
-import AdminHodTeacherList from "./admin/hodTeacherList";
-import AdminHodStudentList from "./admin/hodStudentList";
-import AdminHodStudentProfile from "./admin/hodStudentProfile";
+import AdminHodProfile from "./admin/hod/profile";
+import AdminHodTeacherList from "./admin/hod/teacherList";
+import AdminHodStudentList from "./admin/hod/studentList";
+import AdminHodStudentProfile from "./admin/hod/studentProfile";
 
 import AdminCourseView from "./admin/viewCourse";
 import AdminDiscountConfiguration from "./admin/discountConfiguration";
@@ -141,11 +143,11 @@ import StudyPlanner from "./student/study-planner/";
 // -------------------- General Imports --------------------
 
 import { ForgotPassword } from "./common/forgotPassword";
-import errorPage from "./404";
+import errorPage from "./home/404";
 
 const routes = (
     <Switch>
-        <Route exact path="/" component={LandingPage} />
+        <Route exact path="/" component={Home} />
 
         {/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= Admin Routes =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */}
 
@@ -1425,11 +1427,11 @@ const routes = (
 
         <Route
             exact
-            path="/student"
+            path="/dashboard"
             render={() =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Dashboard />
                 )
@@ -1437,11 +1439,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/profile"
+            path="/dashboard/profile"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Profile {...props} />
                 )
@@ -1452,11 +1454,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/group/:groupId"
+            path="/dashboard/group/:groupId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Group {...props} />
                 )
@@ -1464,11 +1466,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId"
+            path="/dashboard/subject/:subjectId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Subject {...props} />
                 )
@@ -1479,11 +1481,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/subject/:subjectId/personal-notes"
+            path="/dashboard/subject/:subjectId/personal-notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <PersonalNotes {...props} />
                 )
@@ -1491,11 +1493,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/favourites"
+            path="/dashboard/subject/:subjectId/favourites"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Favourites {...props} />
                 )
@@ -1503,11 +1505,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/favourites/:chapterId/:topicNum/:type"
+            path="/dashboard/subject/:subjectId/favourites/:chapterId/:topicNum/:type"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <FavouritesFlashcard {...props} />
                 )
@@ -1518,11 +1520,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/summary"
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/summary"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Summary {...props} />
                 )
@@ -1530,11 +1532,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/notes"
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Notes {...props} />
                 )
@@ -1545,11 +1547,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/:topicNum/learn"
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/:topicNum/learn"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <FlashCard {...props} />
                 )
@@ -1560,11 +1562,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/auto"
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/auto"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <CycleAutoExam {...props} />
                 )
@@ -1572,11 +1574,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/direct"
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/direct"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <CycleDirectExam {...props} />
                 )
@@ -1587,11 +1589,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/quiz/:quizId"
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/quiz/:quizId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Quiz {...props} />
                 )
@@ -1599,11 +1601,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/quiz/:quizId/level/:levelId"
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/quiz/:quizId/level/:levelId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <QuizLevelExam {...props} />
                 )
@@ -1614,11 +1616,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/subject/:subjectId/semester/:semesterId/auto"
+            path="/dashboard/subject/:subjectId/semester/:semesterId/auto"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <SemesterAutoExam {...props} />
                 )
@@ -1626,11 +1628,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/semester/:semesterId/direct"
+            path="/dashboard/subject/:subjectId/semester/:semesterId/direct"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <SemesterDirectExam {...props} />
                 )
@@ -1641,11 +1643,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/subject/:subjectId/results"
+            path="/dashboard/subject/:subjectId/results"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <TestResult {...props} />
                 )
@@ -1653,11 +1655,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/results/cycle/:cycleTestId/preview"
+            path="/dashboard/subject/:subjectId/results/cycle/:cycleTestId/preview"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <TestPreview {...props} />
                 )
@@ -1665,11 +1667,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/results/semester/:semesterId/preview"
+            path="/dashboard/subject/:subjectId/results/semester/:semesterId/preview"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <TestPreview {...props} />
                 )
@@ -1680,11 +1682,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/leaderboard"
+            path="/dashboard/leaderboard"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <Leaderboard {...props} />
                 )
@@ -1695,11 +1697,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/study-planner"
+            path="/dashboard/study-planner"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
+                    <Redirect to="/login" />
                 ) : (
                     <StudyPlanner {...props} />
                 )
@@ -1710,11 +1712,11 @@ const routes = (
 
         <Route
             exact
-            path="/student/login"
+            path="/login"
             render={() =>
                 localStorage.getItem("Authorization") &&
                 localStorage.getItem("is_student") ? (
-                    <Redirect to="/student" />
+                    <Redirect to="/dashboard" />
                 ) : (
                     <StudentLogin />
                 )
@@ -1722,11 +1724,11 @@ const routes = (
         />
         <Route
             exact
-            path="/student/register"
+            path="/register"
             render={() =>
                 localStorage.getItem("Authorization") &&
                 localStorage.getItem("is_student") ? (
-                    <Redirect to="/student" />
+                    <Redirect to="/dashboard" />
                 ) : (
                     <StudentRegister />
                 )

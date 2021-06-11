@@ -142,7 +142,7 @@ class Summary extends Component {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-3">
                         <li className="breadcrumb-item">
-                            <Link to="/student">
+                            <Link to="/dashboard">
                                 <i className="fas fa-home fa-sm"></i>
                             </Link>
                         </li>

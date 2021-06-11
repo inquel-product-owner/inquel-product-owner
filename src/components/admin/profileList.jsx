@@ -4,8 +4,8 @@ import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
 import Select from "react-select";
-import HODTable from "../table/hod";
-import StudentTable from "../table/student";
+import HODTable from "../common/table/hod";
+import StudentTable from "../common/table/student";
 import Paginations from "../common/pagination";
 import ReactSwitch from "../common/switchComponent";
 import dateFormat from "dateformat";
@@ -35,18 +35,18 @@ class HODModal extends Component {
             board: "",
             valid_from: "",
             valid_to: "",
-            progressivescore: false,
-            type1: false,
-            type2: false,
+            prog_sco_card: false,
+            type_1_q: false,
+            type_2_q: false,
             quiz: false,
             match: false,
-            notes: false,
+            copy_download: false,
             summary: false,
-            directquestion: false,
-            configure: false,
-            simulationexam: false,
-            lockingoftest: false,
-            mobileapp: false,
+            direct_q: false,
+            config_course: false,
+            sim_exam: false,
+            lock_test: false,
+            android_app: false,
 
             errorMsg: "",
             successMsg: "",
@@ -128,18 +128,18 @@ class HODModal extends Component {
                                 board: this.state.board,
                                 valid_from: this.state.valid_from,
                                 valid_to: this.state.valid_to,
-                                prog_sco_card: this.state.progressivescore,
-                                type_1_q: this.state.type1,
-                                type_2_q: this.state.type2,
-                                direct_q: this.state.directquestion,
+                                prog_sco_card: this.state.prog_sco_card,
+                                type_1_q: this.state.type_1_q,
+                                type_2_q: this.state.type_2_q,
+                                direct_q: this.state.direct_q,
                                 quiz: this.state.quiz,
                                 match: this.state.match,
-                                config_course: this.state.configure,
+                                config_course: this.state.config_course,
                                 summary: this.state.summary,
-                                sim_exam: this.state.simulationexam,
-                                lock_test: this.state.lockingoftest,
-                                copy_download: this.state.notes,
-                                android_app: this.state.mobileapp,
+                                sim_exam: this.state.sim_exam,
+                                lock_test: this.state.lock_test,
+                                copy_download: this.state.copy_download,
+                                android_app: this.state.android_app,
                             },
                         },
                     },
@@ -283,94 +283,27 @@ class HODModal extends Component {
         });
     };
 
-    handleSwitch = (event) => {
+    handleSwitch = (type) => {
         this.setState({
-            [event.target.name]: !event.target.value,
-        });
-    };
-
-    handlePSChange = () => {
-        this.setState({
-            progressivescore: !this.state.progressivescore,
-        });
-    };
-    handleType1Change = () => {
-        this.setState({
-            type1: !this.state.type1,
-        });
-    };
-    handleType2Change = () => {
-        this.setState({
-            type2: !this.state.type2,
-        });
-    };
-    handleQuizChange = () => {
-        this.setState({
-            quiz: !this.state.quiz,
-        });
-    };
-    handleMatchChange = () => {
-        this.setState({
-            match: !this.state.match,
-        });
-    };
-    handleNotesChange = () => {
-        this.setState({
-            notes: !this.state.notes,
-        });
-    };
-    handleSummaryChange = () => {
-        this.setState({
-            summary: !this.state.summary,
-        });
-    };
-    handleDQChange = () => {
-        this.setState({
-            directquestion: !this.state.directquestion,
-        });
-    };
-    handleConfigureChange = () => {
-        this.setState({
-            configure: !this.state.configure,
-        });
-    };
-    handleSimulationChange = () => {
-        this.setState({
-            simulationexam: !this.state.simulationexam,
-        });
-    };
-    handleLockingoftestChange = () => {
-        this.setState({
-            lockingoftest: !this.state.lockingoftest,
-        });
-    };
-    handleMobileappChange = () => {
-        this.setState({
-            mobileapp: !this.state.mobileapp,
-        });
-    };
-
-    showPassword = () => {
-        this.setState({
-            showPassword: !this.state.showPassword,
+            [type]: !this.state[type],
         });
     };
 
     handleSelectAll = () => {
         this.setState({
             selectAll: !this.state.selectAll,
-            progressivescore: !this.state.selectAll,
-            type1: !this.state.selectAll,
-            type2: !this.state.selectAll,
+            prog_sco_card: !this.state.selectAll,
+            type_1_q: !this.state.selectAll,
+            type_2_q: !this.state.selectAll,
             quiz: !this.state.selectAll,
             match: !this.state.selectAll,
-            notes: !this.state.selectAll,
+            copy_download: !this.state.selectAll,
             summary: !this.state.selectAll,
-            directquestion: !this.state.selectAll,
-            configure: !this.state.selectAll,
-            simulationexam: !this.state.selectAll,
-            lockingoftest: !this.state.selectAll,
-            mobileapp: !this.state.selectAll,
+            direct_q: !this.state.selectAll,
+            config_course: !this.state.selectAll,
+            sim_exam: !this.state.selectAll,
+            lock_test: !this.state.selectAll,
+            android_app: !this.state.selectAll,
         });
     };
 
@@ -384,9 +317,7 @@ class HODModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton className="primary-text h5">
-                    Add HOD
-                </Modal.Header>
+                <Modal.Header closeButton>Create HOD</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -398,7 +329,7 @@ class HODModal extends Component {
                         }}
                         dismissible
                     >
-                        <span></span> {this.state.errorMsg}
+                        {this.state.errorMsg}
                     </Alert>
                     <Alert
                         variant="success"
@@ -470,7 +401,13 @@ class HODModal extends Component {
                                         <button
                                             className="btn btn-link btn-sm bg-white shadow-none"
                                             type="button"
-                                            onClick={this.showPassword}
+                                            onClick={() =>
+                                                this.setState({
+                                                    showPassword:
+                                                        !this.state
+                                                            .showPassword,
+                                                })
+                                            }
                                         >
                                             {this.state.showPassword ? (
                                                 <i className="far fa-eye-slash"></i>
@@ -638,10 +575,12 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={
-                                                this.state.progressivescore
+                                            checked={this.state.prog_sco_card}
+                                            onChange={() =>
+                                                this.handleSwitch(
+                                                    "prog_sco_card"
+                                                )
                                             }
-                                            onChange={this.handlePSChange}
                                         />
                                     </div>
                                 </div>
@@ -653,8 +592,10 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.type1}
-                                            onChange={this.handleType1Change}
+                                            checked={this.state.type_1_q}
+                                            onChange={() =>
+                                                this.handleSwitch("type_1_q")
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -666,8 +607,10 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.type2}
-                                            onChange={this.handleType2Change}
+                                            checked={this.state.type_2_q}
+                                            onChange={() =>
+                                                this.handleSwitch("type_2_q")
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -680,7 +623,9 @@ class HODModal extends Component {
                                     <div className="col-3 text-right">
                                         <ReactSwitch
                                             checked={this.state.quiz}
-                                            onChange={this.handleQuizChange}
+                                            onChange={() =>
+                                                this.handleSwitch("quiz")
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -693,7 +638,9 @@ class HODModal extends Component {
                                     <div className="col-3 text-right">
                                         <ReactSwitch
                                             checked={this.state.match}
-                                            onChange={this.handleMatchChange}
+                                            onChange={() =>
+                                                this.handleSwitch("match")
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -705,8 +652,12 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.notes}
-                                            onChange={this.handleNotesChange}
+                                            checked={this.state.copy_download}
+                                            onChange={() =>
+                                                this.handleSwitch(
+                                                    "copy_download"
+                                                )
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -719,7 +670,9 @@ class HODModal extends Component {
                                     <div className="col-3 text-right">
                                         <ReactSwitch
                                             checked={this.state.summary}
-                                            onChange={this.handleSummaryChange}
+                                            onChange={() =>
+                                                this.handleSwitch("summary")
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -731,8 +684,10 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.directquestion}
-                                            onChange={this.handleDQChange}
+                                            checked={this.state.direct_q}
+                                            onChange={() =>
+                                                this.handleSwitch("direct_q")
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -744,9 +699,11 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.configure}
-                                            onChange={
-                                                this.handleConfigureChange
+                                            checked={this.state.config_course}
+                                            onChange={() =>
+                                                this.handleSwitch(
+                                                    "config_course"
+                                                )
                                             }
                                         />
                                     </div>
@@ -759,9 +716,9 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.simulationexam}
-                                            onChange={
-                                                this.handleSimulationChange
+                                            checked={this.state.sim_exam}
+                                            onChange={() =>
+                                                this.handleSwitch("sim_exam")
                                             }
                                         />
                                     </div>
@@ -774,9 +731,9 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.lockingoftest}
-                                            onChange={
-                                                this.handleLockingoftestChange
+                                            checked={this.state.lock_test}
+                                            onChange={() =>
+                                                this.handleSwitch("lock_test")
                                             }
                                         />
                                     </div>
@@ -789,9 +746,9 @@ class HODModal extends Component {
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.mobileapp}
-                                            onChange={
-                                                this.handleMobileappChange
+                                            checked={this.state.android_app}
+                                            onChange={() =>
+                                                this.handleSwitch("android_app")
                                             }
                                         />
                                     </div>

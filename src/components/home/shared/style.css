@@ -1,0 +1,341 @@
+/* -=-=-=-=-=-=-=-=-=-= Jumbotron carousel =-=-=-=-=-=-=-=-=-=- */
+
+.jumbotron-container {
+    min-height: 90vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.jumbotron-slide {
+    -webkit-animation-name: fade;
+    -webkit-animation-duration: 1.5s;
+    animation-name: fade;
+    animation-duration: 0.5s;
+}
+
+@keyframes fade {
+    from {
+        opacity: 0.8;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Arrow button */
+
+.jumbotron-arrow {
+    position: absolute;
+    top: 45%;
+    bottom: 50%;
+    background-color: #cccccc8f;
+    color: black;
+    border: none;
+    outline: none !important;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s ease-in-out;
+}
+
+.jumbotron-left-arrow {
+    left: 0;
+    margin-left: 10px;
+}
+
+.jumbotron-right-arrow {
+    right: 0;
+    margin-right: 10px;
+}
+
+.jumbotron-left-arrow i,
+.jumbotron-right-arrow i {
+    font-size: 18px;
+}
+
+.jumbotron-left-arrow:hover,
+.jumbotron-right-arrow:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Dot button */
+
+.jumbotron-dot {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.jumbotron-dot-btn {
+    width: 12px;
+    height: 12px;
+    margin: 5px;
+    border-radius: 50%;
+    background-color: var(--secondary);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.jumbotron-dot-btn.active,
+.jumbotron-dot-btn:hover {
+    background-color: var(--primary);
+}
+
+/* Jumbotron text */
+
+.jumbotron-text {
+    width: 55%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 70px;
+    animation: transform-slide 0.7s ease-in-out;
+}
+
+@keyframes transform-slide {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.jumbotron-heading {
+    font-size: 35px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    letter-spacing: 0.3px;
+    margin-bottom: 15px;
+    line-height: 55px;
+}
+
+.jumbotron-subheading {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary);
+    line-height: 45px;
+    margin-bottom: 40px;
+}
+
+@media screen and (max-width: 1024px) {
+    .jumbotron-text {
+        width: 65%;
+    }
+    .jumbotron-heading {
+        font-size: 30px;
+        margin-bottom: 10px;
+        line-height: 50px;
+    }
+    .jumbotron-subheading {
+        font-size: 18px;
+        margin-bottom: 25px;
+        line-height: 35px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .jumbotron-text {
+        width: 80%;
+    }
+    .jumbotron-heading {
+        font-size: 25px;
+        line-height: 45px;
+    }
+    .jumbotron-subheading {
+        font-size: 16px;
+        line-height: 35px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .jumbotron-text {
+        width: 100%;
+        padding: 20px;
+    }
+    .jumbotron-heading {
+        font-size: 20px;
+        line-height: 35px;
+    }
+    .jumbotron-subheading {
+        font-size: 14px;
+        line-height: 30px;
+    }
+}
+
+/* -=-=-=-=-=-=-=-=-=-= Features carousel =-=-=-=-=-=-=-=-=-=- */
+
+.feature-container {
+    min-height: 100vh;
+    position: relative;
+}
+
+.feature-section {
+    display: flex;
+    min-height: 100vh;
+}
+
+.feature-text {
+    width: 50%;
+    background-color: var(--primary);
+    padding: 60px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.feature-heading {
+    font-size: 35px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    animation: feature-slide 0.5s ease-in-out;
+}
+
+.feature-subheading {
+    font-size: 20px;
+    line-height: 35px;
+    margin-bottom: 20px;
+    animation: feature-slide 0.5s ease-in-out;
+}
+
+.feature-text a {
+    animation: feature-slide 0.5s ease-in-out;
+}
+
+@keyframes feature-slide {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.feature-images {
+    height: auto;
+    width: 50%;
+}
+
+/* Dot button */
+
+.feature-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.feature-dot-btn {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin: 25px;
+    background-color: white;
+    border: 1.5px solid var(--primary);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.feature-dot-btn > .feature-dot-btns {
+    width: 8.5px;
+    height: 8.5px;
+    border-radius: 50%;
+    background-color: var(--secondary);
+    transition: all 0.3s ease-in-out;
+}
+
+.feature-dot-btn > .feature-dot-btns.active,
+.feature-dot-btn:hover > .feature-dot-btns {
+    background-color: var(--primary);
+}
+
+@media screen and (max-width: 1024px) {
+    .feature-heading {
+        font-size: 25px;
+        margin-bottom: 20px;
+    }
+    .feature-subheading {
+        font-size: 16px;
+        line-height: 33px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .feature-text {
+        padding: 40px;
+    }
+    .feature-heading {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+    .feature-subheading {
+        font-size: 15px;
+        line-height: 30px;
+        margin-bottom: 15px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .feature-section {
+        flex-direction: column-reverse;
+    }
+    .feature-text {
+        padding: 30px;
+        width: 100%;
+        height: 50vh;
+    }
+    .feature-images {
+        width: 100%;
+        height: 50vh;
+    }
+    .feature-heading {
+        font-size: 20px;
+    }
+    .feature-subheading {
+        font-size: 14px;
+    }
+    .feature-text a {
+        font-size: 13px;
+    }
+    .feature-dot {
+        display: flex;
+    }
+    .feature-dot-btn {
+        width: 14px;
+        height: 14px;
+        margin: 10px;
+    }
+    .feature-dot-btn > .feature-dot-btns {
+        width: 7px;
+        height: 7px;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .feature-text {
+        padding: 20px;
+    }
+    .feature-heading {
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+    .feature-subheading{
+        line-height: 25px;
+        font-size: 13px;
+    }
+    .feature-dot-btn {
+        margin: 8px;
+    }
+}

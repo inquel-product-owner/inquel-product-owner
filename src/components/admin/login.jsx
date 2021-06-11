@@ -119,19 +119,19 @@ class AdminLogin extends Component {
         }
         return (
             <>
-                <Navbar className="secondary-bg py-2 px-4">
+                <Navbar className="secondary-bg py-2 px-4 sticky-top">
                     <Navbar.Brand>
                         <Link to="/">
                             <img src={logo} alt="Logo" />
                         </Link>
                     </Navbar.Brand>
                 </Navbar>
-                <div className="login">
-                    <div className="container">
-                        <div className="row justify-content-center align-items-center page-row">
-                            <div className="col-md-5">
-                                <div className="card shadow py-4">
-                                    <div className="card-body ">
+                <div className="login-reg-section">
+                    <div className="container py-5">
+                        <div className="row justify-content-center align-items-center w-100">
+                            <div className="col-lg-4 col-md-6 px-0">
+                                <div className="card shadow">
+                                    <div className="card-body">
                                         <h4 className="primary-text mb-4">
                                             ADMIN LOGIN
                                         </h4>
@@ -244,42 +244,54 @@ class AdminLogin extends Component {
                             </div>
                         </div>
                     </div>
-                </div>
-                <footer className="primary-bg p-4">
-                    <div className="container-fluid">
-                        <div className="row">
-                            <div className="col-md-6">
-                                <p className="mb-3 mb-md-0 text-white text-center text-md-left">
-                                    &copy;2020 Inquel inc. Powered By{" "}
-                                    <a
-                                        href="https://sachirva.com/"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="secondary-text"
-                                    >
-                                        Sachirva Technology Solutions
-                                    </a>
-                                </p>
-                            </div>
-                            <div className="col-md-6 ">
-                                <div className="d-flex justify-content-center justify-content-md-end ">
-                                    <Link to="/admin" className="text-white">
-                                        <i className="fab fa-facebook-f mr-4"></i>
-                                    </Link>
-                                    <Link to="/admin" className="text-white">
-                                        <i className="fab fa-twitter mr-4"></i>
-                                    </Link>
-                                    <Link to="/admin" className="text-white">
-                                        <i className="fab fa-instagram mr-4"></i>
-                                    </Link>
-                                    <Link to="/admin" className="text-white">
-                                        <i className="fab fa-linkedin-in mr-4"></i>
-                                    </Link>
+                    <footer className="primary-bg py-4">
+                        <div className="container-fluid">
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <p className="mb-3 mb-md-0 text-white text-center text-md-left">
+                                        &copy;2020 Inquel inc. Powered By{" "}
+                                        <a
+                                            href="https://sachirva.com/"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="secondary-text"
+                                        >
+                                            Sachirva Technology Solutions
+                                        </a>
+                                    </p>
+                                </div>
+                                <div className="col-md-6 ">
+                                    <div className="d-flex justify-content-center justify-content-md-end ">
+                                        <Link
+                                            to="/admin"
+                                            className="text-white"
+                                        >
+                                            <i className="fab fa-facebook-f mr-4"></i>
+                                        </Link>
+                                        <Link
+                                            to="/admin"
+                                            className="text-white"
+                                        >
+                                            <i className="fab fa-twitter mr-4"></i>
+                                        </Link>
+                                        <Link
+                                            to="/admin"
+                                            className="text-white"
+                                        >
+                                            <i className="fab fa-instagram mr-4"></i>
+                                        </Link>
+                                        <Link
+                                            to="/admin"
+                                            className="text-white"
+                                        >
+                                            <i className="fab fa-linkedin-in mr-4"></i>
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </footer>
+                    </footer>
+                </div>
             </>
         );
     }
