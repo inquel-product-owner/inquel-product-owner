@@ -66,7 +66,15 @@ export class Logout extends React.Component {
 
     render() {
         if (this.state.isLoggedOut) {
-            return <Redirect to={`/${this.props.path}/login`} />;
+            return (
+                <Redirect
+                    to={`${
+                        this.props.path === "student"
+                            ? "/login"
+                            : `/${this.props.path}/login`
+                    }`}
+                />
+            );
         }
         return (
             <>

@@ -3,7 +3,7 @@ import Wrapper from "./wrapper";
 import { Link } from "react-router-dom";
 import { Tabs, Tab } from "react-bootstrap";
 import Loading from "../common/loader";
-import LeaderboardTable from "../table/leaderboard";
+import LeaderboardTable from "../common/table/leaderboard";
 import Paginations from "../common/pagination";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";

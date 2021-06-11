@@ -6,7 +6,7 @@ import Select from "react-select";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/constant";
 import Loading from "../../common/loader";
-import SubjectTable from "../../table/subject";
+import SubjectTable from "../../common/table/subject";
 import Paginations from "../../common/pagination";
 import AlertBox from "../../common/alert";
 import {

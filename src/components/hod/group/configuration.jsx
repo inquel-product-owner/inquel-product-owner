@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/constant.js";
 import Loading from "../../common/loader";
-import GroupTable from "../../table/group";
+import GroupTable from "../../common/table/group";
 import Paginations from "../../common/pagination";
 import dateFormat from "dateformat";
 import AlertBox from "../../common/alert";

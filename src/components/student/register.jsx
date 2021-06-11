@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { Alert, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
-import AccountNavbar from "./shared/accountNavbar.jsx";
-import Footer from "./shared/footer";
+import TopNavbar from "../home/shared/navbar";
+import Footer from "../home/shared/footer";
 import Select from "react-select";
 import { country } from "../../shared/countries.js";
 
@@ -182,16 +182,21 @@ class StudentRegister extends Component {
 
     render() {
         if (this.state.isAccountCreated === true) {
-            return <Redirect to="/student/login" />;
+            return <Redirect to="/login" />;
         }
         return (
             <>
-                <AccountNavbar />
+                <TopNavbar />
 
-                <div className="login">
-                    <div className="container-fluid">
-                        <div className="row justify-content-center align-items-center page-row">
-                            <div className="col-md-5 col-sm-8">
+                <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{
+                        minHeight: "80vh",
+                    }}
+                >
+                    <div className="container-fluid py-5">
+                        <div className="row justify-content-center align-items-center">
+                            <div className="col-lg-4 col-md-6">
                                 <div className="card shadow py-2">
                                     <div className="card-body">
                                         <h4 className="primary-text">
@@ -519,7 +524,7 @@ class StudentRegister extends Component {
                                                     />
                                                     <label
                                                         className="custom-control-label"
-                                                        for="customCheck1"
+                                                        htmlFor="customCheck1"
                                                     >
                                                         I agree to the{" "}
                                                         <Link
@@ -578,7 +583,7 @@ class StudentRegister extends Component {
                                         <p className="text-center small mb-0">
                                             Click here to{" "}
                                             <Link
-                                                to="/student/login"
+                                                to="/login"
                                                 className="primary-text font-weight-bold"
                                             >
                                                 Login

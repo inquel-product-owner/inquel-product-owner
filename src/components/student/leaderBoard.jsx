@@ -3,7 +3,7 @@ import Wrapper from "./wrapper";
 import { Tabs, Tab } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Loading from "../common/loader";
-import LeaderboardTable from "../table/leaderboard";
+import LeaderboardTable from "../common/table/leaderboard";
 import Paginations from "../common/pagination";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
@@ -55,7 +55,7 @@ class Leaderboard extends Component {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb">
                         <li className="breadcrumb-item mb-3">
-                            <Link to="/student">
+                            <Link to="/dashboard">
                                 <i className="fas fa-home fa-sm"></i>
                             </Link>
                         </li>

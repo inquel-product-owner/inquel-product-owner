@@ -5,7 +5,7 @@ import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import CarouselCard from "../common/owlCarousel";
-import Footer from "./shared/footer";
+import Footer from "../home/shared/footer";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import { connect } from "react-redux";

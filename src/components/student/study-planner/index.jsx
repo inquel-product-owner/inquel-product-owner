@@ -19,7 +19,6 @@ import {
 } from "@syncfusion/ej2-react-schedule";
 import { createElement } from "@syncfusion/ej2-base";
 import { DropDownList } from "@syncfusion/ej2-dropdowns";
-import "../../table/material.css";
 import "./planner.css";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../../common/ErrorFallback";

@@ -23,7 +23,7 @@ class SideNav extends Component {
                                 } btn-sm mb-3`}
                             >
                                 <i
-                                    className="fas fa-home"
+                                    className="fas fa-tachometer-alt"
                                     style={{ marginLeft: "-1.5px" }}
                                 ></i>
                             </button>

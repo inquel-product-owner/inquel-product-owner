@@ -6,7 +6,7 @@ import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import Paginations from "../common/pagination";
-import SubjectTable from "../table/subject";
+import SubjectTable from "../common/table/subject";
 import CarouselCard from "../common/owlCarousel";
 import AlertBox from "../common/alert";
 
