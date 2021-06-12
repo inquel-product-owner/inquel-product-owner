@@ -431,7 +431,7 @@ class TeacherProfile extends Component {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb">
                                 <li className="breadcrumb-item">
-                                    <Link to="/dashboard">
+                                    <Link to="/teacher">
                                         <i className="fas fa-home fa-sm"></i>
                                     </Link>
                                 </li>

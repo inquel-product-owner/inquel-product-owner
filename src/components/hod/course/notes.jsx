@@ -371,7 +371,7 @@ class HODCourseNotes extends Component {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-3">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard">
+                            <Link to="/hod">
                                 <i className="fas fa-home fa-sm"></i>
                             </Link>
                         </li>

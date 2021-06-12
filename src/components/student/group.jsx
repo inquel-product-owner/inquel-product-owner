@@ -181,7 +181,7 @@ class Group extends Component {
                                                         </button>
                                                     </div>
                                                     <Link
-                                                        to={`/student/subject/${data.id}`}
+                                                        to={`/dashboard/subject/${data.id}`}
                                                         className="text-decoration-none"
                                                         onClick={() =>
                                                             storeDispatch(
@@ -196,19 +196,7 @@ class Group extends Component {
                                                                 cursor: "pointer",
                                                             }}
                                                         >
-                                                            <div className="row">
-                                                                <div className="col-9">
-                                                                    {
-                                                                        data.subject_name
-                                                                    }
-                                                                </div>
-                                                                <div className="col-3 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
+                                                            {data.subject_name}
                                                         </div>
                                                     </Link>
                                                 </div>
