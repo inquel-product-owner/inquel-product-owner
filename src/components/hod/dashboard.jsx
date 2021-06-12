@@ -274,8 +274,7 @@ class SubjectModal extends Component {
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
-                scrollable
-                backdrop="static"
+                // scrollable
             >
                 <Modal.Header closeButton>Create Subject</Modal.Header>
                 <Modal.Body>

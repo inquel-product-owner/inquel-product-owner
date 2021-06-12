@@ -45,43 +45,47 @@ class StudyPlanner extends Component {
         };
         this.data = [
             {
-                Id: 1,
-                Subject: "Explosion of Betelgeuse Star",
-                StartTime: "2021-05-06T04:00:00.000Z",
-                EndTime: "2021-05-06T04:00:00.000Z",
-                Description: "Some text",
-                IsAllDay: true,
-                Alert: false,
+                eventId: 1,
+                subject: "Explosion of Betelgeuse Star",
+                startTime: "2021-06-12T04:00:00.000Z",
+                endTime: "2021-06-12T04:00:00.000Z",
+                description: "Some text",
+                isAllDay: true,
+                reminder: "5",
             },
             {
-                Id: 2,
-                Subject: "Thule Air Crash Report",
-                StartTime: new Date(2021, 4, 12, 12, 0),
-                EndTime: new Date(2021, 4, 12, 14, 0),
-                Description: "Some text",
+                eventId: 2,
+                subject: "Thule Air Crash Report",
+                startTime: new Date(2021, 5, 11, 12, 0),
+                endTime: new Date(2021, 5, 11, 14, 0),
+                description: "Some text",
             },
             {
-                Id: 3,
-                Subject: "Blue Moon Eclipse",
-                StartTime: new Date(2021, 4, 13, 9, 30),
-                EndTime: new Date(2021, 4, 13, 11, 0),
-                Description: "Some text",
+                eventId: 3,
+                subject: "Blue Moon Eclipse",
+                startTime: new Date(2021, 5, 13, 9, 30),
+                endTime: new Date(2021, 5, 13, 11, 0),
+                description: "Some text",
             },
             {
-                Id: 4,
-                Subject: "Meteor Showers in 2018",
-                StartTime: new Date(2021, 4, 14, 13, 0),
-                EndTime: new Date(2021, 4, 14, 14, 30),
-                Description: "Some text",
+                eventId: 4,
+                subject: "Meteor Showers in 2018",
+                startTime: new Date(2021, 5, 14, 13, 0),
+                endTime: new Date(2021, 5, 14, 14, 30),
+                description: "Some text",
+                recurrenceRule: "FREQ=DAILY;INTERVAL=1;COUNT=2",
             },
         ];
         this.fields = {
-            subject: { name: "Subject", validation: { required: true } },
+            id: "eventId",
+            subject: { name: "subject", validation: { required: true } },
             description: {
-                name: "Description",
+                name: "description",
             },
-            startTime: { name: "StartTime" },
-            endTime: { name: "EndTime" },
+            startTime: { name: "startTime" },
+            endTime: { name: "endTime" },
+            isAllDay: { name: "isAllDay" },
+            recurrenceRule: { name: "recurrenceRule" },
         };
     }
 
@@ -98,14 +102,8 @@ class StudyPlanner extends Component {
         elem.parentNode.removeChild(elem);
     };
 
-    onChange() {
-        console.log("triggered");
-    }
-
     onPopupOpen(args) {
         if (args.type === "Editor") {
-            console.log(this.scheduleObj);
-
             if (!args.element.querySelector(".custom-field-row")) {
                 let row = createElement("div", {
                     className: "custom-field-row",
@@ -121,23 +119,26 @@ class StudyPlanner extends Component {
                 });
                 let inputEle = createElement("input", {
                     className: "e-field",
-                    attrs: { name: "Alert" },
+                    attrs: { name: "reminder" },
                 });
                 container.appendChild(inputEle);
                 row.appendChild(container);
                 let checkBox = new DropDownList({
                     dataSource: [
-                        { text: "Enable", value: true },
-                        { text: "Disable", value: false },
+                        { text: "None", value: "none" },
+                        { text: "0 Minutes", value: "0" },
+                        { text: "5 Minutes", value: "5" },
+                        { text: "15 Minutes", value: "15" },
+                        { text: "30 Minutes", value: "30" },
+                        { text: "60 Minutes", value: "60" },
                     ],
                     fields: { text: "text", value: "value" },
-                    value: args.data.Alert,
+                    value: args.data.reminder,
                     floatLabelType: "Always",
-                    placeholder: "Notification",
-                    index: 0,
+                    placeholder: "Reminder",
                 });
                 checkBox.appendTo(inputEle);
-                inputEle.setAttribute("name", "Alert");
+                inputEle.setAttribute("name", "reminder");
             }
         }
     }
@@ -188,6 +189,7 @@ class StudyPlanner extends Component {
                         >
                             <ScheduleComponent
                                 currentView="Month"
+                                height="90vh"
                                 rowAutoHeight={true}
                                 ref={(schedule) =>
                                     (this.scheduleObj = schedule)

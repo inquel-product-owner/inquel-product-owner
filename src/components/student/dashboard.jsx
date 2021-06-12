@@ -291,7 +291,7 @@ class Dashboard extends Component {
                                                                 </td>
                                                                 <td>
                                                                     <Link
-                                                                        to={`/student/group/${this.state.groupData.id}`}
+                                                                        to={`/dashboard/group/${this.state.groupData.id}`}
                                                                     >
                                                                         <button
                                                                             className="btn btn-primary btn-sm shadow-none"

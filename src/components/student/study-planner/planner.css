@@ -17,3 +17,7 @@
 .e-dlg-container {
     z-index: 1040 !important;
 }
+
+.e-past-app {
+    background-color: var(--warning) !important;
+}
