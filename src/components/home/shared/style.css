@@ -331,11 +331,121 @@
         margin-bottom: 8px;
         font-size: 18px;
     }
-    .feature-subheading{
+    .feature-subheading {
         line-height: 25px;
         font-size: 13px;
     }
     .feature-dot-btn {
         margin: 8px;
+    }
+}
+
+/* -=-=-=-=-=-=-=-=-=-= Features page Jumbotron =-=-=-=-=-=-=-=-=-=- */
+
+.features-jumbotron {
+    background-color: var(--light-pink);
+    text-align: center;
+}
+
+.features-jumbotron h1 {
+    color: var(--primary);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 35px;
+}
+
+.features-jumbotron p {
+    margin-bottom: 0;
+    color: var(--primary);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.features-section {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    overflow: hidden;
+    min-height: 60vh;
+}
+
+.features-text {
+    width: 50%;
+    background-color: var(--secondary);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.features-heading {
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.features-subheading {
+    line-height: 26px;
+}
+
+@media screen and (max-width: 1024px) {
+    .features-jumbotron h1 {
+        font-size: 30px;
+        letter-spacing: 0.5px;
+    }
+    .features-jumbotron p {
+        font-size: 16px;
+    }
+    .features-heading {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    .features-subheading {
+        line-height: 24px;
+        font-size: 15px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .features-jumbotron h1 {
+        font-size: 28px;
+    }
+    .features-jumbotron p {
+        font-size: 15px;
+    }
+    .features-heading {
+        font-size: 18px;
+    }
+    .features-subheading {
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .features-jumbotron h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+    .features-jumbotron p {
+        font-size: 14px;
+    }
+    .features-section {
+        flex-direction: column-reverse;
+    }
+    .features-text {
+        width: 100%;
+        padding: 20px;
+    }
+    .features-heading {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    .features-subheading {
+        font-size: 13px;
+        line-height: 22px;
     }
 }

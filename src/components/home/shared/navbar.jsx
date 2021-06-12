@@ -66,7 +66,17 @@ class TopNavbar extends React.Component {
                         className="ml-auto"
                     >
                         <Nav className="align-items-md-center">
-                            <Nav.Link as={Link} to="/" className="mr-2">
+                            <Nav.Link
+                                as={Link}
+                                to="/features"
+                                className={`${
+                                    this.props.activeLink
+                                        ? this.props.activeLink === "features"
+                                            ? "active"
+                                            : ""
+                                        : ""
+                                } mr-2`}
+                            >
                                 Features
                             </Nav.Link>
                             <Dropdown>
@@ -84,10 +94,31 @@ class TopNavbar extends React.Component {
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <Nav.Link as={Link} to="/" className="mr-2">
+                            <Nav.Link
+                                as={Link}
+                                to="/leaderboard"
+                                className={`${
+                                    this.props.activeLink
+                                        ? this.props.activeLink ===
+                                          "leaderboard"
+                                            ? "active"
+                                            : ""
+                                        : ""
+                                } mr-2`}
+                            >
                                 Leader Board
                             </Nav.Link>
-                            <Nav.Link as={Link} to="/" className="mr-2">
+                            <Nav.Link
+                                as={Link}
+                                to="/catalog"
+                                className={`${
+                                    this.props.activeLink
+                                        ? this.props.activeLink === "course"
+                                            ? "active"
+                                            : ""
+                                        : ""
+                                } mr-2`}
+                            >
                                 Buy a Course
                             </Nav.Link>
                             {!localStorage.getItem("Authorization") ||

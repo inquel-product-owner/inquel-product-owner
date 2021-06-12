@@ -12,9 +12,12 @@ class TeacherLeaderboard extends Component {
     constructor() {
         super();
         this.state = {
-            activePage: 1,
-            totalCount: 0,
             leaderBoard: [],
+            activeQuizPage: 1,
+            totalQuizCount: 0,
+            activeCoursePage: 1,
+            totalCourseCount: 0,
+
             page_loading: false,
             activeTab: "quiz",
         };
@@ -35,8 +38,11 @@ class TeacherLeaderboard extends Component {
         }
     };
 
-    handlePageChange(pageNumber) {
-        this.setState({ activePage: pageNumber });
+    handleQuizPageChange(pageNumber) {
+        this.setState({ activeQuizPage: pageNumber });
+    }
+    handleCoursePageChange(pageNumber) {
+        this.setState({ activeCoursePage: pageNumber });
     }
 
     handleSelect = (key) => {
@@ -80,11 +86,13 @@ class TeacherLeaderboard extends Component {
                                 leaderBoard={this.state.leaderBoard}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalCount > paginationCount ? (
+                                {this.state.totalQuizCount > paginationCount ? (
                                     <Paginations
-                                        activePage={this.state.activePage}
-                                        totalItemsCount={this.state.totalCount}
-                                        onChange={this.handlePageChange.bind(
+                                        activePage={this.state.activeQuizPage}
+                                        totalItemsCount={
+                                            this.state.totalQuizCount
+                                        }
+                                        onChange={this.handleQuizPageChange.bind(
                                             this
                                         )}
                                     />
@@ -100,11 +108,14 @@ class TeacherLeaderboard extends Component {
                                 leaderBoard={this.state.leaderBoard}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalCount > paginationCount ? (
+                                {this.state.totalCourseCount >
+                                paginationCount ? (
                                     <Paginations
-                                        activePage={this.state.activePage}
-                                        totalItemsCount={this.state.totalCount}
-                                        onChange={this.handlePageChange.bind(
+                                        activePage={this.state.activeCoursePage}
+                                        totalItemsCount={
+                                            this.state.totalCourseCount
+                                        }
+                                        onChange={this.handleCoursePageChange.bind(
                                             this
                                         )}
                                     />
