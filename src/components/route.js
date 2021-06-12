@@ -4,6 +4,8 @@ import { Route, Switch, Redirect } from "react-router-dom";
 // -------------------- Landing page Imports --------------------
 
 import Home from "./home";
+import Features from "./home/features";
+import HomeLeaderboard from "./home/leaderBoard";
 
 // -------------------- Admin Imports --------------------
 
@@ -147,7 +149,11 @@ import errorPage from "./home/404";
 
 const routes = (
     <Switch>
+        {/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= Landing page Routes =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */}
+
         <Route exact path="/" component={Home} />
+        <Route exact path="/features" component={Features} />
+        <Route exact path="/leaderboard" component={HomeLeaderboard} />
 
         {/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= Admin Routes =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */}
 

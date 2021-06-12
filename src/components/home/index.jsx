@@ -6,6 +6,10 @@ import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../common/ErrorFallback";
 
 class Home extends React.Component {
+    componentDidMount = () => {
+        document.title = "IQ Labs Academy";
+    };
+
     render() {
         return (
             <>

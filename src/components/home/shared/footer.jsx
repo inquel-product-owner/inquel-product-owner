@@ -43,7 +43,7 @@ export default function Footer() {
                                     QUICK LINKS
                                 </h5>
                                 <p className="mb-2">
-                                    <Link to="" className="text-light">
+                                    <Link to="/features" className="text-light">
                                         Features
                                     </Link>
                                 </p>
@@ -53,12 +53,12 @@ export default function Footer() {
                                     </Link>
                                 </p>
                                 <p className="mb-2">
-                                    <Link to="" className="text-light">
+                                    <Link to="/catalog" className="text-light">
                                         Buy a Course
                                     </Link>
                                 </p>
                                 <p className="mb-2">
-                                    <Link to="" className="text-light">
+                                    <Link to="/leaderboard" className="text-light">
                                         Leader Board
                                     </Link>
                                 </p>
