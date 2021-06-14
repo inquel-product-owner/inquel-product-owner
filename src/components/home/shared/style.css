@@ -222,13 +222,13 @@
 /* -=-=-=-=-=-=-=-=-=-= Features carousel section =-=-=-=-=-=-=-=-=-=- */
 
 .feature-container {
-    min-height: 100vh;
+    min-height: 90vh;
     position: relative;
 }
 
 .feature-section {
     display: flex;
-    min-height: 100vh;
+    min-height: 90vh;
 }
 
 .feature-text {
@@ -357,7 +357,7 @@
     .feature-dot-btn {
         width: 16px;
         height: 16px;
-        margin: 10px;
+        margin: 8px;
     }
     .feature-dot-btn > .feature-dot-btns {
         width: 8px;
@@ -378,7 +378,7 @@
         font-size: 13px;
     }
     .feature-dot-btn {
-        margin: 8px;
+        margin: 6px;
     }
 }
 

@@ -833,8 +833,8 @@ class HODCourse extends Component {
                     this.setState({
                         successMsg: result.msg,
                         showSuccessAlert: true,
-                        page_loading: false,
                     });
+                    this.loadCourseData();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -945,7 +945,8 @@ class HODCourse extends Component {
                             className="btn btn-primary btn-sm shadow-none"
                             onClick={this.handlePublish}
                         >
-                            <i className="fas fa-share-square mr-1"></i> Publish
+                            <i className="fas fa-share-square mr-1"></i>{" "}
+                            {this.state.data.publish ? "Published" : "Publish"}
                         </button>
                         {this.state.data.publish === false ? (
                             <Link to={`${this.props.match.url}/edit`}>
