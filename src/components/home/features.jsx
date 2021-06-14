@@ -73,10 +73,12 @@ const Features = () => {
     return (
         <>
             <Header activeLink="features" />
-            <div className="jumbotron features-jumbotron">
+
+            <header className="jumbotron">
                 <h1>Feature Listing</h1>
                 <p>Achieve your goals with Inquel</p>
-            </div>
+            </header>
+
             <ErrorBoundary
                 FallbackComponent={ErrorFallback}
                 onReset={() => window.location.reload()}
@@ -116,6 +118,7 @@ const Features = () => {
                     })}
                 </main>
             </ErrorBoundary>
+
             <Footer />
         </>
     );

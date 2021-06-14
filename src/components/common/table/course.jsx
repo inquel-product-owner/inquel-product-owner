@@ -10,72 +10,16 @@ import {
     Resize,
 } from "@syncfusion/ej2-react-grids";
 import "./grid-overview.css";
-import userimage from "../../../assets/user-v1.png";
 import { Link } from "react-router-dom";
 import dateFormat from "dateformat";
-
-function statusTemplate(props) {
-    return (
-        <div id="status" className="statustemp">
-            <span className="statustxt">
-                {props.is_active ? "Active" : "Inactive"}
-            </span>
-        </div>
-    );
-}
-
-function statusdetails(props) {
-    if (props.is_active) {
-        return (
-            <div className="statustemp e-activecolor">
-                <span className="statustxt e-activecolor">Active</span>
-            </div>
-        );
-    } else {
-        return (
-            <div className="statustemp e-inactivecolor">
-                <span className="statustxt e-inactivecolor">Inactive</span>
-            </div>
-        );
-    }
-}
-
-function nameTemplate(props) {
-    return (
-        <div className="d-flex align-items-center">
-            <div className="empimg">
-                <img
-                    src={
-                        props.profile_link !== null
-                            ? props.profile_link
-                            : userimage
-                    }
-                    alt={props.full_name ? props.full_name : props.username}
-                    className="profile-pic"
-                />
-            </div>
-            <span id="Emptext">
-                {props.full_name ? props.full_name : props.username}
-            </span>
-        </div>
-    );
-}
+import storeDispatch from "../../../redux/dispatch";
+import { COURSE } from "../../../redux/action";
 
 function dateTemplate(props) {
-    return dateFormat(props.date_joined, "dd/mm/yyyy");
+    return dateFormat(props.created_on, "dd/mm/yyyy");
 }
 
-function viewTemplate(props) {
-    return (
-        <Link to={`/admin/hod/${props.id}`}>
-            <button className="btn btn-link btn-sm shadow-none">
-                <i className="fas fa-eye"></i>
-            </button>
-        </Link>
-    );
-}
-
-class HODTable extends Component {
+class CourseTable extends Component {
     constructor() {
         super(...arguments);
         this.fields = { text: "text", value: "value" };
@@ -90,19 +34,11 @@ class HODTable extends Component {
             type: "Multiple",
             checkboxOnly: true,
         };
-        this.status = {
-            type: "CheckBox",
-            itemTemplate: statusdetails,
-        };
-        this.date = {
-            type: "Excel",
-            itemTemplate: dateTemplate,
-        };
         this.toolbarOptions = ["Search"];
     }
 
     onQueryCellInfo(args) {
-        if (args.column.field === "is_active") {
+        if (args.column.field === "status") {
             if (args.cell.textContent === "Active") {
                 args.cell
                     .querySelector(".statustxt")
@@ -133,7 +69,9 @@ class HODTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            if (this.props.handleHODId) this.props.handleHODId(element);
+            if (this.props.handleSubjectId) {
+                this.props.handleSubjectId(element);
+            }
         }
     }
 
@@ -144,9 +82,24 @@ class HODTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            if (this.props.handleHODId) this.props.handleHODId(element);
+            if (this.props.handleSubjectId) {
+                this.props.handleSubjectId(element);
+            }
         }
     }
+
+    viewTemplate = (props) => {
+        return (
+            <Link to={`/${this.props.path}/course/${props.course_id}`}>
+                <button
+                    className="btn btn-link btn-sm shadow-none"
+                    onClick={() => storeDispatch(COURSE, props.course_name)}
+                >
+                    <i className="fas fa-eye"></i>
+                </button>
+            </Link>
+        );
+    };
 
     render() {
         return (
@@ -154,9 +107,10 @@ class HODTable extends Component {
                 <div className="control-section">
                     <GridComponent
                         id="overviewgrid"
-                        dataSource={this.props.hodItems}
+                        dataSource={this.props.data}
                         enableHover={true}
                         rowHeight={50}
+                        width={"100%"}
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
@@ -166,7 +120,6 @@ class HODTable extends Component {
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
-                        allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                         rowSelected={this.rowSelected.bind(this)}
@@ -179,67 +132,41 @@ class HODTable extends Component {
                                 allowFiltering={false}
                             ></ColumnDirective>
                             <ColumnDirective
-                                field="id"
-                                visible={false}
-                                headerText="HOD ID"
+                                field="course_id"
+                                headerText="Course ID"
                                 isPrimaryKey={true}
+                                visible={false}
                             ></ColumnDirective>
                             <ColumnDirective
-                                field="full_name"
-                                headerText="Name"
-                                clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
-                                template={nameTemplate}
-                            />
-                            <ColumnDirective
-                                field="username"
-                                headerText="Username"
+                                field="course_name"
+                                headerText="Course title"
                                 clipMode="EllipsisWithTooltip"
                                 filter={this.excel}
                             />
-                            <ColumnDirective
-                                field="category"
-                                headerText="Category"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="sub_category"
-                                headerText="Sub category"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
-                            <ColumnDirective
-                                field="discipline"
-                                headerText="Discipline"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
                             <ColumnDirective
                                 field="board"
-                                headerText="Board University"
+                                headerText="Board"
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
-                                field="date_joined"
-                                filter={this.date}
-                                headerText="Registered On"
+                                field="type"
+                                headerText="Type"
+                                filter={this.excel}
+                                clipMode="EllipsisWithTooltip"
+                            />
+                            <ColumnDirective
+                                field="created_on"
+                                headerText="Created On"
                                 clipMode="EllipsisWithTooltip"
                                 template={dateTemplate}
-                            ></ColumnDirective>
-                            <ColumnDirective
-                                field="is_active"
-                                headerText="Status"
-                                filter={this.status}
-                                clipMode="EllipsisWithTooltip"
-                                template={statusTemplate}
+                                allowFiltering={false}
                             />
                             <ColumnDirective
                                 headerText="Action"
                                 allowSorting={false}
                                 allowFiltering={false}
-                                template={viewTemplate}
+                                template={this.viewTemplate}
                                 width="130"
                             />
                         </ColumnsDirective>
@@ -252,4 +179,4 @@ class HODTable extends Component {
     }
 }
 
-export default HODTable;
+export default CourseTable;
