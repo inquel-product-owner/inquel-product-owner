@@ -1,5 +1,4 @@
 import React from "react";
-import "../shared/style.css";
 
 const images = [
     "https://images.unsplash.com/photo-1491183672482-d0af0e44929d?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80",

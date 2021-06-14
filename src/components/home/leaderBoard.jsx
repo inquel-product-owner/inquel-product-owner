@@ -56,9 +56,11 @@ class HomeLeaderboard extends Component {
         return (
             <>
                 <Header activeLink="leaderboard" />
-                <div className="jumbotron features-jumbotron">
+
+                <header className="jumbotron">
                     <h1 className="mb-0">Leader Board</h1>
-                </div>
+                </header>
+
                 <ErrorBoundary
                     FallbackComponent={ErrorFallback}
                     onReset={() => window.location.reload()}
@@ -135,6 +137,7 @@ class HomeLeaderboard extends Component {
                     {/* Loading component */}
                     {this.state.page_loading ? <Loading /> : ""}
                 </ErrorBoundary>
+
                 <Footer />
             </>
         );

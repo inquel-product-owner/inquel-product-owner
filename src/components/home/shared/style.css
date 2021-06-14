@@ -1,4 +1,57 @@
-/* -=-=-=-=-=-=-=-=-=-= Jumbotron carousel =-=-=-=-=-=-=-=-=-=- */
+/* -=-=-=-=-=-=-=-=-=-= Jumbotron =-=-=-=-=-=-=-=-=-=- */
+
+.jumbotron {
+    background-color: var(--light-pink);
+    text-align: center;
+}
+
+.jumbotron h1 {
+    color: var(--primary);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 35px;
+}
+
+.jumbotron p {
+    margin-bottom: 0;
+    color: var(--primary);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+@media screen and (max-width: 1024px) {
+    .jumbotron h1 {
+        font-size: 30px;
+        letter-spacing: 0.5px;
+    }
+    .jumbotron p {
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .jumbotron h1 {
+        font-size: 28px;
+    }
+    .jumbotron p {
+        font-size: 15px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .jumbotron h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+    .jumbotron p {
+        font-size: 14px;
+    }
+}
+
+/* -=-=-=-=-=-=-=-=-=-= Home carousel section =-=-=-=-=-=-=-=-=-=- */
 
 .jumbotron-container {
     min-height: 90vh;
@@ -84,7 +137,7 @@
     background-color: var(--primary);
 }
 
-/* Jumbotron text */
+/* text */
 
 .jumbotron-text {
     width: 55%;
@@ -146,7 +199,7 @@
         width: 80%;
     }
     .jumbotron-heading {
-        font-size: 25px;
+        font-size: 28px;
         line-height: 45px;
     }
     .jumbotron-subheading {
@@ -158,19 +211,15 @@
 @media screen and (max-width: 500px) {
     .jumbotron-text {
         width: 100%;
-        padding: 20px;
+        padding: 30px;
     }
     .jumbotron-heading {
-        font-size: 20px;
-        line-height: 35px;
-    }
-    .jumbotron-subheading {
-        font-size: 14px;
-        line-height: 30px;
+        font-size: 24px;
+        margin-bottom: 15px;
     }
 }
 
-/* -=-=-=-=-=-=-=-=-=-= Features carousel =-=-=-=-=-=-=-=-=-=- */
+/* -=-=-=-=-=-=-=-=-=-= Features carousel section =-=-=-=-=-=-=-=-=-=- */
 
 .feature-container {
     min-height: 100vh;
@@ -278,12 +327,11 @@
     }
     .feature-heading {
         font-size: 22px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
     .feature-subheading {
         font-size: 15px;
         line-height: 30px;
-        margin-bottom: 15px;
     }
 }
 
@@ -303,23 +351,17 @@
     .feature-heading {
         font-size: 20px;
     }
-    .feature-subheading {
-        font-size: 14px;
-    }
-    .feature-text a {
-        font-size: 13px;
-    }
     .feature-dot {
         display: flex;
     }
     .feature-dot-btn {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
         margin: 10px;
     }
     .feature-dot-btn > .feature-dot-btns {
-        width: 7px;
-        height: 7px;
+        width: 8px;
+        height: 8px;
     }
 }
 
@@ -340,29 +382,264 @@
     }
 }
 
-/* -=-=-=-=-=-=-=-=-=-= Features page Jumbotron =-=-=-=-=-=-=-=-=-=- */
+/* -=-=-=-=-=-=-=-=-=-= Calendar section =-=-=-=-=-=-=-=-=-=- */
 
-.features-jumbotron {
-    background-color: var(--light-pink);
-    text-align: center;
+.calendar-container {
+    min-height: 100vh;
+    background-color: white;
+    position: relative;
+    z-index: 1;
 }
 
-.features-jumbotron h1 {
+.calendar-container .row {
+    min-height: inherit;
+}
+
+.calendar-container .img-section {
+    padding: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.calendar-container .text-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.calendar-container .text-section h1 {
     color: var(--primary);
-    margin-bottom: 10px;
-    letter-spacing: 1px;
-    font-weight: 600;
+    font-size: 38px;
+    letter-spacing: 0.3px;
     text-transform: uppercase;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 35px;
+    margin-bottom: 20px;
+    font-weight: 700;
 }
 
-.features-jumbotron p {
-    margin-bottom: 0;
-    color: var(--primary);
-    font-size: 18px;
-    font-weight: 600;
+.calendar-container .text-section h2 {
+    color: #4b4b4b;
+    font-size: 24px;
+    letter-spacing: 0.4px;
+    line-height: 36px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
 }
+
+.calendar-container .text-section h3 {
+    color: #4b4b4b;
+    font-size: 22px;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+    margin-bottom: 30px;
+}
+
+@media screen and (max-width: 1024px) {
+    .calendar-container .text-section h1 {
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+    .calendar-container .text-section h2 {
+        font-size: 20px;
+        margin-bottom: 25px;
+    }
+    .calendar-container .text-section h3 {
+        font-size: 18px;
+        margin-bottom: 25px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .calendar-container {
+        min-height: 90vh;
+    }
+    .calendar-container .img-section {
+        padding: 40px;
+    }
+    .calendar-container .text-section h1 {
+        font-size: 28px;
+        margin-bottom: 15px;
+    }
+    .calendar-container .text-section h2 {
+        font-size: 18px;
+        line-height: 32px;
+        margin-bottom: 20px;
+    }
+    .calendar-container .text-section h3 {
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .calendar-container .text-section {
+        padding: 0 40px 20px 40px;
+    }
+    .calendar-container .text-section h1 {
+        font-size: 25px;
+    }
+}
+
+/* -=-=-=-=-=-=-=-=-=-= Testimonial section =-=-=-=-=-=-=-=-=-=- */
+
+.testimonial-container {
+    min-height: 100vh;
+    padding: 50px 20px;
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.testimonial-container .section-heading {
+    text-align: center;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 70px;
+    position: relative;
+    z-index: 1;
+}
+
+.testimonial-container .card {
+    border-radius: 20px !important;
+}
+
+.testimonial-container .testimonial-user-img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 6px solid var(--primary);
+}
+
+.testimonial-container .testimonial-rank {
+    margin-bottom: 1px;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.testimonial-container .testimonial-role {
+    margin-bottom: 0;
+    color: var(--secondary);
+    font-size: 14px;
+}
+
+q {
+    quotes: "“" "”" "‘" "’";
+}
+
+q:before {
+    content: open-quote;
+    color: var(--secondary);
+    font-size: 40px;
+    margin-right: 4px;
+    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+        "Lucida Sans", Arial, sans-serif;
+}
+
+q:after {
+    content: close-quote;
+    color: var(--secondary);
+    font-size: 40px;
+    margin-left: 4px;
+    position: absolute;
+    bottom: 45px;
+    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+        "Lucida Sans", Arial, sans-serif;
+}
+
+.testimonial-container .testimonial-text {
+    font-size: 14px;
+    line-height: 24px;
+}
+
+.testimonial-container .testimonial-name {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 0;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.testimonial-container .slick-prev {
+    left: -25px;
+}
+
+.testimonial-container .slick-next {
+    right: -25px;
+}
+
+.testimonial-circle {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background-color: var(--light-pink);
+    z-index: 0;
+}
+
+.testimonial-top-left-circle {
+    top: -20%;
+    left: -10%;
+    border-bottom-right-radius: 75%;
+}
+
+.testimonial-bottom-right-circle {
+    bottom: -20%;
+    right: -10%;
+    border-top-left-radius: 75%;
+}
+
+@media screen and (max-width: 1024px) {
+    .testimonial-container .section-heading {
+        font-size: 33px;
+    }
+    .testimonial-top-left-circle {
+        top: -25%;
+        left: -15%;
+    }
+    .testimonial-bottom-right-circle {
+        right: -15%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .testimonial-container .section-heading {
+        font-size: 30px;
+    }
+    .testimonial-container .testimonial-text {
+        font-size: 13px;
+        line-height: 22px;
+    }
+    .testimonial-top-left-circle {
+        top: -30%;
+        left: -20%;
+    }
+    .testimonial-bottom-right-circle {
+        bottom: -25%;
+        right: -20%;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .testimonial-container {
+        min-height: 50vh;
+    }
+    .testimonial-container .section-heading {
+        font-size: 24px;
+        margin-bottom: 45px;
+    }
+    .testimonial-top-left-circle {
+        top: -40%;
+        left: -50%;
+    }
+    .testimonial-bottom-right-circle {
+        bottom: -35%;
+        right: -50%;
+    }
+}
+
+/* -=-=-=-=-=-=-=-=-=-= Features page =-=-=-=-=-=-=-=-=-=- */
 
 .features-section {
     display: flex;
@@ -393,13 +670,6 @@
 }
 
 @media screen and (max-width: 1024px) {
-    .features-jumbotron h1 {
-        font-size: 30px;
-        letter-spacing: 0.5px;
-    }
-    .features-jumbotron p {
-        font-size: 16px;
-    }
     .features-heading {
         font-size: 20px;
         margin-bottom: 10px;
@@ -411,28 +681,15 @@
 }
 
 @media screen and (max-width: 768px) {
-    .features-jumbotron h1 {
-        font-size: 28px;
-    }
-    .features-jumbotron p {
-        font-size: 15px;
-    }
     .features-heading {
         font-size: 18px;
     }
     .features-subheading {
-        font-size: 13px;
+        font-size: 14px;
     }
 }
 
 @media screen and (max-width: 500px) {
-    .features-jumbotron h1 {
-        font-size: 24px;
-        margin-bottom: 8px;
-    }
-    .features-jumbotron p {
-        font-size: 14px;
-    }
     .features-section {
         flex-direction: column-reverse;
     }
@@ -445,7 +702,6 @@
         margin-bottom: 8px;
     }
     .features-subheading {
-        font-size: 13px;
         line-height: 22px;
     }
 }
