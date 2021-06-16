@@ -385,20 +385,13 @@
 /* -=-=-=-=-=-=-=-=-=-= Calendar section =-=-=-=-=-=-=-=-=-=- */
 
 .calendar-container {
-    min-height: 100vh;
     background-color: white;
     position: relative;
     z-index: 1;
 }
 
-.calendar-container .row {
-    min-height: inherit;
-}
-
 .calendar-container .img-section {
     padding: 60px;
-    display: flex;
-    align-items: center;
 }
 
 .calendar-container .text-section {
@@ -449,9 +442,6 @@
 }
 
 @media screen and (max-width: 768px) {
-    .calendar-container {
-        min-height: 90vh;
-    }
     .calendar-container .img-section {
         padding: 40px;
     }
@@ -481,7 +471,6 @@
 /* -=-=-=-=-=-=-=-=-=-= Testimonial section =-=-=-=-=-=-=-=-=-=- */
 
 .testimonial-container {
-    min-height: 100vh;
     padding: 50px 20px;
     background-color: white;
     position: relative;
@@ -622,9 +611,6 @@ q:after {
 }
 
 @media screen and (max-width: 500px) {
-    .testimonial-container {
-        min-height: 50vh;
-    }
     .testimonial-container .section-heading {
         font-size: 24px;
         margin-bottom: 45px;
