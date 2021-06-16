@@ -1,14 +1,11 @@
 import React, { Component } from "react";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Wrapper from "./wrapper";
 import { Tabs, Tab, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, adminPathUrl, inquelAdminUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallback from "../common/ErrorFallback";
 import SubscriptionTable from "../common/table/subscription";
 import { paginationCount } from "../../shared/constant";
 import Paginations from "../common/pagination";
@@ -317,32 +314,46 @@ class CourseDetails extends Component {
 
 const CourseCard = (props) => {
     return (
-        <div className="row mt-3">
-            {props.data && props.data.length !== 0
-                ? props.data.map((list, index) => {
-                      return (
-                          <div className="col-md-3 col-sm-6 mb-3" key={index}>
+        <>
+            <div className="row mt-3">
+                {props.data.results && props.data.results.length !== 0
+                    ? props.data.results.map((list, index) => {
+                          return (
                               <div
-                                  className="card"
-                                  onClick={props.toggleCourseCard}
-                                  style={{
-                                      cursor: "pointer",
-                                  }}
+                                  className="col-md-3 col-sm-6 mb-3"
+                                  key={index}
                               >
-                                  <img
-                                      src={courseimg}
-                                      className="card-img-top"
-                                      alt={list.course_name}
-                                  />
-                                  <div className="card-body primary-bg text-white p-2">
-                                      {list.course_name}
+                                  <div
+                                      className="card"
+                                      onClick={props.toggleCourseCard}
+                                      style={{
+                                          cursor: "pointer",
+                                      }}
+                                  >
+                                      <img
+                                          src={courseimg}
+                                          className="card-img-top"
+                                          alt={list.course_name}
+                                      />
+                                      <div className="card-body primary-bg text-white p-2">
+                                          {list.course_name}
+                                      </div>
                                   </div>
                               </div>
-                          </div>
-                      );
-                  })
-                : "No data to display..."}
-        </div>
+                          );
+                      })
+                    : "No data to display..."}
+            </div>
+            {props.data.count > paginationCount ? (
+                <div className="d-flex justify-content-center w-100 mt-3">
+                    <Paginations
+                        activePage={props.activePage}
+                        totalItemsCount={props.data.count}
+                        onChange={props.handleOnChange.bind(this)}
+                    />
+                </div>
+            ) : null}
+        </>
     );
 };
 
@@ -350,7 +361,6 @@ class AdminDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showSubscriptionModal: false,
             showCourseCard: false,
             isTableView: true,
@@ -461,23 +471,12 @@ class AdminDashboard extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name="Admin"
-                    togglenav={() => {
-                        this.setState({
-                            showSideNav: !this.state.showSideNav,
-                        });
-                    }}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
+            <Wrapper
+                history={this.props.history}
+                header="Admin"
+                activeLink="dashboard"
+                hideBackButton={true}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -497,321 +496,278 @@ class AdminDashboard extends Component {
                 />
 
                 {/* Subscription create modal */}
-                <ErrorBoundary
-                    FallbackComponent={ErrorFallback}
-                    onReset={() => window.location.reload()}
-                >
-                    <SubscriptionModal
-                        show={this.state.showSubscriptionModal}
-                        onHide={this.toggleSubscriptionModal}
-                    />
-                </ErrorBoundary>
+                <SubscriptionModal
+                    show={this.state.showSubscriptionModal}
+                    onHide={this.toggleSubscriptionModal}
+                />
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <ErrorBoundary
-                        FallbackComponent={ErrorFallback}
-                        onReset={() => window.location.reload()}
+                <div className="row">
+                    <div
+                        className={`${
+                            this.state.showCourseCard ? "col-md-9" : "col-12"
+                        }`}
                     >
-                        <div className="container-fluid">
-                            <div className="row">
+                        {/* Stats */}
+                        <Statistics />
+
+                        {/* Filter area */}
+                        <div className="row align-items-center justify-content-center justify-content-md-end mb-3">
+                            <div className="col-md-6">
                                 <div
-                                    className={`${
-                                        this.state.showCourseCard
-                                            ? "col-md-9"
-                                            : "col-12"
-                                    }`}
+                                    className="btn-group btn-group-toggle"
+                                    data-toggle="buttons"
                                 >
-                                    {/* Stats */}
-                                    <Statistics />
-
-                                    {/* Filter area */}
-                                    <div className="row align-items-center justify-content-center justify-content-md-end mb-3">
-                                        <div className="col-md-6">
-                                            <div
-                                                className="btn-group btn-group-toggle"
-                                                data-toggle="buttons"
+                                    <OverlayTrigger
+                                        key="top1"
+                                        placement="top"
+                                        overlay={
+                                            <Tooltip
+                                                id="tooltip"
+                                                className="text-left"
                                             >
-                                                <OverlayTrigger
-                                                    key="top1"
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip
-                                                            id="tooltip"
-                                                            className="text-left"
-                                                        >
-                                                            Table View
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <label
-                                                        className={`btn btn-light ${
-                                                            this.state
-                                                                .isTableView
-                                                                ? "active"
-                                                                : ""
-                                                        }`}
-                                                    >
-                                                        <input
-                                                            type="radio"
-                                                            name="options"
-                                                            id="tableview"
-                                                            onChange={() => {
-                                                                this.setState({
-                                                                    isTableView: true,
-                                                                });
-                                                            }}
-                                                        />{" "}
-                                                        <i className="fas fa-th-list"></i>
-                                                    </label>
-                                                </OverlayTrigger>
-                                                <OverlayTrigger
-                                                    key="top2"
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip
-                                                            id="tooltip"
-                                                            className="text-left"
-                                                        >
-                                                            Card View
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <label
-                                                        className={`btn btn-light ${
-                                                            this.state
-                                                                .isTableView
-                                                                ? ""
-                                                                : "active"
-                                                        }`}
-                                                    >
-                                                        <input
-                                                            type="radio"
-                                                            name="options"
-                                                            id="cardview"
-                                                            onChange={() => {
-                                                                this.setState({
-                                                                    isTableView: false,
-                                                                });
-                                                            }}
-                                                        />{" "}
-                                                        <i className="fas fa-th-large"></i>
-                                                    </label>
-                                                </OverlayTrigger>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6 text-md-right text-center">
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none mr-1"
-                                                onClick={
-                                                    this.toggleSubscriptionModal
-                                                }
-                                            >
-                                                Create Subscription
-                                            </button>
-                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                                Delete
-                                            </button>
-                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                                Enable
-                                            </button>
-                                            <button className="btn btn-primary btn-sm shadow-none">
-                                                Disable
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Courses list */}
-                                    {this.state.isTableView ? (
-                                        <Tabs
-                                            activeKey={this.state.activeTab}
-                                            onSelect={(key) =>
-                                                this.setState({
-                                                    activeTab: key,
-                                                })
-                                            }
+                                                Table View
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <label
+                                            className={`btn btn-light ${
+                                                this.state.isTableView
+                                                    ? "active"
+                                                    : ""
+                                            }`}
                                         >
-                                            <Tab
-                                                eventKey="published"
-                                                title="Published"
+                                            <input
+                                                type="radio"
+                                                name="options"
+                                                id="tableview"
+                                                onChange={() => {
+                                                    this.setState({
+                                                        isTableView: true,
+                                                    });
+                                                }}
+                                            />{" "}
+                                            <i className="fas fa-th-list"></i>
+                                        </label>
+                                    </OverlayTrigger>
+                                    <OverlayTrigger
+                                        key="top2"
+                                        placement="top"
+                                        overlay={
+                                            <Tooltip
+                                                id="tooltip"
+                                                className="text-left"
                                             >
-                                                <div className="card shadow-sm">
-                                                    <SubscriptionTable
-                                                        data={
-                                                            this.state.published
-                                                                .results || []
-                                                        }
-                                                    />
-                                                    <div className="card-body p-3">
-                                                        {this.state.published
-                                                            .count >
-                                                        paginationCount ? (
-                                                            <Paginations
-                                                                activePage={
-                                                                    this.state
-                                                                        .activePublishedPage
-                                                                }
-                                                                totalItemsCount={
-                                                                    this.state
-                                                                        .published
-                                                                        .count
-                                                                }
-                                                                onChange={this.handlePublishedPageChange.bind(
-                                                                    this
-                                                                )}
-                                                            />
-                                                        ) : null}
-                                                    </div>
-                                                </div>
-                                            </Tab>
-                                            <Tab
-                                                eventKey="unpublished"
-                                                title="Ready for publishing"
-                                            >
-                                                <div className="card shadow-sm">
-                                                    <SubscriptionTable
-                                                        data={
-                                                            this.state
-                                                                .unpublished
-                                                                .results || []
-                                                        }
-                                                    />
-                                                    <div className="card-body p-3">
-                                                        {this.state.unpublished
-                                                            .count >
-                                                        paginationCount ? (
-                                                            <Paginations
-                                                                activePage={
-                                                                    this.state
-                                                                        .activeUnpublishPage
-                                                                }
-                                                                totalItemsCount={
-                                                                    this.state
-                                                                        .unpublished
-                                                                        .count
-                                                                }
-                                                                onChange={this.handleUnpublishPageChange.bind(
-                                                                    this
-                                                                )}
-                                                            />
-                                                        ) : null}
-                                                    </div>
-                                                </div>
-                                            </Tab>
-                                            <Tab
-                                                eventKey="hod_course"
-                                                title="HOD Course"
-                                            >
-                                                <div className="card shadow-sm">
-                                                    <CourseTable
-                                                        path="admin"
-                                                        data={
-                                                            this.state
-                                                                .hod_courses
-                                                                .results || []
-                                                        }
-                                                    />
-                                                    <div className="card-body p-3">
-                                                        {this.state.hod_courses
-                                                            .count >
-                                                        paginationCount ? (
-                                                            <Paginations
-                                                                activePage={
-                                                                    this.state
-                                                                        .activeHODCoursePage
-                                                                }
-                                                                totalItemsCount={
-                                                                    this.state
-                                                                        .hod_courses
-                                                                        .count
-                                                                }
-                                                                onChange={this.handleHODCoursePageChange.bind(
-                                                                    this
-                                                                )}
-                                                            />
-                                                        ) : null}
-                                                    </div>
-                                                </div>
-                                            </Tab>
-                                        </Tabs>
-                                    ) : (
-                                        // ---------- Card view ----------
-                                        <Tabs
-                                            activeKey={this.state.activeTab}
-                                            onSelect={(key) =>
-                                                this.setState({
-                                                    activeTab: key,
-                                                })
-                                            }
+                                                Card View
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <label
+                                            className={`btn btn-light ${
+                                                this.state.isTableView
+                                                    ? ""
+                                                    : "active"
+                                            }`}
                                         >
-                                            <Tab
-                                                eventKey="published"
-                                                title="Published"
-                                            >
-                                                <CourseCard
-                                                    data={
-                                                        this.state.published
-                                                            .results
-                                                    }
-                                                    toggleCourseCard={
-                                                        this.toggleCourseCard
-                                                    }
-                                                />
-                                            </Tab>
-                                            <Tab
-                                                eventKey="unpublished"
-                                                title="Ready for publishing"
-                                            >
-                                                <CourseCard
-                                                    data={
-                                                        this.state.unpublished
-                                                            .results
-                                                    }
-                                                    toggleCourseCard={
-                                                        this.toggleCourseCard
-                                                    }
-                                                />
-                                            </Tab>
-                                            <Tab
-                                                eventKey="hod_course"
-                                                title="HOD Course"
-                                            >
-                                                <CourseCard
-                                                    data={
-                                                        this.state.hod_courses
-                                                            .results
-                                                    }
-                                                    toggleCourseCard={
-                                                        this.toggleCourseCard
-                                                    }
-                                                />
-                                            </Tab>
-                                        </Tabs>
-                                    )}
+                                            <input
+                                                type="radio"
+                                                name="options"
+                                                id="cardview"
+                                                onChange={() => {
+                                                    this.setState({
+                                                        isTableView: false,
+                                                    });
+                                                }}
+                                            />{" "}
+                                            <i className="fas fa-th-large"></i>
+                                        </label>
+                                    </OverlayTrigger>
                                 </div>
+                            </div>
+                            <div className="col-md-6 text-md-right text-center">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.toggleSubscriptionModal}
+                                >
+                                    Create Subscription
+                                </button>
+                                <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                    Delete
+                                </button>
+                                <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                    Enable
+                                </button>
+                                <button className="btn btn-primary btn-sm shadow-none">
+                                    Disable
+                                </button>
+                            </div>
+                        </div>
 
-                                {this.state.showCourseCard ? (
-                                    <div className="col-md-3">
-                                        <CourseDetails
-                                            toggleCourseCard={
-                                                this.toggleCourseCard
+                        {/* Courses list */}
+                        {this.state.isTableView ? (
+                            <Tabs
+                                activeKey={this.state.activeTab}
+                                onSelect={(key) =>
+                                    this.setState({
+                                        activeTab: key,
+                                    })
+                                }
+                            >
+                                <Tab eventKey="published" title="Published">
+                                    <div className="card shadow-sm">
+                                        <SubscriptionTable
+                                            data={
+                                                this.state.published.results ||
+                                                []
                                             }
                                         />
+                                        <div className="card-body p-3">
+                                            {this.state.published.count >
+                                            paginationCount ? (
+                                                <Paginations
+                                                    activePage={
+                                                        this.state
+                                                            .activePublishedPage
+                                                    }
+                                                    totalItemsCount={
+                                                        this.state.published
+                                                            .count
+                                                    }
+                                                    onChange={this.handlePublishedPageChange.bind(
+                                                        this
+                                                    )}
+                                                />
+                                            ) : null}
+                                        </div>
                                     </div>
-                                ) : (
-                                    ""
-                                )}
-                            </div>
+                                </Tab>
+                                <Tab
+                                    eventKey="unpublished"
+                                    title="Ready for publishing"
+                                >
+                                    <div className="card shadow-sm">
+                                        <SubscriptionTable
+                                            data={
+                                                this.state.unpublished
+                                                    .results || []
+                                            }
+                                        />
+                                        <div className="card-body p-3">
+                                            {this.state.unpublished.count >
+                                            paginationCount ? (
+                                                <Paginations
+                                                    activePage={
+                                                        this.state
+                                                            .activeUnpublishPage
+                                                    }
+                                                    totalItemsCount={
+                                                        this.state.unpublished
+                                                            .count
+                                                    }
+                                                    onChange={this.handleUnpublishPageChange.bind(
+                                                        this
+                                                    )}
+                                                />
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                </Tab>
+                                <Tab eventKey="hod_course" title="HOD Course">
+                                    <div className="card shadow-sm">
+                                        <CourseTable
+                                            path="admin"
+                                            data={
+                                                this.state.hod_courses
+                                                    .results || []
+                                            }
+                                        />
+                                        <div className="card-body p-3">
+                                            {this.state.hod_courses.count >
+                                            paginationCount ? (
+                                                <Paginations
+                                                    activePage={
+                                                        this.state
+                                                            .activeHODCoursePage
+                                                    }
+                                                    totalItemsCount={
+                                                        this.state.hod_courses
+                                                            .count
+                                                    }
+                                                    onChange={this.handleHODCoursePageChange.bind(
+                                                        this
+                                                    )}
+                                                />
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                </Tab>
+                            </Tabs>
+                        ) : (
+                            // ---------- Card view ----------
+                            <Tabs
+                                activeKey={this.state.activeTab}
+                                onSelect={(key) =>
+                                    this.setState({
+                                        activeTab: key,
+                                    })
+                                }
+                            >
+                                <Tab eventKey="published" title="Published">
+                                    <CourseCard
+                                        data={this.state.published}
+                                        toggleCourseCard={this.toggleCourseCard}
+                                        activePage={
+                                            this.state.activePublishedPage
+                                        }
+                                        handleOnChange={
+                                            this.handlePublishedPageChange
+                                        }
+                                    />
+                                </Tab>
+                                <Tab
+                                    eventKey="unpublished"
+                                    title="Ready for publishing"
+                                >
+                                    <CourseCard
+                                        data={this.state.unpublished}
+                                        toggleCourseCard={this.toggleCourseCard}
+                                        activePage={
+                                            this.state.activeUnpublishPage
+                                        }
+                                        handleOnChange={
+                                            this.handleUnpublishPageChange
+                                        }
+                                    />
+                                </Tab>
+                                <Tab eventKey="hod_course" title="HOD Course">
+                                    <CourseCard
+                                        data={this.state.hod_courses}
+                                        toggleCourseCard={this.toggleCourseCard}
+                                        activePage={
+                                            this.state.activeHODCoursePage
+                                        }
+                                        handleOnChange={
+                                            this.handleHODCoursePageChange
+                                        }
+                                    />
+                                </Tab>
+                            </Tabs>
+                        )}
+                    </div>
 
-                            {/* Loading component */}
-                            {this.state.page_loading ? <Loading /> : ""}
+                    {this.state.showCourseCard ? (
+                        <div className="col-md-3">
+                            <CourseDetails
+                                toggleCourseCard={this.toggleCourseCard}
+                            />
                         </div>
-                    </ErrorBoundary>
+                    ) : (
+                        ""
+                    )}
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }
