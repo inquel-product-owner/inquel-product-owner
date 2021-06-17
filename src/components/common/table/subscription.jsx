@@ -10,8 +10,15 @@ import {
     Resize,
 } from "@syncfusion/ej2-react-grids";
 import "./grid-overview.css";
-import { Link } from "react-router-dom";
-import store from "../../../redux/store";
+import dateFormat from "dateformat";
+
+function dateTemplate(props) {
+    return dateFormat(props.created_on, "dd/mm/yyyy");
+}
+
+function durationTemplate(props) {
+    return `${props.duration_in_months} Months ${props.duration_in_days} Days`;
+}
 
 function statusTemplate(props) {
     return (
@@ -97,7 +104,7 @@ class SubscriptionTable extends Component {
                 element.push(selectedrecords[index].id.toString());
             }
             if (this.props.handleSubjectId) {
-                this.props.handleSubjectId(element);
+                this.props.handleId(element);
             }
         }
     }
@@ -110,25 +117,19 @@ class SubscriptionTable extends Component {
                 element.push(selectedrecords[index].id.toString());
             }
             if (this.props.handleSubjectId) {
-                this.props.handleSubjectId(element);
+                this.props.handleId(element);
             }
         }
     }
 
-    dispatch = (data) => {
-        store.dispatch({ type: "SUBJECT", payload: data });
-    };
-
-    viewTemplate = (props) => {
+    viewTemplate = () => {
         return (
-            <Link to={`/${this.props.path}/subject/${props.id}`}>
-                <button
-                    className="btn btn-link btn-sm shadow-none"
-                    onClick={() => this.dispatch(props.subject_name)}
-                >
-                    <i className="fas fa-eye"></i>
-                </button>
-            </Link>
+            <button
+                className="btn btn-link btn-sm shadow-none"
+                onClick={this.props.toggleDetails}
+            >
+                <i className="fas fa-eye"></i>
+            </button>
         );
     };
 
@@ -138,7 +139,7 @@ class SubscriptionTable extends Component {
                 <div className="control-section">
                     <GridComponent
                         id="overviewgrid"
-                        dataSource={this.props.subjectItems}
+                        dataSource={this.props.data}
                         enableHover={true}
                         rowHeight={50}
                         width={"100%"}
@@ -163,54 +164,50 @@ class SubscriptionTable extends Component {
                                 allowFiltering={false}
                             ></ColumnDirective>
                             <ColumnDirective
-                                field="id"
+                                field="subscription_id"
                                 headerText="Subscription ID"
                                 isPrimaryKey={true}
                                 visible={false}
                             ></ColumnDirective>
                             <ColumnDirective
-                                field="subscription_name"
+                                field="title"
                                 headerText="Name"
                                 clipMode="EllipsisWithTooltip"
                                 filter={this.excel}
                             />
                             <ColumnDirective
-                                field="subject"
-                                headerText="Subject"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="category"
-                                headerText="Category"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="sub_category"
-                                headerText="Sub category"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="subscription_id"
+                                field="search_id"
                                 headerText="Subscription ID"
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
-                                field="pricing"
+                                field="discounted_price"
                                 headerText="Pricing"
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
+                                field="duration"
+                                headerText="Duration"
+                                clipMode="EllipsisWithTooltip"
+                                template={durationTemplate}
+                                allowFiltering={false}
+                            />
+                            <ColumnDirective
+                                field="created_on"
+                                headerText="Created On"
+                                clipMode="EllipsisWithTooltip"
+                                template={dateTemplate}
+                                allowFiltering={false}
+                            />
+                            {/* <ColumnDirective
                                 field="status"
                                 headerText="Status"
                                 filter={this.status}
                                 clipMode="EllipsisWithTooltip"
                                 template={statusTemplate}
-                            />
+                            /> */}
                             <ColumnDirective
                                 headerText="Action"
                                 allowSorting={false}

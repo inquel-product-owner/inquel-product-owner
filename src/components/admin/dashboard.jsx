@@ -106,7 +106,7 @@ class CourseDetails extends Component {
                     <div className="card-header text-right p-1">
                         <button
                             className="btn btn-link btn-sm shadow-none"
-                            onClick={this.props.toggleCourseCard}
+                            onClick={this.props.toggleClose}
                         >
                             <i className="fas fa-times fa-sm ml-1"></i> Close
                         </button>
@@ -325,18 +325,30 @@ const CourseCard = (props) => {
                               >
                                   <div
                                       className="card"
-                                      onClick={props.toggleCourseCard}
+                                      onClick={
+                                          !props.course
+                                              ? props.toggleSubscriptionDetails
+                                              : () => {}
+                                      }
                                       style={{
-                                          cursor: "pointer",
+                                          cursor: `${
+                                              !props.course ? "pointer" : "auto"
+                                          }`,
                                       }}
                                   >
                                       <img
                                           src={courseimg}
                                           className="card-img-top"
-                                          alt={list.course_name}
+                                          alt={
+                                              list.course_name
+                                                  ? list.course_name
+                                                  : list.title
+                                          }
                                       />
                                       <div className="card-body primary-bg text-white p-2">
-                                          {list.course_name}
+                                          {list.course_name
+                                              ? list.course_name
+                                              : list.title}
                                       </div>
                                   </div>
                               </div>
@@ -362,7 +374,7 @@ class AdminDashboard extends Component {
         super(props);
         this.state = {
             showSubscriptionModal: false,
-            showCourseCard: false,
+            showSubscriptionDetails: false,
             isTableView: true,
             activeTab: "published",
 
@@ -396,17 +408,51 @@ class AdminDashboard extends Component {
         });
     };
 
-    toggleCourseCard = () => {
+    toggleSubscriptionDetails = () => {
         this.setState({
-            showCourseCard: !this.state.showCourseCard,
+            showSubscriptionDetails: true,
         });
+    };
+
+    loadUnpublishedSubscription = (page) => {
+        let URL =
+            page && page > 1
+                ? `${this.inquelURL}/subscription/?page=${page}`
+                : `${this.inquelURL}/subscription/`;
+        fetch(URL, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        unpublished: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     loadHODCourses = (page) => {
         let URL =
             page && page > 1
-                ? `${this.url}/hod/courses/?page=${page}`
-                : `${this.url}/hod/courses/`;
+                ? `${this.inquelURL}/hod/courses/?page=${page}`
+                : `${this.inquelURL}/hod/courses/`;
         fetch(URL, {
             method: "GET",
             headers: this.headers,
@@ -439,7 +485,16 @@ class AdminDashboard extends Component {
     componentDidMount = () => {
         document.title = "Dashboard - Admin | IQLabs";
 
+        this.loadUnpublishedSubscription();
         this.loadHODCourses();
+    };
+
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showSubscriptionModal: false,
+            });
+        }, 1000);
     };
 
     handlePublishedPageChange(pageNumber) {
@@ -499,12 +554,15 @@ class AdminDashboard extends Component {
                 <SubscriptionModal
                     show={this.state.showSubscriptionModal}
                     onHide={this.toggleSubscriptionModal}
+                    formSubmission={this.formSubmission}
                 />
 
                 <div className="row">
                     <div
                         className={`${
-                            this.state.showCourseCard ? "col-md-9" : "col-12"
+                            this.state.showSubscriptionDetails
+                                ? "col-md-9"
+                                : "col-12"
                         }`}
                     >
                         {/* Stats */}
@@ -584,25 +642,49 @@ class AdminDashboard extends Component {
                                 </div>
                             </div>
                             <div className="col-md-6 text-md-right text-center">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                    onClick={this.toggleSubscriptionModal}
-                                >
-                                    Create Subscription
-                                </button>
-                                <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                    Delete
-                                </button>
-                                <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                    Enable
-                                </button>
-                                <button className="btn btn-primary btn-sm shadow-none">
-                                    Disable
-                                </button>
+                                {this.state.activeTab === "hod_course" ? (
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                        onClick={this.toggleSubscriptionModal}
+                                    >
+                                        Create Subscription
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
+                                {this.state.activeTab === "published" ? (
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        disabled={
+                                            this.state.published.results &&
+                                            this.state.published.results
+                                                .length === 0
+                                                ? true
+                                                : false
+                                        }
+                                    >
+                                        Unpublish
+                                    </button>
+                                ) : this.state.activeTab === "hod_course" ? (
+                                    <button className="btn btn-primary btn-sm shadow-none">
+                                        Unpublish
+                                    </button>
+                                ) : (
+                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                        Publish
+                                    </button>
+                                )}
+                                {this.state.activeTab === "unpublished" ? (
+                                    <button className="btn btn-primary btn-sm shadow-none">
+                                        Delete
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                         </div>
 
-                        {/* Courses list */}
+                        {/* ---------- Table view ---------- */}
                         {this.state.isTableView ? (
                             <Tabs
                                 activeKey={this.state.activeTab}
@@ -618,6 +700,9 @@ class AdminDashboard extends Component {
                                             data={
                                                 this.state.published.results ||
                                                 []
+                                            }
+                                            toggleDetails={
+                                                this.toggleSubscriptionDetails
                                             }
                                         />
                                         <div className="card-body p-3">
@@ -650,6 +735,9 @@ class AdminDashboard extends Component {
                                                 this.state.unpublished
                                                     .results || []
                                             }
+                                            toggleDetails={
+                                                this.toggleSubscriptionDetails
+                                            }
                                         />
                                         <div className="card-body p-3">
                                             {this.state.unpublished.count >
@@ -674,7 +762,6 @@ class AdminDashboard extends Component {
                                 <Tab eventKey="hod_course" title="HOD Course">
                                     <div className="card shadow-sm">
                                         <CourseTable
-                                            path="admin"
                                             data={
                                                 this.state.hod_courses
                                                     .results || []
@@ -714,7 +801,9 @@ class AdminDashboard extends Component {
                                 <Tab eventKey="published" title="Published">
                                     <CourseCard
                                         data={this.state.published}
-                                        toggleCourseCard={this.toggleCourseCard}
+                                        toggleSubscriptionDetails={
+                                            this.toggleSubscriptionDetails
+                                        }
                                         activePage={
                                             this.state.activePublishedPage
                                         }
@@ -729,7 +818,9 @@ class AdminDashboard extends Component {
                                 >
                                     <CourseCard
                                         data={this.state.unpublished}
-                                        toggleCourseCard={this.toggleCourseCard}
+                                        toggleSubscriptionDetails={
+                                            this.toggleSubscriptionDetails
+                                        }
                                         activePage={
                                             this.state.activeUnpublishPage
                                         }
@@ -741,23 +832,30 @@ class AdminDashboard extends Component {
                                 <Tab eventKey="hod_course" title="HOD Course">
                                     <CourseCard
                                         data={this.state.hod_courses}
-                                        toggleCourseCard={this.toggleCourseCard}
+                                        toggleSubscriptionDetails={
+                                            this.toggleSubscriptionDetails
+                                        }
                                         activePage={
                                             this.state.activeHODCoursePage
                                         }
                                         handleOnChange={
                                             this.handleHODCoursePageChange
                                         }
+                                        course={true}
                                     />
                                 </Tab>
                             </Tabs>
                         )}
                     </div>
 
-                    {this.state.showCourseCard ? (
+                    {this.state.showSubscriptionDetails ? (
                         <div className="col-md-3">
                             <CourseDetails
-                                toggleCourseCard={this.toggleCourseCard}
+                                toggleClose={() => {
+                                    this.setState({
+                                        showSubscriptionDetails: false,
+                                    });
+                                }}
                             />
                         </div>
                     ) : (

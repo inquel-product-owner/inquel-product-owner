@@ -56,6 +56,7 @@ class Leaderboard extends Component {
                 header="Leaderboard"
                 activeLink="leaderboard"
                 history={this.props.history}
+                hideBackButton={true}
             >
                 {/* Breadcrumb */}
                 <nav aria-label="breadcrumb">
