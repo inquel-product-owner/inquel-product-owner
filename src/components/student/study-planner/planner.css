@@ -2,6 +2,7 @@
     width: 100% !important;
 }
 
+/* Removing timezone from editor */
 .e-time-zone-container {
     display: none !important;
 }
@@ -20,4 +21,8 @@
 
 .e-past-app {
     background-color: var(--warning) !important;
+}
+
+.e-quick-dialog-occurrence-event {
+    display: none !important;
 }

@@ -144,6 +144,12 @@ class CourseTable extends Component {
                                 filter={this.excel}
                             />
                             <ColumnDirective
+                                field="search_id"
+                                headerText="Course key"
+                                clipMode="EllipsisWithTooltip"
+                                filter={this.excel}
+                            />
+                            <ColumnDirective
                                 field="board"
                                 headerText="Board"
                                 filter={this.excel}
@@ -156,19 +162,29 @@ class CourseTable extends Component {
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
+                                field="hod.hod_username"
+                                headerText="Created By"
+                                filter={this.excel}
+                                clipMode="EllipsisWithTooltip"
+                            />
+                            <ColumnDirective
                                 field="created_on"
                                 headerText="Created On"
                                 clipMode="EllipsisWithTooltip"
                                 template={dateTemplate}
                                 allowFiltering={false}
                             />
-                            <ColumnDirective
-                                headerText="Action"
-                                allowSorting={false}
-                                allowFiltering={false}
-                                template={this.viewTemplate}
-                                width="130"
-                            />
+                            {this.props.path ? (
+                                <ColumnDirective
+                                    headerText="Action"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                    template={this.viewTemplate}
+                                    width="130"
+                                />
+                            ) : (
+                                ""
+                            )}
                         </ColumnsDirective>
                         <Inject services={[Filter, Sort, Toolbar, Resize]} />
                     </GridComponent>

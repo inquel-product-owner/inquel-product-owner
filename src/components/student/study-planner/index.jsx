@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
+import Wrapper from "../wrapper";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
@@ -20,21 +19,19 @@ import {
 import { createElement } from "@syncfusion/ej2-base";
 import { DropDownList } from "@syncfusion/ej2-dropdowns";
 import "./planner.css";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallback from "../../common/ErrorFallback";
+import dateFormat from "dateformat";
 
 class StudyPlanner extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
-            data: [],
+            events: [],
 
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            page_loading: false,
+            page_loading: true,
         };
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -47,8 +44,8 @@ class StudyPlanner extends Component {
             {
                 eventId: 1,
                 subject: "Explosion of Betelgeuse Star",
-                startTime: "2021-06-12T04:00:00.000Z",
-                endTime: "2021-06-12T04:00:00.000Z",
+                startTime: "2021-06-12 00:00:00",
+                endTime: "2021-06-12 00:00:00",
                 description: "Some text",
                 isAllDay: true,
                 reminder: "5",
@@ -77,7 +74,6 @@ class StudyPlanner extends Component {
             },
         ];
         this.fields = {
-            id: "eventId",
             subject: { name: "subject", validation: { required: true } },
             description: {
                 name: "description",
@@ -89,14 +85,40 @@ class StudyPlanner extends Component {
         };
     }
 
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
+    loadCalendarEvents = () => {
+        fetch(`${this.url}/student/studyplanner/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        events: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     componentDidMount = () => {
         document.title = "Study Planner - Student | IQLabs";
+
+        this.loadCalendarEvents();
 
         var elem = document.querySelector(".e-location-container");
         elem.parentNode.removeChild(elem);
@@ -145,14 +167,184 @@ class StudyPlanner extends Component {
 
     actionBegin(args) {
         console.log(args);
+
+        if (args.requestType === "eventCreate") {
+            try {
+                let data = {
+                    subject: args.data[0].subject,
+                    startTime: dateFormat(
+                        args.data[0].startTime,
+                        "yyyy-mm-dd HH:MM:ss"
+                    ),
+                    endTime: dateFormat(
+                        args.data[0].endTime,
+                        "yyyy-mm-dd HH:MM:ss"
+                    ),
+                    isAllDay: args.data[0].isAllDay,
+                    reminder: args.data[0].reminder || "none",
+                    recurrenceRule: args.data[0].recurrenceRule || "",
+                    description: args.data[0].description || "",
+                };
+                this.handlePOST(data, args);
+            } catch (error) {
+                console.log(error);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            }
+        } else if (args.requestType === "eventRemove") {
+            this.handleDelete(args.data[0]);
+        } else if (args.requestType === "eventChange") {
+            try {
+                let data = {
+                    subject: args.changedRecords[0].subject,
+                    startTime: dateFormat(
+                        args.changedRecords[0].startTime,
+                        "yyyy-mm-dd HH:MM:ss"
+                    ),
+                    endTime: dateFormat(
+                        args.changedRecords[0].endTime,
+                        "yyyy-mm-dd HH:MM:ss"
+                    ),
+                    isAllDay: args.changedRecords[0].isAllDay,
+                    reminder: args.changedRecords[0].reminder || "none",
+                    recurrenceRule: args.changedRecords[0].recurrenceRule || "",
+                    description: args.changedRecords[0].description || "",
+                };
+                this.handlePATCH(data, args.changedRecords[0]);
+            } catch (error) {
+                console.log(error);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            }
+        }
     }
+
+    handlePOST = (data, args) => {
+        this.setState({
+            page_loading: true,
+        });
+
+        fetch(`${this.url}/student/studyplanner/`, {
+            method: "POST",
+            headers: this.headers,
+            body: JSON.stringify(data),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                    this.loadCalendarEvents();
+                } else {
+                    this.scheduleObj.deleteEvent(args.data[0].id);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.scheduleObj.deleteEvent(args.data[0].id);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+    };
+
+    handlePATCH = (data, args) => {
+        this.setState({
+            page_loading: true,
+        });
+        
+        fetch(`${this.url}/student/studyplanner/${args.event_id}/`, {
+            method: "PATCH",
+            headers: this.headers,
+            body: JSON.stringify(data),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                    this.loadCalendarEvents();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+    };
+
+    handleDelete = (data) => {
+        this.setState({
+            page_loading: true,
+        });
+        
+        fetch(`${this.url}/student/studyplanner/${data.event_id}/`, {
+            method: "DELETE",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                    this.loadCalendarEvents();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+    };
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header name="Study Planner" togglenav={this.toggleSideNav} />
-
+            <Wrapper
+                header="Study Planner"
+                activeLink="calendar"
+                history={this.props.history}
+                hideBackButton={true}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -170,64 +362,42 @@ class StudyPlanner extends Component {
                         });
                     }}
                 />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="calendar"
-                />
-
-                <div
-                    className={`section content pb-2 ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
+                <ScheduleComponent
+                    currentView="Month"
+                    height="90vh"
+                    rowAutoHeight={true}
+                    ref={(schedule) => (this.scheduleObj = schedule)}
+                    popupOpen={this.onPopupOpen.bind(this)}
+                    eventSettings={{
+                        dataSource: this.state.events,
+                        fields: this.fields,
+                        enableTooltip: true,
+                    }}
+                    quickInfoOnSelectionEnd={true}
+                    actionBegin={this.actionBegin.bind(this)}
                 >
-                    <div className="container-fluid">
-                        <ErrorBoundary
-                            FallbackComponent={ErrorFallback}
-                            onReset={() => window.location.reload()}
-                        >
-                            <ScheduleComponent
-                                currentView="Month"
-                                height="90vh"
-                                rowAutoHeight={true}
-                                ref={(schedule) =>
-                                    (this.scheduleObj = schedule)
-                                }
-                                popupOpen={this.onPopupOpen.bind(this)}
-                                eventSettings={{
-                                    dataSource: this.data,
-                                    fields: this.fields,
-                                    enableTooltip: true,
-                                }}
-                                quickInfoOnSelectionEnd={true}
-                                actionBegin={this.actionBegin.bind(this)}
-                            >
-                                <ViewsDirective>
-                                    <ViewDirective option="Day" />
-                                    <ViewDirective option="Week" />
-                                    <ViewDirective option="Month" />
-                                    <ViewDirective option="Agenda" />
-                                </ViewsDirective>
-                                <Inject
-                                    services={[
-                                        Day,
-                                        Week,
-                                        WorkWeek,
-                                        Month,
-                                        Agenda,
-                                        Resize,
-                                        DragAndDrop,
-                                    ]}
-                                />
-                            </ScheduleComponent>
-                        </ErrorBoundary>
+                    <ViewsDirective>
+                        <ViewDirective option="Day" />
+                        <ViewDirective option="Week" />
+                        <ViewDirective option="Month" />
+                        <ViewDirective option="Agenda" />
+                    </ViewsDirective>
+                    <Inject
+                        services={[
+                            Day,
+                            Week,
+                            WorkWeek,
+                            Month,
+                            Agenda,
+                            Resize,
+                            DragAndDrop,
+                        ]}
+                    />
+                </ScheduleComponent>
 
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                    </div>
-                </div>
-            </div>
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }
