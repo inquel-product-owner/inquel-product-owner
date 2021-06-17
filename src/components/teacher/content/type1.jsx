@@ -10,7 +10,7 @@ import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import FileModal from "../shared/fileExplorer";
-import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
+import { SingleContentDeleteModal } from "../../common/modal/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
@@ -2346,7 +2346,7 @@ class TeacherType1 extends Component {
 
                 {/* MCQ Deletion Modal */}
                 {this.state.showMCQDelete_Modal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showMCQDelete_Modal}
                         onHide={this.toggleDeleteModal}
                         formSubmission={this.handleMCQ_Deletion}
@@ -2358,7 +2358,6 @@ class TeacherType1 extends Component {
                             topic_num: this.topicNum,
                             question_random_id: this.state.selectedQuestion,
                         }}
-                        toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
 

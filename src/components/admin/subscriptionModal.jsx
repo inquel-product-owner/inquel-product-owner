@@ -8,14 +8,16 @@ export default class SubscriptionModal extends Component {
     constructor() {
         super();
         this.state = {
-            category: [],
-            sub_category: [],
-            discipline: [],
-            levels: [],
-            subjects: [],
-            type: [],
-            board: [],
-            hod: [],
+            filter: {
+                category: [],
+                sub_category: [],
+                discipline: [],
+                levels: [],
+                subjects: [],
+                type: [],
+                board: [],
+                hod: [],
+            },
             selected: {
                 category: "",
                 sub_category: "",
@@ -37,10 +39,9 @@ export default class SubscriptionModal extends Component {
                 recommend_course: [],
                 discount_applicable: false,
             },
-            total_price: "",
+            total_price: 0,
 
             course_list: [],
-            course_ids: [],
             discounts: [],
 
             file: "",
@@ -74,8 +75,10 @@ export default class SubscriptionModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    let filter = this.state.filter;
+                    filter.category = result.data.category;
                     this.setState({
-                        category: result.data.category,
+                        filter: filter,
                         course_list: [],
                     });
                 } else {
@@ -104,15 +107,17 @@ export default class SubscriptionModal extends Component {
         data.board = "";
         data.type = "";
         data.hod = "";
+        let filter = this.state.filter;
+        filter.sub_category = [];
+        filter.discipline = [];
+        filter.levels = [];
+        filter.subjects = [];
+        filter.type = [];
+        filter.board = [];
+        filter.hod = [];
         this.setState({
             selected: data,
-            sub_category: [],
-            discipline: [],
-            levels: [],
-            subjects: [],
-            type: [],
-            board: [],
-            hod: [],
+            filter: filter,
             course_list: [],
         });
 
@@ -124,8 +129,10 @@ export default class SubscriptionModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
+                        let filter = this.state.filter;
+                        filter.sub_category = result.data.sub_category;
                         this.setState({
-                            sub_category: result.data.sub_category,
+                            filter: filter,
                         });
                     } else {
                         this.setState({
@@ -153,14 +160,16 @@ export default class SubscriptionModal extends Component {
         data.board = "";
         data.type = "";
         data.hod = "";
+        let filter = this.state.filter;
+        filter.discipline = [];
+        filter.levels = [];
+        filter.subjects = [];
+        filter.type = [];
+        filter.board = [];
+        filter.hod = [];
         this.setState({
             selected: data,
-            discipline: [],
-            levels: [],
-            subjects: [],
-            type: [],
-            board: [],
-            hod: [],
+            filter: filter,
             course_list: [],
         });
 
@@ -175,8 +184,10 @@ export default class SubscriptionModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
+                        let filter = this.state.filter;
+                        filter.discipline = result.data.discipline;
                         this.setState({
-                            discipline: result.data.discipline,
+                            filter: filter,
                         });
                     } else {
                         this.setState({
@@ -203,13 +214,15 @@ export default class SubscriptionModal extends Component {
         data.board = "";
         data.type = "";
         data.hod = "";
+        let filter = this.state.filter;
+        filter.levels = [];
+        filter.subjects = [];
+        filter.type = [];
+        filter.board = [];
+        filter.hod = [];
         this.setState({
             selected: data,
-            levels: [],
-            subjects: [],
-            type: [],
-            board: [],
-            hod: [],
+            filter: filter,
             course_list: [],
         });
 
@@ -224,8 +237,10 @@ export default class SubscriptionModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
+                        let filter = this.state.filter;
+                        filter.levels = result.data.level;
                         this.setState({
-                            levels: result.data.level,
+                            filter: filter,
                         });
                     } else {
                         this.setState({
@@ -251,12 +266,14 @@ export default class SubscriptionModal extends Component {
         data.board = "";
         data.type = "";
         data.hod = "";
+        let filter = this.state.filter;
+        filter.subjects = [];
+        filter.type = [];
+        filter.board = [];
+        filter.hod = [];
         this.setState({
             selected: data,
-            subjects: [],
-            type: [],
-            board: [],
-            hod: [],
+            filter: filter,
             course_list: [],
         });
 
@@ -271,8 +288,10 @@ export default class SubscriptionModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
+                        let filter = this.state.filter;
+                        filter.subjects = result.data.subject;
                         this.setState({
-                            subjects: result.data.subject,
+                            filter: filter,
                         });
                     } else {
                         this.setState({
@@ -297,11 +316,13 @@ export default class SubscriptionModal extends Component {
         data.board = "";
         data.type = "";
         data.hod = "";
+        let filter = this.state.filter;
+        filter.type = [];
+        filter.board = [];
+        filter.hod = [];
         this.setState({
             selected: data,
-            board: [],
-            type: [],
-            hod: [],
+            filter: filter,
             course_list: [],
         });
 
@@ -316,8 +337,10 @@ export default class SubscriptionModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
+                        let filter = this.state.filter;
+                        filter.board = result.data.board;
                         this.setState({
-                            board: result.data.board,
+                            filter: filter,
                         });
                     } else {
                         this.setState({
@@ -341,10 +364,12 @@ export default class SubscriptionModal extends Component {
         data.board = event.value;
         data.type = "";
         data.hod = "";
+        let filter = this.state.filter;
+        filter.type = [];
+        filter.hod = [];
         this.setState({
             selected: data,
-            type: [],
-            hod: [],
+            filter: filter,
             course_list: [],
         });
 
@@ -359,8 +384,10 @@ export default class SubscriptionModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
+                        let filter = this.state.filter;
+                        filter.type = result.data.type;
                         this.setState({
-                            type: result.data.type,
+                            filter: filter,
                         });
                     } else {
                         this.setState({
@@ -383,9 +410,11 @@ export default class SubscriptionModal extends Component {
         let data = this.state.selected;
         data.type = event.value;
         data.hod = "";
+        let filter = this.state.filter;
+        filter.hod = [];
         this.setState({
             selected: data,
-            hod: [],
+            filter: filter,
             course_list: [],
         });
 
@@ -400,8 +429,10 @@ export default class SubscriptionModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
+                        let filter = this.state.filter;
+                        filter.hod = result.data;
                         this.setState({
-                            hod: result.data,
+                            filter: filter,
                         });
                     } else {
                         this.setState({
@@ -488,35 +519,86 @@ export default class SubscriptionModal extends Component {
             });
     };
 
-    // ----- Subscription course adding & removing -----
-    handleAddCourse = (course_data) => {
-        let course_ids = this.state.course_ids;
-        let data = this.state.subscription_data;
-        data.courses.push({
-            course_id: course_data.course_id,
-            course_name: course_data.course_name,
-            price: "",
-        });
-        course_ids.push(course_data.course_id);
+    // ----- Subscription & Recommend course adding, removing -----
+    handleDragStart = (event, data) => {
+        event.dataTransfer.setData("data", JSON.stringify(data));
+        var node = document.getElementById(event.target.id);
+        if (node !== null) {
+            var crt = node.cloneNode(true);
+            crt.id = event.target.id + "-copy";
+            crt.classList.add("ghost-card");
+            document.getElementById("root").appendChild(crt);
+            event.dataTransfer.setDragImage(crt, 0, 0);
+        }
+    };
+
+    handleDragEnd = (event) => {
+        var id = event.target.id + "-copy";
+        var node = document.getElementById(id);
+        if (node !== null) {
+            node.parentNode.removeChild(node);
+        }
+    };
+
+    handleSubscriptionDrop = (event) => {
+        let data = JSON.parse(event.dataTransfer.getData("data")) || null;
+        let subscription = this.state.subscription_data;
+
+        if (data !== null) {
+            const found = subscription.courses.some(
+                (el) => el.course_id === data.course_id
+            );
+            if (!found) {
+                subscription.courses.push({
+                    course_id: data.course_id,
+                    course_name: data.course_name,
+                    price: "",
+                });
+            } else {
+                this.setState({
+                    errorMsg: "Course already added!",
+                    showErrorAlert: true,
+                });
+            }
+        }
 
         this.setState({
-            subscription_data: data,
-            course_ids: course_ids,
+            subscription_data: subscription,
+        });
+    };
+
+    handleRecommendDrop = (event) => {
+        let data = JSON.parse(event.dataTransfer.getData("data")) || null;
+        let subscription = this.state.subscription_data;
+
+        if (data !== null) {
+            const found = subscription.recommend_course.some(
+                (el) => el === data.course_id
+            );
+            if (!found) {
+                subscription.recommend_course.push(data.course_id);
+            } else {
+                this.setState({
+                    errorMsg: "Course already added!",
+                    showErrorAlert: true,
+                });
+            }
+        }
+
+        this.setState({
+            subscription_data: subscription,
         });
     };
 
     handleRemoveCourse = (index) => {
-        let course_ids = this.state.course_ids;
         let data = this.state.subscription_data;
         let total_price = 0;
 
         data.courses.splice(index, 1);
-        course_ids.splice(index, 1);
 
         this.setState(
             {
                 subscription_data: data,
-                course_ids: course_ids,
             },
             () => {
                 data.courses.forEach((data) => {
@@ -528,6 +610,16 @@ export default class SubscriptionModal extends Component {
                 });
             }
         );
+    };
+
+    handleRemoveRecommendCourse = (index) => {
+        let data = this.state.subscription_data;
+
+        data.recommend_course.splice(index, 1);
+
+        this.setState({
+            subscription_data: data,
+        });
     };
 
     // ----- Subscription user inputs -----
@@ -741,7 +833,8 @@ export default class SubscriptionModal extends Component {
         const data = this.state.subscription_data;
         return (
             <Modal
-                {...this.props}
+                show={this.props.show}
+                onHide={this.props.onHide}
                 size="xl"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
@@ -797,7 +890,8 @@ export default class SubscriptionModal extends Component {
                                                 name="category"
                                                 id="category"
                                                 options={(
-                                                    this.state.category || []
+                                                    this.state.filter
+                                                        .category || []
                                                 ).map((list) => {
                                                     return {
                                                         value: list.code,
@@ -805,7 +899,8 @@ export default class SubscriptionModal extends Component {
                                                     };
                                                 })}
                                                 value={(
-                                                    this.state.category || []
+                                                    this.state.filter
+                                                        .category || []
                                                 ).map((list) => {
                                                     return this.state.selected
                                                         .category === list.code
@@ -834,7 +929,8 @@ export default class SubscriptionModal extends Component {
                                                 name="discipline"
                                                 id="discipline"
                                                 options={(
-                                                    this.state.discipline || []
+                                                    this.state.filter
+                                                        .discipline || []
                                                 ).map((list) => {
                                                     return {
                                                         value: list.code,
@@ -842,7 +938,8 @@ export default class SubscriptionModal extends Component {
                                                     };
                                                 })}
                                                 value={(
-                                                    this.state.discipline || []
+                                                    this.state.filter
+                                                        .discipline || []
                                                 ).map((list) => {
                                                     return this.state.selected
                                                         .discipline ===
@@ -878,7 +975,8 @@ export default class SubscriptionModal extends Component {
                                                 name="subject"
                                                 id="subject"
                                                 options={(
-                                                    this.state.subjects || []
+                                                    this.state.filter
+                                                        .subjects || []
                                                 ).map((list) => {
                                                     return {
                                                         value: list.code,
@@ -886,7 +984,8 @@ export default class SubscriptionModal extends Component {
                                                     };
                                                 })}
                                                 value={(
-                                                    this.state.subjects || []
+                                                    this.state.filter
+                                                        .subjects || []
                                                 ).map((list) => {
                                                     return this.state.selected
                                                         .subjects === list.code
@@ -919,7 +1018,7 @@ export default class SubscriptionModal extends Component {
                                                 name="type"
                                                 id="type"
                                                 options={(
-                                                    this.state.type || []
+                                                    this.state.filter.type || []
                                                 ).map((list) => {
                                                     return {
                                                         value: list.code,
@@ -927,7 +1026,7 @@ export default class SubscriptionModal extends Component {
                                                     };
                                                 })}
                                                 value={(
-                                                    this.state.type || []
+                                                    this.state.filter.type || []
                                                 ).map((list) => {
                                                     return this.state.selected
                                                         .type === list.code
@@ -963,7 +1062,7 @@ export default class SubscriptionModal extends Component {
                                                 isSearchable={true}
                                                 name="sub_category"
                                                 id="sub_category"
-                                                options={this.state.sub_category.map(
+                                                options={this.state.filter.sub_category.map(
                                                     (list) => {
                                                         return {
                                                             value: list.code,
@@ -972,8 +1071,8 @@ export default class SubscriptionModal extends Component {
                                                     }
                                                 )}
                                                 value={(
-                                                    this.state.sub_category ||
-                                                    []
+                                                    this.state.filter
+                                                        .sub_category || []
                                                 ).map((list) => {
                                                     return this.state.selected
                                                         .sub_category ===
@@ -1007,7 +1106,8 @@ export default class SubscriptionModal extends Component {
                                                 name="level"
                                                 id="level"
                                                 options={(
-                                                    this.state.levels || []
+                                                    this.state.filter.levels ||
+                                                    []
                                                 ).map((list) => {
                                                     return {
                                                         value: list.code,
@@ -1015,7 +1115,8 @@ export default class SubscriptionModal extends Component {
                                                     };
                                                 })}
                                                 value={(
-                                                    this.state.levels || []
+                                                    this.state.filter.levels ||
+                                                    []
                                                 ).map((list) => {
                                                     return this.state.selected
                                                         .levels === list.code
@@ -1050,7 +1151,8 @@ export default class SubscriptionModal extends Component {
                                                 name="board"
                                                 id="board"
                                                 options={(
-                                                    this.state.board || []
+                                                    this.state.filter.board ||
+                                                    []
                                                 ).map((list) => {
                                                     return {
                                                         value: list.code,
@@ -1058,7 +1160,8 @@ export default class SubscriptionModal extends Component {
                                                     };
                                                 })}
                                                 value={(
-                                                    this.state.board || []
+                                                    this.state.filter.board ||
+                                                    []
                                                 ).map((list) => {
                                                     return this.state.selected
                                                         .board === list.code
@@ -1091,7 +1194,7 @@ export default class SubscriptionModal extends Component {
                                                 name="hod"
                                                 id="hod"
                                                 options={(
-                                                    this.state.hod || []
+                                                    this.state.filter.hod || []
                                                 ).map((list) => {
                                                     return {
                                                         value: list.id,
@@ -1101,7 +1204,7 @@ export default class SubscriptionModal extends Component {
                                                     };
                                                 })}
                                                 value={(
-                                                    this.state.hod || []
+                                                    this.state.filter.hod || []
                                                 ).map((list) => {
                                                     return this.state.selected
                                                         .hod === list.id
@@ -1139,44 +1242,37 @@ export default class SubscriptionModal extends Component {
                                 <div className="card-header p-2 font-weight-bold-600">
                                     Course List
                                 </div>
-                                <div className="card-body p-3">
-                                    {this.state.course_list
-                                        ? (this.state.course_list || []).map(
-                                              (list, index) => {
-                                                  return !this.state.course_ids.includes(
-                                                      list.course_id
-                                                  ) ? (
-                                                      <div
-                                                          key={index}
-                                                          className="d-flex align-items-center mb-2"
-                                                      >
-                                                          <p className="small font-weight-bold-600 w-100 mr-2 mb-0">
-                                                              {list.course_name}
-                                                          </p>
-                                                          <span
-                                                              style={{
-                                                                  cursor: "pointer",
-                                                              }}
-                                                              onClick={() => {
-                                                                  this.handleAddCourse(
-                                                                      list
-                                                                  );
-                                                              }}
-                                                          >
-                                                              <i className="fas fa-plus-circle"></i>
-                                                          </span>
-                                                      </div>
-                                                  ) : (
-                                                      ""
-                                                  );
-                                              }
-                                          )
-                                        : ""}
+                                <div className="card-body px-2 pb-2 pt-0">
+                                    {(this.state.course_list || []).map(
+                                        (list, index) => {
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className="p-1 rounded-lg"
+                                                    id={list.course_id}
+                                                    onDragStart={(e) =>
+                                                        this.handleDragStart(
+                                                            e,
+                                                            list
+                                                        )
+                                                    }
+                                                    onDragEnd={(e) =>
+                                                        this.handleDragEnd(e)
+                                                    }
+                                                    draggable
+                                                >
+                                                    <p className="small font-weight-bold-600 w-100 mb-0">
+                                                        {list.course_name}
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+                                    )}
                                 </div>
                             </div>
 
                             <div className="row mt-3">
-                                {/* ----- Image upload & Discounts ----- */}
+                                {/* ----- Image upload ----- */}
                                 <div className="col-md-6">
                                     <p className="primary-text font-weight-bold-600 small">
                                         Upload image
@@ -1201,51 +1297,9 @@ export default class SubscriptionModal extends Component {
                                                 : "Choose file"}
                                         </label>
                                     </div>
-
-                                    <div className="custom-control custom-checkbox mb-3">
-                                        <input
-                                            type="checkbox"
-                                            className="custom-control-input"
-                                            id="discounts"
-                                            checked={
-                                                data.discount_applicable
-                                                    ? true
-                                                    : false
-                                            }
-                                            onChange={this.loadDiscounts}
-                                            disabled={
-                                                this.state.selected.subjects ===
-                                                ""
-                                                    ? true
-                                                    : false
-                                            }
-                                        />
-                                        <label
-                                            className="custom-control-label"
-                                            htmlFor="discounts"
-                                        >
-                                            Discounts applicable
-                                        </label>
-                                    </div>
-                                    <div className="d-flex flex-wrap small text-secondary">
-                                        {data.discount_applicable
-                                            ? (this.state.discounts || []).map(
-                                                  (list, index) => {
-                                                      return (
-                                                          <span
-                                                              className="bg-light border-secondary m-1 px-2 py-1 rounded-lg"
-                                                              key={index}
-                                                          >
-                                                              {list.coupon_name}
-                                                          </span>
-                                                      );
-                                                  }
-                                              )
-                                            : ""}
-                                    </div>
                                 </div>
 
-                                {/* ----- Search terms & Recommend course ----- */}
+                                {/* ----- Search terms ----- */}
                                 <div className="col-md-6">
                                     <div className="form-group">
                                         <label htmlFor="searchterms">
@@ -1296,7 +1350,117 @@ export default class SubscriptionModal extends Component {
                                             Press Enter to create search terms
                                         </small>
                                     </div>
-                                    {/* <div className="form-group"></div> */}
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                {/* ----- Discounts ----- */}
+                                <div className="col-md-4">
+                                    <div className="custom-control custom-checkbox mb-3">
+                                        <input
+                                            type="checkbox"
+                                            className="custom-control-input"
+                                            id="discounts"
+                                            checked={
+                                                data.discount_applicable
+                                                    ? true
+                                                    : false
+                                            }
+                                            onChange={this.loadDiscounts}
+                                            disabled={
+                                                this.state.selected.subjects ===
+                                                ""
+                                                    ? true
+                                                    : false
+                                            }
+                                        />
+                                        <label
+                                            className="custom-control-label"
+                                            htmlFor="discounts"
+                                        >
+                                            Discounts applicable
+                                        </label>
+                                    </div>
+                                    <div className="d-flex flex-wrap small text-secondary">
+                                        {data.discount_applicable
+                                            ? (this.state.discounts || []).map(
+                                                  (list, index) => {
+                                                      return (
+                                                          <span
+                                                              className="bg-light border-secondary m-1 px-2 py-1 rounded-lg"
+                                                              key={index}
+                                                          >
+                                                              {list.coupon_name}
+                                                          </span>
+                                                      );
+                                                  }
+                                              )
+                                            : ""}
+                                    </div>
+                                </div>
+
+                                {/* ----- Recommend course ----- */}
+                                <div className="col-md-8">
+                                    <div className="form-group">
+                                        <div
+                                            className="card border-secondary"
+                                            style={{ minHeight: "100px" }}
+                                            onDragOver={(e) =>
+                                                e.preventDefault()
+                                            }
+                                            onDrop={(e) =>
+                                                this.handleRecommendDrop(e)
+                                            }
+                                        >
+                                            <div className="card-header small font-weight-bold-600 p-2">
+                                                Recommend courses
+                                            </div>
+                                            <div className="card-body pt-0 px-2">
+                                                {(
+                                                    data.recommend_course || []
+                                                ).map((list, index) => {
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="d-flex align-items-center mb-1"
+                                                        >
+                                                            <p className="small font-weight-bold-600 w-100 mr-2 mb-0">
+                                                                {(
+                                                                    this.state
+                                                                        .course_list ||
+                                                                    []
+                                                                )
+                                                                    .filter(
+                                                                        (id) =>
+                                                                            id.course_id ===
+                                                                            list
+                                                                    )
+                                                                    .map(
+                                                                        (
+                                                                            name
+                                                                        ) => {
+                                                                            return name.course_name;
+                                                                        }
+                                                                    )}
+                                                            </p>
+                                                            <span
+                                                                style={{
+                                                                    cursor: "pointer",
+                                                                }}
+                                                                onClick={() => {
+                                                                    this.handleRemoveRecommendCourse(
+                                                                        index
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-minus-circle fa-sm"></i>
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1452,6 +1616,8 @@ export default class SubscriptionModal extends Component {
                             <div
                                 className="card border-secondary"
                                 style={{ minHeight: "180px" }}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => this.handleSubscriptionDrop(e)}
                             >
                                 <div className="table-responsive">
                                     <table className="table">
@@ -1573,35 +1739,68 @@ export default class SubscriptionModal extends Component {
 }
 
 export class SubscriptionUpdateModal extends Component {
+    constructor() {
+        super();
+        this.state = {
+            data: {},
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + inquelAdminUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
+        };
+    }
+
+    componentDidMount = () => {
+        fetch(`${this.url}/subscription/${this.props.data.subscription_id}/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        data: result,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                });
+            });
+    };
+
     render() {
         return (
             <Modal
-                {...this.props}
+                show={this.props.show}
+                onHide={this.props.onHide}
                 size="xl"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
+                scrollable
+                backdrop="static"
             >
-                <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">
-                        <h5 className="primary-text">Subscription Plans</h5>
-                    </Modal.Title>
-                </Modal.Header>
+                <Modal.Header closeButton>Update subscription</Modal.Header>
                 <Modal.Body>
                     <div className="row">
                         <div className="col-md-5 mb-3 mb-md-0">
-                            <div className="row align-items-center mb-4">
-                                <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0">Subscription ID</p>
-                                </div>
-                                <div className="col-md-8">
-                                    <input
-                                        type="text"
-                                        name="subscriptionid"
-                                        id="subscriptionid"
-                                        className="form-control form-control-sm form-shadow"
-                                    />
-                                </div>
-                            </div>
                             <div className="row align-items-center mb-4">
                                 <div className="col-md-4 mb-2 mb-md-0">
                                     <p className="mb-0">Title</p>
@@ -1720,6 +1919,20 @@ export class SubscriptionUpdateModal extends Component {
                         </div>
                     </div>
                 </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-link btn-sm shadow-none mr-1"
+                        onClick={this.props.onHide}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        Update
+                    </button>
+                </Modal.Footer>
             </Modal>
         );
     }

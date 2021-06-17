@@ -143,7 +143,7 @@ export class ContentUpdateModal extends Component {
 // ----------------------------------------------------------------------
 
 // Single Content DELETE modal
-export class ContentDeleteModal extends Component {
+export class SingleContentDeleteModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -261,7 +261,7 @@ export class ContentDeleteModal extends Component {
                 <Modal.Footer>
                     <button
                         className="btn btn-link btn-sm shadow-none mr-2"
-                        onClick={this.props.toggleModal}
+                        onClick={this.props.onHide}
                     >
                         Cancel
                     </button>
@@ -577,7 +577,7 @@ export class SingleContentDisableModal extends Component {
 }
 
 // Multi Content DISABLE modal
-export class ContentDisableModal extends Component {
+export class MultiContentDisableModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -865,7 +865,7 @@ export class SingleContentEnableModal extends Component {
 }
 
 // Multi Content ENABLE modal
-export class ContentEnableModal extends Component {
+export class MultiContentEnableModal extends Component {
     constructor(props) {
         super(props);
         this.state = {

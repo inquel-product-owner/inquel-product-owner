@@ -5,7 +5,7 @@ import { Modal, Spinner, Alert, Tabs, Tab, Dropdown } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
-import { ContentDeleteModal } from "../common/modal/contentManagementModal";
+import { SingleContentDeleteModal } from "../common/modal/contentManagementModal";
 
 class ContentAdding extends Component {
     constructor(props) {
@@ -789,10 +789,9 @@ class AdminMasterData extends Component {
 
                 {/* Content delete modal */}
                 {this.state.showDeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showDeleteModal}
                         onHide={this.handleDelete}
-                        toggleModal={this.handleDelete}
                         formSubmission={this.formSubmission}
                         url={`${this.url}/data/master/`}
                         name={this.state.selectedData.title}

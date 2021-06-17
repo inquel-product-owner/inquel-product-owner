@@ -10,8 +10,8 @@ import SubjectTable from "../../common/table/subject";
 import Paginations from "../../common/pagination";
 import AlertBox from "../../common/alert";
 import {
-    ContentDisableModal,
-    ContentEnableModal,
+    MultiContentDisableModal,
+    MultiContentEnableModal,
     MultiContentDeleteModal,
 } from "../../common/modal/contentManagementModal";
 import { connect } from "react-redux";
@@ -477,7 +477,7 @@ class HODGroup extends Component {
 
                 {/* Subject Disable Modal */}
                 {this.state.showSubject_DisableModal ? (
-                    <ContentDisableModal
+                    <MultiContentDisableModal
                         show={this.state.showSubject_DisableModal}
                         onHide={this.handleDisable}
                         toggleModal={this.handleDisable}
@@ -493,7 +493,7 @@ class HODGroup extends Component {
 
                 {/* Subject Enable Modal */}
                 {this.state.showSubject_EnableModal ? (
-                    <ContentEnableModal
+                    <MultiContentEnableModal
                         show={this.state.showSubject_EnableModal}
                         onHide={this.handleEnable}
                         toggleModal={this.handleEnable}

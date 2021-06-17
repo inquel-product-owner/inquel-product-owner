@@ -7,7 +7,7 @@ import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
-import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
+import { SingleContentDeleteModal } from "../../common/modal/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
@@ -559,7 +559,7 @@ class TeacherMatch extends Component {
 
                 {/* Match Deletion Modal */}
                 {this.state.showDeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showDeleteModal}
                         onHide={this.toggleDeleteModal}
                         formSubmission={this.handleMatch_Deletion}
@@ -569,7 +569,6 @@ class TeacherMatch extends Component {
                         data={{
                             match_id: this.state.selectedMatch,
                         }}
-                        toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
 

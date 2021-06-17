@@ -8,7 +8,7 @@ import Loading from "../../common/loader";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../common/alert";
 import {
-    ContentDeleteModal,
+    SingleContentDeleteModal,
     ContentUpdateModal,
 } from "../../common/modal/contentManagementModal";
 import {
@@ -844,7 +844,7 @@ class TeacherChapters extends Component {
 
                 {/* Topic Delete modal */}
                 {this.state.showTopic_DeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showTopic_DeleteModal}
                         onHide={this.toggleTopic_DeleteModal}
                         formSubmission={this.topic_formSubmission}
@@ -856,7 +856,6 @@ class TeacherChapters extends Component {
                             topic_num: this.state.selectedTopicData.topic_num,
                             ancestor: this.state.selectedTopicData.ancestor,
                         }}
-                        toggleModal={this.toggleTopic_DeleteModal}
                     />
                 ) : (
                     ""
@@ -898,7 +897,7 @@ class TeacherChapters extends Component {
 
                 {/* Cycle test Delete modal */}
                 {this.state.showCycle_DeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showCycle_DeleteModal}
                         onHide={this.toggleCycle_DeleteModal}
                         formSubmission={this.cycleTest_formSubmission}
@@ -910,7 +909,6 @@ class TeacherChapters extends Component {
                             cycle_test_id:
                                 this.state.selectedCycleData.cycle_test_id,
                         }}
-                        toggleModal={this.toggleCycle_DeleteModal}
                     />
                 ) : (
                     ""
@@ -977,7 +975,7 @@ class TeacherChapters extends Component {
 
                 {/* Quiz Delete modal */}
                 {this.state.showQuiz_DeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showQuiz_DeleteModal}
                         onHide={this.toggleQuiz_DeleteModal}
                         formSubmission={this.quiz_formSubmission}
@@ -987,7 +985,6 @@ class TeacherChapters extends Component {
                         data={{
                             quiz_id: this.state.selectedQuizData.quiz_id,
                         }}
-                        toggleModal={this.toggleQuiz_DeleteModal}
                     />
                 ) : (
                     ""

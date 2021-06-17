@@ -8,7 +8,7 @@ import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import {
-    ContentDeleteModal,
+    SingleContentDeleteModal,
     ContentUpdateModal,
 } from "../../common/modal/contentManagementModal";
 import ScoreCardTable from "../../common/scorecard";
@@ -1002,7 +1002,7 @@ class HODSubject extends Component {
 
                 {/* Simulation Delete modal */}
                 {this.state.showSimulationDeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showSimulationDeleteModal}
                         onHide={() => this.toggleSimulationModal("DELETE")}
                         formSubmission={this.simulationFormSubmission}
@@ -1013,7 +1013,6 @@ class HODSubject extends Component {
                             simulation_id:
                                 this.state.selectedSimulation.simulation_id,
                         }}
-                        toggleModal={() => this.toggleSimulationModal("DELETE")}
                     />
                 ) : (
                     ""

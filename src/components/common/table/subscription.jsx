@@ -20,32 +20,6 @@ function durationTemplate(props) {
     return `${props.duration_in_months} Months ${props.duration_in_days} Days`;
 }
 
-function statusTemplate(props) {
-    return (
-        <div id="status" className="statustemp">
-            <span className="statustxt">
-                {props.status ? "Active" : "Inactive"}
-            </span>
-        </div>
-    );
-}
-
-function statusdetails(props) {
-    if (props.status) {
-        return (
-            <div className="statustemp e-activecolor">
-                <span className="statustxt e-activecolor">Active</span>
-            </div>
-        );
-    } else {
-        return (
-            <div className="statustemp e-inactivecolor">
-                <span className="statustxt e-inactivecolor">Inactive</span>
-            </div>
-        );
-    }
-}
-
 class SubscriptionTable extends Component {
     constructor() {
         super(...arguments);
@@ -58,10 +32,6 @@ class SubscriptionTable extends Component {
         };
         this.Filter = {
             type: "Menu",
-        };
-        this.status = {
-            type: "CheckBox",
-            itemTemplate: statusdetails,
         };
         this.select = {
             persistSelection: true,
@@ -101,10 +71,7 @@ class SubscriptionTable extends Component {
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
-                element.push(selectedrecords[index].id.toString());
-            }
-            if (this.props.handleSubjectId) {
-                this.props.handleId(element);
+                element.push(selectedrecords[index].subscription_id.toString());
             }
         }
     }
@@ -114,22 +81,27 @@ class SubscriptionTable extends Component {
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
-                element.push(selectedrecords[index].id.toString());
-            }
-            if (this.props.handleSubjectId) {
-                this.props.handleId(element);
+                element.push(selectedrecords[index].subscription_id.toString());
             }
         }
     }
 
-    viewTemplate = () => {
+    viewTemplate = (props) => {
         return (
-            <button
-                className="btn btn-link btn-sm shadow-none"
-                onClick={this.props.toggleDetails}
-            >
-                <i className="fas fa-eye"></i>
-            </button>
+            <div className="d-flex">
+                <button
+                    className="btn btn-link btn-sm shadow-none"
+                    onClick={() => this.props.toggleEdit(props)}
+                >
+                    <i className="fas fa-edit fa-sm"></i>
+                </button>
+                <button
+                    className="btn btn-link btn-sm shadow-none"
+                    onClick={() => this.props.toggleDelete(props)}
+                >
+                    <i className="fas fa-trash fa-sm"></i>
+                </button>
+            </div>
         );
     };
 
@@ -201,20 +173,17 @@ class SubscriptionTable extends Component {
                                 template={dateTemplate}
                                 allowFiltering={false}
                             />
-                            {/* <ColumnDirective
-                                field="status"
-                                headerText="Status"
-                                filter={this.status}
-                                clipMode="EllipsisWithTooltip"
-                                template={statusTemplate}
-                            /> */}
-                            <ColumnDirective
-                                headerText="Action"
-                                allowSorting={false}
-                                allowFiltering={false}
-                                template={this.viewTemplate}
-                                width="130"
-                            />
+                            {this.props.showAction ? (
+                                <ColumnDirective
+                                    headerText="Action"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                    template={this.viewTemplate}
+                                    width="130"
+                                />
+                            ) : (
+                                ""
+                            )}
                         </ColumnsDirective>
                         <Inject services={[Filter, Sort, Toolbar, Resize]} />
                     </GridComponent>

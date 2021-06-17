@@ -12,9 +12,9 @@ import SubjectTable from "../common/table/subject";
 import Paginations from "../common/pagination";
 import AlertBox from "../common/alert";
 import {
-    ContentDeleteModal,
-    ContentDisableModal,
-    ContentEnableModal,
+    SingleContentDeleteModal,
+    MultiContentDisableModal,
+    MultiContentEnableModal,
     MultiContentDeleteModal,
     SingleContentDisableModal,
     SingleContentEnableModal,
@@ -859,7 +859,7 @@ class HODDashboard extends Component {
                 {this.state.showModal &&
                 this.state.content === "subject" &&
                 this.state.type === "DISABLE" ? (
-                    <ContentDisableModal
+                    <MultiContentDisableModal
                         show={this.state.showModal}
                         onHide={() => this.toggleModal("subject", "DISABLE")}
                         toggleModal={() =>
@@ -879,7 +879,7 @@ class HODDashboard extends Component {
                 {this.state.showModal &&
                 this.state.content === "subject" &&
                 this.state.type === "ENABLE" ? (
-                    <ContentEnableModal
+                    <MultiContentEnableModal
                         show={this.state.showModal}
                         onHide={() => this.toggleModal("subject", "ENABLE")}
                         toggleModal={() =>
@@ -899,10 +899,9 @@ class HODDashboard extends Component {
                 {this.state.showModal &&
                 this.state.content === "course" &&
                 this.state.type === "DELETE" ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showModal}
                         onHide={() => this.toggleModal("course", "DELETE")}
-                        toggleModal={() => this.toggleModal("course", "DELETE")}
                         formSubmission={this.formSubmission}
                         url={`${this.url}/hod/course/${this.state.selectedData.course_id}/`}
                         name={this.state.selectedData.course_name}

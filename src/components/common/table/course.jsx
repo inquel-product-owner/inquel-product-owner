@@ -67,7 +67,7 @@ class CourseTable extends Component {
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
-                element.push(selectedrecords[index].id.toString());
+                element.push(selectedrecords[index].course_id.toString());
             }
             if (this.props.handleSubjectId) {
                 this.props.handleSubjectId(element);
@@ -80,7 +80,7 @@ class CourseTable extends Component {
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
-                element.push(selectedrecords[index].id.toString());
+                element.push(selectedrecords[index].course_id.toString());
             }
             if (this.props.handleSubjectId) {
                 this.props.handleSubjectId(element);
