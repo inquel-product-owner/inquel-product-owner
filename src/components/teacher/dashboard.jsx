@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Wrapper from "./wrapper";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
@@ -8,8 +7,6 @@ import GroupTable from "../common/table/group";
 import SubjectTable from "../common/table/subject";
 import Paginations from "../common/pagination";
 import AlertBox from "../common/alert";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorFallback from "../common/ErrorFallback";
 
 class TeacherDashboard extends Component {
     constructor(props) {
@@ -135,10 +132,12 @@ class TeacherDashboard extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header name="Dashboard" togglenav={this.toggleSideNav} />
-
+            <Wrapper
+                header="Dashboard"
+                activeLink="dashboard"
+                history={this.props.history}
+                hideBackButton={true}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -156,97 +155,63 @@ class TeacherDashboard extends Component {
                         });
                     }}
                 />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        <ErrorBoundary
-                            FallbackComponent={ErrorFallback}
-                            onReset={() => window.location.reload()}
-                        >
-                            {/* Welcome */}
-                            <div className="card shadow-sm mb-4">
-                                <div className="card-body text-center p-4">
-                                    <h3 className="primary-text mb-0">
-                                        WELCOME BACK
-                                    </h3>
-                                </div>
-                            </div>
-
-                            {/* Group table */}
-                            <div className="card shadow-sm mb-4">
-                                <div className="card-header">
-                                    <h5 className="primary-text">Groups</h5>
-                                </div>
-                                <GroupTable
-                                    groupItems={this.state.groupItem}
-                                    path="teacher"
-                                    view={true}
-                                />
-                                <div className="card-body p-3">
-                                    {this.state.totalGroupCount >
-                                    paginationCount ? (
-                                        <Paginations
-                                            activePage={
-                                                this.state.activeGroupPage
-                                            }
-                                            totalItemsCount={
-                                                this.state.totalGroupCount
-                                            }
-                                            onChange={this.handleGroupPageChange.bind(
-                                                this
-                                            )}
-                                        />
-                                    ) : null}
-                                </div>
-                            </div>
-
-                            {/* Subject Table */}
-                            <div className="card shadow-sm mb-4">
-                                <div className="card-header">
-                                    <h5 className="primary-text">Subjects</h5>
-                                </div>
-                                <SubjectTable
-                                    subjectItems={this.state.subjectItem}
-                                    path="teacher"
-                                    category={true}
-                                    sub_category={true}
-                                    discipline={true}
-                                    level={true}
-                                    subject={true}
-                                />
-                                <div className="card-body p-3">
-                                    {this.state.totalSubjectCount >
-                                    paginationCount ? (
-                                        <Paginations
-                                            activePage={
-                                                this.state.activeSubjectPage
-                                            }
-                                            totalItemsCount={
-                                                this.state.totalSubjectCount
-                                            }
-                                            onChange={this.handleSubjectPageChange.bind(
-                                                this
-                                            )}
-                                        />
-                                    ) : null}
-                                </div>
-                            </div>
-                            {/* Loading component */}
-                            {this.state.page_loading ? <Loading /> : ""}
-                        </ErrorBoundary>
+                {/* Welcome */}
+                <div className="card shadow-sm mb-4">
+                    <div className="card-body text-center p-4">
+                        <h3 className="primary-text mb-0">WELCOME BACK</h3>
                     </div>
                 </div>
-            </div>
+
+                {/* Group table */}
+                <div className="card shadow-sm mb-4">
+                    <div className="card-header">
+                        <h5 className="primary-text">Groups</h5>
+                    </div>
+                    <GroupTable
+                        groupItems={this.state.groupItem}
+                        path="teacher"
+                        view={true}
+                    />
+                    <div className="card-body p-3">
+                        {this.state.totalGroupCount > paginationCount ? (
+                            <Paginations
+                                activePage={this.state.activeGroupPage}
+                                totalItemsCount={this.state.totalGroupCount}
+                                onChange={this.handleGroupPageChange.bind(this)}
+                            />
+                        ) : null}
+                    </div>
+                </div>
+
+                {/* Subject Table */}
+                <div className="card shadow-sm mb-4">
+                    <div className="card-header">
+                        <h5 className="primary-text">Subjects</h5>
+                    </div>
+                    <SubjectTable
+                        subjectItems={this.state.subjectItem}
+                        path="teacher"
+                        category={true}
+                        sub_category={true}
+                        discipline={true}
+                        level={true}
+                        subject={true}
+                    />
+                    <div className="card-body p-3">
+                        {this.state.totalSubjectCount > paginationCount ? (
+                            <Paginations
+                                activePage={this.state.activeSubjectPage}
+                                totalItemsCount={this.state.totalSubjectCount}
+                                onChange={this.handleSubjectPageChange.bind(
+                                    this
+                                )}
+                            />
+                        ) : null}
+                    </div>
+                </div>
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

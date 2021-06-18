@@ -8,9 +8,12 @@ class SideNav extends Component {
         return (
             <div
                 id="sidebar"
-                className={`text-center light-bg ${this.props.shownav ? "active" : ""}`}
+                className={`text-center light-bg ${
+                    this.props.shownav ? "active" : ""
+                }`}
+                style={{ display: "flex", flexDirection: "column" }}
             >
-                <div style={{ height: "80%" }}>
+                <div>
                     <Link to="/hod">
                         <OverlayTrigger
                             key="right"
@@ -47,36 +50,8 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
-                    <Link to="/">
-                        <OverlayTrigger
-                            key="right"
-                            placement="right"
-                            overlay={<Tooltip id="tooltip">Notes</Tooltip>}
-                        >
-                            <button className="btn sidebar-btn btn-sm mb-3">
-                                <i
-                                    className="far fa-sticky-note"
-                                    style={{ marginLeft: "-1.5px" }}
-                                ></i>
-                            </button>
-                        </OverlayTrigger>
-                    </Link>
-                    <Link to="/">
-                        <OverlayTrigger
-                            key="right"
-                            placement="right"
-                            overlay={<Tooltip id="tooltip">Clipboard</Tooltip>}
-                        >
-                            <button className="btn sidebar-btn btn-sm mb-3">
-                                <i
-                                    className="far fa-clipboard"
-                                    style={{ marginLeft: "-1.5px" }}
-                                ></i>
-                            </button>
-                        </OverlayTrigger>
-                    </Link>
                 </div>
-                <div className="d-flex flex-column justify-content-end" style={{ height: "20%" }}>
+                <div className="mt-auto">
                     <Link to="/">
                         <OverlayTrigger
                             key="right"

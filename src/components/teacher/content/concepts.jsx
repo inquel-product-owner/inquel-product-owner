@@ -11,7 +11,7 @@ import ReactCardFlip from "react-card-flip";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import FileModal from "../shared/fileExplorer";
-import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
+import { SingleContentDeleteModal } from "../../common/modal/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
@@ -1743,7 +1743,7 @@ class TeacherConcepts extends Component {
 
                 {/* Concept Deletion Modal */}
                 {this.state.showConceptDelete_Modal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showConceptDelete_Modal}
                         onHide={this.toggleDeleteModal}
                         formSubmission={this.handleConcept_Deletion}
@@ -1755,7 +1755,6 @@ class TeacherConcepts extends Component {
                             topic_num: this.topicNum,
                             concepts_random_id: this.state.selectedConcept,
                         }}
-                        toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
 

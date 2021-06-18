@@ -10,7 +10,7 @@ import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
-import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
+import { SingleContentDeleteModal } from "../../common/modal/contentManagementModal";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 
@@ -1594,7 +1594,7 @@ class HODSimulationType2 extends Component {
 
                 {/* MCQ Deletion Modal */}
                 {this.state.showMCQDelete_Modal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showMCQDelete_Modal}
                         onHide={this.toggleDeleteModal}
                         formSubmission={this.handleMCQ_Deletion}
@@ -1605,13 +1605,12 @@ class HODSimulationType2 extends Component {
                             section_id: this.sectionId,
                             question_random_id: this.state.selectedQuestion,
                         }}
-                        toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
 
                 {/* Sub MCQ Deletion Modal */}
                 {this.state.showSubMCQDelete_Modal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showSubMCQDelete_Modal}
                         onHide={this.toggleSubDeleteModal}
                         formSubmission={this.handleSubMCQ_Deletion}
@@ -1623,7 +1622,6 @@ class HODSimulationType2 extends Component {
                             question_random_id: this.state.selectedQuestion,
                             sub_question_id: this.state.selectedSubQuestion,
                         }}
-                        toggleModal={this.toggleSubDeleteModal}
                     />
                 ) : null}
 

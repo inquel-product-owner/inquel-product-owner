@@ -9,7 +9,7 @@ import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
-import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
+import { SingleContentDeleteModal } from "../../common/modal/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -281,7 +281,7 @@ class TeacherNotesUpload extends Component {
 
                 {/* Delete Modal */}
                 {this.state.showModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showModal}
                         onHide={this.toggleModal}
                         formSubmission={this.formSubmission}
@@ -293,7 +293,6 @@ class TeacherNotesUpload extends Component {
                             topic_num: this.topicNum,
                             notes_id: this.state.notes_id,
                         }}
-                        toggleModal={this.toggleModal}
                     />
                 ) : null}
 

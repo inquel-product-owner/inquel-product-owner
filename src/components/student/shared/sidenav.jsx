@@ -11,8 +11,9 @@ class SideNav extends Component {
                 className={`text-center light-bg ${
                     this.props.shownav ? "active" : ""
                 }`}
+                style={{ display: "flex", flexDirection: "column" }}
             >
-                <div style={{ height: "80%" }}>
+                <div>
                     <Link to="/dashboard">
                         <OverlayTrigger
                             key="right"
@@ -72,9 +73,7 @@ class SideNav extends Component {
                         <OverlayTrigger
                             key="right"
                             placement="right"
-                            overlay={
-                                <Tooltip id="tooltip">Quiz</Tooltip>
-                            }
+                            overlay={<Tooltip id="tooltip">Quiz</Tooltip>}
                         >
                             <button
                                 className={`btn sidebar-btn ${
@@ -98,16 +97,16 @@ class SideNav extends Component {
                                     active === "course" ? "active" : ""
                                 } btn-sm mb-3`}
                             >
-                                <i className="fas fa-graduation-cap" style={{marginLeft:'-2px'}}></i>
+                                <i
+                                    className="fas fa-graduation-cap"
+                                    style={{ marginLeft: "-2px" }}
+                                ></i>
                             </button>
                         </OverlayTrigger>
                     </Link>
                 </div>
 
-                <div
-                    className="d-flex flex-column justify-content-end"
-                    style={{ height: "20%" }}
-                >
+                <div className="mt-auto">
                     <Link to="/dashboard">
                         <OverlayTrigger
                             key="right"

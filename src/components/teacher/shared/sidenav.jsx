@@ -8,9 +8,12 @@ class SideNav extends Component {
         return (
             <div
                 id="sidebar"
-                className={`text-center light-bg ${this.props.shownav ? "active" : ""}`}
+                className={`text-center light-bg ${
+                    this.props.shownav ? "active" : ""
+                }`}
+                style={{ display: "flex", flexDirection: "column" }}
             >
-                <div style={{ height: "80%" }}>
+                <div>
                     <Link to="/teacher">
                         <OverlayTrigger
                             key="right"
@@ -47,28 +50,8 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
-                    <Link to="/teacher/leaderboard">
-                        <OverlayTrigger
-                            key="right"
-                            placement="right"
-                            overlay={
-                                <Tooltip id="tooltip">Leaderboard</Tooltip>
-                            }
-                        >
-                            <button
-                                className={`btn sidebar-btn ${
-                                    active === "leaderboard" ? "active" : ""
-                                } btn-sm mb-3`}
-                            >
-                                <i
-                                    className="fas fa-chart-bar"
-                                    style={{ marginLeft: "-1.5px" }}
-                                ></i>
-                            </button>
-                        </OverlayTrigger>
-                    </Link>
                 </div>
-                <div className="d-flex flex-column justify-content-end" style={{ height: "20%" }}>
+                <div className="mt-auto">
                     <Link to="/">
                         <OverlayTrigger
                             key="right"

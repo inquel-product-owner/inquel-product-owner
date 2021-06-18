@@ -6,7 +6,7 @@ import { Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
-import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
+import { SingleContentDeleteModal } from "../../common/modal/contentManagementModal";
 import {
     ChapterList,
     ChapterEditModal,
@@ -264,7 +264,7 @@ class TeacherIndependentSubject extends Component {
 
                 {/* ----- Semester Delete modal ----- */}
                 {this.state.showSemester_DeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showSemester_DeleteModal}
                         onHide={this.toggleSemester_DeleteModal}
                         formSubmission={this.semesterFormSubmission}
@@ -275,7 +275,6 @@ class TeacherIndependentSubject extends Component {
                             semester_id:
                                 this.state.selectedSemester.semester_id,
                         }}
-                        toggleModal={this.toggleSemester_DeleteModal}
                     />
                 ) : (
                     ""

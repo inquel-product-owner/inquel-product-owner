@@ -7,7 +7,7 @@ import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import {
-    ContentDeleteModal,
+    SingleContentDeleteModal,
     ContentUpdateModal,
 } from "../../common/modal/contentManagementModal";
 import {
@@ -324,7 +324,7 @@ class TeacherSubject extends Component {
 
                 {/* ----- Semester Delete modal ----- */}
                 {this.state.showSemester_DeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showSemester_DeleteModal}
                         onHide={this.toggleSemester_DeleteModal}
                         formSubmission={this.semesterFormSubmission}
@@ -335,7 +335,6 @@ class TeacherSubject extends Component {
                             semester_id:
                                 this.state.selectedSemester.semester_id,
                         }}
-                        toggleModal={this.toggleSemester_DeleteModal}
                     />
                 ) : (
                     ""

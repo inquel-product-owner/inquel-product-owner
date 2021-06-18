@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Wrapper from "./wrapper";
-import { Tabs, Tab, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Tabs, Tab, OverlayTrigger, Tooltip, Dropdown } from "react-bootstrap";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, adminPathUrl, inquelAdminUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
@@ -13,6 +12,7 @@ import SubscriptionModal, {
     SubscriptionUpdateModal,
 } from "./subscriptionModal";
 import CourseTable from "../common/table/course";
+import { SingleContentDeleteModal } from "../common/modal/contentManagementModal";
 
 const Statistics = (props) => {
     return (
@@ -81,237 +81,6 @@ const Statistics = (props) => {
     );
 };
 
-class CourseDetails extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            subscriptionModalShow: false,
-        };
-    }
-
-    toggleSubscriptionModal = () => {
-        this.setState({
-            subscriptionModalShow: !this.state.subscriptionModalShow,
-        });
-    };
-
-    render() {
-        return (
-            <>
-                <SubscriptionUpdateModal
-                    show={this.state.subscriptionModalShow}
-                    onHide={this.toggleSubscriptionModal}
-                />
-                <div className="card shadow-sm">
-                    <div className="card-header text-right p-1">
-                        <button
-                            className="btn btn-link btn-sm shadow-none"
-                            onClick={this.props.toggleClose}
-                        >
-                            <i className="fas fa-times fa-sm ml-1"></i> Close
-                        </button>
-                    </div>
-                    <div className="card-body">
-                        <h6 className="primary-text font-weight-bold mb-3">
-                            Course Name
-                        </h6>
-                        <p className="primary-text">Configuration</p>
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Category ID
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="category"
-                                        id="category"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="school">School</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Sub Category
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="subcategory"
-                                        id="subcategory"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="sch">SCH</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Discipline
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="discipline"
-                                        id="discipline"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="none">None</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Levels
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="level"
-                                        id="level"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="10">10th</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Subjects
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="subject"
-                                        id="subject"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="maths">Maths</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Board / University
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="university"
-                                        id="university"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="cbse">CBSE</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <div className="row align-items-center mb-4">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Type
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="type"
-                                        id="type"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="premium">Premium</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <Link
-                            to="/admin/course/001"
-                            style={{
-                                textDecoration: "none",
-                            }}
-                        >
-                            <button className="btn btn-primary btn-block btn-sm">
-                                View course
-                            </button>
-                        </Link>
-                        <div className="dropdown-divider my-3"></div>
-                        <p className="primary-text small font-weight-bold">
-                            Others
-                        </p>
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Assigned HOD
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="assignedhod"
-                                        id="assignedhod"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="ram">Ram</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <div className="row align-items-center mb-4">
-                            <div className="col-md-5">
-                                <p className="primary-text small mb-0 font-weight-bold">
-                                    Content Status
-                                </p>
-                            </div>
-                            <div className="col-md-7">
-                                <form action="">
-                                    <select
-                                        name="status"
-                                        id="status"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="published">
-                                            Published
-                                        </option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                        <button
-                            className="btn btn-primary btn-block btn-sm"
-                            onClick={this.toggleSubscriptionModal}
-                        >
-                            Subscription plans
-                        </button>
-                        <div className="dropdown-divider my-3"></div>
-
-                        <button className="btn btn-primary btn-block btn-sm">
-                            Publish course
-                        </button>
-                    </div>
-                </div>
-            </>
-        );
-    }
-}
-
 const CourseCard = (props) => {
     return (
         <>
@@ -323,21 +92,16 @@ const CourseCard = (props) => {
                                   className="col-md-3 col-sm-6 mb-3"
                                   key={index}
                               >
-                                  <div
-                                      className="card"
-                                      onClick={
-                                          !props.course
-                                              ? props.toggleSubscriptionDetails
-                                              : () => {}
-                                      }
-                                      style={{
-                                          cursor: `${
-                                              !props.course ? "pointer" : "auto"
-                                          }`,
-                                      }}
-                                  >
+                                  <div className="card">
                                       <img
-                                          src={courseimg}
+                                          src={
+                                              list.subscription_file_link
+                                                  ? list.subscription_file_link
+                                                        .subscription_image_1
+                                                  : list.course_thumbnail_url
+                                                  ? list.course_thumbnail_url
+                                                  : courseimg
+                                          }
                                           className="card-img-top"
                                           alt={
                                               list.course_name
@@ -349,6 +113,84 @@ const CourseCard = (props) => {
                                           {list.course_name
                                               ? list.course_name
                                               : list.title}
+                                      </div>
+                                      <div
+                                          className="text-right mt-2"
+                                          style={{
+                                              position: "absolute",
+                                              right: "7px",
+                                          }}
+                                      >
+                                          <Dropdown>
+                                              <Dropdown.Toggle
+                                                  variant="white"
+                                                  className="btn text-dark bg-light btn-sm shadow-none caret-off"
+                                              >
+                                                  <i className="fas fa-ellipsis-v"></i>
+                                              </Dropdown.Toggle>
+
+                                              <Dropdown.Menu>
+                                                  {props.course ? (
+                                                      <Dropdown.Item
+                                                          onClick={async () => {
+                                                              await props.handleID(
+                                                                  list.course_id
+                                                              );
+                                                              props.handlePublishUnpublish();
+                                                          }}
+                                                      >
+                                                          <i className="fas fa-sign-out-alt mr-1"></i>{" "}
+                                                          Unpublish
+                                                      </Dropdown.Item>
+                                                  ) : props.published ? (
+                                                      <Dropdown.Item
+                                                          onClick={async () => {
+                                                              await props.handleID(
+                                                                  list.subscription_id
+                                                              );
+                                                              props.handlePublishUnpublish();
+                                                          }}
+                                                      >
+                                                          <i className="fas fa-sign-out-alt mr-1"></i>{" "}
+                                                          Unpublish
+                                                      </Dropdown.Item>
+                                                  ) : (
+                                                      <>
+                                                          <Dropdown.Item
+                                                              onClick={async () => {
+                                                                  await props.handleID(
+                                                                      list.subscription_id
+                                                                  );
+                                                                  props.handlePublishUnpublish();
+                                                              }}
+                                                          >
+                                                              <i className="fas fa-upload mr-1"></i>{" "}
+                                                              Publish
+                                                          </Dropdown.Item>
+                                                          <Dropdown.Item
+                                                              onClick={() =>
+                                                                  props.toggleEdit(
+                                                                      list
+                                                                  )
+                                                              }
+                                                          >
+                                                              <i className="far fa-edit mr-1"></i>{" "}
+                                                              Edit
+                                                          </Dropdown.Item>
+                                                          <Dropdown.Item
+                                                              onClick={() =>
+                                                                  props.toggleDelete(
+                                                                      list
+                                                                  )
+                                                              }
+                                                          >
+                                                              <i className="far fa-trash-alt mr-1"></i>{" "}
+                                                              Delete
+                                                          </Dropdown.Item>
+                                                      </>
+                                                  )}
+                                              </Dropdown.Menu>
+                                          </Dropdown>
                                       </div>
                                   </div>
                               </div>
@@ -374,13 +216,15 @@ class AdminDashboard extends Component {
         super(props);
         this.state = {
             showSubscriptionModal: false,
-            showSubscriptionDetails: false,
+            showSubscriptionEditModal: false,
+            showSubscriptionDeleteModal: false,
             isTableView: true,
             activeTab: "published",
 
             hod_courses: {},
             published: {},
             unpublished: {},
+            selectedData: {},
 
             activePublishedPage: 1,
             activeUnpublishPage: 1,
@@ -408,10 +252,39 @@ class AdminDashboard extends Component {
         });
     };
 
-    toggleSubscriptionDetails = () => {
-        this.setState({
-            showSubscriptionDetails: true,
-        });
+    // ----- Data loading -----
+    loadPublishedSubscription = (page) => {
+        let URL =
+            page && page > 1
+                ? `${this.inquelURL}/subscription/list/publish/?page=${page}`
+                : `${this.inquelURL}/subscription/list/publish/`;
+        fetch(URL, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        published: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     loadUnpublishedSubscription = (page) => {
@@ -451,8 +324,8 @@ class AdminDashboard extends Component {
     loadHODCourses = (page) => {
         let URL =
             page && page > 1
-                ? `${this.inquelURL}/hod/courses/?page=${page}`
-                : `${this.inquelURL}/hod/courses/`;
+                ? `${this.inquelURL}/hod/course/?page=${page}`
+                : `${this.inquelURL}/hod/course/`;
         fetch(URL, {
             method: "GET",
             headers: this.headers,
@@ -485,6 +358,7 @@ class AdminDashboard extends Component {
     componentDidMount = () => {
         document.title = "Dashboard - Admin | IQLabs";
 
+        this.loadPublishedSubscription();
         this.loadUnpublishedSubscription();
         this.loadHODCourses();
     };
@@ -493,10 +367,94 @@ class AdminDashboard extends Component {
         setTimeout(() => {
             this.setState({
                 showSubscriptionModal: false,
+                showSubscriptionEditModal: false,
+                showSubscriptionDeleteModal: false,
             });
         }, 1000);
+        this.loadUnpublishedSubscription();
     };
 
+    // ----- Publish & Unpublish -----
+    handleID = (id) => {
+        try {
+            let temp = [];
+
+            if (Array.isArray(id)) {
+                temp = id;
+            } else {
+                temp.push(id);
+            }
+
+            this.setState({
+                selectedData: temp,
+            });
+        } catch (error) {
+            console.log(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        }
+    };
+
+    handlePublishUnpublish = async () => {
+        this.setState({
+            page_loading: true,
+        });
+
+        await (this.state.selectedData || []).forEach(async (id, index) => {
+            let URL =
+                this.state.activeTab === "published"
+                    ? `${this.inquelURL}/subscription/${id}/unpublish/`
+                    : this.state.activeTab === "unpublished"
+                    ? `${this.inquelURL}/subscription/${id}/publish/`
+                    : `${this.inquelURL}/hod/course/${id}/unpublish/`;
+
+            await fetch(URL, {
+                method: "POST",
+                headers: this.headers,
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                });
+        });
+
+        if (this.state.activeTab === "hod_course") {
+            setTimeout(() => {
+                this.loadHODCourses(this.state.activeHODCoursePage);
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                this.loadPublishedSubscription(this.state.activePublishedPage);
+                this.loadUnpublishedSubscription(
+                    this.state.activeUnpublishPage
+                );
+            }, 1000);
+        }
+    };
+
+    // ----- Pagination -----
     handlePublishedPageChange(pageNumber) {
         this.setState(
             { activePublishedPage: pageNumber, page_loading: true },
@@ -551,317 +509,359 @@ class AdminDashboard extends Component {
                 />
 
                 {/* Subscription create modal */}
-                <SubscriptionModal
-                    show={this.state.showSubscriptionModal}
-                    onHide={this.toggleSubscriptionModal}
+                {this.state.showSubscriptionModal ? (
+                    <SubscriptionModal
+                        show={this.state.showSubscriptionModal}
+                        onHide={this.toggleSubscriptionModal}
+                        formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Subscription update modal */}
+                {this.state.showSubscriptionEditModal ? (
+                    <SubscriptionUpdateModal
+                        show={this.state.showSubscriptionEditModal}
+                        onHide={() =>
+                            this.setState({
+                                showSubscriptionEditModal: false,
+                            })
+                        }
+                        formSubmission={this.formSubmission}
+                        data={this.state.selectedData}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Subscription delete modal */}
+                <SingleContentDeleteModal
+                    show={this.state.showSubscriptionDeleteModal}
+                    onHide={() =>
+                        this.setState({
+                            showSubscriptionDeleteModal: false,
+                        })
+                    }
                     formSubmission={this.formSubmission}
+                    url={`${this.inquelURL}/subscription/${this.state.selectedData.subscription_id}/`}
+                    name={this.state.selectedData.title}
+                    type="subscription"
                 />
 
-                <div className="row">
-                    <div
-                        className={`${
-                            this.state.showSubscriptionDetails
-                                ? "col-md-9"
-                                : "col-12"
-                        }`}
-                    >
-                        {/* Stats */}
-                        <Statistics />
+                {/* Stats */}
+                <Statistics />
 
-                        {/* Filter area */}
-                        <div className="row align-items-center justify-content-center justify-content-md-end mb-3">
-                            <div className="col-md-6">
-                                <div
-                                    className="btn-group btn-group-toggle"
-                                    data-toggle="buttons"
+                {/* Filter area */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-6">
+                        <div
+                            className="btn-group btn-group-toggle"
+                            data-toggle="buttons"
+                        >
+                            <OverlayTrigger
+                                key="top1"
+                                placement="top"
+                                overlay={
+                                    <Tooltip id="tooltip" className="text-left">
+                                        Table View
+                                    </Tooltip>
+                                }
+                            >
+                                <label
+                                    className={`btn btn-light ${
+                                        this.state.isTableView ? "active" : ""
+                                    }`}
                                 >
-                                    <OverlayTrigger
-                                        key="top1"
-                                        placement="top"
-                                        overlay={
-                                            <Tooltip
-                                                id="tooltip"
-                                                className="text-left"
-                                            >
-                                                Table View
-                                            </Tooltip>
-                                        }
-                                    >
-                                        <label
-                                            className={`btn btn-light ${
-                                                this.state.isTableView
-                                                    ? "active"
-                                                    : ""
-                                            }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="options"
-                                                id="tableview"
-                                                onChange={() => {
-                                                    this.setState({
-                                                        isTableView: true,
-                                                    });
-                                                }}
-                                            />{" "}
-                                            <i className="fas fa-th-list"></i>
-                                        </label>
-                                    </OverlayTrigger>
-                                    <OverlayTrigger
-                                        key="top2"
-                                        placement="top"
-                                        overlay={
-                                            <Tooltip
-                                                id="tooltip"
-                                                className="text-left"
-                                            >
-                                                Card View
-                                            </Tooltip>
-                                        }
-                                    >
-                                        <label
-                                            className={`btn btn-light ${
-                                                this.state.isTableView
-                                                    ? ""
-                                                    : "active"
-                                            }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="options"
-                                                id="cardview"
-                                                onChange={() => {
-                                                    this.setState({
-                                                        isTableView: false,
-                                                    });
-                                                }}
-                                            />{" "}
-                                            <i className="fas fa-th-large"></i>
-                                        </label>
-                                    </OverlayTrigger>
-                                </div>
-                            </div>
-                            <div className="col-md-6 text-md-right text-center">
-                                {this.state.activeTab === "hod_course" ? (
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.toggleSubscriptionModal}
-                                    >
-                                        Create Subscription
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                                {this.state.activeTab === "published" ? (
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none"
-                                        disabled={
-                                            this.state.published.results &&
-                                            this.state.published.results
-                                                .length === 0
-                                                ? true
-                                                : false
-                                        }
-                                    >
-                                        Unpublish
-                                    </button>
-                                ) : this.state.activeTab === "hod_course" ? (
-                                    <button className="btn btn-primary btn-sm shadow-none">
-                                        Unpublish
-                                    </button>
-                                ) : (
-                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                        Publish
-                                    </button>
-                                )}
-                                {this.state.activeTab === "unpublished" ? (
-                                    <button className="btn btn-primary btn-sm shadow-none">
-                                        Delete
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                            </div>
+                                    <input
+                                        type="radio"
+                                        name="options"
+                                        id="tableview"
+                                        onChange={() => {
+                                            this.setState({
+                                                isTableView: true,
+                                            });
+                                        }}
+                                    />{" "}
+                                    <i className="fas fa-th-list"></i>
+                                </label>
+                            </OverlayTrigger>
+                            <OverlayTrigger
+                                key="top2"
+                                placement="top"
+                                overlay={
+                                    <Tooltip id="tooltip" className="text-left">
+                                        Card View
+                                    </Tooltip>
+                                }
+                            >
+                                <label
+                                    className={`btn btn-light ${
+                                        this.state.isTableView ? "" : "active"
+                                    }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="options"
+                                        id="cardview"
+                                        onChange={() => {
+                                            this.setState({
+                                                isTableView: false,
+                                            });
+                                        }}
+                                    />{" "}
+                                    <i className="fas fa-th-large"></i>
+                                </label>
+                            </OverlayTrigger>
                         </div>
-
-                        {/* ---------- Table view ---------- */}
-                        {this.state.isTableView ? (
-                            <Tabs
-                                activeKey={this.state.activeTab}
-                                onSelect={(key) =>
-                                    this.setState({
-                                        activeTab: key,
-                                    })
+                    </div>
+                    <div className="col-6 text-right">
+                        {this.state.activeTab === "hod_course" ? (
+                            <button
+                                className="btn btn-primary btn-sm shadow-none"
+                                onClick={this.toggleSubscriptionModal}
+                                disabled={
+                                    this.state.hod_courses.results &&
+                                    this.state.hod_courses.results.length === 0
+                                        ? true
+                                        : false
                                 }
                             >
-                                <Tab eventKey="published" title="Published">
-                                    <div className="card shadow-sm">
-                                        <SubscriptionTable
-                                            data={
-                                                this.state.published.results ||
-                                                []
-                                            }
-                                            toggleDetails={
-                                                this.toggleSubscriptionDetails
-                                            }
-                                        />
-                                        <div className="card-body p-3">
-                                            {this.state.published.count >
-                                            paginationCount ? (
-                                                <Paginations
-                                                    activePage={
-                                                        this.state
-                                                            .activePublishedPage
-                                                    }
-                                                    totalItemsCount={
-                                                        this.state.published
-                                                            .count
-                                                    }
-                                                    onChange={this.handlePublishedPageChange.bind(
-                                                        this
-                                                    )}
-                                                />
-                                            ) : null}
-                                        </div>
-                                    </div>
-                                </Tab>
-                                <Tab
-                                    eventKey="unpublished"
-                                    title="Ready for publishing"
-                                >
-                                    <div className="card shadow-sm">
-                                        <SubscriptionTable
-                                            data={
-                                                this.state.unpublished
-                                                    .results || []
-                                            }
-                                            toggleDetails={
-                                                this.toggleSubscriptionDetails
-                                            }
-                                        />
-                                        <div className="card-body p-3">
-                                            {this.state.unpublished.count >
-                                            paginationCount ? (
-                                                <Paginations
-                                                    activePage={
-                                                        this.state
-                                                            .activeUnpublishPage
-                                                    }
-                                                    totalItemsCount={
-                                                        this.state.unpublished
-                                                            .count
-                                                    }
-                                                    onChange={this.handleUnpublishPageChange.bind(
-                                                        this
-                                                    )}
-                                                />
-                                            ) : null}
-                                        </div>
-                                    </div>
-                                </Tab>
-                                <Tab eventKey="hod_course" title="HOD Course">
-                                    <div className="card shadow-sm">
-                                        <CourseTable
-                                            data={
-                                                this.state.hod_courses
-                                                    .results || []
-                                            }
-                                        />
-                                        <div className="card-body p-3">
-                                            {this.state.hod_courses.count >
-                                            paginationCount ? (
-                                                <Paginations
-                                                    activePage={
-                                                        this.state
-                                                            .activeHODCoursePage
-                                                    }
-                                                    totalItemsCount={
-                                                        this.state.hod_courses
-                                                            .count
-                                                    }
-                                                    onChange={this.handleHODCoursePageChange.bind(
-                                                        this
-                                                    )}
-                                                />
-                                            ) : null}
-                                        </div>
-                                    </div>
-                                </Tab>
-                            </Tabs>
+                                Create Subscription
+                            </button>
                         ) : (
-                            // ---------- Card view ----------
-                            <Tabs
-                                activeKey={this.state.activeTab}
-                                onSelect={(key) =>
-                                    this.setState({
-                                        activeTab: key,
-                                    })
-                                }
-                            >
-                                <Tab eventKey="published" title="Published">
-                                    <CourseCard
-                                        data={this.state.published}
-                                        toggleSubscriptionDetails={
-                                            this.toggleSubscriptionDetails
-                                        }
-                                        activePage={
-                                            this.state.activePublishedPage
-                                        }
-                                        handleOnChange={
-                                            this.handlePublishedPageChange
-                                        }
-                                    />
-                                </Tab>
-                                <Tab
-                                    eventKey="unpublished"
-                                    title="Ready for publishing"
+                            ""
+                        )}
+                        {this.state.isTableView ? (
+                            this.state.activeTab === "published" ? (
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublishUnpublish}
+                                    disabled={
+                                        this.state.published.results &&
+                                        this.state.published.results.length ===
+                                            0
+                                            ? true
+                                            : false
+                                    }
                                 >
-                                    <CourseCard
-                                        data={this.state.unpublished}
-                                        toggleSubscriptionDetails={
-                                            this.toggleSubscriptionDetails
-                                        }
-                                        activePage={
-                                            this.state.activeUnpublishPage
-                                        }
-                                        handleOnChange={
-                                            this.handleUnpublishPageChange
-                                        }
-                                    />
-                                </Tab>
-                                <Tab eventKey="hod_course" title="HOD Course">
-                                    <CourseCard
-                                        data={this.state.hod_courses}
-                                        toggleSubscriptionDetails={
-                                            this.toggleSubscriptionDetails
-                                        }
-                                        activePage={
-                                            this.state.activeHODCoursePage
-                                        }
-                                        handleOnChange={
-                                            this.handleHODCoursePageChange
-                                        }
-                                        course={true}
-                                    />
-                                </Tab>
-                            </Tabs>
+                                    Unpublish
+                                </button>
+                            ) : this.state.activeTab === "hod_course" ? (
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none ml-1"
+                                    onClick={this.handlePublishUnpublish}
+                                    disabled={
+                                        this.state.hod_courses.results &&
+                                        this.state.hod_courses.results
+                                            .length === 0
+                                            ? true
+                                            : false
+                                    }
+                                >
+                                    Unpublish
+                                </button>
+                            ) : (
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublishUnpublish}
+                                    disabled={
+                                        this.state.unpublished.results &&
+                                        this.state.unpublished.results
+                                            .length === 0
+                                            ? true
+                                            : false
+                                    }
+                                >
+                                    Publish
+                                </button>
+                            )
+                        ) : (
+                            ""
                         )}
                     </div>
+                </div>
 
-                    {this.state.showSubscriptionDetails ? (
-                        <div className="col-md-3">
-                            <CourseDetails
-                                toggleClose={() => {
+                {/* ---------- Table view ---------- */}
+                {this.state.isTableView ? (
+                    <Tabs
+                        activeKey={this.state.activeTab}
+                        onSelect={(key) =>
+                            this.setState({
+                                activeTab: key,
+                            })
+                        }
+                    >
+                        {/* ----- Published subscription table ----- */}
+                        <Tab eventKey="published" title="Published">
+                            <div className="card shadow-sm">
+                                <SubscriptionTable
+                                    data={this.state.published.results || []}
+                                    handleID={this.handleID}
+                                />
+                                <div className="card-body p-3">
+                                    {this.state.published.count >
+                                    paginationCount ? (
+                                        <Paginations
+                                            activePage={
+                                                this.state.activePublishedPage
+                                            }
+                                            totalItemsCount={
+                                                this.state.published.count
+                                            }
+                                            onChange={this.handlePublishedPageChange.bind(
+                                                this
+                                            )}
+                                        />
+                                    ) : null}
+                                </div>
+                            </div>
+                        </Tab>
+
+                        {/* ----- Unpublished subscription table ----- */}
+                        <Tab
+                            eventKey="unpublished"
+                            title="Ready for publishing"
+                        >
+                            <div className="card shadow-sm">
+                                <SubscriptionTable
+                                    data={this.state.unpublished.results || []}
+                                    handleID={this.handleID}
+                                    toggleEdit={(data) => {
+                                        this.setState({
+                                            showSubscriptionEditModal:
+                                                !this.state
+                                                    .showSubscriptionEditModal,
+                                            selectedData: data,
+                                        });
+                                    }}
+                                    toggleDelete={(data) =>
+                                        this.setState({
+                                            showSubscriptionDeleteModal:
+                                                !this.state
+                                                    .showSubscriptionDeleteModal,
+                                            selectedData: data,
+                                        })
+                                    }
+                                    showAction={true}
+                                />
+                                <div className="card-body p-3">
+                                    {this.state.unpublished.count >
+                                    paginationCount ? (
+                                        <Paginations
+                                            activePage={
+                                                this.state.activeUnpublishPage
+                                            }
+                                            totalItemsCount={
+                                                this.state.unpublished.count
+                                            }
+                                            onChange={this.handleUnpublishPageChange.bind(
+                                                this
+                                            )}
+                                        />
+                                    ) : null}
+                                </div>
+                            </div>
+                        </Tab>
+
+                        {/* ----- HOD Courses table ----- */}
+                        <Tab eventKey="hod_course" title="HOD Course">
+                            <div className="card shadow-sm">
+                                <CourseTable
+                                    data={this.state.hod_courses.results || []}
+                                    handleID={this.handleID}
+                                />
+                                <div className="card-body p-3">
+                                    {this.state.hod_courses.count >
+                                    paginationCount ? (
+                                        <Paginations
+                                            activePage={
+                                                this.state.activeHODCoursePage
+                                            }
+                                            totalItemsCount={
+                                                this.state.hod_courses.count
+                                            }
+                                            onChange={this.handleHODCoursePageChange.bind(
+                                                this
+                                            )}
+                                        />
+                                    ) : null}
+                                </div>
+                            </div>
+                        </Tab>
+                    </Tabs>
+                ) : (
+                    // --------------- Card view ---------------
+                    <Tabs
+                        activeKey={this.state.activeTab}
+                        onSelect={(key) =>
+                            this.setState({
+                                activeTab: key,
+                            })
+                        }
+                    >
+                        {/* ----- Published subscription card ----- */}
+                        <Tab eventKey="published" title="Published">
+                            <CourseCard
+                                data={this.state.published}
+                                activePage={this.state.activePublishedPage}
+                                handleOnChange={this.handlePublishedPageChange}
+                                handleID={this.handleID}
+                                handlePublishUnpublish={
+                                    this.handlePublishUnpublish
+                                }
+                                published={true}
+                            />
+                        </Tab>
+
+                        {/* ----- Unpublished subscription card ----- */}
+                        <Tab
+                            eventKey="unpublished"
+                            title="Ready for publishing"
+                        >
+                            <CourseCard
+                                data={this.state.unpublished}
+                                activePage={this.state.activeUnpublishPage}
+                                handleOnChange={this.handleUnpublishPageChange}
+                                handleID={this.handleID}
+                                handlePublishUnpublish={
+                                    this.handlePublishUnpublish
+                                }
+                                toggleEdit={(data) => {
                                     this.setState({
-                                        showSubscriptionDetails: false,
+                                        showSubscriptionEditModal:
+                                            !this.state
+                                                .showSubscriptionEditModal,
+                                        selectedData: data,
                                     });
                                 }}
+                                toggleDelete={(data) =>
+                                    this.setState({
+                                        showSubscriptionDeleteModal:
+                                            !this.state
+                                                .showSubscriptionDeleteModal,
+                                        selectedData: data,
+                                    })
+                                }
+                                unpublished={true}
                             />
-                        </div>
-                    ) : (
-                        ""
-                    )}
-                </div>
+                        </Tab>
+
+                        {/* ----- HOD Courses card ----- */}
+                        <Tab eventKey="hod_course" title="HOD Course">
+                            <CourseCard
+                                data={this.state.hod_courses}
+                                activePage={this.state.activeHODCoursePage}
+                                handleOnChange={this.handleHODCoursePageChange}
+                                handleID={this.handleID}
+                                handlePublishUnpublish={
+                                    this.handlePublishUnpublish
+                                }
+                                course={true}
+                            />
+                        </Tab>
+                    </Tabs>
+                )}
 
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}
@@ -871,3 +871,234 @@ class AdminDashboard extends Component {
 }
 
 export default AdminDashboard;
+
+// class CourseDetails extends Component {
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             subscriptionModalShow: false,
+//         };
+//     }
+
+//     toggleSubscriptionModal = () => {
+//         this.setState({
+//             subscriptionModalShow: !this.state.subscriptionModalShow,
+//         });
+//     };
+
+//     render() {
+//         return (
+//             <>
+//                 <SubscriptionUpdateModal
+//                     show={this.state.subscriptionModalShow}
+//                     onHide={this.toggleSubscriptionModal}
+//                 />
+//                 <div className="card shadow-sm">
+//                     <div className="card-header text-right p-1">
+//                         <button
+//                             className="btn btn-link btn-sm shadow-none"
+//                             onClick={this.props.toggleClose}
+//                         >
+//                             <i className="fas fa-times fa-sm ml-1"></i> Close
+//                         </button>
+//                     </div>
+//                     <div className="card-body">
+//                         <h6 className="primary-text font-weight-bold mb-3">
+//                             Course Name
+//                         </h6>
+//                         <p className="primary-text">Configuration</p>
+//                         <div className="row align-items-center mb-3">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Category ID
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="category"
+//                                         id="category"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="school">School</option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <div className="row align-items-center mb-3">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Sub Category
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="subcategory"
+//                                         id="subcategory"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="sch">SCH</option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <div className="row align-items-center mb-3">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Discipline
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="discipline"
+//                                         id="discipline"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="none">None</option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <div className="row align-items-center mb-3">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Levels
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="level"
+//                                         id="level"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="10">10th</option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <div className="row align-items-center mb-3">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Subjects
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="subject"
+//                                         id="subject"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="maths">Maths</option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <div className="row align-items-center mb-3">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Board / University
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="university"
+//                                         id="university"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="cbse">CBSE</option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <div className="row align-items-center mb-4">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Type
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="type"
+//                                         id="type"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="premium">Premium</option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <Link
+//                             to="/admin/course/001"
+//                             style={{
+//                                 textDecoration: "none",
+//                             }}
+//                         >
+//                             <button className="btn btn-primary btn-block btn-sm">
+//                                 View course
+//                             </button>
+//                         </Link>
+//                         <div className="dropdown-divider my-3"></div>
+//                         <p className="primary-text small font-weight-bold">
+//                             Others
+//                         </p>
+//                         <div className="row align-items-center mb-3">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Assigned HOD
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="assignedhod"
+//                                         id="assignedhod"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="ram">Ram</option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <div className="row align-items-center mb-4">
+//                             <div className="col-md-5">
+//                                 <p className="primary-text small mb-0 font-weight-bold">
+//                                     Content Status
+//                                 </p>
+//                             </div>
+//                             <div className="col-md-7">
+//                                 <form action="">
+//                                     <select
+//                                         name="status"
+//                                         id="status"
+//                                         className="form-control form-control-sm form-shadow"
+//                                     >
+//                                         <option value="published">
+//                                             Published
+//                                         </option>
+//                                     </select>
+//                                 </form>
+//                             </div>
+//                         </div>
+//                         <button
+//                             className="btn btn-primary btn-block btn-sm"
+//                             onClick={this.toggleSubscriptionModal}
+//                         >
+//                             Subscription plans
+//                         </button>
+//                         <div className="dropdown-divider my-3"></div>
+
+//                         <button className="btn btn-primary btn-block btn-sm">
+//                             Publish course
+//                         </button>
+//                     </div>
+//                 </div>
+//             </>
+//         );
+//     }
+// }

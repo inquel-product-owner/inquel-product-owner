@@ -1224,12 +1224,12 @@ class HODCourseFlashCard extends Component {
         window.MathJax.typeset();
     };
 
-    handleDragEnter = (event) => {
+    handleDragEnter = () => {
         var node = document.getElementById("drop-area");
         node.classList.toggle("over");
     };
 
-    handleDragLeave = (event) => {
+    handleDragLeave = () => {
         var node = document.getElementById("drop-area");
         node.classList.toggle("over");
     };

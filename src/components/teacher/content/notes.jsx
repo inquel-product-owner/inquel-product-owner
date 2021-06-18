@@ -10,7 +10,7 @@ import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import CKeditor from "../../common/CKEditor";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
-import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
+import { SingleContentDeleteModal } from "../../common/modal/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -542,7 +542,7 @@ class TeacherNotes extends Component {
 
                 {/* Delete Modal */}
                 {this.state.showDeleteModal ? (
-                    <ContentDeleteModal
+                    <SingleContentDeleteModal
                         show={this.state.showDeleteModal}
                         onHide={this.toggleDeleteModal}
                         formSubmission={this.formSubmission}
@@ -554,7 +554,6 @@ class TeacherNotes extends Component {
                             topic_num: this.topicNum,
                             notes_id: this.state.notes_id,
                         }}
-                        toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
 
