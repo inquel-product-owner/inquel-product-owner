@@ -73,6 +73,9 @@ class SubscriptionTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].subscription_id.toString());
             }
+            if (this.props.handleID) {
+                this.props.handleID(element);
+            }
         }
     }
 
@@ -82,6 +85,9 @@ class SubscriptionTable extends Component {
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].subscription_id.toString());
+            }
+            if (this.props.handleID) {
+                this.props.handleID(element);
             }
         }
     }

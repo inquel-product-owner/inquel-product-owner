@@ -234,9 +234,6 @@ class AdminStudentProfile extends Component {
                                     <th scope="col">Discount Applied</th>
                                     <th scope="col">Quiz Points</th>
                                     <th scope="col">Simulation</th>
-                                    <th scope="col" className="text-center">
-                                        Scorecard
-                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -249,13 +246,6 @@ class AdminStudentProfile extends Component {
                                     <td>SP2020210001</td>
                                     <td>212</td>
                                     <td>First Class</td>
-                                    <td className="text-center">
-                                        <Link to="/admin/course/001">
-                                            <button className="btn btn-sm btn-primary shadow-none">
-                                                <i className="fas fa-eye"></i>
-                                            </button>
-                                        </Link>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Physics</td>
@@ -266,13 +256,6 @@ class AdminStudentProfile extends Component {
                                     <td>SP2020210001</td>
                                     <td>436</td>
                                     <td>Not Taken</td>
-                                    <td className="text-center">
-                                        <Link to="/admin/course/001">
-                                            <button className="btn btn-sm btn-primary shadow-none">
-                                                <i className="fas fa-eye"></i>
-                                            </button>
-                                        </Link>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Chemistry</td>
@@ -283,13 +266,6 @@ class AdminStudentProfile extends Component {
                                     <td>SP2020210001</td>
                                     <td>128</td>
                                     <td>Distiction</td>
-                                    <td className="text-center">
-                                        <Link to="/admin/course/001">
-                                            <button className="btn btn-sm btn-primary shadow-none">
-                                                <i className="fas fa-eye"></i>
-                                            </button>
-                                        </Link>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>

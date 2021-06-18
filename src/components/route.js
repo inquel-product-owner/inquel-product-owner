@@ -72,7 +72,6 @@ import HODEmailVerification from "./hod/emailVerification";
 // -------------------- Teacher Imports --------------------
 
 import TeacherDashboard from "./teacher/dashboard";
-import TeacherLeaderboard from "./teacher/leaderBoard";
 import TeacherStudentList from "./teacher/studentList";
 import TeacherStudentProfile from "./teacher/studentProfile";
 
@@ -801,18 +800,6 @@ const routes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <TeacherProfile {...props} />
-                )
-            }
-        />
-        <Route
-            exact
-            path="/teacher/leaderboard"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_teacher") ? (
-                    <Redirect to="/teacher/login" />
-                ) : (
-                    <TeacherLeaderboard {...props} />
                 )
             }
         />

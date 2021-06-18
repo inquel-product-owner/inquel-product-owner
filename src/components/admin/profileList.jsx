@@ -830,8 +830,13 @@ class AdminHODAndStudentList extends Component {
     };
 
     // Fetch HOD List
-    loadHodData = () => {
-        fetch(`${this.url}/hod/?page=${this.state.activeHODPage}`, {
+    loadHodData = (page) => {
+        let URL =
+            page && page > 1
+                ? `${this.url}/hod/?page=${page}`
+                : `${this.url}/hod/`;
+
+        fetch(URL, {
             headers: this.headers,
             method: "GET",
         })
@@ -862,8 +867,13 @@ class AdminHODAndStudentList extends Component {
     };
 
     // Fetch Students list
-    loadStudentData = () => {
-        fetch(`${this.url}/student/?page=${this.state.activeStudentPage}`, {
+    loadStudentData = (page) => {
+        let URL =
+            page && page > 1
+                ? `${this.url}/student/?page=${page}`
+                : `${this.url}/student/`;
+
+        fetch(URL, {
             headers: this.headers,
             method: "GET",
         })
@@ -991,7 +1001,7 @@ class AdminHODAndStudentList extends Component {
 
     handleHODPageChange(pageNumber) {
         this.setState({ activeHODPage: pageNumber, page_loading: true }, () => {
-            this.loadHodData();
+            this.loadHodData(this.state.activeHODPage);
         });
     }
 
@@ -999,7 +1009,7 @@ class AdminHODAndStudentList extends Component {
         this.setState(
             { activeStudentPage: pageNumber, page_loading: true },
             () => {
-                this.loadStudentData();
+                this.loadStudentData(this.state.activeStudentPage);
             }
         );
     }

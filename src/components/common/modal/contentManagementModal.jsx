@@ -154,10 +154,12 @@ export class SingleContentDeleteModal extends Component {
             showLoader: false,
         };
         this.authToken = localStorage.getItem("Authorization");
+        this.inquelAuth = localStorage.getItem("Inquel-Auth");
         this.headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             Authorization: this.authToken,
+            "Inquel-Auth": this.inquelAuth,
         };
     }
 

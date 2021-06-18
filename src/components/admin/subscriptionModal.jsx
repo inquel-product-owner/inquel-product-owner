@@ -1250,6 +1250,7 @@ export default class SubscriptionModal extends Component {
                                                     key={index}
                                                     className="p-1 rounded-lg"
                                                     id={list.course_id}
+                                                    style={{ cursor: "move" }}
                                                     onDragStart={(e) =>
                                                         this.handleDragStart(
                                                             e,
@@ -1344,6 +1345,7 @@ export default class SubscriptionModal extends Component {
                                                 id="search_terms"
                                                 className="form-control form-control-sm w-100 p-0"
                                                 onKeyUp={this.handleSearchTerms}
+                                                placeholder="Type here..."
                                             />
                                         </div>
                                         <small className="text-muted">
@@ -1742,13 +1744,24 @@ export class SubscriptionUpdateModal extends Component {
     constructor() {
         super();
         this.state = {
-            data: {},
+            subscription_data: {
+                title: "",
+                description: "",
+                months: 0,
+                days: 0,
+                discounted_price: "",
+                courses: [],
+                search_terms: [],
+                discount_applicable: false,
+            },
+            total_price: 0,
 
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+            modal_loading: true,
         };
         this.url = baseUrl + inquelAdminUrl;
         this.authToken = localStorage.getItem("Inquel-Auth");
@@ -1767,8 +1780,26 @@ export class SubscriptionUpdateModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    let total_price = 0;
+                    let data = this.state.subscription_data;
+
+                    data.title = result.data.title;
+                    data.description = result.data.description;
+                    data.months = result.data.duration_in_months;
+                    data.days = result.data.duration_in_days;
+                    data.discounted_price = result.data.discounted_price;
+                    data.courses = result.data.courses;
+                    data.search_terms = result.data.search_terms;
+                    data.discount_applicable = result.data.discount_applicable;
+
+                    result.data.courses.forEach((data) => {
+                        total_price += data.price;
+                    });
+
                     this.setState({
-                        data: result,
+                        subscription_data: data,
+                        total_price: total_price,
+                        modal_loading: false,
                     });
                 } else {
                     this.setState({
@@ -1786,7 +1817,164 @@ export class SubscriptionUpdateModal extends Component {
             });
     };
 
+    // ----- Subscription user inputs -----
+    handleInput = (event) => {
+        let data = this.state.subscription_data;
+        if (event.target.name === "months" || event.target.name === "days") {
+            data[event.target.name] = Number(event.target.value);
+        } else if (event.target.name === "discounted_price") {
+            data[event.target.name] = parseFloat(event.target.value);
+        } else {
+            data[event.target.name] = event.target.value;
+        }
+
+        this.setState({
+            subscription_data: data,
+        });
+    };
+
+    handleCoursePrice = (event, index) => {
+        let data = this.state.subscription_data;
+        data.courses[index].price = parseFloat(event.target.value);
+        let total_price = 0;
+
+        this.setState(
+            {
+                subscription_data: data,
+            },
+            () => {
+                data.courses.forEach((data) => {
+                    total_price += data.price;
+                });
+
+                this.setState({
+                    total_price: total_price,
+                });
+            }
+        );
+    };
+
+    // ----- Discounts -----
+    loadDiscounts = (event) => {
+        let data = this.state.subscription_data;
+
+        if (event.target.checked) {
+            data.discount_applicable = true;
+        } else {
+            data.discount_applicable = false;
+        }
+
+        this.setState({
+            subscription_data: data,
+        });
+    };
+
+    // ----- Search terms -----
+    handleSearchTerms = (event) => {
+        let data = this.state.subscription_data;
+        if (event.key === "Enter") {
+            if (event.target.value !== "") {
+                data.search_terms.push(event.target.value.trim());
+                this.setState(
+                    {
+                        subscription_data: data,
+                    },
+                    () => (document.getElementById("search_terms").value = "")
+                );
+            }
+        }
+    };
+
+    handleRemoveSearchTerms = (index) => {
+        let data = this.state.subscription_data;
+        data.search_terms.splice(index, 1);
+
+        this.setState({
+            subscription_data: data,
+        });
+    };
+
+    // ----- Course table removing -----
+    handleRemoveCourse = (index) => {
+        let data = this.state.subscription_data;
+        let total_price = 0;
+
+        data.courses.splice(index, 1);
+
+        this.setState(
+            {
+                subscription_data: data,
+            },
+            () => {
+                data.courses.forEach((data) => {
+                    total_price += data.price;
+                });
+
+                this.setState({
+                    total_price: total_price,
+                });
+            }
+        );
+    };
+
+    // ----- Handle Submit -----
+    handleSubmit = () => {
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
+        const options = {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "multipart/form-data",
+                "Inquel-Auth": this.authToken,
+            },
+        };
+
+        let form_data = new FormData();
+        form_data.append(
+            "subscription_data",
+            JSON.stringify({
+                subscription_data: this.state.subscription_data,
+            })
+        );
+
+        axios
+            .put(
+                `${this.url}/subscription/${this.props.data.subscription_id}/`,
+                form_data,
+                options
+            )
+            .then((result) => {
+                if (result.data.sts === true) {
+                    this.setState({
+                        successMsg: result.data.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.data.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
+            });
+    };
+
     render() {
+        const data = this.state.subscription_data;
         return (
             <Modal
                 show={this.props.show}
@@ -1797,123 +1985,330 @@ export class SubscriptionUpdateModal extends Component {
                 scrollable
                 backdrop="static"
             >
-                <Modal.Header closeButton>Update subscription</Modal.Header>
+                <Modal.Header closeButton className="d-flex align-items-center">
+                    Update subscription{" "}
+                    {this.state.modal_loading ? (
+                        <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                            className="ml-3"
+                        />
+                    ) : (
+                        ""
+                    )}
+                </Modal.Header>
                 <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        className="sticky-top"
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        className="sticky-top"
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
                     <div className="row">
+                        {/* -------------- Left column --------------- */}
                         <div className="col-md-5 mb-3 mb-md-0">
-                            <div className="row align-items-center mb-4">
+                            <div className="form-row form-group">
                                 <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0">Title</p>
+                                    <p className="mb-0 small">
+                                        Subscription Title
+                                    </p>
                                 </div>
                                 <div className="col-md-8">
                                     <input
                                         type="text"
                                         name="title"
                                         id="title"
-                                        className="form-control form-control-sm form-shadow"
+                                        placeholder="Enter title"
+                                        value={data.title}
+                                        className="form-control border-secondary"
+                                        onChange={this.handleInput}
+                                        autoComplete="off"
                                     />
                                 </div>
                             </div>
-                            <div className="row align-items-center mb-4">
+                            <div className="form-row form-group">
                                 <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0">Duration / Validity</p>
+                                    <p className="mb-0 small">
+                                        Subscription Description
+                                    </p>
                                 </div>
                                 <div className="col-md-8">
-                                    <select
-                                        name="duration"
-                                        id="duration"
-                                        className="form-control form-control-sm form-shadow"
-                                    >
-                                        <option value="05">05</option>
-                                    </select>
+                                    <textarea
+                                        name="description"
+                                        id="description"
+                                        rows="4"
+                                        placeholder="Enter description"
+                                        className="form-control border-secondary"
+                                        value={data.description}
+                                        onChange={this.handleInput}
+                                        autoComplete="off"
+                                    ></textarea>
                                 </div>
                             </div>
-                            <div className="row align-items-center mb-4">
+                            <div className="form-row form-group">
                                 <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0">Pricing</p>
+                                    <p className="mb-0 small">Duration</p>
                                 </div>
                                 <div className="col-md-8">
-                                    <input
-                                        type="text"
-                                        name="pricing"
-                                        id="pricing"
-                                        className="form-control form-control-sm form-shadow"
-                                    />
+                                    <div className="form-row align-items-center">
+                                        <div className="col-6">
+                                            <select
+                                                name="months"
+                                                id="months"
+                                                className="form-control border-secondary"
+                                                onChange={this.handleInput}
+                                                value={data.months}
+                                            >
+                                                <option value="">Months</option>
+                                                {Array(12)
+                                                    .fill()
+                                                    .map((element, index) => {
+                                                        return (
+                                                            <option
+                                                                key={index}
+                                                                value={
+                                                                    index + 1
+                                                                }
+                                                            >
+                                                                {index + 1}{" "}
+                                                                Months
+                                                            </option>
+                                                        );
+                                                    })}
+                                            </select>
+                                        </div>
+                                        <div className="col-6">
+                                            <select
+                                                name="days"
+                                                id="days"
+                                                className="form-control border-secondary"
+                                                onChange={this.handleInput}
+                                                value={data.days}
+                                            >
+                                                <option value="">Days</option>
+                                                {Array(31)
+                                                    .fill()
+                                                    .map((element, index) => {
+                                                        return (
+                                                            <option
+                                                                key={index}
+                                                                value={
+                                                                    index + 1
+                                                                }
+                                                            >
+                                                                {index + 1} Days
+                                                            </option>
+                                                        );
+                                                    })}
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="form-check mb-4">
+                            <div className="form-row form-group">
+                                <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0 small">Pricing</p>
+                                </div>
+                                <div className="col-md-8">
+                                    <form action="">
+                                        <input
+                                            type="number"
+                                            name="discounted_price"
+                                            id="discounted_price"
+                                            placeholder="Enter pricing"
+                                            value={data.discounted_price}
+                                            className="form-control border-secondary"
+                                            onChange={this.handleInput}
+                                            autoComplete="off"
+                                        />
+                                    </form>
+                                </div>
+                            </div>
+
+                            {/* ----- Discounts ----- */}
+                            <div className="custom-control custom-checkbox mb-2">
                                 <input
-                                    className="form-check-input"
                                     type="checkbox"
-                                    value=""
-                                    id="discount"
-                                    name="discount"
+                                    className="custom-control-input"
+                                    id="discounts"
+                                    checked={
+                                        data.discount_applicable ? true : false
+                                    }
+                                    onChange={this.loadDiscounts}
                                 />
                                 <label
-                                    className="form-check-label"
-                                    htmlFor="discount"
+                                    className="custom-control-label"
+                                    htmlFor="discounts"
                                 >
                                     Discounts applicable
                                 </label>
                             </div>
-                            <div className="row">
-                                <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0">Search terms</p>
+
+                            {/* ----- Search terms ----- */}
+                            <div className="form-group">
+                                <label htmlFor="searchterms">
+                                    Search terms
+                                </label>
+                                <div className="border-secondary rounded-lg p-1">
+                                    <div className="d-flex flex-wrap font-weight-bold-600">
+                                        {data.search_terms.map(
+                                            (list, index) => {
+                                                return (
+                                                    <div
+                                                        className="d-flex align-items-center light-bg borders primary-text mr-1 mb-1 p-1 rounded-lg"
+                                                        key={index}
+                                                        style={{
+                                                            fontSize: "11px",
+                                                        }}
+                                                    >
+                                                        <span>{list}</span>
+                                                        <span
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                            onClick={() =>
+                                                                this.handleRemoveSearchTerms(
+                                                                    index
+                                                                )
+                                                            }
+                                                        >
+                                                            <i className="fas fa-times ml-2"></i>
+                                                        </span>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        name="search_terms"
+                                        id="search_terms"
+                                        className="form-control form-control-sm w-100 p-0"
+                                        onKeyUp={this.handleSearchTerms}
+                                        placeholder="Type here..."
+                                    />
                                 </div>
-                                <div className="col-md-8">
-                                    <textarea
-                                        name="searchterm"
-                                        id="searchterm"
-                                        rows="5"
-                                        className="form-control form-control-sm form-shadow"
-                                    ></textarea>
-                                </div>
+                                <small className="text-muted">
+                                    Press Enter to create search terms
+                                </small>
                             </div>
                         </div>
+
+                        {/* --------------- Right column --------------- */}
+
                         <div className="col-md-7">
-                            <div className="card shadow-sm h-100">
-                                <div className="card-header">
-                                    <h6>Subscription ID SP2020210001</h6>
+                            <h6 className="primary-text mb-3">
+                                Subscription ID: {this.props.data.search_id}
+                            </h6>
+                            <div
+                                className="card border-secondary"
+                                style={{ minHeight: "180px" }}
+                            >
+                                <div className="table-responsive">
+                                    <table className="table">
+                                        <thead className="primary-text">
+                                            <tr
+                                                style={{ whiteSpace: "nowrap" }}
+                                            >
+                                                <th scope="col">Sl.No</th>
+                                                <th scope="col">Course name</th>
+                                                <th scope="col">Price(INR)</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {data.courses &&
+                                            data.courses.length !== 0
+                                                ? (data.courses || []).map(
+                                                      (list, index) => {
+                                                          return (
+                                                              <tr
+                                                                  key={index}
+                                                                  style={{
+                                                                      whiteSpace:
+                                                                          "nowrap",
+                                                                  }}
+                                                              >
+                                                                  <td>
+                                                                      {index +
+                                                                          1}
+                                                                  </td>
+                                                                  <td>
+                                                                      {
+                                                                          list.course_name
+                                                                      }
+                                                                  </td>
+                                                                  <td>
+                                                                      <input
+                                                                          type="number"
+                                                                          name="price"
+                                                                          id="price"
+                                                                          className="form-control form-control-sm border-secondary"
+                                                                          value={
+                                                                              list.price
+                                                                          }
+                                                                          onChange={(
+                                                                              event
+                                                                          ) =>
+                                                                              this.handleCoursePrice(
+                                                                                  event,
+                                                                                  index
+                                                                              )
+                                                                          }
+                                                                          autoComplete="off"
+                                                                      />
+                                                                  </td>
+                                                                  <td>
+                                                                      <span
+                                                                          style={{
+                                                                              cursor: "pointer",
+                                                                          }}
+                                                                          onClick={() =>
+                                                                              this.handleRemoveCourse(
+                                                                                  index
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <i className="fas fa-minus-circle"></i>
+                                                                      </span>
+                                                                  </td>
+                                                              </tr>
+                                                          );
+                                                      }
+                                                  )
+                                                : null}
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div className="card-body">
-                                    <div className="table-responsive">
-                                        <table className="table">
-                                            <thead className="primary-text">
-                                                <tr>
-                                                    <th scope="col">Sl.No</th>
-                                                    <th scope="col">
-                                                        Course ID
-                                                    </th>
-                                                    <th scope="col">
-                                                        Assigned course list
-                                                    </th>
-                                                    <th scope="col">
-                                                        Price(INR)
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>01</td>
-                                                    <td>SJBDIHENKD885858</td>
-                                                    <td>
-                                                        CBSE 10th Maths -
-                                                        Premium
-                                                    </td>
-                                                    <td>2000.00</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <button className="btn btn-light btn-block btn-sm my-3">
-                                        Add
-                                    </button>
-                                    <div className="text-right">
-                                        <span className="primary-text font-weight-bold mr-3">
-                                            Total:
-                                        </span>
-                                        2000.00
-                                    </div>
+                                <div className="card-footer text-right mt-auto">
+                                    <span className="primary-text font-weight-bold mr-3">
+                                        Total:
+                                    </span>
+                                    {this.state.total_price}
                                 </div>
                             </div>
                         </div>
@@ -1930,6 +2325,18 @@ export class SubscriptionUpdateModal extends Component {
                         className="btn btn-primary btn-sm shadow-none"
                         onClick={this.handleSubmit}
                     >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
                         Update
                     </button>
                 </Modal.Footer>

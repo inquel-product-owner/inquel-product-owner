@@ -124,25 +124,46 @@ const CourseCard = (props) => {
                                           <Dropdown>
                                               <Dropdown.Toggle
                                                   variant="white"
-                                                  className="btn btn-primary-invert btn-sm shadow-none caret-off"
+                                                  className="btn text-dark bg-light btn-sm shadow-none caret-off"
                                               >
                                                   <i className="fas fa-ellipsis-v"></i>
                                               </Dropdown.Toggle>
 
                                               <Dropdown.Menu>
                                                   {props.course ? (
-                                                      <Dropdown.Item>
+                                                      <Dropdown.Item
+                                                          onClick={async () => {
+                                                              await props.handleID(
+                                                                  list.course_id
+                                                              );
+                                                              props.handlePublishUnpublish();
+                                                          }}
+                                                      >
                                                           <i className="fas fa-sign-out-alt mr-1"></i>{" "}
                                                           Unpublish
                                                       </Dropdown.Item>
                                                   ) : props.published ? (
-                                                      <Dropdown.Item>
-                                                          <i className="far fa-sign-out-alt mr-1"></i>{" "}
+                                                      <Dropdown.Item
+                                                          onClick={async () => {
+                                                              await props.handleID(
+                                                                  list.subscription_id
+                                                              );
+                                                              props.handlePublishUnpublish();
+                                                          }}
+                                                      >
+                                                          <i className="fas fa-sign-out-alt mr-1"></i>{" "}
                                                           Unpublish
                                                       </Dropdown.Item>
                                                   ) : (
                                                       <>
-                                                          <Dropdown.Item>
+                                                          <Dropdown.Item
+                                                              onClick={async () => {
+                                                                  await props.handleID(
+                                                                      list.subscription_id
+                                                                  );
+                                                                  props.handlePublishUnpublish();
+                                                              }}
+                                                          >
                                                               <i className="fas fa-upload mr-1"></i>{" "}
                                                               Publish
                                                           </Dropdown.Item>
@@ -231,6 +252,41 @@ class AdminDashboard extends Component {
         });
     };
 
+    // ----- Data loading -----
+    loadPublishedSubscription = (page) => {
+        let URL =
+            page && page > 1
+                ? `${this.inquelURL}/subscription/list/publish/?page=${page}`
+                : `${this.inquelURL}/subscription/list/publish/`;
+        fetch(URL, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        published: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+    };
+
     loadUnpublishedSubscription = (page) => {
         let URL =
             page && page > 1
@@ -302,6 +358,7 @@ class AdminDashboard extends Component {
     componentDidMount = () => {
         document.title = "Dashboard - Admin | IQLabs";
 
+        this.loadPublishedSubscription();
         this.loadUnpublishedSubscription();
         this.loadHODCourses();
     };
@@ -317,6 +374,87 @@ class AdminDashboard extends Component {
         this.loadUnpublishedSubscription();
     };
 
+    // ----- Publish & Unpublish -----
+    handleID = (id) => {
+        try {
+            let temp = [];
+
+            if (Array.isArray(id)) {
+                temp = id;
+            } else {
+                temp.push(id);
+            }
+
+            this.setState({
+                selectedData: temp,
+            });
+        } catch (error) {
+            console.log(error);
+            this.setState({
+                errorMsg: "Something went wrong!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        }
+    };
+
+    handlePublishUnpublish = async () => {
+        this.setState({
+            page_loading: true,
+        });
+
+        await (this.state.selectedData || []).forEach(async (id, index) => {
+            let URL =
+                this.state.activeTab === "published"
+                    ? `${this.inquelURL}/subscription/${id}/unpublish/`
+                    : this.state.activeTab === "unpublished"
+                    ? `${this.inquelURL}/subscription/${id}/publish/`
+                    : `${this.inquelURL}/hod/course/${id}/unpublish/`;
+
+            await fetch(URL, {
+                method: "POST",
+                headers: this.headers,
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                });
+        });
+
+        if (this.state.activeTab === "hod_course") {
+            setTimeout(() => {
+                this.loadHODCourses(this.state.activeHODCoursePage);
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                this.loadPublishedSubscription(this.state.activePublishedPage);
+                this.loadUnpublishedSubscription(
+                    this.state.activeUnpublishPage
+                );
+            }, 1000);
+        }
+    };
+
+    // ----- Pagination -----
     handlePublishedPageChange(pageNumber) {
         this.setState(
             { activePublishedPage: pageNumber, page_loading: true },
@@ -371,11 +509,15 @@ class AdminDashboard extends Component {
                 />
 
                 {/* Subscription create modal */}
-                <SubscriptionModal
-                    show={this.state.showSubscriptionModal}
-                    onHide={this.toggleSubscriptionModal}
-                    formSubmission={this.formSubmission}
-                />
+                {this.state.showSubscriptionModal ? (
+                    <SubscriptionModal
+                        show={this.state.showSubscriptionModal}
+                        onHide={this.toggleSubscriptionModal}
+                        formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
 
                 {/* Subscription update modal */}
                 {this.state.showSubscriptionEditModal ? (
@@ -494,6 +636,7 @@ class AdminDashboard extends Component {
                             this.state.activeTab === "published" ? (
                                 <button
                                     className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublishUnpublish}
                                     disabled={
                                         this.state.published.results &&
                                         this.state.published.results.length ===
@@ -507,6 +650,7 @@ class AdminDashboard extends Component {
                             ) : this.state.activeTab === "hod_course" ? (
                                 <button
                                     className="btn btn-primary btn-sm shadow-none ml-1"
+                                    onClick={this.handlePublishUnpublish}
                                     disabled={
                                         this.state.hod_courses.results &&
                                         this.state.hod_courses.results
@@ -520,6 +664,7 @@ class AdminDashboard extends Component {
                             ) : (
                                 <button
                                     className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublishUnpublish}
                                     disabled={
                                         this.state.unpublished.results &&
                                         this.state.unpublished.results
@@ -552,6 +697,7 @@ class AdminDashboard extends Component {
                             <div className="card shadow-sm">
                                 <SubscriptionTable
                                     data={this.state.published.results || []}
+                                    handleID={this.handleID}
                                 />
                                 <div className="card-body p-3">
                                     {this.state.published.count >
@@ -580,6 +726,7 @@ class AdminDashboard extends Component {
                             <div className="card shadow-sm">
                                 <SubscriptionTable
                                     data={this.state.unpublished.results || []}
+                                    handleID={this.handleID}
                                     toggleEdit={(data) => {
                                         this.setState({
                                             showSubscriptionEditModal:
@@ -622,6 +769,7 @@ class AdminDashboard extends Component {
                             <div className="card shadow-sm">
                                 <CourseTable
                                     data={this.state.hod_courses.results || []}
+                                    handleID={this.handleID}
                                 />
                                 <div className="card-body p-3">
                                     {this.state.hod_courses.count >
@@ -658,6 +806,10 @@ class AdminDashboard extends Component {
                                 data={this.state.published}
                                 activePage={this.state.activePublishedPage}
                                 handleOnChange={this.handlePublishedPageChange}
+                                handleID={this.handleID}
+                                handlePublishUnpublish={
+                                    this.handlePublishUnpublish
+                                }
                                 published={true}
                             />
                         </Tab>
@@ -671,6 +823,10 @@ class AdminDashboard extends Component {
                                 data={this.state.unpublished}
                                 activePage={this.state.activeUnpublishPage}
                                 handleOnChange={this.handleUnpublishPageChange}
+                                handleID={this.handleID}
+                                handlePublishUnpublish={
+                                    this.handlePublishUnpublish
+                                }
                                 toggleEdit={(data) => {
                                     this.setState({
                                         showSubscriptionEditModal:
@@ -697,6 +853,10 @@ class AdminDashboard extends Component {
                                 data={this.state.hod_courses}
                                 activePage={this.state.activeHODCoursePage}
                                 handleOnChange={this.handleHODCoursePageChange}
+                                handleID={this.handleID}
+                                handlePublishUnpublish={
+                                    this.handlePublishUnpublish
+                                }
                                 course={true}
                             />
                         </Tab>
