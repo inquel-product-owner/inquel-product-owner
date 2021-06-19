@@ -36,13 +36,15 @@ export default class SubscriptionModal extends Component {
                 discounted_price: "",
                 courses: [],
                 search_terms: [],
-                recommend_course: [],
+                recommended_course: [],
                 discount_applicable: false,
+                coupons: [],
             },
             total_price: 0,
 
             course_list: [],
             discounts: [],
+            recommended_course: [],
 
             file: "",
             filename: "",
@@ -77,9 +79,13 @@ export default class SubscriptionModal extends Component {
                 if (result.sts === true) {
                     let filter = this.state.filter;
                     filter.category = result.data.category;
+                    let subscription_data = this.state.subscription_data;
+                    subscription_data.discount_applicable = false;
                     this.setState({
                         filter: filter,
+                        subscription_data: subscription_data,
                         course_list: [],
+                        discounts: [],
                     });
                 } else {
                     this.setState({
@@ -115,10 +121,14 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
+        let subscription_data = this.state.subscription_data;
+        subscription_data.discount_applicable = false;
         this.setState({
             selected: data,
             filter: filter,
+            subscription_data: subscription_data,
             course_list: [],
+            discounts: [],
         });
 
         if (event.value !== "") {
@@ -167,10 +177,14 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
+        let subscription_data = this.state.subscription_data;
+        subscription_data.discount_applicable = false;
         this.setState({
             selected: data,
             filter: filter,
+            subscription_data: subscription_data,
             course_list: [],
+            discounts: [],
         });
 
         if (event.value !== "") {
@@ -220,10 +234,14 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
+        let subscription_data = this.state.subscription_data;
+        subscription_data.discount_applicable = false;
         this.setState({
             selected: data,
             filter: filter,
+            subscription_data: subscription_data,
             course_list: [],
+            discounts: [],
         });
 
         if (event.value !== "") {
@@ -271,10 +289,14 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
+        let subscription_data = this.state.subscription_data;
+        subscription_data.discount_applicable = false;
         this.setState({
             selected: data,
             filter: filter,
+            subscription_data: subscription_data,
             course_list: [],
+            discounts: [],
         });
 
         if (event.value !== "") {
@@ -324,6 +346,7 @@ export default class SubscriptionModal extends Component {
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
         });
 
         if (event.value !== "") {
@@ -371,6 +394,7 @@ export default class SubscriptionModal extends Component {
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
         });
 
         if (event.value !== "") {
@@ -416,6 +440,7 @@ export default class SubscriptionModal extends Component {
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
         });
 
         if (event.value !== "") {
@@ -459,6 +484,7 @@ export default class SubscriptionModal extends Component {
             {
                 selected: data,
                 course_list: [],
+                discounts: [],
             },
             () => {
                 if (event.value !== "") {
@@ -543,6 +569,7 @@ export default class SubscriptionModal extends Component {
     handleSubscriptionDrop = (event) => {
         let data = JSON.parse(event.dataTransfer.getData("data")) || null;
         let subscription = this.state.subscription_data;
+        let recommended_course = this.state.recommended_course;
 
         if (data !== null) {
             const found = subscription.courses.some(
@@ -554,6 +581,16 @@ export default class SubscriptionModal extends Component {
                     course_name: data.course_name,
                     price: "",
                 });
+                if (subscription.recommended_course.includes(data.course_id)) {
+                    subscription.recommended_course.splice(
+                        subscription.recommended_course.indexOf(data.course_id),
+                        1
+                    );
+                    recommended_course.splice(
+                        subscription.recommended_course.indexOf(data.course_id),
+                        1
+                    );
+                }
             } else {
                 this.setState({
                     errorMsg: "Course already added!",
@@ -564,22 +601,36 @@ export default class SubscriptionModal extends Component {
 
         this.setState({
             subscription_data: subscription,
+            recommended_course: recommended_course,
         });
     };
 
     handleRecommendDrop = (event) => {
         let data = JSON.parse(event.dataTransfer.getData("data")) || null;
         let subscription = this.state.subscription_data;
+        let recommended_course = this.state.recommended_course;
 
         if (data !== null) {
-            const found = subscription.recommend_course.some(
-                (el) => el === data.course_id
+            const found = subscription.courses.some(
+                (el) => el.course_id === data.course_id
             );
+            // checking if the course is already added in the subscription table
             if (!found) {
-                subscription.recommend_course.push(data.course_id);
+                if (!subscription.recommended_course.includes(data.course_id)) {
+                    subscription.recommended_course.push(data.course_id);
+                    recommended_course.push({
+                        course_name: data.course_name,
+                        course_id: data.course_id,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: "Course already added!",
+                        showErrorAlert: true,
+                    });
+                }
             } else {
                 this.setState({
-                    errorMsg: "Course already added!",
+                    errorMsg: "Course already added in the subscription!",
                     showErrorAlert: true,
                 });
             }
@@ -587,6 +638,7 @@ export default class SubscriptionModal extends Component {
 
         this.setState({
             subscription_data: subscription,
+            recommended_course: recommended_course,
         });
     };
 
@@ -614,8 +666,10 @@ export default class SubscriptionModal extends Component {
 
     handleRemoveRecommendCourse = (index) => {
         let data = this.state.subscription_data;
+        let recommended_course = this.state.recommended_course;
 
-        data.recommend_course.splice(index, 1);
+        data.recommended_course.splice(index, 1);
+        recommended_course.splice(index, 1);
 
         this.setState({
             subscription_data: data,
@@ -744,6 +798,19 @@ export default class SubscriptionModal extends Component {
             }
         } else {
             data.discount_applicable = false;
+        }
+
+        this.setState({
+            subscription_data: data,
+        });
+    };
+
+    handleCouponSelect = (id) => {
+        let data = this.state.subscription_data;
+        if (!data.coupons.includes(id)) {
+            data.coupons.push(id);
+        } else {
+            data.coupons.splice(data.coupons.indexOf(id), 1);
         }
 
         this.setState({
@@ -1355,10 +1422,10 @@ export default class SubscriptionModal extends Component {
                                 </div>
                             </div>
 
-                            <div className="row">
+                            <div className="form-row">
                                 {/* ----- Discounts ----- */}
-                                <div className="col-md-4">
-                                    <div className="custom-control custom-checkbox mb-3">
+                                <div className="col-md-5">
+                                    <div className="custom-control custom-checkbox mb-2">
                                         <input
                                             type="checkbox"
                                             className="custom-control-input"
@@ -1383,14 +1450,28 @@ export default class SubscriptionModal extends Component {
                                             Discounts applicable
                                         </label>
                                     </div>
-                                    <div className="d-flex flex-wrap small text-secondary">
+                                    <div className="d-flex flex-wrap small">
                                         {data.discount_applicable
                                             ? (this.state.discounts || []).map(
                                                   (list, index) => {
                                                       return (
                                                           <span
-                                                              className="bg-light border-secondary m-1 px-2 py-1 rounded-lg"
+                                                              className={`${
+                                                                  data.coupons.includes(
+                                                                      list.coupon_id
+                                                                  )
+                                                                      ? "primary-bg text-white border-primary"
+                                                                      : "bg-light border-secondary text-dark"
+                                                              } small m-1 px-2 py-1 rounded-lg`}
                                                               key={index}
+                                                              onClick={() =>
+                                                                  this.handleCouponSelect(
+                                                                      list.coupon_id
+                                                                  )
+                                                              }
+                                                              style={{
+                                                                  cursor: "pointer",
+                                                              }}
                                                           >
                                                               {list.coupon_name}
                                                           </span>
@@ -1402,7 +1483,7 @@ export default class SubscriptionModal extends Component {
                                 </div>
 
                                 {/* ----- Recommend course ----- */}
-                                <div className="col-md-8">
+                                <div className="col-md-7">
                                     <div className="form-group">
                                         <div
                                             className="card border-secondary"
@@ -1419,7 +1500,8 @@ export default class SubscriptionModal extends Component {
                                             </div>
                                             <div className="card-body pt-0 px-2">
                                                 {(
-                                                    data.recommend_course || []
+                                                    data.recommended_course ||
+                                                    []
                                                 ).map((list, index) => {
                                                     return (
                                                         <div
@@ -1429,7 +1511,7 @@ export default class SubscriptionModal extends Component {
                                                             <p className="small font-weight-bold-600 w-100 mr-2 mb-0">
                                                                 {(
                                                                     this.state
-                                                                        .course_list ||
+                                                                        .recommended_course ||
                                                                     []
                                                                 )
                                                                     .filter(
@@ -1805,6 +1887,7 @@ export class SubscriptionUpdateModal extends Component {
                     this.setState({
                         errorMsg: result.msg,
                         showErrorAlert: true,
+                        modal_loading: false,
                     });
                 }
             })
@@ -1813,6 +1896,7 @@ export class SubscriptionUpdateModal extends Component {
                 this.setState({
                     errorMsg: "Something went wrong!",
                     showErrorAlert: true,
+                    modal_loading: false,
                 });
             });
     };
