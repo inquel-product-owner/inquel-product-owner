@@ -8,9 +8,7 @@ import AlertBox from "../common/alert";
 import SubscriptionTable from "../common/table/subscription";
 import { paginationCount } from "../../shared/constant";
 import Paginations from "../common/pagination";
-import SubscriptionModal, {
-    SubscriptionUpdateModal,
-} from "./subscriptionModal";
+import SubscriptionModal from "./subscriptionModal";
 import CourseTable from "../common/table/course";
 import { SingleContentDeleteModal } from "../common/modal/contentManagementModal";
 
@@ -113,6 +111,13 @@ const CourseCard = (props) => {
                                           {list.course_name
                                               ? list.course_name
                                               : list.title}
+                                          {!props.course ? (
+                                              <p className="small mt-1 mb-0">
+                                                  {list.description}
+                                              </p>
+                                          ) : (
+                                              ""
+                                          )}
                                       </div>
                                       <div
                                           className="text-right mt-2"
@@ -521,7 +526,7 @@ class AdminDashboard extends Component {
 
                 {/* Subscription update modal */}
                 {this.state.showSubscriptionEditModal ? (
-                    <SubscriptionUpdateModal
+                    <SubscriptionModal
                         show={this.state.showSubscriptionEditModal}
                         onHide={() =>
                             this.setState({
@@ -871,234 +876,3 @@ class AdminDashboard extends Component {
 }
 
 export default AdminDashboard;
-
-// class CourseDetails extends Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             subscriptionModalShow: false,
-//         };
-//     }
-
-//     toggleSubscriptionModal = () => {
-//         this.setState({
-//             subscriptionModalShow: !this.state.subscriptionModalShow,
-//         });
-//     };
-
-//     render() {
-//         return (
-//             <>
-//                 <SubscriptionUpdateModal
-//                     show={this.state.subscriptionModalShow}
-//                     onHide={this.toggleSubscriptionModal}
-//                 />
-//                 <div className="card shadow-sm">
-//                     <div className="card-header text-right p-1">
-//                         <button
-//                             className="btn btn-link btn-sm shadow-none"
-//                             onClick={this.props.toggleClose}
-//                         >
-//                             <i className="fas fa-times fa-sm ml-1"></i> Close
-//                         </button>
-//                     </div>
-//                     <div className="card-body">
-//                         <h6 className="primary-text font-weight-bold mb-3">
-//                             Course Name
-//                         </h6>
-//                         <p className="primary-text">Configuration</p>
-//                         <div className="row align-items-center mb-3">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Category ID
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="category"
-//                                         id="category"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="school">School</option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <div className="row align-items-center mb-3">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Sub Category
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="subcategory"
-//                                         id="subcategory"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="sch">SCH</option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <div className="row align-items-center mb-3">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Discipline
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="discipline"
-//                                         id="discipline"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="none">None</option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <div className="row align-items-center mb-3">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Levels
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="level"
-//                                         id="level"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="10">10th</option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <div className="row align-items-center mb-3">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Subjects
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="subject"
-//                                         id="subject"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="maths">Maths</option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <div className="row align-items-center mb-3">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Board / University
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="university"
-//                                         id="university"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="cbse">CBSE</option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <div className="row align-items-center mb-4">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Type
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="type"
-//                                         id="type"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="premium">Premium</option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <Link
-//                             to="/admin/course/001"
-//                             style={{
-//                                 textDecoration: "none",
-//                             }}
-//                         >
-//                             <button className="btn btn-primary btn-block btn-sm">
-//                                 View course
-//                             </button>
-//                         </Link>
-//                         <div className="dropdown-divider my-3"></div>
-//                         <p className="primary-text small font-weight-bold">
-//                             Others
-//                         </p>
-//                         <div className="row align-items-center mb-3">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Assigned HOD
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="assignedhod"
-//                                         id="assignedhod"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="ram">Ram</option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <div className="row align-items-center mb-4">
-//                             <div className="col-md-5">
-//                                 <p className="primary-text small mb-0 font-weight-bold">
-//                                     Content Status
-//                                 </p>
-//                             </div>
-//                             <div className="col-md-7">
-//                                 <form action="">
-//                                     <select
-//                                         name="status"
-//                                         id="status"
-//                                         className="form-control form-control-sm form-shadow"
-//                                     >
-//                                         <option value="published">
-//                                             Published
-//                                         </option>
-//                                     </select>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                         <button
-//                             className="btn btn-primary btn-block btn-sm"
-//                             onClick={this.toggleSubscriptionModal}
-//                         >
-//                             Subscription plans
-//                         </button>
-//                         <div className="dropdown-divider my-3"></div>
-
-//                         <button className="btn btn-primary btn-block btn-sm">
-//                             Publish course
-//                         </button>
-//                     </div>
-//                 </div>
-//             </>
-//         );
-//     }
-// }

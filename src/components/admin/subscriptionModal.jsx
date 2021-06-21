@@ -36,8 +36,9 @@ export default class SubscriptionModal extends Component {
                 discounted_price: "",
                 courses: [],
                 search_terms: [],
-                recommend_course: [],
+                recommended_course: [],
                 discount_applicable: false,
+                coupons: [],
             },
             total_price: 0,
 
@@ -47,6 +48,18 @@ export default class SubscriptionModal extends Component {
             file: "",
             filename: "",
 
+            loader: {
+                category: true,
+                sub_category: false,
+                discipline: false,
+                levels: false,
+                subjects: false,
+                board: false,
+                type: false,
+                hod: false,
+                course_list: false,
+                modal_loading: true,
+            },
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -63,6 +76,75 @@ export default class SubscriptionModal extends Component {
     }
 
     componentDidMount = () => {
+        if (this.props.data) {
+            fetch(
+                `${this.url}/subscription/${this.props.data.subscription_id}/`,
+                {
+                    headers: this.headers,
+                    method: "GET",
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        let total_price = 0;
+                        let data = this.state.subscription_data;
+
+                        data.title = result.data.title;
+                        data.description = result.data.description;
+                        data.months = result.data.duration_in_months;
+                        data.days = result.data.duration_in_days;
+                        data.discounted_price = result.data.discounted_price;
+                        data.courses = result.data.courses;
+                        data.search_terms = result.data.search_terms;
+                        data.discount_applicable =
+                            result.data.discount_applicable === true
+                                ? true
+                                : false;
+                        data.coupons = result.data.coupons;
+                        data.recommended_course =
+                            result.data.recommended_course;
+
+                        result.data.courses.forEach((data) => {
+                            total_price += data.price;
+                        });
+
+                        let loader = this.state.loader;
+                        loader.modal_loading = false;
+
+                        this.setState({
+                            subscription_data: data,
+                            total_price: total_price,
+                            loader: loader,
+                        });
+                    } else {
+                        let loader = this.state.loader;
+                        loader.modal_loading = false;
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            loader: loader,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    let loader = this.state.loader;
+                    loader.modal_loading = false;
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        loader: loader,
+                    });
+                });
+        } else {
+            let loader = this.state.loader;
+            loader.modal_loading = false;
+            this.setState({
+                loader: loader,
+            });
+        }
+
         this.loadCategory();
     };
 
@@ -77,9 +159,13 @@ export default class SubscriptionModal extends Component {
                 if (result.sts === true) {
                     let filter = this.state.filter;
                     filter.category = result.data.category;
+                    let loader = this.state.loader;
+                    loader.category = false;
                     this.setState({
                         filter: filter,
                         course_list: [],
+                        discounts: [],
+                        loader: loader,
                     });
                 } else {
                     this.setState({
@@ -97,7 +183,7 @@ export default class SubscriptionModal extends Component {
             });
     };
 
-    loadSubCategory = (event) => {
+    loadSubCategory = async (event) => {
         let data = this.state.selected;
         data.category = event.value;
         data.sub_category = "";
@@ -115,10 +201,14 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
-        this.setState({
+        let loader = this.state.loader;
+        loader.sub_category = true;
+        await this.setState({
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
+            loader: loader,
         });
 
         if (event.value !== "") {
@@ -131,8 +221,11 @@ export default class SubscriptionModal extends Component {
                     if (result.sts === true) {
                         let filter = this.state.filter;
                         filter.sub_category = result.data.sub_category;
+                        let loader = this.state.loader;
+                        loader.sub_category = false;
                         this.setState({
                             filter: filter,
+                            loader: loader,
                         });
                     } else {
                         this.setState({
@@ -151,7 +244,7 @@ export default class SubscriptionModal extends Component {
         }
     };
 
-    loadDiscipline = (event) => {
+    loadDiscipline = async (event) => {
         let data = this.state.selected;
         data.sub_category = event.value;
         data.discipline = "";
@@ -167,10 +260,14 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
-        this.setState({
+        let loader = this.state.loader;
+        loader.discipline = true;
+        await this.setState({
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
+            loader: loader,
         });
 
         if (event.value !== "") {
@@ -186,8 +283,11 @@ export default class SubscriptionModal extends Component {
                     if (result.sts === true) {
                         let filter = this.state.filter;
                         filter.discipline = result.data.discipline;
+                        let loader = this.state.loader;
+                        loader.discipline = false;
                         this.setState({
                             filter: filter,
+                            loader: loader,
                         });
                     } else {
                         this.setState({
@@ -206,7 +306,7 @@ export default class SubscriptionModal extends Component {
         }
     };
 
-    loadLevels = (event) => {
+    loadLevels = async (event) => {
         let data = this.state.selected;
         data.discipline = event.value;
         data.levels = "";
@@ -220,10 +320,15 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
-        this.setState({
+        let loader = this.state.loader;
+        loader.levels = true;
+        loader.course_list = true;
+        await this.setState({
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
+            loader: loader,
         });
 
         if (event.value !== "") {
@@ -242,6 +347,8 @@ export default class SubscriptionModal extends Component {
                         this.setState({
                             filter: filter,
                         });
+                        let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}`;
+                        this.courseAPI(URL);
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -259,7 +366,7 @@ export default class SubscriptionModal extends Component {
         }
     };
 
-    loadSubjects = (event) => {
+    loadSubjects = async (event) => {
         let data = this.state.selected;
         data.levels = event.value;
         data.subjects = "";
@@ -271,10 +378,15 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
-        this.setState({
+        let loader = this.state.loader;
+        loader.subjects = true;
+        loader.course_list = true;
+        await this.setState({
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
+            loader: loader,
         });
 
         if (event.value !== "") {
@@ -293,6 +405,8 @@ export default class SubscriptionModal extends Component {
                         this.setState({
                             filter: filter,
                         });
+                        let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}&level=${data.levels}`;
+                        this.courseAPI(URL);
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -310,7 +424,7 @@ export default class SubscriptionModal extends Component {
         }
     };
 
-    loadBoard = (event) => {
+    loadBoard = async (event) => {
         let data = this.state.selected;
         data.subjects = event.value;
         data.board = "";
@@ -320,10 +434,15 @@ export default class SubscriptionModal extends Component {
         filter.type = [];
         filter.board = [];
         filter.hod = [];
-        this.setState({
+        let loader = this.state.loader;
+        loader.board = true;
+        loader.course_list = true;
+        await this.setState({
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
+            loader: loader,
         });
 
         if (event.value !== "") {
@@ -342,6 +461,14 @@ export default class SubscriptionModal extends Component {
                         this.setState({
                             filter: filter,
                         });
+                        let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}&level=${data.levels}&subject=${data.subjects}`;
+                        this.courseAPI(URL);
+                        if (
+                            this.state.discounts &&
+                            this.state.discounts.length === 0
+                        ) {
+                            this.discountsAPI();
+                        }
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -359,7 +486,7 @@ export default class SubscriptionModal extends Component {
         }
     };
 
-    loadType = (event) => {
+    loadType = async (event) => {
         let data = this.state.selected;
         data.board = event.value;
         data.type = "";
@@ -367,10 +494,15 @@ export default class SubscriptionModal extends Component {
         let filter = this.state.filter;
         filter.type = [];
         filter.hod = [];
-        this.setState({
+        let loader = this.state.loader;
+        loader.type = true;
+        loader.course_list = true;
+        await this.setState({
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
+            loader: loader,
         });
 
         if (event.value !== "") {
@@ -389,6 +521,8 @@ export default class SubscriptionModal extends Component {
                         this.setState({
                             filter: filter,
                         });
+                        let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}&level=${data.levels}&subject=${data.subjects}&board=${data.board}`;
+                        this.courseAPI(URL);
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -406,16 +540,21 @@ export default class SubscriptionModal extends Component {
         }
     };
 
-    loadHOD = (event) => {
+    loadHOD = async (event) => {
         let data = this.state.selected;
         data.type = event.value;
         data.hod = "";
         let filter = this.state.filter;
         filter.hod = [];
-        this.setState({
+        let loader = this.state.loader;
+        loader.hod = true;
+        loader.course_list = true;
+        await this.setState({
             selected: data,
             filter: filter,
             course_list: [],
+            discounts: [],
+            loader: loader,
         });
 
         if (event.value !== "") {
@@ -434,6 +573,8 @@ export default class SubscriptionModal extends Component {
                         this.setState({
                             filter: filter,
                         });
+                        let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}&level=${data.levels}&subject=${data.subjects}&board=${data.board}&type=${data.type}`;
+                        this.courseAPI(URL);
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -455,33 +596,33 @@ export default class SubscriptionModal extends Component {
     loadCourseList = (event) => {
         let data = this.state.selected;
         data.hod = event.value;
+        let loader = this.state.loader;
+        loader.course_list = true;
         this.setState(
             {
                 selected: data,
                 course_list: [],
+                discounts: [],
+                loader: loader,
             },
             () => {
                 if (event.value !== "") {
-                    this.courseAPI("");
+                    let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}&level=${data.levels}&subject=${data.subjects}&board=${data.board}&type=${data.type}&hod_id=${data.hod}`;
+                    this.courseAPI(URL);
                 }
             }
         );
     };
 
-    courseAPI = (path) => {
-        let selected = this.state.selected;
-        let URL = path
-            ? path
-            : `${this.url}/subscription/filter/course/?category=${selected.category}&sub_category=${selected.sub_category}&discipline=${selected.discipline}&level=${selected.levels}&subject=${selected.subjects}&board=${selected.board}&type=${selected.type}&hod_id=${selected.hod}`;
-
-        fetch(URL, {
+    courseAPI = async (path) => {
+        fetch(path, {
             headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                    let data = [...this.state.course_list];
+                    let data = this.state.course_list;
                     if (
                         result.data.results &&
                         result.data.results.length !== 0
@@ -491,9 +632,25 @@ export default class SubscriptionModal extends Component {
                             {
                                 course_list: data,
                             },
-                            () => {
+                            async () => {
                                 if (result.data.next !== null) {
+                                    let loader = this.state.loader;
+                                    loader.course_list = true;
+                                    await this.setState({
+                                        loader: loader,
+                                    });
                                     this.courseAPI(result.data.next);
+                                } else {
+                                    let loader = this.state.loader;
+                                    loader.course_list = false;
+                                    loader.levels = false;
+                                    loader.subjects = false;
+                                    loader.board = false;
+                                    loader.type = false;
+                                    loader.hod = false;
+                                    this.setState({
+                                        loader: loader,
+                                    });
                                 }
                             }
                         );
@@ -545,6 +702,7 @@ export default class SubscriptionModal extends Component {
         let subscription = this.state.subscription_data;
 
         if (data !== null) {
+            // checking whether a course is already present or not
             const found = subscription.courses.some(
                 (el) => el.course_id === data.course_id
             );
@@ -554,6 +712,20 @@ export default class SubscriptionModal extends Component {
                     course_name: data.course_name,
                     price: "",
                 });
+                // remove the course from the recommend section if it is already present
+                const isCourseAdded = subscription.recommended_course.some(
+                    (el) => el.course_id === data.course_id
+                );
+                if (isCourseAdded) {
+                    subscription.recommended_course.splice(
+                        subscription.recommended_course
+                            .map((item) => {
+                                return item.course_id;
+                            })
+                            .indexOf(data.course_id),
+                        1
+                    );
+                }
             } else {
                 this.setState({
                     errorMsg: "Course already added!",
@@ -572,14 +744,29 @@ export default class SubscriptionModal extends Component {
         let subscription = this.state.subscription_data;
 
         if (data !== null) {
-            const found = subscription.recommend_course.some(
-                (el) => el === data.course_id
+            // checking if the course is already added in the subscription table
+            const found = subscription.courses.some(
+                (el) => el.course_id === data.course_id
             );
             if (!found) {
-                subscription.recommend_course.push(data.course_id);
+                // check if course is already added in the recommended section
+                const isCourseAdded = subscription.recommended_course.some(
+                    (el) => el.course_id === data.course_id
+                );
+                if (!isCourseAdded) {
+                    subscription.recommended_course.push({
+                        course_name: data.course_name,
+                        course_id: data.course_id,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: "Course already added!",
+                        showErrorAlert: true,
+                    });
+                }
             } else {
                 this.setState({
-                    errorMsg: "Course already added!",
+                    errorMsg: "Course already added in the subscription!",
                     showErrorAlert: true,
                 });
             }
@@ -614,8 +801,7 @@ export default class SubscriptionModal extends Component {
 
     handleRemoveRecommendCourse = (index) => {
         let data = this.state.subscription_data;
-
-        data.recommend_course.splice(index, 1);
+        data.recommended_course.splice(index, 1);
 
         this.setState({
             subscription_data: data,
@@ -739,11 +925,34 @@ export default class SubscriptionModal extends Component {
 
         if (event.target.checked) {
             data.discount_applicable = true;
-            if (this.state.discounts && this.state.discounts.length === 0) {
-                this.discountsAPI();
-            }
         } else {
             data.discount_applicable = false;
+        }
+
+        this.setState({
+            subscription_data: data,
+        });
+    };
+
+    handleCouponSelect = (index, list) => {
+        let data = this.state.subscription_data;
+        let isCouponAvailable = data.coupons.some(
+            (el) => el.coupon_id === list.coupon_id
+        );
+        if (!isCouponAvailable) {
+            data.coupons.push({
+                coupon_name: list.coupon_name,
+                coupon_id: list.coupon_id,
+            });
+        } else {
+            data.coupons.splice(
+                data.coupons
+                    .map((item) => {
+                        return item.coupon_id;
+                    })
+                    .indexOf(list.coupon_id),
+                1
+            );
         }
 
         this.setState({
@@ -792,41 +1001,127 @@ export default class SubscriptionModal extends Component {
             },
         };
 
-        let form_data = new FormData();
-        form_data.append("subscription_image_1", this.state.file);
-        form_data.append(
-            "subscription_data",
-            JSON.stringify({
-                subscription_data: this.state.subscription_data,
-            })
-        );
-
-        axios
-            .post(`${this.url}/subscription/`, form_data, options)
-            .then((result) => {
-                if (result.data.sts === true) {
-                    this.setState({
-                        successMsg: result.data.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission();
-                } else {
-                    this.setState({
-                        errorMsg: result.data.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    showLoader: false,
-                });
+        let subscription = this.state.subscription_data;
+        if (subscription.title === "") {
+            this.setState({
+                errorMsg: "Subscription title is required",
+                showErrorAlert: true,
+                showLoader: false,
             });
+        } else if (subscription.description === "") {
+            this.setState({
+                errorMsg: "Subscription description is required",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (subscription.months === 0 && subscription.days === 0) {
+            this.setState({
+                errorMsg: "Select duration month and days",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (subscription.discounted_price === "") {
+            this.setState({
+                errorMsg: "Pricing is required",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            let form_data = new FormData();
+            if (this.state.file !== "") {
+                form_data.append("subscription_image_1", this.state.file);
+            }
+            form_data.append(
+                "subscription_data",
+                JSON.stringify({
+                    subscription_data: subscription,
+                })
+            );
+
+            if (this.props.data) {
+                axios
+                    .put(
+                        `${this.url}/subscription/${this.props.data.subscription_id}/`,
+                        form_data,
+                        options
+                    )
+                    .then((result) => {
+                        if (result.data.sts === true) {
+                            this.setState({
+                                successMsg: result.data.msg,
+                                showSuccessAlert: true,
+                                showLoader: false,
+                            });
+                            this.props.formSubmission();
+                        } else {
+                            this.setState({
+                                errorMsg: result.data.msg,
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        if (err.response) {
+                            this.setState({
+                                errorMsg: err.response.data.msg,
+                            });
+                        } else if (err.request) {
+                            this.setState({
+                                errorMsg: err.request.data.msg,
+                            });
+                        } else if (err.message) {
+                            this.setState({
+                                errorMsg: err.message.data.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    });
+            } else {
+                axios
+                    .post(`${this.url}/subscription/`, form_data, options)
+                    .then((result) => {
+                        if (result.data.sts === true) {
+                            this.setState({
+                                successMsg: result.data.msg,
+                                showSuccessAlert: true,
+                                showLoader: false,
+                            });
+                            this.props.formSubmission();
+                        } else {
+                            this.setState({
+                                errorMsg: result.data.msg,
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        if (err.response) {
+                            this.setState({
+                                errorMsg: err.response.data.msg,
+                            });
+                        } else if (err.request) {
+                            this.setState({
+                                errorMsg: err.request.data.msg,
+                            });
+                        } else if (err.message) {
+                            this.setState({
+                                errorMsg: err.message.data.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    });
+            }
+        }
     };
 
     render() {
@@ -841,7 +1136,21 @@ export default class SubscriptionModal extends Component {
                 scrollable
                 backdrop="static"
             >
-                <Modal.Header closeButton>Create subscription</Modal.Header>
+                <Modal.Header closeButton className="d-flex align-items-center">
+                    {this.props.data ? "Update" : "Create"} subscription{" "}
+                    {this.state.loader.modal_loading ? (
+                        <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                            className="ml-3"
+                        />
+                    ) : (
+                        ""
+                    )}
+                </Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -910,6 +1219,9 @@ export default class SubscriptionModal extends Component {
                                                           }
                                                         : "";
                                                 })}
+                                                isLoading={
+                                                    this.state.loader.category
+                                                }
                                                 onChange={this.loadSubCategory}
                                                 required
                                             />
@@ -956,6 +1268,9 @@ export default class SubscriptionModal extends Component {
                                                         ? true
                                                         : false
                                                 }
+                                                isLoading={
+                                                    this.state.loader.discipline
+                                                }
                                                 onChange={this.loadLevels}
                                                 required
                                             />
@@ -997,9 +1312,14 @@ export default class SubscriptionModal extends Component {
                                                 })}
                                                 isDisabled={
                                                     this.state.selected
-                                                        .levels === ""
+                                                        .levels === "" ||
+                                                    this.state.loader
+                                                        .course_list
                                                         ? true
                                                         : false
+                                                }
+                                                isLoading={
+                                                    this.state.loader.subjects
                                                 }
                                                 onChange={this.loadBoard}
                                                 required
@@ -1038,9 +1358,14 @@ export default class SubscriptionModal extends Component {
                                                 })}
                                                 isDisabled={
                                                     this.state.selected
-                                                        .board === ""
+                                                        .board === "" ||
+                                                    this.state.loader
+                                                        .course_list
                                                         ? true
                                                         : false
+                                                }
+                                                isLoading={
+                                                    this.state.loader.type
                                                 }
                                                 onChange={this.loadHOD}
                                                 required
@@ -1089,6 +1414,10 @@ export default class SubscriptionModal extends Component {
                                                         ? true
                                                         : false
                                                 }
+                                                isLoading={
+                                                    this.state.loader
+                                                        .sub_category
+                                                }
                                                 onChange={this.loadDiscipline}
                                                 required
                                             />
@@ -1128,9 +1457,14 @@ export default class SubscriptionModal extends Component {
                                                 })}
                                                 isDisabled={
                                                     this.state.selected
-                                                        .discipline === ""
+                                                        .discipline === "" ||
+                                                    this.state.loader
+                                                        .course_list
                                                         ? true
                                                         : false
+                                                }
+                                                isLoading={
+                                                    this.state.loader.levels
                                                 }
                                                 onChange={this.loadSubjects}
                                                 required
@@ -1173,9 +1507,14 @@ export default class SubscriptionModal extends Component {
                                                 })}
                                                 isDisabled={
                                                     this.state.selected
-                                                        .subjects === ""
+                                                        .subjects === "" ||
+                                                    this.state.loader
+                                                        .course_list
                                                         ? true
                                                         : false
+                                                }
+                                                isLoading={
+                                                    this.state.loader.board
                                                 }
                                                 onChange={this.loadType}
                                                 required
@@ -1218,9 +1557,14 @@ export default class SubscriptionModal extends Component {
                                                 })}
                                                 isDisabled={
                                                     this.state.selected.type ===
-                                                    ""
+                                                        "" ||
+                                                    this.state.loader
+                                                        .course_list
                                                         ? true
                                                         : false
+                                                }
+                                                isLoading={
+                                                    this.state.loader.hod
                                                 }
                                                 onChange={this.loadCourseList}
                                                 required
@@ -1243,32 +1587,38 @@ export default class SubscriptionModal extends Component {
                                     Course List
                                 </div>
                                 <div className="card-body px-2 pb-2 pt-0">
-                                    {(this.state.course_list || []).map(
-                                        (list, index) => {
-                                            return (
-                                                <div
-                                                    key={index}
-                                                    className="p-1 rounded-lg"
-                                                    id={list.course_id}
-                                                    style={{ cursor: "move" }}
-                                                    onDragStart={(e) =>
-                                                        this.handleDragStart(
-                                                            e,
-                                                            list
-                                                        )
-                                                    }
-                                                    onDragEnd={(e) =>
-                                                        this.handleDragEnd(e)
-                                                    }
-                                                    draggable
-                                                >
-                                                    <p className="small font-weight-bold-600 w-100 mb-0">
-                                                        {list.course_name}
-                                                    </p>
-                                                </div>
-                                            );
-                                        }
-                                    )}
+                                    {!this.state.loader.course_list
+                                        ? (this.state.course_list || []).map(
+                                              (list, index) => {
+                                                  return (
+                                                      <div
+                                                          key={index}
+                                                          className="p-1 rounded-lg"
+                                                          id={list.course_id}
+                                                          style={{
+                                                              cursor: "move",
+                                                          }}
+                                                          onDragStart={(e) =>
+                                                              this.handleDragStart(
+                                                                  e,
+                                                                  list
+                                                              )
+                                                          }
+                                                          onDragEnd={(e) =>
+                                                              this.handleDragEnd(
+                                                                  e
+                                                              )
+                                                          }
+                                                          draggable
+                                                      >
+                                                          <p className="small font-weight-bold-600 w-100 mb-0">
+                                                              {list.course_name}
+                                                          </p>
+                                                      </div>
+                                                  );
+                                              }
+                                          )
+                                        : "Loading..."}
                                 </div>
                             </div>
 
@@ -1355,26 +1705,21 @@ export default class SubscriptionModal extends Component {
                                 </div>
                             </div>
 
-                            <div className="row">
+                            <div className="form-row">
                                 {/* ----- Discounts ----- */}
-                                <div className="col-md-4">
-                                    <div className="custom-control custom-checkbox mb-3">
+                                <div className="col-md-5">
+                                    <div className="custom-control custom-checkbox mb-2">
                                         <input
                                             type="checkbox"
                                             className="custom-control-input"
                                             id="discounts"
                                             checked={
-                                                data.discount_applicable
+                                                data.discount_applicable ===
+                                                true
                                                     ? true
                                                     : false
                                             }
                                             onChange={this.loadDiscounts}
-                                            disabled={
-                                                this.state.selected.subjects ===
-                                                ""
-                                                    ? true
-                                                    : false
-                                            }
                                         />
                                         <label
                                             className="custom-control-label"
@@ -1383,14 +1728,24 @@ export default class SubscriptionModal extends Component {
                                             Discounts applicable
                                         </label>
                                     </div>
-                                    <div className="d-flex flex-wrap small text-secondary">
+                                    {/* coupons */}
+                                    <div className="d-flex flex-wrap small">
                                         {data.discount_applicable
-                                            ? (this.state.discounts || []).map(
+                                            ? (data.coupons || []).map(
                                                   (list, index) => {
                                                       return (
                                                           <span
-                                                              className="bg-light border-secondary m-1 px-2 py-1 rounded-lg"
+                                                              className="primary-bg text-white border-primary small m-1 px-2 py-1 rounded-lg"
                                                               key={index}
+                                                              onClick={() =>
+                                                                  this.handleCouponSelect(
+                                                                      index,
+                                                                      list
+                                                                  )
+                                                              }
+                                                              style={{
+                                                                  cursor: "pointer",
+                                                              }}
                                                           >
                                                               {list.coupon_name}
                                                           </span>
@@ -1399,10 +1754,42 @@ export default class SubscriptionModal extends Component {
                                               )
                                             : ""}
                                     </div>
+                                    {/* all discounts */}
+                                    <div className="d-flex flex-wrap small">
+                                        {data.discount_applicable
+                                            ? (this.state.discounts || []).map(
+                                                  (list, index) => {
+                                                      return !data.coupons.some(
+                                                          (el) =>
+                                                              el.coupon_id ===
+                                                              list.coupon_id
+                                                      ) ? (
+                                                          <span
+                                                              className="bg-light border-secondary text-dark small m-1 px-2 py-1 rounded-lg"
+                                                              key={index}
+                                                              onClick={() =>
+                                                                  this.handleCouponSelect(
+                                                                      index,
+                                                                      list
+                                                                  )
+                                                              }
+                                                              style={{
+                                                                  cursor: "pointer",
+                                                              }}
+                                                          >
+                                                              {list.coupon_name}
+                                                          </span>
+                                                      ) : (
+                                                          ""
+                                                      );
+                                                  }
+                                              )
+                                            : ""}
+                                    </div>
                                 </div>
 
                                 {/* ----- Recommend course ----- */}
-                                <div className="col-md-8">
+                                <div className="col-md-7">
                                     <div className="form-group">
                                         <div
                                             className="card border-secondary"
@@ -1419,7 +1806,8 @@ export default class SubscriptionModal extends Component {
                                             </div>
                                             <div className="card-body pt-0 px-2">
                                                 {(
-                                                    data.recommend_course || []
+                                                    data.recommended_course ||
+                                                    []
                                                 ).map((list, index) => {
                                                     return (
                                                         <div
@@ -1427,23 +1815,9 @@ export default class SubscriptionModal extends Component {
                                                             className="d-flex align-items-center mb-1"
                                                         >
                                                             <p className="small font-weight-bold-600 w-100 mr-2 mb-0">
-                                                                {(
-                                                                    this.state
-                                                                        .course_list ||
-                                                                    []
-                                                                )
-                                                                    .filter(
-                                                                        (id) =>
-                                                                            id.course_id ===
-                                                                            list
-                                                                    )
-                                                                    .map(
-                                                                        (
-                                                                            name
-                                                                        ) => {
-                                                                            return name.course_name;
-                                                                        }
-                                                                    )}
+                                                                {
+                                                                    list.course_name
+                                                                }
                                                             </p>
                                                             <span
                                                                 style={{
@@ -1532,19 +1906,18 @@ export default class SubscriptionModal extends Component {
                                                         "months"
                                                     )
                                                 }
+                                                value={data.months}
                                             >
                                                 <option value="">Months</option>
-                                                {Array(12)
+                                                {Array(13)
                                                     .fill()
                                                     .map((element, index) => {
                                                         return (
                                                             <option
                                                                 key={index}
-                                                                value={
-                                                                    index + 1
-                                                                }
+                                                                value={index}
                                                             >
-                                                                {index + 1}
+                                                                {index}
                                                             </option>
                                                         );
                                                     })}
@@ -1561,19 +1934,18 @@ export default class SubscriptionModal extends Component {
                                                         "days"
                                                     )
                                                 }
+                                                value={data.days}
                                             >
                                                 <option value="">Days</option>
-                                                {Array(31)
+                                                {Array(32)
                                                     .fill()
                                                     .map((element, index) => {
                                                         return (
                                                             <option
                                                                 key={index}
-                                                                value={
-                                                                    index + 1
-                                                                }
+                                                                value={index}
                                                             >
-                                                                {index + 1}
+                                                                {index}
                                                             </option>
                                                         );
                                                     })}
@@ -1581,10 +1953,7 @@ export default class SubscriptionModal extends Component {
                                         </div>
                                         <div className="col-5 mt-2 mt-md-0">
                                             <p className="mb-0">
-                                                {data.months && data.days
-                                                    ? `${data.months} Months ${data.days}
-                                                Days`
-                                                    : ""}
+                                                {`${data.months} Months ${data.days} Days`}
                                             </p>
                                         </div>
                                     </div>
@@ -1731,614 +2100,9 @@ export default class SubscriptionModal extends Component {
                             ) : (
                                 ""
                             )}
-                            Save
+                            {this.props.data ? "Update" : "Save"}
                         </button>
                     </div>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
-
-export class SubscriptionUpdateModal extends Component {
-    constructor() {
-        super();
-        this.state = {
-            subscription_data: {
-                title: "",
-                description: "",
-                months: 0,
-                days: 0,
-                discounted_price: "",
-                courses: [],
-                search_terms: [],
-                discount_applicable: false,
-            },
-            total_price: 0,
-
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-            modal_loading: true,
-        };
-        this.url = baseUrl + inquelAdminUrl;
-        this.authToken = localStorage.getItem("Inquel-Auth");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": this.authToken,
-        };
-    }
-
-    componentDidMount = () => {
-        fetch(`${this.url}/subscription/${this.props.data.subscription_id}/`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    let total_price = 0;
-                    let data = this.state.subscription_data;
-
-                    data.title = result.data.title;
-                    data.description = result.data.description;
-                    data.months = result.data.duration_in_months;
-                    data.days = result.data.duration_in_days;
-                    data.discounted_price = result.data.discounted_price;
-                    data.courses = result.data.courses;
-                    data.search_terms = result.data.search_terms;
-                    data.discount_applicable = result.data.discount_applicable;
-
-                    result.data.courses.forEach((data) => {
-                        total_price += data.price;
-                    });
-
-                    this.setState({
-                        subscription_data: data,
-                        total_price: total_price,
-                        modal_loading: false,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                });
-            });
-    };
-
-    // ----- Subscription user inputs -----
-    handleInput = (event) => {
-        let data = this.state.subscription_data;
-        if (event.target.name === "months" || event.target.name === "days") {
-            data[event.target.name] = Number(event.target.value);
-        } else if (event.target.name === "discounted_price") {
-            data[event.target.name] = parseFloat(event.target.value);
-        } else {
-            data[event.target.name] = event.target.value;
-        }
-
-        this.setState({
-            subscription_data: data,
-        });
-    };
-
-    handleCoursePrice = (event, index) => {
-        let data = this.state.subscription_data;
-        data.courses[index].price = parseFloat(event.target.value);
-        let total_price = 0;
-
-        this.setState(
-            {
-                subscription_data: data,
-            },
-            () => {
-                data.courses.forEach((data) => {
-                    total_price += data.price;
-                });
-
-                this.setState({
-                    total_price: total_price,
-                });
-            }
-        );
-    };
-
-    // ----- Discounts -----
-    loadDiscounts = (event) => {
-        let data = this.state.subscription_data;
-
-        if (event.target.checked) {
-            data.discount_applicable = true;
-        } else {
-            data.discount_applicable = false;
-        }
-
-        this.setState({
-            subscription_data: data,
-        });
-    };
-
-    // ----- Search terms -----
-    handleSearchTerms = (event) => {
-        let data = this.state.subscription_data;
-        if (event.key === "Enter") {
-            if (event.target.value !== "") {
-                data.search_terms.push(event.target.value.trim());
-                this.setState(
-                    {
-                        subscription_data: data,
-                    },
-                    () => (document.getElementById("search_terms").value = "")
-                );
-            }
-        }
-    };
-
-    handleRemoveSearchTerms = (index) => {
-        let data = this.state.subscription_data;
-        data.search_terms.splice(index, 1);
-
-        this.setState({
-            subscription_data: data,
-        });
-    };
-
-    // ----- Course table removing -----
-    handleRemoveCourse = (index) => {
-        let data = this.state.subscription_data;
-        let total_price = 0;
-
-        data.courses.splice(index, 1);
-
-        this.setState(
-            {
-                subscription_data: data,
-            },
-            () => {
-                data.courses.forEach((data) => {
-                    total_price += data.price;
-                });
-
-                this.setState({
-                    total_price: total_price,
-                });
-            }
-        );
-    };
-
-    // ----- Handle Submit -----
-    handleSubmit = () => {
-        this.setState({
-            showLoader: true,
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-
-        const options = {
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "multipart/form-data",
-                "Inquel-Auth": this.authToken,
-            },
-        };
-
-        let form_data = new FormData();
-        form_data.append(
-            "subscription_data",
-            JSON.stringify({
-                subscription_data: this.state.subscription_data,
-            })
-        );
-
-        axios
-            .put(
-                `${this.url}/subscription/${this.props.data.subscription_id}/`,
-                form_data,
-                options
-            )
-            .then((result) => {
-                if (result.data.sts === true) {
-                    this.setState({
-                        successMsg: result.data.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission();
-                } else {
-                    this.setState({
-                        errorMsg: result.data.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    showLoader: false,
-                });
-            });
-    };
-
-    render() {
-        const data = this.state.subscription_data;
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="xl"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-                scrollable
-                backdrop="static"
-            >
-                <Modal.Header closeButton className="d-flex align-items-center">
-                    Update subscription{" "}
-                    {this.state.modal_loading ? (
-                        <Spinner
-                            as="span"
-                            animation="border"
-                            size="sm"
-                            role="status"
-                            aria-hidden="true"
-                            className="ml-3"
-                        />
-                    ) : (
-                        ""
-                    )}
-                </Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        className="sticky-top"
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        className="sticky-top"
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-
-                    <div className="row">
-                        {/* -------------- Left column --------------- */}
-                        <div className="col-md-5 mb-3 mb-md-0">
-                            <div className="form-row form-group">
-                                <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0 small">
-                                        Subscription Title
-                                    </p>
-                                </div>
-                                <div className="col-md-8">
-                                    <input
-                                        type="text"
-                                        name="title"
-                                        id="title"
-                                        placeholder="Enter title"
-                                        value={data.title}
-                                        className="form-control border-secondary"
-                                        onChange={this.handleInput}
-                                        autoComplete="off"
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-row form-group">
-                                <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0 small">
-                                        Subscription Description
-                                    </p>
-                                </div>
-                                <div className="col-md-8">
-                                    <textarea
-                                        name="description"
-                                        id="description"
-                                        rows="4"
-                                        placeholder="Enter description"
-                                        className="form-control border-secondary"
-                                        value={data.description}
-                                        onChange={this.handleInput}
-                                        autoComplete="off"
-                                    ></textarea>
-                                </div>
-                            </div>
-                            <div className="form-row form-group">
-                                <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0 small">Duration</p>
-                                </div>
-                                <div className="col-md-8">
-                                    <div className="form-row align-items-center">
-                                        <div className="col-6">
-                                            <select
-                                                name="months"
-                                                id="months"
-                                                className="form-control border-secondary"
-                                                onChange={this.handleInput}
-                                                value={data.months}
-                                            >
-                                                <option value="">Months</option>
-                                                {Array(12)
-                                                    .fill()
-                                                    .map((element, index) => {
-                                                        return (
-                                                            <option
-                                                                key={index}
-                                                                value={
-                                                                    index + 1
-                                                                }
-                                                            >
-                                                                {index + 1}{" "}
-                                                                Months
-                                                            </option>
-                                                        );
-                                                    })}
-                                            </select>
-                                        </div>
-                                        <div className="col-6">
-                                            <select
-                                                name="days"
-                                                id="days"
-                                                className="form-control border-secondary"
-                                                onChange={this.handleInput}
-                                                value={data.days}
-                                            >
-                                                <option value="">Days</option>
-                                                {Array(31)
-                                                    .fill()
-                                                    .map((element, index) => {
-                                                        return (
-                                                            <option
-                                                                key={index}
-                                                                value={
-                                                                    index + 1
-                                                                }
-                                                            >
-                                                                {index + 1} Days
-                                                            </option>
-                                                        );
-                                                    })}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="form-row form-group">
-                                <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0 small">Pricing</p>
-                                </div>
-                                <div className="col-md-8">
-                                    <form action="">
-                                        <input
-                                            type="number"
-                                            name="discounted_price"
-                                            id="discounted_price"
-                                            placeholder="Enter pricing"
-                                            value={data.discounted_price}
-                                            className="form-control border-secondary"
-                                            onChange={this.handleInput}
-                                            autoComplete="off"
-                                        />
-                                    </form>
-                                </div>
-                            </div>
-
-                            {/* ----- Discounts ----- */}
-                            <div className="custom-control custom-checkbox mb-2">
-                                <input
-                                    type="checkbox"
-                                    className="custom-control-input"
-                                    id="discounts"
-                                    checked={
-                                        data.discount_applicable ? true : false
-                                    }
-                                    onChange={this.loadDiscounts}
-                                />
-                                <label
-                                    className="custom-control-label"
-                                    htmlFor="discounts"
-                                >
-                                    Discounts applicable
-                                </label>
-                            </div>
-
-                            {/* ----- Search terms ----- */}
-                            <div className="form-group">
-                                <label htmlFor="searchterms">
-                                    Search terms
-                                </label>
-                                <div className="border-secondary rounded-lg p-1">
-                                    <div className="d-flex flex-wrap font-weight-bold-600">
-                                        {data.search_terms.map(
-                                            (list, index) => {
-                                                return (
-                                                    <div
-                                                        className="d-flex align-items-center light-bg borders primary-text mr-1 mb-1 p-1 rounded-lg"
-                                                        key={index}
-                                                        style={{
-                                                            fontSize: "11px",
-                                                        }}
-                                                    >
-                                                        <span>{list}</span>
-                                                        <span
-                                                            style={{
-                                                                cursor: "pointer",
-                                                            }}
-                                                            onClick={() =>
-                                                                this.handleRemoveSearchTerms(
-                                                                    index
-                                                                )
-                                                            }
-                                                        >
-                                                            <i className="fas fa-times ml-2"></i>
-                                                        </span>
-                                                    </div>
-                                                );
-                                            }
-                                        )}
-                                    </div>
-                                    <input
-                                        type="text"
-                                        name="search_terms"
-                                        id="search_terms"
-                                        className="form-control form-control-sm w-100 p-0"
-                                        onKeyUp={this.handleSearchTerms}
-                                        placeholder="Type here..."
-                                    />
-                                </div>
-                                <small className="text-muted">
-                                    Press Enter to create search terms
-                                </small>
-                            </div>
-                        </div>
-
-                        {/* --------------- Right column --------------- */}
-
-                        <div className="col-md-7">
-                            <h6 className="primary-text mb-3">
-                                Subscription ID: {this.props.data.search_id}
-                            </h6>
-                            <div
-                                className="card border-secondary"
-                                style={{ minHeight: "180px" }}
-                            >
-                                <div className="table-responsive">
-                                    <table className="table">
-                                        <thead className="primary-text">
-                                            <tr
-                                                style={{ whiteSpace: "nowrap" }}
-                                            >
-                                                <th scope="col">Sl.No</th>
-                                                <th scope="col">Course name</th>
-                                                <th scope="col">Price(INR)</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {data.courses &&
-                                            data.courses.length !== 0
-                                                ? (data.courses || []).map(
-                                                      (list, index) => {
-                                                          return (
-                                                              <tr
-                                                                  key={index}
-                                                                  style={{
-                                                                      whiteSpace:
-                                                                          "nowrap",
-                                                                  }}
-                                                              >
-                                                                  <td>
-                                                                      {index +
-                                                                          1}
-                                                                  </td>
-                                                                  <td>
-                                                                      {
-                                                                          list.course_name
-                                                                      }
-                                                                  </td>
-                                                                  <td>
-                                                                      <input
-                                                                          type="number"
-                                                                          name="price"
-                                                                          id="price"
-                                                                          className="form-control form-control-sm border-secondary"
-                                                                          value={
-                                                                              list.price
-                                                                          }
-                                                                          onChange={(
-                                                                              event
-                                                                          ) =>
-                                                                              this.handleCoursePrice(
-                                                                                  event,
-                                                                                  index
-                                                                              )
-                                                                          }
-                                                                          autoComplete="off"
-                                                                      />
-                                                                  </td>
-                                                                  <td>
-                                                                      <span
-                                                                          style={{
-                                                                              cursor: "pointer",
-                                                                          }}
-                                                                          onClick={() =>
-                                                                              this.handleRemoveCourse(
-                                                                                  index
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <i className="fas fa-minus-circle"></i>
-                                                                      </span>
-                                                                  </td>
-                                                              </tr>
-                                                          );
-                                                      }
-                                                  )
-                                                : null}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div className="card-footer text-right mt-auto">
-                                    <span className="primary-text font-weight-bold mr-3">
-                                        Total:
-                                    </span>
-                                    {this.state.total_price}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-link btn-sm shadow-none mr-1"
-                        onClick={this.props.onHide}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm shadow-none"
-                        onClick={this.handleSubmit}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Update
-                    </button>
                 </Modal.Footer>
             </Modal>
         );

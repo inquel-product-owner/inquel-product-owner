@@ -734,8 +734,20 @@ class TeacherConcepts extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                if (err.response) {
+                    this.setState({
+                        errorMsg: err.response.data.msg,
+                    });
+                } else if (err.request) {
+                    this.setState({
+                        errorMsg: err.request.data.msg,
+                    });
+                } else if (err.message) {
+                    this.setState({
+                        errorMsg: err.message.data.msg,
+                    });
+                }
                 this.setState({
-                    errorMsg: "Something went wrong!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -782,8 +794,20 @@ class TeacherConcepts extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                if (err.response) {
+                    this.setState({
+                        errorMsg: err.response.data.msg,
+                    });
+                } else if (err.request) {
+                    this.setState({
+                        errorMsg: err.request.data.msg,
+                    });
+                } else if (err.message) {
+                    this.setState({
+                        errorMsg: err.message.data.msg,
+                    });
+                }
                 this.setState({
-                    errorMsg: "Something went wrong!",
                     showErrorAlert: true,
                     page_loading: false,
                 });

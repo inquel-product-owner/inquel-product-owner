@@ -224,8 +224,21 @@ class CycleDirectExam extends Component {
                 }
             })
             .catch((err) => {
+                console.log(err);
+                if (err.response) {
+                    this.setState({
+                        errorMsg: err.response.data.msg,
+                    });
+                } else if (err.request) {
+                    this.setState({
+                        errorMsg: err.request.data.msg,
+                    });
+                } else if (err.message) {
+                    this.setState({
+                        errorMsg: err.message.data.msg,
+                    });
+                }
                 this.setState({
-                    errorMsg: err.response.data.msg,
                     showErrorAlert: true,
                     showLoader: false,
                 });
@@ -257,17 +270,28 @@ class CycleDirectExam extends Component {
                     );
                 } else if (result.data.sts === false) {
                     this.setState({
-                        errorMsg: result.data.detail
-                            ? result.data.detail
-                            : result.data.msg,
+                        errorMsg: result.data.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
                 }
             })
             .catch((err) => {
+                console.log(err);
+                if (err.response) {
+                    this.setState({
+                        errorMsg: err.response.data.msg,
+                    });
+                } else if (err.request) {
+                    this.setState({
+                        errorMsg: err.request.data.msg,
+                    });
+                } else if (err.message) {
+                    this.setState({
+                        errorMsg: err.message.data.msg,
+                    });
+                }
                 this.setState({
-                    errorMsg: err.response.data.msg,
                     showErrorAlert: true,
                     showLoader: false,
                 });
