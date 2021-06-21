@@ -1,17 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
 /* -=-=-=-=-=-=-=-=-=-= Jumbotron =-=-=-=-=-=-=-=-=-=- */
 
 .jumbotron {
     background-color: var(--light-pink);
     text-align: center;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .jumbotron h1 {
     color: var(--primary);
     margin-bottom: 10px;
     letter-spacing: 1px;
-    font-weight: 600;
     text-transform: uppercase;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 700;
     font-size: 35px;
 }
 
@@ -57,6 +59,7 @@
     min-height: 90vh;
     position: relative;
     overflow: hidden;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .jumbotron-slide {
@@ -167,14 +170,14 @@
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     letter-spacing: 0.3px;
     margin-bottom: 15px;
-    line-height: 55px;
+    line-height: 60px;
 }
 
 .jumbotron-subheading {
     font-size: 20px;
     font-weight: 600;
     color: var(--primary);
-    line-height: 45px;
+    line-height: 40px;
     margin-bottom: 40px;
 }
 
@@ -224,6 +227,7 @@
 .feature-container {
     min-height: 90vh;
     position: relative;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .feature-section {
@@ -242,14 +246,14 @@
 }
 
 .feature-heading {
-    font-size: 35px;
+    font-size: 32px;
     font-weight: 600;
     margin-bottom: 25px;
     animation: feature-slide 0.5s ease-in-out;
 }
 
 .feature-subheading {
-    font-size: 20px;
+    font-size: 18px;
     line-height: 35px;
     margin-bottom: 20px;
     animation: feature-slide 0.5s ease-in-out;
@@ -388,6 +392,7 @@
     background-color: white;
     position: relative;
     z-index: 1;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .calendar-container .img-section {
@@ -412,6 +417,7 @@
 .calendar-container .text-section h2 {
     color: #4b4b4b;
     font-size: 24px;
+    font-weight: 600;
     letter-spacing: 0.4px;
     line-height: 36px;
     text-transform: uppercase;
@@ -475,6 +481,7 @@
     background-color: white;
     position: relative;
     overflow: hidden;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .testimonial-container .section-heading {
@@ -504,7 +511,7 @@
 .testimonial-container .testimonial-rank {
     margin-bottom: 1px;
     color: var(--primary);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 20px;
 }
 
@@ -512,6 +519,7 @@
     margin-bottom: 0;
     color: var(--secondary);
     font-size: 14px;
+    font-weight: 600;
 }
 
 q {
@@ -547,7 +555,7 @@ q:after {
     font-size: 16px;
     text-align: center;
     margin-bottom: 0;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--primary);
 }
 
@@ -633,6 +641,7 @@ q:after {
     border-radius: 6px;
     overflow: hidden;
     min-height: 60vh;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .features-text {
