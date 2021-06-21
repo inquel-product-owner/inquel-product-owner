@@ -14,18 +14,106 @@ export default class CKeditor extends React.Component {
                 data={this.props.data}
                 onChange={this.props.onChange}
                 config={{
-                    extraPlugins: "ckeditor_wiris",
-                    removePlugins:
-                        "filetools,uploadimage,uploadwidget,uploadfile,filebrowser,easyimage,forms,about,save,exportpdf,div,showblocks",
-                    removeButtons: "Anchor",
-                    allowedContent: true,
-                }}
-                onBeforeLoad={(CKEDITOR) => {
-                    CKEDITOR.plugins.addExternal(
-                        "ckeditor_wiris",
-                        "/mathtype-ckeditor4/",
-                        "plugin.js"
-                    );
+                    extraPlugins: "mathjax",
+                    mathJaxLib:
+                        "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML",
+                    removePlugins: "exportpdf",
+                    toolbar: [
+                        {
+                            name: "document",
+                            groups: ["mode", "document", "doctools"],
+                            items: ["Source", "-", "Preview", "Templates"],
+                        },
+                        {
+                            name: "clipboard",
+                            groups: ["clipboard", "undo"],
+                            items: [
+                                "Cut",
+                                "Copy",
+                                "Paste",
+                                "PasteText",
+                                "-",
+                                "Undo",
+                                "Redo",
+                            ],
+                        },
+                        {
+                            name: "editing",
+                            groups: ["find", "selection", "spellchecker"],
+                            items: [
+                                "Find",
+                                "Replace",
+                                "SelectAll",
+                                "Scayt",
+                                "Language",
+                                "-",
+                                "CopyFormatting",
+                                "RemoveFormat",
+                            ],
+                        },
+                        { name: "links", items: ["Link", "Unlink"] },
+                        {
+                            name: "insert",
+                            items: [
+                                "Image",
+                                "Flash",
+                                "Table",
+                                "HorizontalRule",
+                                "Smiley",
+                                "SpecialChar",
+                                "PageBreak",
+                                "Iframe",
+                                "-",
+                                "Mathjax",
+                                "Maximize",
+                            ],
+                        },
+                        "/",
+                        {
+                            name: "basicstyles",
+                            groups: ["basicstyles", "cleanup"],
+                            items: [
+                                "Bold",
+                                "Italic",
+                                "Underline",
+                                "Strike",
+                                "Subscript",
+                                "Superscript",
+                            ],
+                        },
+                        {
+                            name: "paragraph",
+                            groups: [
+                                "list",
+                                "indent",
+                                "blocks",
+                                "align",
+                                "bidi",
+                            ],
+                            items: [
+                                "NumberedList",
+                                "BulletedList",
+                                "-",
+                                "Outdent",
+                                "Indent",
+                                "-",
+                                "Blockquote",
+                                "-",
+                                "JustifyLeft",
+                                "JustifyCenter",
+                                "JustifyRight",
+                                "JustifyBlock",
+                                "-",
+                                "BidiLtr",
+                                "BidiRtl",
+                            ],
+                        },
+                        {
+                            name: "styles",
+                            items: ["Styles", "Format", "Font", "FontSize"],
+                        },
+                        { name: "colors", items: ["TextColor", "BGColor"] },
+                    ],
                 }}
             />
         );
@@ -41,27 +129,11 @@ export class OptionEditor extends React.Component {
                 type="inline"
                 config={{
                     editorplaceholder: "Enter options here...",
-                    extraPlugins: "ckeditor_wiris",
-                    removePlugins:
-                        "basicstyles,link,list,blockquote,format,about,filetools,uploadimage,uploadwidget,uploadfile,filebrowser,easyimage,forms,about,save,exportpdf,div,showblocks,justify,font,smiley,flash,iframe,pagebreak,language,find,copyformatting,selectall,newpage,print,templates,preview,",
-                    removeButtons:
-                        "Cut,Copy,Paste,PasteFromWord,PasteText,Table,Styles,Indent,Outdent,RemoveFormat,Source,Undo,Redo,SpecialChar,HorizontalRule,Scayt,TextColor,BGColor,BidiLtr,BidiRtl",
-                    allowedContent: true,
-                    toolbar: [
-                        [
-                            "Image",
-                            "ckeditor_wiris_formulaEditor",
-                            "ckeditor_wiris_formulaEditorChemistry",
-                            "Maximize",
-                        ],
-                    ],
-                }}
-                onBeforeLoad={(CKEDITOR) => {
-                    CKEDITOR.plugins.addExternal(
-                        "ckeditor_wiris",
-                        "/mathtype-ckeditor4/",
-                        "plugin.js"
-                    );
+                    extraPlugins: "mathjax",
+                    mathJaxLib:
+                        "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML",
+                    removePlugins: "exportpdf",
+                    toolbar: [["Image", "Mathjax", "Maximize"]],
                 }}
             />
         );
