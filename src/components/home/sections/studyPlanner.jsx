@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import calendar from "../../../../assets/events.svg";
-import playButton from "../../../../assets/google-play-badge.png";
+import calendar from "../../../assets/events.svg";
+import playButton from "../../../assets/google-play-badge.png";
 
 const StudyPlanner = () => {
     return (
-        <section className="calendar-container container-fluid">
+        <section className="calendar-container">
             <div className="row justify-content-around">
                 <div className="col-md-6 img-section">
                     <img

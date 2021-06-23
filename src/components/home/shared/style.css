@@ -1,17 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
 
 /* -=-=-=-=-=-=-=-=-=-= Jumbotron =-=-=-=-=-=-=-=-=-=- */
 
 .jumbotron {
     background-color: var(--light-pink);
     text-align: center;
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
 }
 
 .jumbotron h1 {
     color: var(--primary);
     margin-bottom: 10px;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
     font-weight: 700;
     font-size: 35px;
@@ -59,7 +59,7 @@
     min-height: 90vh;
     position: relative;
     overflow: hidden;
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
 }
 
 .jumbotron-slide {
@@ -227,7 +227,7 @@
 .feature-container {
     min-height: 90vh;
     position: relative;
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
 }
 
 .feature-section {
@@ -386,13 +386,194 @@
     }
 }
 
+/* -=-=-=-=-=-=-=-=-=-= Popular course section =-=-=-=-=-=-=-=-=-=- */
+
+.course-container {
+    padding: 50px 20px;
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+    font-family: "Quicksand", sans-serif;
+}
+
+.course-container .section-heading {
+    text-align: center;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+}
+
+.course-container .tabs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.course-container .tabs .tab {
+    margin: 5px 12px;
+    text-transform: capitalize;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 6px 2px 0;
+    transition: all 0.2s ease-in-out;
+    border-radius: 6px;
+}
+
+.course-container .tabs .tab:hover {
+    background-color: var(--light-pink);
+}
+
+.course-container .tabs .tab.active {
+    background-color: var(--light-pink);
+}
+
+.course-container .tabs .tab .icon {
+    width: 30px;
+    height: 30px;
+    background-color: var(--light-pink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: 2px;
+}
+
+.course-container .courses {
+    margin-bottom: 50px;
+}
+
+.course-container .courses .card {
+    border-radius: 16px !important;
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.075) !important;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.course-container .courses .card:hover {
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.course-container .card-img-top {
+    height: 210px !important;
+    border-top-left-radius: 16px !important;
+    border-top-right-radius: 16px !important;
+}
+
+.course-container .courses .title {
+    background-color: var(--primary);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 10px 12px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.course-container .courses .description {
+    font-size: 14px;
+    padding: 16px;
+    margin-bottom: 0;
+}
+
+.course-container .courses .enroll {
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: white;
+    background-color: var(--primary);
+    padding: 10px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    cursor: pointer;
+}
+
+.course-container .courses .enroll i {
+    transition: all 0.2s ease-in-out;
+}
+
+.course-container .courses .enroll:hover i {
+    transform: translateX(3px);
+}
+
+.course-container .course-btn {
+    text-align: center;
+}
+
+.course-container .course-btn button {
+    border: 1.5px solid var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+    padding: 10px 20px;
+    transition: all 0.2s ease-in-out;
+}
+
+.course-container .course-btn button:hover {
+    border: 1.5px solid var(--primary);
+    color: white;
+    background-color: var(--primary);
+}
+
+.course-container .slick-prev {
+    left: -25px;
+}
+
+.course-container .slick-next {
+    right: -25px;
+}
+
+.course-container .course-circle {
+    position: absolute;
+    z-index: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--light-pink);
+    border-top-left-radius: 75%;
+    bottom: -150px;
+    left: 0;
+}
+
+@media screen and (max-width: 1024px) {
+    .course-container .section-heading {
+        font-size: 33px;
+    }
+    .course-container .courses .description {
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .course-container .section-heading {
+        font-size: 30px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .course-container .section-heading {
+        font-size: 24px;
+        margin-bottom: 45px;
+    }
+}
+
 /* -=-=-=-=-=-=-=-=-=-= Calendar section =-=-=-=-=-=-=-=-=-=- */
 
 .calendar-container {
     background-color: white;
     position: relative;
     z-index: 1;
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .calendar-container .img-section {
@@ -481,7 +662,7 @@
     background-color: white;
     position: relative;
     overflow: hidden;
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
 }
 
 .testimonial-container .section-heading {
@@ -633,6 +814,21 @@ q:after {
     }
 }
 
+/* -=-=-=-=-=-=-=-=-=-= Banner section =-=-=-=-=-=-=-=-=-=- */
+
+.banner-container {
+    background-color: white;
+    padding: 50px 0;
+}
+
+.banner-container img {
+    transition: all 0.2s;
+}
+
+.banner-container img:hover {
+    filter: brightness(1.2);
+}
+
 /* -=-=-=-=-=-=-=-=-=-= Features page =-=-=-=-=-=-=-=-=-=- */
 
 .features-section {
@@ -641,7 +837,7 @@ q:after {
     border-radius: 6px;
     overflow: hidden;
     min-height: 60vh;
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
 }
 
 .features-text {
@@ -698,5 +894,115 @@ q:after {
     }
     .features-subheading {
         line-height: 22px;
+    }
+}
+
+/* -=-=-=-=-=-=-=-=-=-= Catalog page =-=-=-=-=-=-=-=-=-=- */
+
+.catalog {
+    font-family: "Quicksand", sans-serif;
+}
+
+.catalog .card-img-top {
+    height: 200px !important;
+}
+
+.catalog .title {
+    margin-bottom: 0;
+    background-color: var(--primary);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 10px 12px;
+    text-align: center;
+}
+
+.catalog .description {
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.catalog .border-hover {
+    padding: 2px;
+    background-color: var(--primary);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    transform: translateY(25%);
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.catalog .card:hover .border-hover {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* -=-=-=-=-=-=-=-=-=-= Cart page =-=-=-=-=-=-=-=-=-=- */
+
+.cart {
+    background-color: white;
+    min-height: 60vh;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 30px;
+    border-radius: 6px;
+}
+
+.cart .section-heading {
+    text-align: center;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.cart .cart-header {
+    border-bottom: 1.5px solid #ccc;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.cart .cart-row {
+    border-bottom: 1px solid #ccc;
+    padding: 15px 0;
+    font-size: 14px;
+}
+
+.cart .cart-row .title {
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+.cart .cart-row .fa-trash-alt {
+    cursor: pointer;
+}
+
+.cart .cart-row .fa-trash-alt:hover {
+    color: black !important;
+}
+
+.cart .cart-footer {
+    padding-top: 18px;
+    font-size: 14px;
+    color: rgb(119, 119, 119);
+}
+
+.cart .cart-footer .form-row {
+    margin-bottom: 12px;
+}
+
+@media screen and (max-width: 768px) {
+    .cart .section-heading {
+        font-size: 26px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .cart .section-heading {
+        font-size: 24px;
     }
 }

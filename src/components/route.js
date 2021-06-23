@@ -5,6 +5,8 @@ import { Route, Switch, Redirect } from "react-router-dom";
 
 import Home from "./home";
 import Features from "./home/features";
+import Catalog from "./home/catalog";
+import Cart from "./home/cart";
 import HomeLeaderboard from "./home/leaderBoard";
 
 // -------------------- Admin Imports --------------------
@@ -152,6 +154,9 @@ const routes = (
 
         <Route exact path="/" component={Home} />
         <Route exact path="/features" component={Features} />
+        <Route exact path="/catalog" component={Catalog} />
+        <Route exact path="/catalog/:category" component={Catalog} />
+        <Route exact path="/cart" component={Cart} />
         <Route exact path="/leaderboard" component={HomeLeaderboard} />
 
         {/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= Admin Routes =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */}
