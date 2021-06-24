@@ -80,6 +80,23 @@ const Statistics = (props) => {
 };
 
 const CourseCard = (props) => {
+    const returnImage = (list) => {
+        let URL = "";
+        if (list.subscription_file_link) {
+            if (list.subscription_file_link.subscription_image_1) {
+                URL = list.subscription_file_link.subscription_image_1;
+            } else {
+                URL = courseimg;
+            }
+        } else if (list.course_thumbnail_url) {
+            URL = list.course_thumbnail_url;
+        } else {
+            URL = courseimg;
+        }
+
+        return URL;
+    };
+
     return (
         <>
             <div className="row mt-3">
@@ -90,16 +107,9 @@ const CourseCard = (props) => {
                                   className="col-md-3 col-sm-6 mb-3"
                                   key={index}
                               >
-                                  <div className="card">
+                                  <div className="card shadow-sm h-100">
                                       <img
-                                          src={
-                                              list.subscription_file_link
-                                                  ? list.subscription_file_link
-                                                        .subscription_image_1
-                                                  : list.course_thumbnail_url
-                                                  ? list.course_thumbnail_url
-                                                  : courseimg
-                                          }
+                                          src={returnImage(list)}
                                           className="card-img-top"
                                           alt={
                                               list.course_name
@@ -107,14 +117,42 @@ const CourseCard = (props) => {
                                                   : list.title
                                           }
                                       />
-                                      <div className="card-body primary-bg text-white p-2">
-                                          {list.course_name
-                                              ? list.course_name
-                                              : list.title}
+                                      <div className="card-body primary-bg text-white p-3">
+                                          <p className="mb-0">
+                                              {list.course_name
+                                                  ? list.course_name
+                                                  : list.title}
+                                          </p>
                                           {!props.course ? (
-                                              <p className="small mt-1 mb-0">
-                                                  {list.description}
-                                              </p>
+                                              <div className="mt-2">
+                                                  <div className="d-flex small mb-1">
+                                                      <span className="font-weight-bold bg-white primary-text rounded-pill small py-1 px-2 mr-1">
+                                                          ₹{" "}
+                                                          {
+                                                              list.discounted_price
+                                                          }
+                                                      </span>
+                                                      <span className="font-weight-bold bg-white primary-text rounded-pill small py-1 px-2">
+                                                          <i className="far fa-clock"></i>{" "}
+                                                          {`${list.duration_in_months} Months ${list.duration_in_days} Days`}
+                                                      </span>
+                                                  </div>
+                                                  <p
+                                                      className="small mb-0"
+                                                      title={list.description}
+                                                  >
+                                                      {list.description.substring(
+                                                          0,
+                                                          200
+                                                      )}
+                                                      {list.description
+                                                          ? list.description
+                                                                .length > 200
+                                                              ? "..."
+                                                              : ""
+                                                          : ""}
+                                                  </p>
+                                              </div>
                                           ) : (
                                               ""
                                           )}
@@ -381,6 +419,9 @@ class AdminDashboard extends Component {
 
     // ----- Publish & Unpublish -----
     handleID = (id) => {
+        this.setState({
+            selectedData: [],
+        });
         try {
             let temp = [];
 
