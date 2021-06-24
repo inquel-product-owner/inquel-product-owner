@@ -129,6 +129,14 @@ const Cart = () => {
                                             2500
                                         </div>
                                     </div>
+                                    <div className="form-row align-items-center justify-content-center mt-3 mb-0">
+                                        <div className="col-6"></div>
+                                        <div className="col-6 text-right text-md-left">
+                                            <button className="btn btn-primary btn-sm shadow-none">
+                                                Checkout
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

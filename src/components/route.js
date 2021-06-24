@@ -154,8 +154,16 @@ const routes = (
 
         <Route exact path="/" component={Home} />
         <Route exact path="/features" component={Features} />
-        <Route exact path="/catalog" component={Catalog} />
-        <Route exact path="/catalog/:category" component={Catalog} />
+        <Route
+            exact
+            path="/catalog"
+            component={(props) => <Catalog {...props} />}
+        />
+        <Route
+            exact
+            path="/catalog/:category"
+            component={(props) => <Catalog {...props} />}
+        />
         <Route exact path="/cart" component={Cart} />
         <Route exact path="/leaderboard" component={HomeLeaderboard} />
 
@@ -1711,12 +1719,12 @@ const routes = (
         <Route
             exact
             path="/login"
-            render={() =>
+            render={(props) =>
                 localStorage.getItem("Authorization") &&
                 localStorage.getItem("is_student") ? (
                     <Redirect to="/dashboard" />
                 ) : (
-                    <StudentLogin />
+                    <StudentLogin {...props} />
                 )
             }
         />

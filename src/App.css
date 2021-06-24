@@ -125,7 +125,7 @@ body {
 .card-img-top {
     border-top-left-radius: 8px !important;
     border-top-right-radius: 8px !important;
-    height: 30vh;
+    height: 200px;
     object-fit: cover;
 }
 
@@ -278,7 +278,7 @@ label {
     box-shadow: none !important;
 }
 
-input[type="search"] {
+/* input[type="search"] {
     outline: none;
     border: none;
     border-bottom: 1px solid var(--primary);
@@ -292,7 +292,7 @@ input[type="search"]:focus {
     box-shadow: none;
     border: none;
     border-bottom: 1px solid var(--primary);
-}
+} */
 
 .custom-file-label {
     z-index: 0 !important;

@@ -42,12 +42,14 @@ class Header extends Component {
             });
     };
 
-    componentDidMount = () => {
-        if (
-            this.props.profile &&
-            Object.keys(this.props.profile).length === 0
-        ) {
-            this.loadProfileData();
+    componentDidUpdate = (prevProps) => {
+        if (prevProps.profile === this.props.profile) {
+            if (
+                this.props.profile &&
+                Object.keys(this.props.profile).length === 0
+            ) {
+                this.loadProfileData();
+            }
         }
     };
 

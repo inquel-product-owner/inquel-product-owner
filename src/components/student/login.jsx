@@ -1,7 +1,12 @@
 import React, { Component } from "react";
 import { Alert, Spinner } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
-import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import {
+    baseUrl,
+    accountsUrl,
+    adminPathUrl,
+    studentUrl,
+} from "../../shared/baseUrl.js";
 import Footer from "../home/shared/footer";
 import TopNavbar from "../home/shared/navbar";
 import { ForgotPasswordModal } from "../common/forgotPassword";
@@ -29,6 +34,9 @@ class StudentLogin extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        this.redirect = new URLSearchParams(this.props.location.search).get(
+            "redirect"
+        );
     }
 
     handleInput = (event) => {
@@ -47,11 +55,32 @@ class StudentLogin extends Component {
         });
     };
 
-    setLocalStorage = (data) => {
+    loadProfileData = (token) => {
+        fetch(`${baseUrl + studentUrl}/student/profile/`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Token ${token}`,
+            },
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    storeDispatch(PROFILE, result.data);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    setLocalStorage = async (data) => {
         localStorage.clear();
         storeDispatch(PROFILE, {});
         localStorage.setItem("Authorization", `Token ${data.token}`);
         localStorage.setItem("is_student", data.is_student);
+        await this.loadProfileData(data.token);
 
         this.setState({
             showLoader: false,
@@ -167,7 +196,11 @@ class StudentLogin extends Component {
             localStorage.getItem("Authorization") &&
             localStorage.getItem("is_student")
         ) {
-            return <Redirect to="/dashboard" />;
+            if (this.redirect) {
+                return <Redirect to={this.redirect} />;
+            } else {
+                return <Redirect to="/dashboard" />;
+            }
         }
         return (
             <>

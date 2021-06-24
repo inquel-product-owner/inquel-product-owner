@@ -80,6 +80,23 @@ const Statistics = (props) => {
 };
 
 const CourseCard = (props) => {
+    const returnImage = (list) => {
+        let URL = "";
+        if (list.subscription_file_link) {
+            if (list.subscription_file_link.subscription_image_1) {
+                URL = list.subscription_file_link.subscription_image_1;
+            } else {
+                URL = courseimg;
+            }
+        } else if (list.course_thumbnail_url) {
+            URL = list.course_thumbnail_url;
+        } else {
+            URL = courseimg;
+        }
+
+        return URL;
+    };
+
     return (
         <>
             <div className="row mt-3">
@@ -92,14 +109,7 @@ const CourseCard = (props) => {
                               >
                                   <div className="card shadow-sm h-100">
                                       <img
-                                          src={
-                                              list.subscription_file_link
-                                                  ? list.subscription_file_link
-                                                        .subscription_image_1
-                                                  : list.course_thumbnail_url
-                                                  ? list.course_thumbnail_url
-                                                  : courseimg
-                                          }
+                                          src={returnImage(list)}
                                           className="card-img-top"
                                           alt={
                                               list.course_name
@@ -127,35 +137,20 @@ const CourseCard = (props) => {
                                                           {`${list.duration_in_months} Months ${list.duration_in_days} Days`}
                                                       </span>
                                                   </div>
-                                                  <p className="small mb-0">
+                                                  <p
+                                                      className="small mb-0"
+                                                      title={list.description}
+                                                  >
                                                       {list.description.substring(
                                                           0,
                                                           200
                                                       )}
-                                                      {list.description.length >
-                                                      200 ? (
-                                                          <OverlayTrigger
-                                                              key="top3"
-                                                              placement="top"
-                                                              overlay={
-                                                                  <Tooltip
-                                                                      id="tooltip"
-                                                                      style={{
-                                                                          textAlign:
-                                                                              "left !important",
-                                                                      }}
-                                                                  >
-                                                                      {
-                                                                          list.description
-                                                                      }
-                                                                  </Tooltip>
-                                                              }
-                                                          >
-                                                              <span>...</span>
-                                                          </OverlayTrigger>
-                                                      ) : (
-                                                          ""
-                                                      )}
+                                                      {list.description
+                                                          ? list.description
+                                                                .length > 200
+                                                              ? "..."
+                                                              : ""
+                                                          : ""}
                                                   </p>
                                               </div>
                                           ) : (
@@ -424,6 +419,9 @@ class AdminDashboard extends Component {
 
     // ----- Publish & Unpublish -----
     handleID = (id) => {
+        this.setState({
+            selectedData: [],
+        });
         try {
             let temp = [];
 

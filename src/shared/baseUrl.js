@@ -11,3 +11,5 @@ export const hodUrl = "424f_0659/api/v1";
 export const teacherUrl = "3a3c_a1a6/api/v1";
 
 export const studentUrl = "5ddf_cae2/api/v1";
+
+export const homeURL = "a69e_f43e/api/v1/website";
