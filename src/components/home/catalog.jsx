@@ -4,7 +4,7 @@ import Footer from "./shared/footer";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../common/ErrorFallback";
 import { connect } from "react-redux";
-import { baseUrl, homeURL } from "../../shared/baseUrl";
+import { baseUrl, homeURL, studentUrl } from "../../shared/baseUrl";
 import courseimg from "../../assets/code.jpg";
 import Loading from "../common/loader";
 import Paginations from "../common/pagination";
@@ -40,7 +40,10 @@ const Catalog = (props) => {
     const [selectedData, setData] = useState("");
 
     useEffect(() => {
-        document.title = "Course catalog | IQ Labs Academy";
+        document.title = "Buy a course | IQ Labs Academy";
+        if (localStorage.getItem("Authorization")) {
+            headers["Authorization"] = localStorage.getItem("Authorization");
+        }
         loadCourses(page, tab);
         loadCategory();
         window.scrollTo(0, 0);
@@ -118,8 +121,7 @@ const Catalog = (props) => {
             localStorage.getItem("Authorization") &&
             localStorage.getItem("is_student")
         ) {
-            headers["Authorization"] = localStorage.getItem("Authorization");
-            fetch(`${url}/student/cart/`, {
+            fetch(`${baseUrl}${studentUrl}/student/cart/`, {
                 headers: headers,
                 method: "POST",
                 body: JSON.stringify({
@@ -352,17 +354,30 @@ const Catalog = (props) => {
                                                                     </button>
                                                                 </div>
                                                                 <div className="col-6">
-                                                                    <button
-                                                                        className="btn bg-transparent border-primary btn-sm btn-block shadow-none"
-                                                                        onClick={() => {
-                                                                            handle_AddToCart(
-                                                                                item.subscription_id
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        Add to
-                                                                        cart
-                                                                    </button>
+                                                                    {item.added_to_cart ? (
+                                                                        <Link
+                                                                            className="text-decoration-none"
+                                                                            to="/cart"
+                                                                        >
+                                                                            <button className="btn bg-transparent primary-text border-primary btn-sm btn-block shadow-none">
+                                                                                Added{" "}
+                                                                                <i className="fas fa-check-circle fa-sm ml-1 text-success"></i>
+                                                                            </button>
+                                                                        </Link>
+                                                                    ) : (
+                                                                        <button
+                                                                            className="btn bg-transparent primary-text border-primary btn-sm btn-block shadow-none"
+                                                                            onClick={() => {
+                                                                                handle_AddToCart(
+                                                                                    item.subscription_id
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            Add
+                                                                            to
+                                                                            cart
+                                                                        </button>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -398,12 +413,18 @@ const Catalog = (props) => {
                                         alignItems: "center",
                                     }}
                                 >
-                                    <h1 className="text-center display-4">
-                                        <i className="far fa-folder-open"></i>
-                                    </h1>
-                                    <h4 className="text-center">
-                                        No data to display...
-                                    </h4>
+                                    {!isLoading ? (
+                                        <>
+                                            <h1 className="text-center display-4">
+                                                <i className="far fa-folder-open"></i>
+                                            </h1>
+                                            <h4 className="text-center">
+                                                No data to display...
+                                            </h4>
+                                        </>
+                                    ) : (
+                                        ""
+                                    )}
                                 </div>
                             )}
                         </div>

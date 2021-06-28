@@ -164,7 +164,18 @@ const routes = (
             path="/catalog/:category"
             component={(props) => <Catalog {...props} />}
         />
-        <Route exact path="/cart" component={Cart} />
+        <Route
+            exact
+            path="/cart"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login?redirect=/cart" />
+                ) : (
+                    <Cart {...props} />
+                )
+            }
+        />
         <Route exact path="/leaderboard" component={HomeLeaderboard} />
 
         {/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= Admin Routes =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */}

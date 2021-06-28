@@ -107,7 +107,11 @@ class TeacherSemesterDirectEvaluation extends Component {
                     let temp = {};
                     let total_obtained_marks = 0;
                     let total_marks = 0;
-                    if (result.data.answer_data.topic_marks) {
+                    if (
+                        result.data.answer_data.topic_marks &&
+                        Object.keys(result.data.answer_data.topic_marks)
+                            .length !== 0
+                    ) {
                         Object.entries(
                             result.data.answer_data.topic_marks
                         ).forEach(([key, value]) => {
@@ -117,15 +121,23 @@ class TeacherSemesterDirectEvaluation extends Component {
                             Object.entries(value.topic_marks).forEach(
                                 ([key1, value1]) => {
                                     temp[key].topic_marks[key1] = {
-                                        total_marks: value1.total_marks,
-                                        obtained_marks: value1.obtained_marks,
+                                        total_marks: value1.total_marks || "",
+                                        obtained_marks:
+                                            value1.obtained_marks || "",
                                         each_question_mark:
-                                            value1.each_question_mark,
+                                            value1.each_question_mark || "",
                                     };
-                                    total_obtained_marks += Number(
-                                        value1.obtained_marks
-                                    );
-                                    total_marks += Number(value1.total_marks);
+
+                                    if (value1.obtained_marks) {
+                                        total_obtained_marks += Number(
+                                            value1.obtained_marks
+                                        );
+                                    }
+                                    if (value1.total_marks) {
+                                        total_marks += Number(
+                                            value1.total_marks
+                                        );
+                                    }
                                 }
                             );
                         });

@@ -105,8 +105,11 @@ class Header extends Component {
 
                         <div className="col-md-3 col-6 d-flex justify-content-end pr-0">
                             <Nav className="ml-auto">
-                                <Nav.Link href="/">
+                                <Nav.Link>
                                     <i className="far fa-bell mr-2 mt-2"></i>
+                                </Nav.Link>
+                                <Nav.Link as={Link} to="/cart">
+                                    <i className="fas fa-shopping-cart mr-2 mt-2"></i>
                                 </Nav.Link>
                                 <Dropdown>
                                     <Dropdown.Toggle
@@ -169,10 +172,6 @@ class Header extends Component {
                                         >
                                             <i className="fas fa-user fa-sm mr-2"></i>{" "}
                                             My Profile
-                                        </Dropdown.Item>
-                                        <Dropdown.Item as={Link} to="/cart">
-                                            <i className="fas fa-shopping-cart fa-sm mr-2"></i>{" "}
-                                            Cart
                                         </Dropdown.Item>
                                         <Dropdown.Divider />
                                         <Dropdown.Item

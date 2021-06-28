@@ -262,11 +262,6 @@ class TestResult extends Component {
                                         <div className="col-md-7">
                                             ATTEMPTS & PAPERS
                                         </div>
-                                        <div className="col-md-2 text-right">
-                                            <button className="btn btn-primary btn-sm shadow-none">
-                                                Generate marks
-                                            </button>
-                                        </div>
                                     </div>
 
                                     {/* ----- Cycle test list ----- */}
