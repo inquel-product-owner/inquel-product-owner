@@ -1499,16 +1499,9 @@ class FavouritesFlashcard extends Component {
             ) {
                 chapter_name = this.props.subject_data.chapters[i].chapter_name;
                 // Extracting topics from the chapter_structure
-                for (
-                    let j = 0;
-                    j < this.props.subject_data.chapters[i].topics.length;
-                    j++
-                ) {
-                    topic_name = this.loopTopicStructure(
-                        this.props.subject_data.chapters[i].topics[j]
-                            .chapter_structure
-                    );
-                }
+                topic_name = this.loopTopicStructure(
+                    this.props.subject_data.chapters[i].topics
+                );
             } else {
                 continue;
             }

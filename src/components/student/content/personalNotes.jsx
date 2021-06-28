@@ -16,6 +16,7 @@ class NotesModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            data: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -31,12 +32,19 @@ class NotesModal extends Component {
         };
     }
 
+    componentDidMount = async () => {
+        await this.setState({
+            data: this.props.data,
+        });
+        window.MathJax.typeset();
+    };
+
     handleDelete = () => {
         let body = {
             topic_num: this.props.topic_num,
-            personal_notes_id: this.props.data.personal_notes_id,
+            personal_notes_id: this.state.data.personal_notes_id,
         };
-        if (this.props.data.type === "concept") {
+        if (this.state.data.type === "concept") {
             body["concept"] = true;
             body["question"] = false;
         } else {
@@ -117,11 +125,11 @@ class NotesModal extends Component {
 
                     <div style={{ minHeight: "50vh" }}>
                         <div className="h5 font-weight-bold-600 mb-3">
-                            {this.props.data.personal_notes_title}
+                            {this.state.data.personal_notes_title}
                         </div>
                         <div
                             dangerouslySetInnerHTML={{
-                                __html: this.props.data.personal_notes_content,
+                                __html: this.state.data.personal_notes_content,
                             }}
                         ></div>
                     </div>

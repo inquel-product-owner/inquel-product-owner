@@ -38,6 +38,7 @@ class TopNavbar extends React.Component {
                     isLoggedOut: true,
                 });
                 storeDispatch(PROFILE, {});
+                window.location.reload();
             })
             .catch((err) => {
                 console.log(err);
@@ -120,6 +121,20 @@ class TopNavbar extends React.Component {
                                 } mr-2`}
                             >
                                 Buy a Course
+                            </Nav.Link>
+                            <Nav.Link
+                                as={Link}
+                                to="/cart"
+                                className={`${
+                                    this.props.activeLink
+                                        ? this.props.activeLink === "cart"
+                                            ? "active"
+                                            : ""
+                                        : ""
+                                } mr-2`}
+                            >
+                                <i className="fas fa-shopping-cart mr-1"></i>{" "}
+                                Cart
                             </Nav.Link>
                             {!localStorage.getItem("Authorization") ||
                             !localStorage.getItem("is_student") ? (
@@ -216,10 +231,6 @@ class TopNavbar extends React.Component {
                                         >
                                             <i className="fas fa-user fa-sm mr-2"></i>{" "}
                                             My Profile
-                                        </Dropdown.Item>
-                                        <Dropdown.Item as={Link} to="/cart">
-                                            <i className="fas fa-shopping-cart fa-sm mr-2"></i>{" "}
-                                            Cart
                                         </Dropdown.Item>
                                         <Dropdown.Divider />
                                         <Dropdown.Item

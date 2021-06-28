@@ -109,19 +109,28 @@ class TeacherCycleDirectEvaluation extends Component {
                     let temp = {};
                     let total_obtained_marks = 0;
                     let total_marks = 0;
-                    if (result.data.answer_data.topic_marks) {
+                    if (
+                        result.data.answer_data.topic_marks &&
+                        Object.keys(result.data.answer_data.topic_marks)
+                            .length !== 0
+                    ) {
                         Object.entries(
                             result.data.answer_data.topic_marks
                         ).forEach(([key, value]) => {
                             temp[key] = {
-                                total_marks: value.total_marks,
-                                obtained_marks: value.obtained_marks,
-                                each_question_mark: value.each_question_mark,
+                                total_marks: value.total_marks || "",
+                                obtained_marks: value.obtained_marks || "",
+                                each_question_mark:
+                                    value.each_question_mark || "",
                             };
-                            total_obtained_marks += Number(
-                                value.obtained_marks
-                            );
-                            total_marks += Number(value.total_marks);
+                            if (value.obtained_marks) {
+                                total_obtained_marks += Number(
+                                    value.obtained_marks
+                                );
+                            }
+                            if (value.total_marks) {
+                                total_marks += Number(value.total_marks);
+                            }
                         });
                     } else {
                         for (let i = 0; i < result.data.topics.length; i++) {

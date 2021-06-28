@@ -50,6 +50,9 @@ const PopularCourse = () => {
     const [selectedData, setData] = useState("");
 
     useEffect(() => {
+        if (localStorage.getItem("Authorization")) {
+            headers["Authorization"] = localStorage.getItem("Authorization");
+        }
         loadCourses();
         loadCategory();
     }, []);
@@ -201,12 +204,23 @@ const PopularCourse = () => {
                                                         ""
                                                     )}
                                                 </div>
-                                                <div className="mt-auto enroll">
-                                                    <button className="btn btn-primary btn-sm btn-block shadow-none">
-                                                        Enroll now{" "}
-                                                        <i className="fas fa-arrow-right fa-sm ml-1"></i>
-                                                    </button>
-                                                </div>
+                                                {data.added_to_cart ? (
+                                                    <div className="mt-auto">
+                                                        <Link className="text-decoration-none" to="/cart">
+                                                            <button className="btn btn-primary btn-sm btn-block shadow-none">
+                                                                Added to cart{" "}
+                                                                <i className="fas fa-check-circle fa-sm ml-1"></i>
+                                                            </button>
+                                                        </Link>
+                                                    </div>
+                                                ) : (
+                                                    <div className="mt-auto enroll">
+                                                        <button className="btn btn-primary btn-sm btn-block shadow-none">
+                                                            Enroll now{" "}
+                                                            <i className="fas fa-arrow-right fa-sm ml-1"></i>
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

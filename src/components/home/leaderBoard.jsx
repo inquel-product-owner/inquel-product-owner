@@ -33,6 +33,7 @@ class HomeLeaderboard extends Component {
     }
 
     componentDidMount = () => {
+        document.title = "Leaderboard | IQ Labs Academy";
         if (!this.props.location.hash) {
             this.setState({ activeTab: "quiz" });
         } else {
