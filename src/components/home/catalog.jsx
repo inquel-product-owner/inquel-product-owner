@@ -151,6 +151,42 @@ const Catalog = (props) => {
         }
     };
 
+    const handleFreeTrial = (id) => {
+        setLoading(true);
+        setErrorAlert(false);
+        setSuccessAlert(false);
+
+        if (
+            localStorage.getItem("Authorization") &&
+            localStorage.getItem("is_student")
+        ) {
+            fetch(`${baseUrl}${studentUrl}/student/enroll/${id}/`, {
+                headers: headers,
+                method: "POST",
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        setResponseMsg(result.msg);
+                        setSuccessAlert(true);
+                        loadCourses(page, tab);
+                    } else {
+                        setResponseMsg(result.msg);
+                        setErrorAlert(true);
+                        setLoading(false);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    setResponseMsg("Something went wrong!");
+                    setErrorAlert(true);
+                    setLoading(false);
+                });
+        } else {
+            props.history.push(`/login?redirect=${props.match.url}`);
+        }
+    };
+
     return (
         <>
             <Header activeLink="course" />
@@ -347,39 +383,68 @@ const Catalog = (props) => {
                                                                     ""
                                                                 )}
                                                             </div>
-                                                            <div className="form-row align-items-center justify-content-center mt-auto">
-                                                                <div className="col-6">
-                                                                    <button className="btn btn-primary btn-sm btn-block shadow-none">
-                                                                        Buy now
-                                                                    </button>
-                                                                </div>
-                                                                <div className="col-6">
-                                                                    {item.added_to_cart ? (
+                                                            {/* check if the subscription is free one */}
+                                                            {item.enroll_now ===
+                                                            true ? (
+                                                                <button
+                                                                    className="btn btn-primary btn-sm btn-block shadow-none mt-auto"
+                                                                    onClick={() =>
+                                                                        handleFreeTrial(
+                                                                            item.subscription_id
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Free Trial
+                                                                </button>
+                                                            ) : (
+                                                                // else show the buy now and add to cart button
+                                                                <div className="form-row align-items-center justify-content-center mt-auto">
+                                                                    <div className="col-6">
                                                                         <Link
+                                                                            to={`/checkout/${item.subscription_id}`}
                                                                             className="text-decoration-none"
-                                                                            to="/cart"
                                                                         >
-                                                                            <button className="btn bg-transparent primary-text border-primary btn-sm btn-block shadow-none">
-                                                                                Added{" "}
-                                                                                <i className="fas fa-check-circle fa-sm ml-1 text-success"></i>
+                                                                            <button
+                                                                                className="btn btn-primary btn-sm btn-block shadow-none"
+                                                                                disabled={
+                                                                                    item.added_to_cart
+                                                                                        ? true
+                                                                                        : false
+                                                                                }
+                                                                            >
+                                                                                Buy
+                                                                                now
                                                                             </button>
                                                                         </Link>
-                                                                    ) : (
-                                                                        <button
-                                                                            className="btn bg-transparent primary-text border-primary btn-sm btn-block shadow-none"
-                                                                            onClick={() => {
-                                                                                handle_AddToCart(
-                                                                                    item.subscription_id
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            Add
-                                                                            to
-                                                                            cart
-                                                                        </button>
-                                                                    )}
+                                                                    </div>
+                                                                    <div className="col-6">
+                                                                        {item.added_to_cart ? (
+                                                                            <Link
+                                                                                className="text-decoration-none"
+                                                                                to="/cart"
+                                                                            >
+                                                                                <button className="btn bg-transparent primary-text border-primary btn-sm btn-block shadow-none">
+                                                                                    Added{" "}
+                                                                                    <i className="fas fa-check-circle fa-sm ml-1 text-success"></i>
+                                                                                </button>
+                                                                            </Link>
+                                                                        ) : (
+                                                                            <button
+                                                                                className="btn bg-transparent primary-text border-primary btn-sm btn-block shadow-none"
+                                                                                onClick={() => {
+                                                                                    handle_AddToCart(
+                                                                                        item.subscription_id
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                Add
+                                                                                to
+                                                                                cart
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -500,38 +500,55 @@ const ChapterListRender = (props) => {
                     )}
 
                     {/* ----- Quiz list ----- */}
-                    {Object.entries(props.quiz).length !== 0 ? (
-                        <div className="card card-header shadow-sm light-bg mb-2">
-                            <div className="row align-items-center">
-                                <div className="col-6">
-                                    <p className="small primary-text font-weight-bold-600 mb-0">
-                                        {props.quiz.quiz_name}
-                                    </p>
-                                </div>
-                                <div className="col-6 d-flex align-items-center justify-content-end">
-                                    <Link
-                                        to={`${props.url}/chapter/${props.chapter.chapter_id}/quiz/${props.quiz.quiz_id}`}
-                                        onClick={() => {
-                                            storeDispatch(
-                                                CHAPTER,
-                                                props.chapter.chapter_name
-                                            );
-                                            storeDispatch(
-                                                QUIZ,
-                                                props.quiz.quiz_name
-                                            );
-                                        }}
-                                    >
-                                        <button className="btn btn-primary btn-sm shadow-none">
-                                            Start
-                                        </button>
-                                    </Link>
+                    {(props.chapter.quiz || []).map((quiz, quiz_index) => {
+                        return (
+                            <div
+                                className="card card-header shadow-sm light-bg mb-2"
+                                key={quiz_index}
+                            >
+                                <div className="row align-items-center">
+                                    <div className="col-5">
+                                        <p className="small primary-text font-weight-bold-600 mb-0">
+                                            {quiz.quiz_name}
+                                        </p>
+                                    </div>
+                                    <div className="col-7">
+                                        <div className="row align-items-center">
+                                            <div className="col-2"></div>
+                                            <div className="col-2"></div>
+                                            <div className="col-2"></div>
+                                            <div className="col-2 small font-weight-bold-600">
+                                                Points:{" "}
+                                                {props.chapter.quiz_points ||
+                                                    ""}
+                                            </div>
+                                            <div className="col-2"></div>
+                                            <div className="col-2 text-right">
+                                                <Link
+                                                    to={`${props.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
+                                                    onClick={() => {
+                                                        storeDispatch(
+                                                            CHAPTER,
+                                                            props.chapter
+                                                                .chapter_name
+                                                        );
+                                                        storeDispatch(
+                                                            QUIZ,
+                                                            quiz.quiz_name
+                                                        );
+                                                    }}
+                                                >
+                                                    <button className="btn btn-primary btn-sm shadow-none">
+                                                        Start
+                                                    </button>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : (
-                        ""
-                    )}
+                        );
+                    })}
                 </>
             </Accordion.Collapse>
         </Card>
@@ -548,7 +565,6 @@ class Subject extends Component {
             topics_remarks: [],
             chapter_remarks: [],
             all_topics_completed: [],
-            quiz: [],
 
             all_chapters: [],
             semester_chapters: [],
@@ -695,42 +711,6 @@ class Subject extends Component {
         return result;
     };
 
-    // Loads quiz data
-    loadQuizData = (chapter_id, chapter_index) => {
-        fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${chapter_id}/quiz/`,
-            {
-                method: "GET",
-                headers: this.headers,
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    let quiz = [...this.state.quiz];
-                    quiz[chapter_index] = result.data;
-                    this.setState({
-                        quiz: quiz,
-                        page_loading: false,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
-            });
-    };
-
     // loads chapter, topic and semester data
     loadSubjectData = () => {
         fetch(`${this.url}/student/subject/${this.subjectId}/`, {
@@ -757,11 +737,6 @@ class Subject extends Component {
                             );
                             // function to load completed topic list from API
                             this.loadTopicCompletedData(
-                                result.data.chapters[i].chapter_id,
-                                i
-                            );
-                            // function to load quiz data from API
-                            this.loadQuizData(
                                 result.data.chapters[i].chapter_id,
                                 i
                             );
@@ -1295,18 +1270,6 @@ class Subject extends Component {
                                                                       this
                                                                           .cycleTest
                                                                   }
-                                                                  quiz={
-                                                                      this.state
-                                                                          .quiz[
-                                                                          chapter_index
-                                                                      ]
-                                                                          ? this
-                                                                                .state
-                                                                                .quiz[
-                                                                                chapter_index
-                                                                            ]
-                                                                          : {}
-                                                                  }
                                                               />
                                                           ) : null;
                                                       }
@@ -1446,15 +1409,6 @@ class Subject extends Component {
                                                       this.toggleTopicCollapse
                                                   }
                                                   cycleTest={this.cycleTest}
-                                                  quiz={
-                                                      this.state.quiz[
-                                                          chapter_index
-                                                      ]
-                                                          ? this.state.quiz[
-                                                                chapter_index
-                                                            ]
-                                                          : {}
-                                                  }
                                               />
                                           ) : null;
                                       })

@@ -7,6 +7,7 @@ import Home from "./home";
 import Features from "./home/features";
 import Catalog from "./home/catalog";
 import Cart from "./home/cart";
+import Checkout from "./home/checkout";
 import HomeLeaderboard from "./home/leaderBoard";
 
 // -------------------- Admin Imports --------------------
@@ -173,6 +174,18 @@ const routes = (
                     <Redirect to="/login?redirect=/cart" />
                 ) : (
                     <Cart {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/checkout/:subscriptionId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <Checkout {...props} />
                 )
             }
         />
