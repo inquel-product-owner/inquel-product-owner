@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "./shared/navbar";
 import Footer from "./shared/footer";
-import Select from "react-select";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../common/ErrorFallback";
 import { Link } from "react-router-dom";
@@ -152,6 +151,8 @@ const Cart = () => {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    setDiscountAmount(result.data.cart_coupon_price);
+                    setTotal(result.data.total_cart_price);
                     setCouponStatus(true);
                 } else {
                     setResponseMsg(result.msg);
@@ -180,6 +181,46 @@ const Cart = () => {
         }
 
         return URL;
+    };
+
+    const handleCheckout = () => {
+        setLoading(true);
+        setErrorAlert(false);
+        setSuccessAlert(false);
+
+        fetch(`${url}/student/cart/checkout/`, {
+            headers: headers,
+            method: "POST",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    try {
+                        setLoading(false);
+                        const rzp = new window.Razorpay(
+                            JSON.parse(window.atob(result.data))
+                        );
+                        rzp.open();
+                    } catch (error) {
+                        console.log(error);
+                        setResponseMsg(
+                            "Something went wrong in initializing payment!"
+                        );
+                        setErrorAlert(true);
+                        setLoading(false);
+                    }
+                } else {
+                    setResponseMsg(result.msg);
+                    setErrorAlert(true);
+                    setLoading(false);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                setResponseMsg("Something went wrong!");
+                setErrorAlert(true);
+                setLoading(false);
+            });
     };
 
     return (
@@ -325,8 +366,8 @@ const Cart = () => {
                                                         <div className="input-group-prepend">
                                                             <button
                                                                 className="btn btn-light btn-sm shadow-none"
-                                                                onClick={() =>
-                                                                    handleCoupon()
+                                                                onClick={
+                                                                    handleCoupon
                                                                 }
                                                             >
                                                                 <i className="fas fa-save"></i>
@@ -335,7 +376,8 @@ const Cart = () => {
                                                     </div>
                                                     {isCouponApplied ? (
                                                         <p className="small text-success mb-0">
-                                                            Coupon applied successfully!
+                                                            Coupon applied
+                                                            successfully!
                                                         </p>
                                                     ) : (
                                                         ""
@@ -351,7 +393,7 @@ const Cart = () => {
                                                     {discount_amount}
                                                 </div>
                                             </div>
-                                            <div className="form-row align-items-center justify-content-center">
+                                            <div className="form-row align-items-center justify-content-center primary-text h5">
                                                 <div className="col-6">
                                                     Total Amount
                                                 </div>
@@ -360,10 +402,13 @@ const Cart = () => {
                                                     {total}
                                                 </div>
                                             </div>
-                                            <div className="form-row align-items-center justify-content-center mt-3 mb-0">
-                                                <div className="col-6"></div>
-                                                <div className="col-6 text-right text-md-left">
-                                                    <button className="btn btn-primary btn-sm shadow-none">
+                                            <div className="form-row align-items-center justify-content-center mt-4 mb-0">
+                                                <div className="col-md-6 d-none d-md-block"></div>
+                                                <div className="col-md-6 col-12">
+                                                    <button
+                                                        className="btn btn-primary btn-block shadow-none"
+                                                        onClick={handleCheckout}
+                                                    >
                                                         Checkout
                                                     </button>
                                                 </div>

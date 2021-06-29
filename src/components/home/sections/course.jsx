@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
-import { baseUrl, homeURL } from "../../../shared/baseUrl";
+import { baseUrl, homeURL, studentUrl } from "../../../shared/baseUrl";
 import courseimg from "../../../assets/code.jpg";
 import { TEMP } from "../../../redux/action";
 import storeDispatch from "../../../redux/dispatch";
 import DetailModal from "../../common/modal/courseDetail";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 
 const settings = {
     dots: false,
@@ -42,12 +44,17 @@ const headers = {
     "Content-Type": "application/json",
 };
 
-const PopularCourse = () => {
+const PopularCourse = (props) => {
     const [tab, setTab] = useState({ code: "ALL", title: "All" });
     const [courses, setCourses] = useState([]);
     const [category, setCategory] = useState([]);
     const [showModal, toggleModal] = useState(false);
     const [selectedData, setData] = useState("");
+
+    const [isLoading, setLoading] = useState(true);
+    const [responseMsg, setResponseMsg] = useState("");
+    const [showErrorAlert, setErrorAlert] = useState(false);
+    const [showSuccessAlert, setSuccessAlert] = useState(false);
 
     useEffect(() => {
         if (localStorage.getItem("Authorization")) {
@@ -70,10 +77,17 @@ const PopularCourse = () => {
             .then((result) => {
                 if (result.sts === true) {
                     setCourses(result.data.results);
+                } else {
+                    setResponseMsg(result.msg);
+                    setErrorAlert(true);
                 }
+                setLoading(false);
             })
             .catch((err) => {
                 console.log(err);
+                setResponseMsg("Something went wrong!");
+                setErrorAlert(true);
+                setLoading(false);
             });
     };
 
@@ -86,11 +100,53 @@ const PopularCourse = () => {
             .then((result) => {
                 if (result.sts === true) {
                     setCategory(result.data.category);
+                } else {
+                    setResponseMsg(result.msg);
+                    setErrorAlert(true);
                 }
             })
             .catch((err) => {
                 console.log(err);
+                setResponseMsg("Something went wrong!");
+                setErrorAlert(true);
+                setLoading(false);
             });
+    };
+
+    const handleFreeTrial = (id) => {
+        setLoading(true);
+        setErrorAlert(false);
+        setSuccessAlert(false);
+
+        if (
+            localStorage.getItem("Authorization") &&
+            localStorage.getItem("is_student")
+        ) {
+            fetch(`${baseUrl}${studentUrl}/student/enroll/${id}/`, {
+                headers: headers,
+                method: "POST",
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        setResponseMsg(result.msg);
+                        setSuccessAlert(true);
+                        loadCourses(tab.code);
+                    } else {
+                        setResponseMsg(result.msg);
+                        setErrorAlert(true);
+                        setLoading(false);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    setResponseMsg("Something went wrong!");
+                    setErrorAlert(true);
+                    setLoading(false);
+                });
+        } else {
+            props.history.push(`/login?redirect=${props.match.url}`);
+        }
     };
 
     return (
@@ -104,6 +160,20 @@ const PopularCourse = () => {
             ) : (
                 ""
             )}
+
+            {/* Alert message */}
+            <AlertBox
+                errorMsg={responseMsg}
+                successMsg={responseMsg}
+                showErrorAlert={showErrorAlert}
+                showSuccessAlert={showSuccessAlert}
+                toggleSuccessAlert={() => {
+                    setSuccessAlert(false);
+                }}
+                toggleErrorAlert={() => {
+                    setErrorAlert(false);
+                }}
+            />
 
             <section className="course-container">
                 <h1 className="section-heading">Popular course</h1>
@@ -204,9 +274,26 @@ const PopularCourse = () => {
                                                         ""
                                                     )}
                                                 </div>
-                                                {data.added_to_cart ? (
+
+                                                {/* check if the subscription is free one */}
+                                                {data.enroll_now === true ? (
+                                                    <button
+                                                        className="btn btn-primary btn-sm btn-block shadow-none mt-auto"
+                                                        onClick={() =>
+                                                            handleFreeTrial(
+                                                                data.subscription_id
+                                                            )
+                                                        }
+                                                    >
+                                                        Free Trial
+                                                    </button>
+                                                ) : // check if the subscription is added in the cart
+                                                data.added_to_cart ? (
                                                     <div className="mt-auto">
-                                                        <Link className="text-decoration-none" to="/cart">
+                                                        <Link
+                                                            className="text-decoration-none"
+                                                            to="/cart"
+                                                        >
                                                             <button className="btn btn-primary btn-sm btn-block shadow-none">
                                                                 Added to cart{" "}
                                                                 <i className="fas fa-check-circle fa-sm ml-1"></i>
@@ -214,11 +301,17 @@ const PopularCourse = () => {
                                                         </Link>
                                                     </div>
                                                 ) : (
+                                                    // else show the enroll button
                                                     <div className="mt-auto enroll">
-                                                        <button className="btn btn-primary btn-sm btn-block shadow-none">
-                                                            Enroll now{" "}
-                                                            <i className="fas fa-arrow-right fa-sm ml-1"></i>
-                                                        </button>
+                                                        <Link
+                                                            to={`/checkout/${data.subscription_id}`}
+                                                            className="text-decoration-none"
+                                                        >
+                                                            <button className="btn btn-primary btn-sm btn-block shadow-none">
+                                                                Enroll now{" "}
+                                                                <i className="fas fa-arrow-right fa-sm ml-1"></i>
+                                                            </button>
+                                                        </Link>
                                                     </div>
                                                 )}
                                             </div>
@@ -241,6 +334,15 @@ const PopularCourse = () => {
                     </div>
                 </div>
                 <div className="course-circle"></div>
+
+                {/* Loading component */}
+                {isLoading ? (
+                    <div style={{ position: "absolute", zIndex: "100" }}>
+                        <Loading />
+                    </div>
+                ) : (
+                    ""
+                )}
             </section>
         </>
     );

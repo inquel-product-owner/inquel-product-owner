@@ -36,7 +36,10 @@ class Home extends React.Component {
                     FallbackComponent={ErrorFallback}
                     onReset={() => window.location.reload()}
                 >
-                    <PopularCourse />
+                    <PopularCourse
+                        history={this.props.history}
+                        match={this.props.match}
+                    />
                 </ErrorBoundary>
                 <ErrorBoundary
                     FallbackComponent={ErrorFallback}
