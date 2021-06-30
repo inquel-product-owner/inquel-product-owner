@@ -9,12 +9,14 @@ import {
     SEMESTER,
     SIMULATION,
     SUBJECT,
+    SUBSCRIPTION,
     TOPIC,
 } from "../action";
 
 let data = {
     group_name: "Group",
     subject_name: "Subject",
+    subscription_name: "Subscription",
     course_name: "Course",
     chapter_name: "Chapter",
     topic_name: "Topic",
@@ -32,6 +34,8 @@ const contentReducer = (state = data, action) => {
             return { ...state, group_name: action.payload };
         case SUBJECT:
             return { ...state, subject_name: action.payload };
+        case SUBSCRIPTION:
+            return { ...state, subscription_name: action.payload };
         case COURSE:
             return { ...state, course_name: action.payload };
         case CHAPTER:

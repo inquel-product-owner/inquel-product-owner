@@ -1,6 +1,7 @@
 // content reducer
 export const GROUP = "GROUP";
 export const SUBJECT = "SUBJECT";
+export const SUBSCRIPTION = "SUBSCRIPTION";
 export const COURSE = "COURSE";
 export const CHAPTER = "CHAPTER";
 export const TOPIC = "TOPIC";

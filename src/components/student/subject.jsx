@@ -1,6 +1,12 @@
 import React, { Component } from "react";
 import Wrapper from "./wrapper";
-import { Card, Accordion, OverlayTrigger, Tooltip } from "react-bootstrap";
+import {
+    Card,
+    Accordion,
+    OverlayTrigger,
+    Tooltip,
+    Dropdown,
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
@@ -1088,7 +1094,7 @@ class Subject extends Component {
                 />
 
                 <div className="row align-items-center mb-3">
-                    <div className="col-md-6">
+                    <div className="col-md-6 col-10">
                         {/* Breadcrumb */}
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb">
@@ -1104,9 +1110,9 @@ class Subject extends Component {
                             </ol>
                         </nav>
                     </div>
-                    <div className="col-md-6 d-flex align-items-center justify-content-start justify-content-md-end">
+                    <div className="col-md-6 col-2 d-flex align-items-center justify-content-end">
                         <div
-                            className="border-primary primary-text small font-weight-bold-600 mr-1 rounded-sm"
+                            className="border-primary primary-text small font-weight-bold-600 mr-1 rounded-sm d-none d-md-block"
                             style={{ padding: "5px 10px" }}
                         >
                             {`Quiz Points: ${
@@ -1115,7 +1121,10 @@ class Subject extends Component {
                                     : 0
                             }`}
                         </div>
-                        <Link to={`${this.props.match.url}/personal-notes`}>
+                        <Link
+                            to={`${this.props.match.url}/personal-notes`}
+                            className="d-none d-md-block"
+                        >
                             <button
                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                 disabled={
@@ -1130,7 +1139,10 @@ class Subject extends Component {
                                 Personal Notes
                             </button>
                         </Link>
-                        <Link to={`${this.props.match.url}/favourites`}>
+                        <Link
+                            to={`${this.props.match.url}/favourites`}
+                            className="d-none d-md-block"
+                        >
                             <button
                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                 disabled={
@@ -1145,7 +1157,10 @@ class Subject extends Component {
                                 Favourites
                             </button>
                         </Link>
-                        <Link to={`${this.props.match.url}/results`}>
+                        <Link
+                            to={`${this.props.match.url}/results`}
+                            className="d-none d-md-block"
+                        >
                             <button
                                 className="btn btn-primary btn-sm shadow-none"
                                 disabled={
@@ -1160,6 +1175,71 @@ class Subject extends Component {
                                 Test Analysis
                             </button>
                         </Link>
+                        <Dropdown className="d-block d-md-none">
+                            <Dropdown.Toggle
+                                variant="Secondary"
+                                className="btn btn-primary btn-sm shadow-none caret-off"
+                            >
+                                <i className="fas fa-ellipsis-h"></i>
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu className="dropdown-menu-down-btn dropdown-menu-down">
+                                <Dropdown.Item className="d-md-none d-block">
+                                    {`Quiz Points: ${
+                                        this.state.subjectItems
+                                            .scored_quiz_points
+                                            ? this.state.subjectItems
+                                                  .scored_quiz_points
+                                            : 0
+                                    }`}
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    as={Link}
+                                    to={`${this.props.match.url}/personal-notes`}
+                                    className="d-md-none d-block"
+                                    disabled={
+                                        this.state.subjectItems.chapters
+                                            ? this.state.subjectItems.chapters
+                                                  .length !== 0
+                                                ? false
+                                                : true
+                                            : false
+                                    }
+                                >
+                                    Personal Notes
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    as={Link}
+                                    to={`${this.props.match.url}/favourites`}
+                                    className="d-md-none d-block"
+                                    disabled={
+                                        this.state.subjectItems.chapters
+                                            ? this.state.subjectItems.chapters
+                                                  .length !== 0
+                                                ? false
+                                                : true
+                                            : false
+                                    }
+                                >
+                                    Favourites
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    as={Link}
+                                    to={`${this.props.match.url}/results`}
+                                    className="d-md-none d-block"
+                                    disabled={
+                                        this.state.subjectItems.chapters
+                                            ? this.state.subjectItems.chapters
+                                                  .length !== 0
+                                                ? false
+                                                : true
+                                            : false
+                                    }
+                                >
+                                    Test Analysis
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
                 </div>
 

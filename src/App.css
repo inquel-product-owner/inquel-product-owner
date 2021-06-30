@@ -125,7 +125,7 @@ body {
 .card-img-top {
     border-top-left-radius: 8px !important;
     border-top-right-radius: 8px !important;
-    height: 200px;
+    height: 180px;
     object-fit: cover;
 }
 
@@ -1038,6 +1038,12 @@ legend {
     font-size: 15px;
     padding: 4px 12px;
     border-radius: 4px;
+}
+
+.primary-fieldset .outline {
+    border: 1.4px solid var(--primary);
+    color: var(--primary);
+    font-weight: 600;
 }
 
 /* -=-=-=-=-= master data =-=-=-=-=- */
