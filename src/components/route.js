@@ -118,8 +118,9 @@ import Leaderboard from "./student/leaderBoard";
 
 import Group from "./student/group";
 import Subject from "./student/subject";
-import TestResult from "./student/testResult";
-import TestPreview from "./student/testPreview";
+
+import Subscription from "./student/subscription";
+import Course from "./student/course";
 
 import Summary from "./student/content/summary";
 import Notes from "./student/content/notes";
@@ -136,6 +137,9 @@ import SemesterAutoExam from "./student/semester/autoExam";
 
 import Quiz from "./student/quiz/quiz";
 import QuizLevelExam from "./student/quiz/levelExam";
+
+import TestResult from "./student/testResult";
+import TestPreview from "./student/testPreview";
 
 import EmailVerify from "./student/emailVerification";
 import StudentLogin from "./student/login";
@@ -1480,7 +1484,7 @@ const routes = (
             }
         />
 
-        {/* --------------- Subject --------------- */}
+        {/* --------------- Group subject --------------- */}
 
         <Route
             exact
@@ -1671,6 +1675,213 @@ const routes = (
 
         {/* --------------- Test result & Preview --------------- */}
 
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/results"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <TestResult {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/results/cycle/:cycleTestId/preview"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <TestPreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/results/semester/:semesterId/preview"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <TestPreview {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Subscription courses --------------- */}
+
+        <Route
+            exact
+            path="/dashboard/subscription/:subscriptionId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <Subscription {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subscription/:subscriptionId/course/:courseId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <Course {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/personal-notes"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <PersonalNotes {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/favourites"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <Favourites {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/favourites/:chapterId/:topicNum/:type"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <FavouritesFlashcard {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/summary"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <Summary {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/notes"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <Notes {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/:topicNum/learn"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <FlashCard {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/auto"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <CycleAutoExam {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/direct"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <CycleDirectExam {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/quiz/:quizId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <Quiz {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/quiz/:quizId/level/:levelId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <QuizLevelExam {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/semester/:semesterId/auto"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <SemesterAutoExam {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/semester/:semesterId/direct"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <SemesterDirectExam {...props} />
+                )
+            }
+        />
         <Route
             exact
             path="/dashboard/subject/:subjectId/results"

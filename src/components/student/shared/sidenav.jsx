@@ -84,7 +84,7 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
-                    <Link to="/dashboard/catalog">
+                    <Link to="/catalog">
                         <OverlayTrigger
                             key="right"
                             placement="right"
@@ -98,7 +98,7 @@ class SideNav extends Component {
                                 } btn-sm mb-3`}
                             >
                                 <i
-                                    className="fas fa-graduation-cap"
+                                    className="fas fa-cart-plus"
                                     style={{ marginLeft: "-2px" }}
                                 ></i>
                             </button>
@@ -111,12 +111,46 @@ class SideNav extends Component {
                         <OverlayTrigger
                             key="right"
                             placement="right"
-                            overlay={<Tooltip id="tooltip">Help</Tooltip>}
+                            overlay={
+                                <Tooltip id="tooltip">About Inquel</Tooltip>
+                            }
+                        >
+                            <button className="btn sidebar-btn btn-sm mb-2">
+                                <i
+                                    className="fas fa-info-circle"
+                                    style={{ marginLeft: "-1px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
+                    <Link to="/dashboard">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={
+                                <Tooltip id="tooltip">Help Center</Tooltip>
+                            }
                         >
                             <button className="btn sidebar-btn btn-sm mb-2">
                                 <i
                                     className="far fa-question-circle"
-                                    style={{ marginLeft: "-1.5px" }}
+                                    style={{ marginLeft: "-1px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
+                    <Link to="/dashboard">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={
+                                <Tooltip id="tooltip">Privacy Policy</Tooltip>
+                            }
+                        >
+                            <button className="btn sidebar-btn btn-sm mb-2">
+                                <i
+                                    className="fas fa-shield-alt"
+                                    style={{ marginLeft: "-1px" }}
                                 ></i>
                             </button>
                         </OverlayTrigger>

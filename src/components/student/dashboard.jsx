@@ -9,17 +9,244 @@ import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
-import { GROUP } from "../../redux/action";
+import { GROUP, SUBSCRIPTION } from "../../redux/action";
+import Slider from "react-slick";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
 });
 
+const Group = (props) => {
+    return props.group && Object.keys(props.group).length !== 0 ? (
+        props.profile && Object.entries(props.profile).length !== 0 ? (
+            props.profile.is_independent_student === false ? (
+                <div className="card shadow-sm mb-4">
+                    <div className="card-header">
+                        <h5 className="mb-0">Group</h5>
+                    </div>
+                    <div className="card-body">
+                        <div className="row">
+                            <div className="col-lg-3 col-md-4 col-sm-6">
+                                <Link
+                                    to={`/dashboard/group/${props.group.id}`}
+                                    className="text-decoration-none"
+                                    onClick={() =>
+                                        storeDispatch(
+                                            GROUP,
+                                            props.group.group_name
+                                        )
+                                    }
+                                >
+                                    <div className="card">
+                                        <img
+                                            src={courseimg}
+                                            className="card-img-top"
+                                            alt="Course"
+                                        />
+                                        <div
+                                            className="card-body primary-bg text-white p-2"
+                                            style={{
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            {props.group.group_name}
+                                        </div>
+                                    </div>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ) : null
+        ) : null
+    ) : null;
+};
+
+class Courses extends Component {
+    constructor() {
+        super();
+        this.state = {
+            subscriptions: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        };
+        this.url = baseUrl + studentUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    componentDidMount = () => {
+        this.fetchCourses();
+    };
+
+    fetchCourses = (path) => {
+        let API = path ? path : `${this.url}/student/sub/`;
+        fetch(API, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    let data = [...this.state.subscriptions];
+                    data.push(...result.data.results);
+                    this.setState(
+                        {
+                            subscriptions: data,
+                        },
+                        () => {
+                            if (result.data.next !== null) {
+                                this.fetchCourses(result.data.next);
+                            } else {
+                                this.setState({
+                                    page_loading: false,
+                                });
+                            }
+                        }
+                    );
+                } else {
+                    this.setState({
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Cannot show courses at the moment!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+    };
+
+    render() {
+        var settings = {
+            dots: true,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            initialSlide: 0,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2,
+                        dots: true,
+                    },
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+            ],
+        };
+        return (
+            <>
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
+                {this.state.subscriptions &&
+                this.state.subscriptions.length !== 0 ? (
+                    <div className="card shadow-sm mb-4">
+                        <div className="card-header">
+                            <h5 className="mb-0">Subscribed Course</h5>
+                        </div>
+                        <div className="card-body">
+                            <Slider {...settings}>
+                                {(this.state.subscriptions || []).map(
+                                    (data, index) => {
+                                        return (
+                                            <div
+                                                className="px-3"
+                                                data-index={index}
+                                                key={index}
+                                            >
+                                                <Link
+                                                    to={`/dashboard/subscription/${data.subscription_id}`}
+                                                    className="text-decoration-none"
+                                                    onClick={() =>
+                                                        storeDispatch(
+                                                            SUBSCRIPTION,
+                                                            data.title
+                                                        )
+                                                    }
+                                                >
+                                                    <div className="card">
+                                                        <img
+                                                            src={
+                                                                data
+                                                                    .subscription_file_link
+                                                                    .subscription_image_1
+                                                                    ? data
+                                                                          .subscription_file_link
+                                                                          .subscription_image_1
+                                                                    : courseimg
+                                                            }
+                                                            className="card-img-top"
+                                                            alt={data.title}
+                                                        />
+                                                        <div
+                                                            className="card-body primary-bg text-white p-2"
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            {data.title}
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        );
+                                    }
+                                )}
+                            </Slider>
+                        </div>
+                    </div>
+                ) : null}
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </>
+        );
+    }
+}
+
 class Dashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            groupData: "",
+            groupData: {},
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -38,6 +265,10 @@ class Dashboard extends Component {
     componentDidMount = () => {
         document.title = "Dashboard - Student | IQLabs";
 
+        this.fetchGroup();
+    };
+
+    fetchGroup = () => {
         fetch(`${this.url}/student/group/`, {
             method: "GET",
             headers: this.headers,
@@ -53,13 +284,12 @@ class Dashboard extends Component {
                     this.setState({
                         page_loading: false,
                     });
-                    console.log(result.msg);
                 }
             })
             .catch((err) => {
                 console.log(err);
                 this.setState({
-                    errorMsg: "Something went wrong!",
+                    errorMsg: "Cannot show group data at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -219,105 +449,20 @@ class Dashboard extends Component {
                     </div>
 
                     {/* Group section */}
-                    {this.props.profile &&
-                    Object.entries(this.props.profile).length !== 0 ? (
-                        this.props.profile.is_independent_student === false ? (
-                            <div className="card shadow-sm mb-4">
-                                <div className="card-header">
-                                    <h5>Group</h5>
-                                </div>
-                                <div className="card-body">
-                                    {this.state.groupData !== "" ? (
-                                        <div className="table-responsive">
-                                            <table className="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Group name</th>
-                                                        <th>
-                                                            Group description
-                                                        </th>
-                                                        <th>View</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            {
-                                                                this.state
-                                                                    .groupData
-                                                                    .group_name
-                                                            }
-                                                        </td>
-                                                        <td>
-                                                            {
-                                                                this.state
-                                                                    .groupData
-                                                                    .group_description
-                                                            }
-                                                        </td>
-                                                        <td>
-                                                            <Link
-                                                                to={`/dashboard/group/${this.state.groupData.id}`}
-                                                            >
-                                                                <button
-                                                                    className="btn btn-primary btn-sm shadow-none"
-                                                                    onClick={() =>
-                                                                        storeDispatch(
-                                                                            GROUP,
-                                                                            this
-                                                                                .state
-                                                                                .groupData
-                                                                                .group_name
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="fas fa-eye"></i>
-                                                                </button>
-                                                            </Link>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    ) : (
-                                        "No data to display..."
-                                    )}
-                                </div>
-                            </div>
-                        ) : (
-                            ""
-                        )
-                    ) : (
-                        ""
-                    )}
+                    <Group
+                        profile={this.props.profile}
+                        group={this.state.groupData}
+                    />
 
                     {/* Courses */}
-                    <div className="card shadow-sm mb-4">
-                        <div className="card-header">
-                            <div className="row align-items-center">
-                                <div className="col-md-3">
-                                    <h5>Courses</h5>
-                                </div>
-                                <div className="col-md-9 text-right">
-                                    <Link to="">
-                                        <button className="btn btn-primary btn-sm">
-                                            View all
-                                        </button>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="card-body">
-                            <CarouselCard />
-                        </div>
-                    </div>
+                    <Courses />
 
-                    {/* What to learn next */}
+                    {/* Recommended course */}
                     <div className="card shadow-sm mb-4">
                         <div className="card-header">
                             <div className="row align-items-center">
                                 <div className="col-md-3">
-                                    <h5>What to learn next</h5>
+                                    <h5 className="mb-0">Recommended Course</h5>
                                 </div>
                                 <div className="col-md-9 text-right">
                                     <Link to="">
@@ -334,136 +479,11 @@ class Dashboard extends Component {
                     </div>
 
                     {/* Topics recommended */}
-                    <div className="card shadow-sm mb-4">
-                        <div className="card-header">
-                            <h5>Topic Recommended For You</h5>
-                        </div>
-                        <div className="card-body">
-                            <div className="row mb-3">
-                                <div className="col-md-3 mb-3">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none"
-                                    >
-                                        <div className="card primary-bg text-white">
-                                            <div className="card-body text-center p-3">
-                                                Topics 01
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none"
-                                    >
-                                        <div className="card primary-bg text-white">
-                                            <div className="card-body text-center p-3">
-                                                Topics 02
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none"
-                                    >
-                                        <div className="card primary-bg text-white">
-                                            <div className="card-body text-center p-3">
-                                                Topics 03
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none"
-                                    >
-                                        <div className="card primary-bg text-white">
-                                            <div className="card-body text-center p-3">
-                                                Topics 04
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none"
-                                    >
-                                        <div className="card primary-bg text-white">
-                                            <div className="card-body text-center p-3">
-                                                Topics 05
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none"
-                                    >
-                                        <div className="card primary-bg text-white">
-                                            <div className="card-body text-center p-3">
-                                                Topics 06
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none"
-                                    >
-                                        <div className="card primary-bg text-white">
-                                            <div className="card-body text-center p-3">
-                                                Topics 07
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                                <div className="col-md-3 mb-3">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none"
-                                    >
-                                        <div className="card primary-bg text-white">
-                                            <div className="card-body text-center p-3">
-                                                Topics 08
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <button className="btn btn-primary btn-sm">
-                                    View all topics
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Featured */}
                     <div className="card shadow-sm">
                         <div className="card-header">
-                            <div className="row align-items-center">
-                                <div className="col-md-3">
-                                    <h5>Featured</h5>
-                                </div>
-                                <div className="col-md-9 text-right">
-                                    <Link to="">
-                                        <button className="btn btn-primary btn-sm">
-                                            View all
-                                        </button>
-                                    </Link>
-                                </div>
-                            </div>
+                            <h5 className="mb-0">Featured Topics</h5>
                         </div>
-                        <div className="card-body">
-                            <CarouselCard />
-                        </div>
+                        <div className="card-body"></div>
                     </div>
 
                     {/* Loading component */}

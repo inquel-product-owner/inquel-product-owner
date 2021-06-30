@@ -7,7 +7,6 @@ import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import Paginations from "../common/pagination";
 import SubjectTable from "../common/table/subject";
-import CarouselCard from "../common/owlCarousel";
 import AlertBox from "../common/alert";
 
 const mapStateToProps = (state) => ({
@@ -161,48 +160,6 @@ class TeacherGroup extends Component {
                                 )}
                             />
                         ) : null}
-                    </div>
-                </div>
-
-                {/* ----- Exams carousel ----- */}
-                <div className="card shadow-sm mb-4">
-                    <div className="card-header">
-                        <div className="row align-items-center">
-                            <div className="col-md-3">
-                                <h5>Exams</h5>
-                            </div>
-                            <div className="col-md-9 text-right">
-                                <Link to="">
-                                    <button className="btn btn-primary btn-sm">
-                                        View all
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="card-body">
-                        <CarouselCard />
-                    </div>
-                </div>
-
-                {/* ----- Quiz carousel ----- */}
-                <div className="card shadow-sm">
-                    <div className="card-header">
-                        <div className="row align-items-center">
-                            <div className="col-md-3">
-                                <h5>Quiz</h5>
-                            </div>
-                            <div className="col-md-9 text-right">
-                                <Link to="">
-                                    <button className="btn btn-primary btn-sm">
-                                        View all
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="card-body">
-                        <CarouselCard />
                     </div>
                 </div>
 
