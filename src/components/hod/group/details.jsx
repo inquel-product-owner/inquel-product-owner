@@ -117,16 +117,18 @@ class HODGroupDetails extends Component {
                                     <th scope="col">Subject</th>
                                     <th scope="col">
                                         <div className="row">
-                                            <div className="col-6">
+                                            <div className="col-4">
                                                 Chapters
                                             </div>
-                                            <div className="col-6">Teacher</div>
+                                            <div className="col-4">Status</div>
+                                            <div className="col-4">Teacher</div>
                                         </div>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {this.state.groupItem.length !== 0
+                                {this.state.groupItem &&
+                                this.state.groupItem.length !== 0
                                     ? this.state.groupItem.subjects.map(
                                           (data, index) => {
                                               return (
@@ -150,17 +152,60 @@ class HODGroupDetails extends Component {
                                                                                     index
                                                                                 }
                                                                             >
-                                                                                <p className="col-6">
+                                                                                <p className="col-4">
                                                                                     {
                                                                                         chapter.chapter_name
                                                                                     }
                                                                                 </p>
-                                                                                <div className="col-6">
-                                                                                    <p
-                                                                                        key={
-                                                                                            index
-                                                                                        }
-                                                                                    >
+                                                                                <p className="col-4">
+                                                                                    {chapter.chapter_status.toLowerCase() ===
+                                                                                    "yet to start" ? (
+                                                                                        <span className="text-danger text-capitalize">
+                                                                                            {
+                                                                                                chapter.chapter_status
+                                                                                            }
+                                                                                        </span>
+                                                                                    ) : chapter.chapter_status.toLowerCase() ===
+                                                                                      "in progress" ? (
+                                                                                        <span className="text-warning text-capitalize">
+                                                                                            {
+                                                                                                chapter.chapter_status
+                                                                                            }
+                                                                                        </span>
+                                                                                    ) : chapter.chapter_status.toLowerCase() ===
+                                                                                      "review" ? (
+                                                                                        <span className="text-primary text-capitalize">
+                                                                                            {
+                                                                                                chapter.chapter_status
+                                                                                            }
+                                                                                        </span>
+                                                                                    ) : chapter.chapter_status.toLowerCase() ===
+                                                                                      "ready for review" ? (
+                                                                                        <span className="text-primary text-capitalize">
+                                                                                            {
+                                                                                                chapter.chapter_status
+                                                                                            }
+                                                                                        </span>
+                                                                                    ) : chapter.chapter_status.toLowerCase() ===
+                                                                                      "approved" ? (
+                                                                                        <span className="text-success text-capitalize">
+                                                                                            {
+                                                                                                chapter.chapter_status
+                                                                                            }
+                                                                                        </span>
+                                                                                    ) : chapter.chapter_status.toLowerCase() ===
+                                                                                      "published to group" ? (
+                                                                                        <span className="text-success text-capitalize">
+                                                                                            {
+                                                                                                chapter.chapter_status
+                                                                                            }
+                                                                                        </span>
+                                                                                    ) : (
+                                                                                        chapter.chapter_status
+                                                                                    )}
+                                                                                </p>
+                                                                                <div className="col-4">
+                                                                                    <p>
                                                                                         {
                                                                                             chapter
                                                                                                 .teacher
@@ -172,17 +217,16 @@ class HODGroupDetails extends Component {
                                                                         );
                                                                     }
                                                                 )
-                                                              : ""}
+                                                              : null}
                                                       </td>
                                                   </tr>
                                               );
                                           }
                                       )
-                                    : ""}
+                                    : null}
                             </tbody>
                         </table>
                     </div>
-                    <div className="card-footer"></div>
                 </div>
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}

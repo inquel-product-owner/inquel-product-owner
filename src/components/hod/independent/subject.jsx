@@ -302,40 +302,63 @@ class ChapterModal extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/subject/${this.props.subjectId}/assign/teacher/`, {
-            headers: headers,
-            method: "POST",
-            body: JSON.stringify({
-                chapter_name: this.state.chapter,
-                teacher_id: this.state.teacher,
-                weightage: this.state.weightage,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
+        if (this.state.chapter === "") {
+            this.setState({
+                errorMsg: "Enter chapter name",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (this.state.teacher === "") {
+            this.setState({
+                errorMsg: "Select teacher from the list",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (this.state.weightage === "") {
+            this.setState({
+                errorMsg: "Enter weightage",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            fetch(
+                `${url}/hod/subject/${this.props.subjectId}/assign/teacher/`,
+                {
+                    headers: headers,
+                    method: "POST",
+                    body: JSON.stringify({
+                        chapter_name: this.state.chapter,
+                        teacher_id: this.state.teacher,
+                        weightage: this.state.weightage,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                        });
+                        this.props.formSubmission();
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
                     this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission();
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
+                        errorMsg: "Something went wrong!",
                         showErrorAlert: true,
                         showLoader: false,
                     });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    showLoader: false,
                 });
-            });
+        }
     };
 
     render() {

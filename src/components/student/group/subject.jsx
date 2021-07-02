@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Wrapper from "./wrapper";
+import Wrapper from "../wrapper";
 import {
     Card,
     Accordion,
@@ -8,11 +8,11 @@ import {
     Dropdown,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Loading from "../common/loader";
-import AlertBox from "../common/alert";
-import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { connect } from "react-redux";
-import storeDispatch from "../../redux/dispatch";
+import storeDispatch from "../../../redux/dispatch";
 import {
     CHAPTER,
     RESPONSE,
@@ -21,7 +21,7 @@ import {
     SEMESTER,
     TEMP,
     TOPIC,
-} from "../../redux/action";
+} from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,

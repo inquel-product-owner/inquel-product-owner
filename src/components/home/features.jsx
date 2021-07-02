@@ -40,6 +40,8 @@ const data = [
 const Features = () => {
     useEffect(() => {
         document.title = "Features | IQ Labs Academy";
+
+        window.scrollTo(0, 0);
     }, []);
 
     const getTextOrderClass = (index) => {

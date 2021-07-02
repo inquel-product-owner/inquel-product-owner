@@ -2,14 +2,14 @@ import React, { Component } from "react";
 import Wrapper from "./wrapper";
 import { Link } from "react-router-dom";
 import dateFormat from "dateformat";
-import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
-import axios from "axios";
+import { Modal, Alert, Spinner } from "react-bootstrap";
 import Select from "react-select";
 import { baseUrl, inquelAdminUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import { paginationCount } from "../../shared/constant";
 import Paginations from "../common/pagination";
+import DiscountTable from "../common/table/discounts";
 
 class DiscountModal extends Component {
     constructor() {
@@ -94,43 +94,43 @@ class DiscountModal extends Component {
                 percentage: this.props.data.percentage || "",
 
                 currency: this.props.data.currency || "",
-                points_exists: false,
-                percent_exists: false,
-                price_exists: false,
+                points_exists: this.props.data.points_exists || false,
+                percent_exists: this.props.data.percent_exists || false,
+                price_exists: this.props.data.price_exists || false,
             };
 
-            if (
-                (this.props.data.min_points !== "" &&
-                    this.props.data.min_points !== 0 &&
-                    this.props.data.min_points !== null) ||
-                (this.props.data.max_points !== "" &&
-                    this.props.data.max_points !== 0 &&
-                    this.props.data.max_points !== null) ||
-                (this.props.data.deduction_points !== "" &&
-                    this.props.data.deduction_points !== 0 &&
-                    this.props.data.deduction_points !== null) ||
-                (this.props.data.points_in_decimal !== "" &&
-                    this.props.data.points_in_decimal !== 0 &&
-                    this.props.data.points_in_decimal !== null)
-            ) {
-                tempObj.points_exists = true;
-            } else if (
-                this.props.data.percentage !== "" &&
-                this.props.data.percentage !== 0 &&
-                this.props.data.percentage !== null
-            ) {
-                tempObj.percent_exists = true;
-            } else if (
-                this.props.data.fixed_price !== "" &&
-                this.props.data.fixed_price !== 0 &&
-                this.props.data.fixed_price !== null
-            ) {
-                tempObj.price_exists = true;
-            } else {
-                tempObj.points_exists = false;
-                tempObj.percent_exists = false;
-                tempObj.price_exists = false;
-            }
+            // if (
+            //     (this.props.data.min_points !== "" &&
+            //         this.props.data.min_points !== 0 &&
+            //         this.props.data.min_points !== null) ||
+            //     (this.props.data.max_points !== "" &&
+            //         this.props.data.max_points !== 0 &&
+            //         this.props.data.max_points !== null) ||
+            //     (this.props.data.deduction_points !== "" &&
+            //         this.props.data.deduction_points !== 0 &&
+            //         this.props.data.deduction_points !== null) ||
+            //     (this.props.data.points_in_decimal !== "" &&
+            //         this.props.data.points_in_decimal !== 0 &&
+            //         this.props.data.points_in_decimal !== null)
+            // ) {
+            //     tempObj.points_exists = true;
+            // } else if (
+            //     this.props.data.percentage !== "" &&
+            //     this.props.data.percentage !== 0 &&
+            //     this.props.data.percentage !== null
+            // ) {
+            //     tempObj.percent_exists = true;
+            // } else if (
+            //     this.props.data.fixed_price !== "" &&
+            //     this.props.data.fixed_price !== 0 &&
+            //     this.props.data.fixed_price !== null
+            // ) {
+            //     tempObj.price_exists = true;
+            // } else {
+            //     tempObj.points_exists = false;
+            //     tempObj.percent_exists = false;
+            //     tempObj.price_exists = false;
+            // }
 
             this.setState(
                 {
@@ -899,110 +899,6 @@ class DiscountModal extends Component {
     }
 }
 
-const DiscountTable = (props) => {
-    return (
-        <table className="table table-hover">
-            <thead className="text-white primary-bg">
-                <tr style={{ whiteSpace: "nowrap" }}>
-                    <th scope="col">Sl.No</th>
-                    <th scope="col">Coupon ID</th>
-                    <th scope="col">Coupon Title</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Sub Category</th>
-                    <th scope="col">Discipline</th>
-                    <th scope="col">Levels</th>
-                    <th scope="col">Subjects</th>
-                    <th scope="col">Valid from</th>
-                    <th scope="col">Valid to</th>
-                    <th scope="col">Minimum points</th>
-                    <th scope="col">Maximum points</th>
-                    <th scope="col">Deduction points</th>
-                    <th scope="col">Points value (Decimal)</th>
-                    <th scope="col">Percentage</th>
-                    <th scope="col">Fixed Price</th>
-                    <th scope="col">Currency</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {props.state.data && props.state.data.length !== 0 ? (
-                    (props.state.data || []).map((list, index) => {
-                        return (
-                            <tr
-                                style={{
-                                    whiteSpace: "nowrap",
-                                }}
-                                key={index}
-                            >
-                                <td>{index + 1}</td>
-                                <td>{list.coupon_name}</td>
-                                <td>{list.title}</td>
-                                <td>{list.category}</td>
-                                <td>{list.sub_category}</td>
-                                <td>{list.discipline}</td>
-                                <td>{list.level}</td>
-                                <td>{list.subject}</td>
-                                <td>
-                                    {dateFormat(list.valid_from, "dd/mm/yyyy")}
-                                </td>
-                                <td>
-                                    {dateFormat(list.valid_to, "dd/mm/yyyy")}
-                                </td>
-                                <td>{list.min_points}</td>
-                                <td>{list.max_points}</td>
-                                <td>{list.deduction_points}</td>
-                                <td>{list.points_in_decimal}</td>
-                                <td>{list.percentage}</td>
-                                <td>{list.fixed_price}</td>
-                                <td>{list.currency}</td>
-                                <td>
-                                    <Dropdown drop="left" key="left">
-                                        <Dropdown.Toggle
-                                            variant="Secondary"
-                                            className="btn btn-outline-secondary btn-sm shadow-none caret-off"
-                                        >
-                                            <i className="fas fa-ellipsis-h"></i>
-                                        </Dropdown.Toggle>
-
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item
-                                                onClick={() =>
-                                                    props.handleEdit(list)
-                                                }
-                                            >
-                                                <i className="far fa-edit mr-1"></i>{" "}
-                                                Edit
-                                            </Dropdown.Item>
-                                            <Dropdown.Item
-                                                onClick={() =>
-                                                    props.handleDelete(
-                                                        list.coupon_id
-                                                    )
-                                                }
-                                            >
-                                                <i className="far fa-trash-alt mr-1"></i>{" "}
-                                                Delete
-                                            </Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </td>
-                            </tr>
-                        );
-                    })
-                ) : (
-                    <tr
-                        style={{
-                            whiteSpace: "nowrap",
-                        }}
-                    >
-                        <td>No data to display...</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>
-    );
-};
-
 class AdminDiscountConfiguration extends Component {
     constructor(props) {
         super(props);
@@ -1035,20 +931,22 @@ class AdminDiscountConfiguration extends Component {
             this.state.activePage === 1
                 ? `${this.url}/coupon/`
                 : `${this.url}/coupon/?page=${this.state.activePage}`;
-        axios
-            .get(URL, {
-                headers: this.headers,
-            })
+
+        fetch(URL, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
             .then((response) => {
-                if (response.data.sts === true) {
+                if (response.sts === true) {
                     this.setState({
-                        data: response.data.data.results,
-                        totalCount: response.data.data.count,
+                        data: response.data.results,
+                        totalCount: response.data.count,
                         page_loading: false,
                     });
                 } else {
                     this.setState({
-                        errorMsg: response.data.data.msg,
+                        errorMsg: response.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -1056,20 +954,8 @@ class AdminDiscountConfiguration extends Component {
             })
             .catch((err) => {
                 console.log(err);
-                if (err.response) {
-                    this.setState({
-                        errorMsg: err.response.data.msg,
-                    });
-                } else if (err.request) {
-                    this.setState({
-                        errorMsg: err.request.data.msg,
-                    });
-                } else if (err.message) {
-                    this.setState({
-                        errorMsg: err.message.data.msg,
-                    });
-                }
                 this.setState({
+                    errorMsg: "Cannot load discount coupons at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -1213,13 +1099,11 @@ class AdminDiscountConfiguration extends Component {
 
                 {/* ----- Discount table ----- */}
                 <div className="card shadow-sm">
-                    <div className="table-responsive">
-                        <DiscountTable
-                            state={this.state}
-                            handleEdit={this.handleEdit}
-                            handleDelete={this.handleDelete}
-                        />
-                    </div>
+                    <DiscountTable
+                        data={this.state.data}
+                        handleEdit={this.handleEdit}
+                        handleDelete={this.handleDelete}
+                    />
                     <div className="card-body p-3">
                         {this.state.totalCount > paginationCount ? (
                             <Paginations

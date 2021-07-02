@@ -242,7 +242,7 @@ const Category = (props) => {
                                 className="small"
                                 onClick={() => props.handleCategory(list.code)}
                             >
-                                {list.title}{" "}
+                                {list.code} - {list.title}{" "}
                                 <i
                                     className={`fas fa-angle-right ml-2 master-data-arrow ${
                                         props.selectedCategory === list.code
@@ -292,7 +292,7 @@ const SubCategory = (props) => {
                                     props.handleSubcategory(list.code)
                                 }
                             >
-                                {list.title}{" "}
+                                {list.code} - {list.title}{" "}
                                 <i
                                     className={`fas fa-angle-right ml-2 master-data-arrow ${
                                         props.selectedSubcategory === list.code
@@ -331,7 +331,7 @@ const Discipline = (props) => {
                             className="master-data-list border-bottom"
                             key={index}
                         >
-                            <p className="small">{title}</p>
+                            <p className="small">{code} - {title}</p>
                             <DropDownBtn
                                 {...props}
                                 code={code}
@@ -362,7 +362,7 @@ const Level = (props) => {
                             className="master-data-list border-bottom"
                             key={index}
                         >
-                            <p className="small">{title}</p>
+                            <p className="small">{code} - {title}</p>
                             <DropDownBtn
                                 {...props}
                                 code={code}
@@ -393,7 +393,7 @@ const Subject = (props) => {
                             className="master-data-list border-bottom"
                             key={index}
                         >
-                            <p className="small">{title}</p>
+                            <p className="small">{code} - {title}</p>
                             <DropDownBtn
                                 {...props}
                                 code={code}
@@ -426,7 +426,7 @@ const Board = (props) => {
                                     className="master-data-list border-bottom"
                                     key={index}
                                 >
-                                    <p className="small">{list.title}</p>
+                                    <p className="small">{list.code} - {list.title}</p>
                                     <DropDownBtn
                                         {...props}
                                         code={list.code}
@@ -461,7 +461,7 @@ const Type = (props) => {
                                     className="master-data-list border-bottom"
                                     key={index}
                                 >
-                                    <p className="small">{list.title}</p>
+                                    <p className="small">{list.code} - {list.title}</p>
                                     <DropDownBtn
                                         {...props}
                                         code={list.code}
@@ -814,7 +814,10 @@ class AdminMasterData extends Component {
                     </ol>
                 </nav>
 
-                <Tabs defaultActiveKey="categories" id="uncontrolled-tab-example">
+                <Tabs
+                    defaultActiveKey="categories"
+                    id="uncontrolled-tab-example"
+                >
                     {/* master filter */}
                     <Tab eventKey="categories" title="Categories">
                         <div className="form-row">

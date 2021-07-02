@@ -7,18 +7,26 @@ import GroupTable from "../common/table/group";
 import SubjectTable from "../common/table/subject";
 import Paginations from "../common/pagination";
 import AlertBox from "../common/alert";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import Slider from "react-slick";
+import courseimg from "../../assets/code.jpg";
+import storeDispatch from "../../redux/dispatch";
+import { GROUP } from "../../redux/action";
+import { Link } from "react-router-dom";
 
 class TeacherDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             groupItem: [],
             subjectItem: [],
+
             activeGroupPage: 1,
             totalGroupCount: 0,
             activeSubjectPage: 1,
             totalSubjectCount: 0,
+
+            isTableView: true,
 
             errorMsg: "",
             successMsg: "",
@@ -34,12 +42,6 @@ class TeacherDashboard extends Component {
             Authorization: this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     loadGroupData = () => {
         fetch(`${this.url}/teacher/group/?page=${this.state.activeGroupPage}`, {
@@ -131,6 +133,32 @@ class TeacherDashboard extends Component {
     }
 
     render() {
+        var settings = {
+            dots: true,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            initialSlide: 0,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2,
+                        dots: true,
+                    },
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+            ],
+        };
         return (
             <Wrapper
                 header="Dashboard"
@@ -165,28 +193,157 @@ class TeacherDashboard extends Component {
                 {/* Group table */}
                 <div className="card shadow-sm mb-4">
                     <div className="card-header">
-                        <h5 className="primary-text">Groups</h5>
+                        <div className="row">
+                            <div className="col-6">
+                                <h5 className="mb-0">Groups</h5>
+                            </div>
+                            <div className="col-6 text-right">
+                                <div
+                                    className="btn-group btn-group-sm btn-group-toggle"
+                                    data-toggle="buttons"
+                                >
+                                    <OverlayTrigger
+                                        key="group_table"
+                                        placement="top"
+                                        overlay={
+                                            <Tooltip
+                                                id="tooltip"
+                                                className="text-left"
+                                            >
+                                                Table View
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <label
+                                            className={`btn btn-light ${
+                                                this.state.isTableView
+                                                    ? "active"
+                                                    : ""
+                                            }`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="options"
+                                                id="tableview"
+                                                onChange={() => {
+                                                    this.setState({
+                                                        isTableView: true,
+                                                    });
+                                                }}
+                                            />{" "}
+                                            <i className="fas fa-th-list"></i>
+                                        </label>
+                                    </OverlayTrigger>
+                                    <OverlayTrigger
+                                        key="group_card"
+                                        placement="top"
+                                        overlay={
+                                            <Tooltip
+                                                id="tooltip"
+                                                className="text-left"
+                                            >
+                                                Card View
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <label
+                                            className={`btn btn-light ${
+                                                !this.state.isTableView
+                                                    ? "active"
+                                                    : ""
+                                            }`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="options"
+                                                id="cardview"
+                                                onChange={() => {
+                                                    this.setState({
+                                                        isTableView: false,
+                                                    });
+                                                }}
+                                            />{" "}
+                                            <i className="fas fa-th-large"></i>
+                                        </label>
+                                    </OverlayTrigger>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <GroupTable
-                        groupItems={this.state.groupItem}
-                        path="teacher"
-                        view={true}
-                    />
-                    <div className="card-body p-3">
-                        {this.state.totalGroupCount > paginationCount ? (
-                            <Paginations
-                                activePage={this.state.activeGroupPage}
-                                totalItemsCount={this.state.totalGroupCount}
-                                onChange={this.handleGroupPageChange.bind(this)}
+
+                    {this.state.isTableView ? (
+                        <>
+                            <GroupTable
+                                groupItems={this.state.groupItem}
+                                path="teacher"
+                                view={true}
+                                status={true}
                             />
-                        ) : null}
-                    </div>
+                            <div className="card-body p-3">
+                                {this.state.totalGroupCount >
+                                paginationCount ? (
+                                    <Paginations
+                                        activePage={this.state.activeGroupPage}
+                                        totalItemsCount={
+                                            this.state.totalGroupCount
+                                        }
+                                        onChange={this.handleGroupPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="card-body">
+                            <Slider {...settings}>
+                                {(this.state.groupItem || []).map(
+                                    (data, index) => {
+                                        return (
+                                            <div
+                                                className="px-3"
+                                                data-index={index}
+                                                key={index}
+                                            >
+                                                <div className="card">
+                                                    <img
+                                                        src={courseimg}
+                                                        className="card-img-top"
+                                                        alt={data.group_name}
+                                                    />
+                                                    <Link
+                                                        to={`${this.props.match.url}/group/${data.id}`}
+                                                        className="text-decoration-none"
+                                                        onClick={() => {
+                                                            storeDispatch(
+                                                                GROUP,
+                                                                data.group_name
+                                                            );
+                                                        }}
+                                                    >
+                                                        <div
+                                                            className="card-body primary-bg text-white p-2"
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            {data.group_name}
+                                                        </div>
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                )}
+                            </Slider>
+                        </div>
+                    )}
                 </div>
 
                 {/* Subject Table */}
                 <div className="card shadow-sm mb-4">
                     <div className="card-header">
-                        <h5 className="primary-text">Subjects</h5>
+                        <h5 className="mb-0">Subjects</h5>
                     </div>
                     <SubjectTable
                         subjectItems={this.state.subjectItem}

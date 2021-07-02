@@ -1,7 +1,14 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import Wrapper from "./wrapper";
 import { Link } from "react-router-dom";
-import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
+import {
+    Modal,
+    Alert,
+    Spinner,
+    Dropdown,
+    OverlayTrigger,
+    Tooltip,
+} from "react-bootstrap";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import { paginationCount } from "../../shared/constant";
@@ -12,17 +19,16 @@ import Paginations from "../common/pagination";
 import AlertBox from "../common/alert";
 import {
     SingleContentDeleteModal,
-    MultiContentDisableModal,
-    MultiContentEnableModal,
     MultiContentDeleteModal,
-    SingleContentDisableModal,
-    SingleContentEnableModal,
+    SingleContentEnableDisableModal,
+    MultiContentEnableDisableModal,
 } from "../common/modal/contentManagementModal";
 import { connect } from "react-redux";
 import Slider from "react-slick";
 import Select from "react-select";
 import storeDispatch from "../../redux/dispatch";
-import { COURSE } from "../../redux/action";
+import { COURSE, GROUP } from "../../redux/action";
+import CourseTable from "../common/table/course";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -520,18 +526,654 @@ class SubjectModal extends Component {
     }
 }
 
+const GroupSection = (props) => {
+    const settings = {
+        dots: true,
+        infinite: false,
+        speed: 500,
+        slidesToShow: 4,
+        slidesToScroll: 4,
+        initialSlide: 0,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    dots: true,
+                },
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    dots: false,
+                },
+            },
+        ],
+    };
+    const [tab, setTab] = useState("table");
+    const [selected_data, setData] = useState({});
+    const [showModal, toggleModal] = useState(false);
+
+    const formSubmission = () => {
+        setTimeout(() => {
+            toggleModal(!showModal);
+        }, 1000);
+        props.loadData();
+    };
+
+    const handleGroupId = (data) => {
+        let value = [];
+        const group_data = props.data;
+        for (let i = 0; i < group_data.length; i++) {
+            if (data.includes(group_data[i].id.toString())) {
+                value.push({
+                    id: group_data[i].id.toString(),
+                    name: group_data[i].group_name,
+                });
+            } else {
+                continue;
+            }
+        }
+        setData(value);
+    };
+
+    return props.data && props.data.length !== 0 ? (
+        <>
+            {/* Delete Modal */}
+            {showModal ? (
+                <MultiContentDeleteModal
+                    show={showModal}
+                    onHide={() => toggleModal(!showModal)}
+                    formSubmission={formSubmission}
+                    url={`${props.url}/hod/group/delete/`}
+                    data={selected_data}
+                    field="group_ids"
+                    type="Group"
+                />
+            ) : (
+                ""
+            )}
+
+            <div className="card shadow-sm mb-4">
+                <div className="card-header">
+                    <div className="row align-items-center">
+                        <div className="col-md-6 mb-2 mb-md-0">
+                            <h5>Groups</h5>
+                        </div>
+                        <div className="col-md-6 text-right">
+                            <Link to={`${props.match.url}/group`}>
+                                <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                    Group Configuration
+                                </button>
+                            </Link>
+                            {tab === "table" ? (
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={() => toggleModal(!showModal)}
+                                >
+                                    Delete
+                                </button>
+                            ) : (
+                                ""
+                            )}
+                            <div
+                                className="btn-group btn-group-sm btn-group-toggle ml-2"
+                                data-toggle="buttons"
+                            >
+                                <OverlayTrigger
+                                    key="group_table"
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip
+                                            id="tooltip"
+                                            className="text-left"
+                                        >
+                                            Table View
+                                        </Tooltip>
+                                    }
+                                >
+                                    <label
+                                        className={`btn btn-light ${
+                                            tab === "table" ? "active" : ""
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="options"
+                                            id="tableview"
+                                            onChange={() => {
+                                                setTab("table");
+                                            }}
+                                        />{" "}
+                                        <i className="fas fa-th-list"></i>
+                                    </label>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                    key="group_card"
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip
+                                            id="tooltip"
+                                            className="text-left"
+                                        >
+                                            Card View
+                                        </Tooltip>
+                                    }
+                                >
+                                    <label
+                                        className={`btn btn-light ${
+                                            tab === "card" ? "active" : ""
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="options"
+                                            id="cardview"
+                                            onChange={() => {
+                                                setTab("card");
+                                            }}
+                                        />{" "}
+                                        <i className="fas fa-th-large"></i>
+                                    </label>
+                                </OverlayTrigger>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {tab === "table" ? (
+                    <>
+                        <GroupTable
+                            groupItems={props.data}
+                            path="hod"
+                            status={true}
+                            view={true}
+                            check={true}
+                            handleGroupId={handleGroupId}
+                        />
+                        <div className="card-body p-3">
+                            {props.totalCount > paginationCount ? (
+                                <Paginations
+                                    activePage={props.activePage}
+                                    totalItemsCount={props.totalCount}
+                                    onChange={props.handlePageChange.bind(this)}
+                                />
+                            ) : null}
+                        </div>
+                    </>
+                ) : (
+                    <div className="card-body">
+                        <Slider {...settings}>
+                            {(props.data || []).map((data, index) => {
+                                return (
+                                    <div
+                                        className="px-3"
+                                        data-index={index}
+                                        key={index}
+                                    >
+                                        <div className="card">
+                                            <img
+                                                src={courseimg}
+                                                className="card-img-top"
+                                                alt={data.group_name}
+                                            />
+                                            <div
+                                                className="text-right mt-2"
+                                                style={{
+                                                    position: "absolute",
+                                                    right: "7px",
+                                                }}
+                                            >
+                                                <Dropdown>
+                                                    <Dropdown.Toggle
+                                                        variant="white"
+                                                        className="btn text-dark bg-light btn-sm shadow-none caret-off"
+                                                    >
+                                                        <i className="fas fa-ellipsis-v"></i>
+                                                    </Dropdown.Toggle>
+
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item
+                                                            onClick={() => {
+                                                                handleGroupId([
+                                                                    data.id,
+                                                                ]);
+                                                                toggleModal(
+                                                                    !showModal
+                                                                );
+                                                            }}
+                                                        >
+                                                            <i className="far fa-trash-alt mr-1"></i>{" "}
+                                                            Delete
+                                                        </Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </div>
+                                            <Link
+                                                to={`${props.match.url}/group/${data.id}`}
+                                                className="text-decoration-none"
+                                                onClick={() => {
+                                                    storeDispatch(
+                                                        GROUP,
+                                                        data.group_name
+                                                    );
+                                                }}
+                                            >
+                                                <div
+                                                    className="card-body primary-bg text-white p-2"
+                                                    style={{
+                                                        cursor: "pointer",
+                                                    }}
+                                                >
+                                                    {data.group_name}
+                                                </div>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </Slider>
+                    </div>
+                )}
+            </div>
+        </>
+    ) : null;
+};
+
+const SubjectSection = (props) => {
+    const [selected_data, setData] = useState({});
+    const [showModal, toggleModal] = useState(false);
+    const [type, setType] = useState("");
+
+    const formSubmission = () => {
+        setTimeout(() => {
+            toggleModal(!showModal);
+        }, 1000);
+        props.loadData();
+    };
+
+    const handleSubjectId = (data) => {
+        let value = [];
+        const subject_data = props.data;
+        for (let i = 0; i < subject_data.length; i++) {
+            if (data.includes(subject_data[i].id.toString())) {
+                value.push({
+                    id: subject_data[i].id.toString(),
+                    name: subject_data[i].subject_name,
+                });
+            } else {
+                continue;
+            }
+        }
+        setData(value);
+    };
+
+    return props.data && props.data.length !== 0 ? (
+        <>
+            {/* Create modal */}
+            {showModal && type === "ADD" ? (
+                <SubjectModal
+                    show={showModal}
+                    onHide={() => toggleModal(!showModal)}
+                    formSubmission={formSubmission}
+                />
+            ) : (
+                ""
+            )}
+
+            {/* Delete Modal */}
+            {showModal && type === "DELETE" ? (
+                <MultiContentDeleteModal
+                    show={showModal}
+                    onHide={() => toggleModal(!showModal)}
+                    formSubmission={formSubmission}
+                    url={`${props.url}/hod/group/subject/`}
+                    data={selected_data}
+                    field="subject_ids"
+                    type="subject"
+                />
+            ) : (
+                ""
+            )}
+
+            {/* Enable / Disable Modal */}
+            {showModal && type === "ENABLE/DISABLE" ? (
+                <MultiContentEnableDisableModal
+                    show={showModal}
+                    onHide={() => toggleModal(!showModal)}
+                    formSubmission={formSubmission}
+                    url={`${props.url}/hod/group/subject/`}
+                    data={selected_data}
+                    field="subject_ids"
+                    type="subject"
+                />
+            ) : (
+                ""
+            )}
+
+            <div className="card shadow-sm mb-4">
+                <div className="card-header">
+                    <div className="row align-items-center">
+                        <div className="col-md-3 mb-2 mb-md-0">
+                            <h5 className="mb-0">Subjects</h5>
+                        </div>
+                        <div className="col-md-9 text-right">
+                            <button
+                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                onClick={() => {
+                                    setType("ADD");
+                                    toggleModal(!showModal);
+                                }}
+                            >
+                                Create
+                            </button>
+                            <button
+                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                onClick={() => {
+                                    setType("DELETE");
+                                    toggleModal(!showModal);
+                                }}
+                            >
+                                Delete
+                            </button>
+                            <button
+                                className="btn btn-primary btn-sm shadow-none"
+                                onClick={() => {
+                                    setType("ENABLE/DISABLE");
+                                    toggleModal(!showModal);
+                                }}
+                            >
+                                Enable / Disable
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <SubjectTable
+                    subjectItems={props.data}
+                    path="hod"
+                    check={true}
+                    status={true}
+                    category={true}
+                    sub_category={true}
+                    discipline={true}
+                    level={true}
+                    subject={true}
+                    handleSubjectId={handleSubjectId}
+                />
+                <div className="card-body p-3">
+                    {props.totalCount > paginationCount ? (
+                        <Paginations
+                            activePage={props.activePage}
+                            totalItemsCount={props.totalCount}
+                            onChange={props.handlePageChange.bind(this)}
+                        />
+                    ) : null}
+                </div>
+            </div>
+        </>
+    ) : null;
+};
+
+const CourseSection = (props) => {
+    const settings = {
+        dots: true,
+        infinite: false,
+        speed: 500,
+        slidesToShow: 4,
+        slidesToScroll: 4,
+        initialSlide: 0,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    dots: true,
+                },
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    dots: false,
+                },
+            },
+        ],
+    };
+    const [tab, setTab] = useState("table");
+    const [selected_data, setData] = useState({});
+    const [showModal, toggleModal] = useState(false);
+    const [type, setType] = useState("");
+
+    const handleCRUD = (data, type) => {
+        setData(data);
+        setType(type);
+        toggleModal(!showModal);
+    };
+
+    const formSubmission = () => {
+        setTimeout(() => {
+            toggleModal(!showModal);
+        }, 1000);
+        props.loadData();
+    };
+
+    return props.data && props.data.length !== 0 ? (
+        <>
+            {/* Delete Modal */}
+            {showModal && type === "DELETE" ? (
+                <SingleContentDeleteModal
+                    show={showModal}
+                    onHide={() => toggleModal(!showModal)}
+                    formSubmission={formSubmission}
+                    url={`${props.url}/hod/course/${selected_data.course_id}/`}
+                    name={selected_data.course_name}
+                    type="course"
+                />
+            ) : (
+                ""
+            )}
+
+            {/* Enable / Disable Modal */}
+            {showModal && type === "Enable/Disable" ? (
+                <SingleContentEnableDisableModal
+                    show={showModal}
+                    onHide={() => toggleModal(!showModal)}
+                    formSubmission={formSubmission}
+                    url={`${props.url}/hod/course/${selected_data.course_id}/status/`}
+                    name={selected_data.course_name}
+                    method="PATCH"
+                />
+            ) : (
+                ""
+            )}
+
+            <div className="card shadow-sm">
+                <div className="card-header">
+                    <div className="row">
+                        <div className="col-6">
+                            <h5 className="mb-0">Course</h5>
+                        </div>
+                        <div className="col-6 text-right">
+                            <div
+                                className="btn-group btn-group-sm btn-group-toggle"
+                                data-toggle="buttons"
+                            >
+                                <OverlayTrigger
+                                    key="course_table"
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip
+                                            id="tooltip"
+                                            className="text-left"
+                                        >
+                                            Table View
+                                        </Tooltip>
+                                    }
+                                >
+                                    <label
+                                        className={`btn btn-light ${
+                                            tab === "table" ? "active" : ""
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="options"
+                                            id="tableview"
+                                            onChange={() => {
+                                                setTab("table");
+                                            }}
+                                        />{" "}
+                                        <i className="fas fa-th-list"></i>
+                                    </label>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                    key="course_card"
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip
+                                            id="tooltip"
+                                            className="text-left"
+                                        >
+                                            Card View
+                                        </Tooltip>
+                                    }
+                                >
+                                    <label
+                                        className={`btn btn-light ${
+                                            tab === "card" ? "active" : ""
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="options"
+                                            id="cardview"
+                                            onChange={() => {
+                                                setTab("card");
+                                            }}
+                                        />{" "}
+                                        <i className="fas fa-th-large"></i>
+                                    </label>
+                                </OverlayTrigger>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {tab === "table" ? (
+                    <>
+                        <CourseTable
+                            data={props.data}
+                            handleCRUD={handleCRUD}
+                            path={props.match.url}
+                            action={true}
+                            status={true}
+                        />
+                        <div className="card-footer"></div>
+                    </>
+                ) : (
+                    <div className="card-body">
+                        <Slider {...settings}>
+                            {(props.data || []).map((data, index) => {
+                                return (
+                                    <div
+                                        className="px-3"
+                                        data-index={index}
+                                        key={index}
+                                    >
+                                        <div className="card">
+                                            <img
+                                                src={
+                                                    data.course_thumbnail_url ===
+                                                    null
+                                                        ? courseimg
+                                                        : data.course_thumbnail_url
+                                                }
+                                                className="card-img-top"
+                                                alt={data.course_name}
+                                            />
+                                            <div
+                                                className="text-right mt-2"
+                                                style={{
+                                                    position: "absolute",
+                                                    right: "7px",
+                                                }}
+                                            >
+                                                <Dropdown>
+                                                    <Dropdown.Toggle
+                                                        variant="white"
+                                                        className="btn text-dark bg-light btn-sm shadow-none caret-off"
+                                                    >
+                                                        <i className="fas fa-ellipsis-v"></i>
+                                                    </Dropdown.Toggle>
+
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item
+                                                            onClick={() => {
+                                                                handleCRUD(
+                                                                    data,
+                                                                    "DELETE"
+                                                                );
+                                                            }}
+                                                        >
+                                                            <i className="far fa-trash-alt mr-1"></i>{" "}
+                                                            Delete
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            onClick={() => {
+                                                                handleCRUD(
+                                                                    data,
+                                                                    "Enable/Disable"
+                                                                );
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-ban mr-1"></i>{" "}
+                                                            Enable / Disable
+                                                        </Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </div>
+                                            <Link
+                                                to={`${props.match.url}/course/${data.course_id}`}
+                                                className="text-decoration-none"
+                                                onClick={() => {
+                                                    storeDispatch(
+                                                        COURSE,
+                                                        data.course_name
+                                                    );
+                                                }}
+                                            >
+                                                <div
+                                                    className="card-body primary-bg text-white p-2"
+                                                    style={{
+                                                        cursor: "pointer",
+                                                    }}
+                                                >
+                                                    {data.course_name}
+                                                </div>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </Slider>
+                    </div>
+                )}
+            </div>
+        </>
+    ) : null;
+};
+
 class HODDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
-            showModal: false,
-            content: "",
-            type: "",
-
-            groupItems: [],
-            subjectItems: [],
-            courseItems: [],
+            group_data: [],
+            subject_data: [],
+            course_data: [],
             selectedData: [],
 
             activeGroupPage: 1,
@@ -554,14 +1196,13 @@ class HODDashboard extends Component {
         };
     }
 
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
-
     loadGroupData = () => {
-        fetch(`${this.url}/hod/group/?page=${this.state.activeGroupPage}`, {
+        let API_URL =
+            this.state.activeGroupPage > 1
+                ? `${this.url}/hod/group/?page=${this.state.activeGroupPage}`
+                : `${this.url}/hod/group/`;
+
+        fetch(API_URL, {
             headers: this.headers,
             method: "GET",
         })
@@ -569,7 +1210,7 @@ class HODDashboard extends Component {
             .then((result) => {
                 if (result.sts === true) {
                     this.setState({
-                        groupItems: result.data.results,
+                        group_data: result.data.results,
                         totalGroupCount: result.data.count,
                         page_loading: false,
                     });
@@ -584,7 +1225,7 @@ class HODDashboard extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
-                    errorMsg: "Something went wrong!",
+                    errorMsg: "Cannot load group at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -592,7 +1233,12 @@ class HODDashboard extends Component {
     };
 
     loadSubjectData = () => {
-        fetch(`${this.url}/hod/subject/?page=${this.state.activeSubjectPage}`, {
+        let API_URL =
+            this.state.activeSubjectPage > 1
+                ? `${this.url}/hod/subject/?page=${this.state.activeSubjectPage}`
+                : `${this.url}/hod/subject/`;
+
+        fetch(API_URL, {
             headers: this.headers,
             method: "GET",
         })
@@ -600,7 +1246,7 @@ class HODDashboard extends Component {
             .then((result) => {
                 if (result.sts === true) {
                     this.setState({
-                        subjectItems: result.data.results,
+                        subject_data: result.data.results,
                         totalSubjectCount: result.data.count,
                         page_loading: false,
                     });
@@ -614,7 +1260,7 @@ class HODDashboard extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
-                    errorMsg: "Something went wrong!",
+                    errorMsg: "Cannot load subject at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -630,7 +1276,7 @@ class HODDashboard extends Component {
             .then((result) => {
                 if (result.sts === true) {
                     this.setState({
-                        courseItems: result.data || [],
+                        course_data: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -643,7 +1289,7 @@ class HODDashboard extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
-                    errorMsg: "Something went wrong!",
+                    errorMsg: "Cannot load courses at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -656,67 +1302,6 @@ class HODDashboard extends Component {
         this.loadGroupData();
         this.loadSubjectData();
         this.loadCourseData();
-    };
-
-    toggleModal = (content, type) => {
-        this.setState({
-            showModal: !this.state.showModal,
-            content: content,
-            type: type,
-        });
-    };
-
-    formSubmission = () => {
-        setTimeout(() => {
-            this.setState({
-                showModal: false,
-            });
-        }, 1000);
-        if (this.state.content === "group") {
-            this.loadGroupData();
-        } else if (this.state.content === "subject") {
-            this.loadSubjectData();
-        } else if (this.state.content === "course") {
-            this.loadCourseData();
-        }
-    };
-
-    // Gets group ID from the group table
-    handleGroupId = (data) => {
-        let value = [];
-        const groupItems = this.state.groupItems;
-        for (let i = 0; i < groupItems.length; i++) {
-            if (data.includes(groupItems[i].id.toString())) {
-                value.push({
-                    id: groupItems[i].id.toString(),
-                    name: groupItems[i].group_name,
-                });
-            } else {
-                continue;
-            }
-        }
-        this.setState({
-            selectedData: value,
-        });
-    };
-
-    // Gets Subject ID from the Subject table
-    handleSubjectId = (data) => {
-        let value = [];
-        const subjectItems = this.state.subjectItems;
-        for (let i = 0; i < subjectItems.length; i++) {
-            if (data.includes(subjectItems[i].id.toString())) {
-                value.push({
-                    id: subjectItems[i].id.toString(),
-                    name: subjectItems[i].subject_name,
-                });
-            } else {
-                continue;
-            }
-        }
-        this.setState({
-            selectedData: value,
-        });
     };
 
     handleGroupPageChange(pageNumber) {
@@ -738,40 +1323,6 @@ class HODDashboard extends Component {
     }
 
     render() {
-        var settings = {
-            dots: true,
-            infinite: false,
-            speed: 500,
-            slidesToShow: 4,
-            slidesToScroll: 4,
-            initialSlide: 0,
-            responsive: [
-                {
-                    breakpoint: 1024,
-                    settings: {
-                        slidesToShow: 2,
-                        slidesToScroll: 2,
-                        dots: true,
-                    },
-                },
-                {
-                    breakpoint: 600,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1,
-                        dots: false,
-                    },
-                },
-                {
-                    breakpoint: 480,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1,
-                        dots: false,
-                    },
-                },
-            ],
-        };
         return (
             <Wrapper
                 header="Dashboard"
@@ -797,150 +1348,6 @@ class HODDashboard extends Component {
                     }}
                 />
 
-                {/* Group Delete Modal */}
-                {this.state.showModal &&
-                this.state.content === "group" &&
-                this.state.type === "DELETE" ? (
-                    <MultiContentDeleteModal
-                        show={this.state.showModal}
-                        onHide={() => this.toggleModal("group", "DELETE")}
-                        toggleModal={() => this.toggleModal("group", "DELETE")}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/group/delete/`}
-                        data={this.state.selectedData}
-                        field="group_ids"
-                        type="Group"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Subject create modal */}
-                {this.state.showModal &&
-                this.state.content === "subject" &&
-                this.state.type === "ADD" ? (
-                    <SubjectModal
-                        show={this.state.showModal}
-                        onHide={() => this.toggleModal("subject", "ADD")}
-                        formSubmission={this.formSubmission}
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Subject Delete Modal */}
-                {this.state.showModal &&
-                this.state.content === "subject" &&
-                this.state.type === "DELETE" ? (
-                    <MultiContentDeleteModal
-                        show={this.state.showModal}
-                        onHide={() => this.toggleModal("subject", "DELETE")}
-                        toggleModal={() =>
-                            this.toggleModal("subject", "DELETE")
-                        }
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/group/subject/`}
-                        data={this.state.selectedData}
-                        field="subject_ids"
-                        type="subject"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Subject Disable Modal */}
-                {this.state.showModal &&
-                this.state.content === "subject" &&
-                this.state.type === "DISABLE" ? (
-                    <MultiContentDisableModal
-                        show={this.state.showModal}
-                        onHide={() => this.toggleModal("subject", "DISABLE")}
-                        toggleModal={() =>
-                            this.toggleModal("subject", "DISABLE")
-                        }
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/group/subject/`}
-                        data={this.state.selectedData}
-                        field="subject_ids"
-                        type="subject"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Subject Enable Modal */}
-                {this.state.showModal &&
-                this.state.content === "subject" &&
-                this.state.type === "ENABLE" ? (
-                    <MultiContentEnableModal
-                        show={this.state.showModal}
-                        onHide={() => this.toggleModal("subject", "ENABLE")}
-                        toggleModal={() =>
-                            this.toggleModal("subject", "ENABLE")
-                        }
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/group/subject/`}
-                        data={this.state.selectedData}
-                        field="subject_ids"
-                        type="subject"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Course Delete Modal */}
-                {this.state.showModal &&
-                this.state.content === "course" &&
-                this.state.type === "DELETE" ? (
-                    <SingleContentDeleteModal
-                        show={this.state.showModal}
-                        onHide={() => this.toggleModal("course", "DELETE")}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/course/${this.state.selectedData.course_id}/`}
-                        name={this.state.selectedData.course_name}
-                        type="course"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Course Disable Modal */}
-                {this.state.showModal &&
-                this.state.content === "course" &&
-                this.state.type === "DISABLE" ? (
-                    <SingleContentDisableModal
-                        show={this.state.showModal}
-                        onHide={() => this.toggleModal("course", "DISABLE")}
-                        toggleModal={() =>
-                            this.toggleModal("course", "DISABLE")
-                        }
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/course/${this.state.selectedData.course_id}/status/`}
-                        name={this.state.selectedData.course_name}
-                        type="course"
-                        method="PATCH"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Course Enable Modal */}
-                {this.state.showModal &&
-                this.state.content === "course" &&
-                this.state.type === "ENABLE" ? (
-                    <SingleContentEnableModal
-                        show={this.state.showModal}
-                        onHide={() => this.toggleModal("course", "ENABLE")}
-                        toggleModal={() => this.toggleModal("course", "ENABLE")}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/course/${this.state.selectedData.course_id}/status/`}
-                        name={this.state.selectedData.course_name}
-                        type="course"
-                        method="PATCH"
-                    />
-                ) : (
-                    ""
-                )}
                 {/* ----- Welcome ----- */}
                 <div className="card shadow-sm mb-4">
                     <div className="card-body text-center p-4">
@@ -949,47 +1356,17 @@ class HODDashboard extends Component {
                 </div>
 
                 {/* ----- Group card ----- */}
-                <div className="card shadow-sm mb-4">
-                    <div className="card-header">
-                        <div className="row align-items-center">
-                            <div className="col-6">
-                                <h5>Groups</h5>
-                            </div>
-                            <div className="col-6 text-right">
-                                <Link to="/hod/group">
-                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                        Group Configuration
-                                    </button>
-                                </Link>
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={() =>
-                                        this.toggleModal("group", "DELETE")
-                                    }
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <GroupTable
-                        groupItems={this.state.groupItems}
-                        path="hod"
-                        view={true}
-                        check={true}
-                        handleGroupId={this.handleGroupId}
-                    />
-                    <div className="card-body p-3">
-                        {this.state.totalGroupCount > paginationCount ? (
-                            <Paginations
-                                activePage={this.state.activeGroupPage}
-                                totalItemsCount={this.state.totalGroupCount}
-                                onChange={this.handleGroupPageChange.bind(this)}
-                            />
-                        ) : null}
-                    </div>
-                </div>
+                <GroupSection
+                    {...this.props}
+                    data={this.state.group_data}
+                    loadData={this.loadGroupData}
+                    totalCount={this.state.totalGroupCount}
+                    activePage={this.state.activeGroupPage}
+                    handlePageChange={this.handleGroupPageChange}
+                    url={this.url}
+                />
 
+                {/* check if the hod has course config permissions */}
                 {this.props.profile &&
                 Object.keys(this.props.profile).length !== 0 ? (
                     this.props.profile.permissions !== undefined ? (
@@ -997,228 +1374,25 @@ class HODDashboard extends Component {
                         true ? (
                             <>
                                 {/* ----- Subject card ----- */}
-                                <div className="card shadow-sm mb-4">
-                                    <div className="card-header">
-                                        <div className="row align-items-center">
-                                            <div className="col-md-3">
-                                                <h5>Subjects</h5>
-                                            </div>
-                                            <div className="col-md-9 text-right">
-                                                <button
-                                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                                    onClick={() =>
-                                                        this.toggleModal(
-                                                            "subject",
-                                                            "ADD"
-                                                        )
-                                                    }
-                                                >
-                                                    Add
-                                                </button>
-                                                <button
-                                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                                    onClick={() =>
-                                                        this.toggleModal(
-                                                            "subject",
-                                                            "DELETE"
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                                <button
-                                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                                    onClick={() =>
-                                                        this.toggleModal(
-                                                            "subject",
-                                                            "ENABLE"
-                                                        )
-                                                    }
-                                                >
-                                                    Enable
-                                                </button>
-                                                <button
-                                                    className="btn btn-primary btn-sm shadow-none"
-                                                    onClick={() =>
-                                                        this.toggleModal(
-                                                            "subject",
-                                                            "DISABLE"
-                                                        )
-                                                    }
-                                                >
-                                                    Disable
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <SubjectTable
-                                        subjectItems={this.state.subjectItems}
-                                        path="hod"
-                                        check={true}
-                                        status={true}
-                                        category={true}
-                                        sub_category={true}
-                                        discipline={true}
-                                        level={true}
-                                        subject={true}
-                                        handleSubjectId={this.handleSubjectId}
-                                    />
-                                    <div className="card-body p-3">
-                                        {this.state.totalSubjectCount >
-                                        paginationCount ? (
-                                            <Paginations
-                                                activePage={
-                                                    this.state.activeSubjectPage
-                                                }
-                                                totalItemsCount={
-                                                    this.state.totalSubjectCount
-                                                }
-                                                onChange={this.handleSubjectPageChange.bind(
-                                                    this
-                                                )}
-                                            />
-                                        ) : null}
-                                    </div>
-                                </div>
+                                <SubjectSection
+                                    {...this.props}
+                                    data={this.state.subject_data}
+                                    loadData={this.loadSubjectData}
+                                    totalCount={this.state.totalSubjectCount}
+                                    activePage={this.state.activeSubjectPage}
+                                    handlePageChange={
+                                        this.handleSubjectPageChange
+                                    }
+                                    url={this.url}
+                                />
 
                                 {/* ----- Course card ----- */}
-                                <div className="card shadow-sm">
-                                    <div className="card-header">
-                                        <h5>Course</h5>
-                                    </div>
-                                    <div className="card-body">
-                                        {this.state.courseItems.length !== 0 ? (
-                                            <Slider {...settings}>
-                                                {this.state.courseItems.map(
-                                                    (data, index) => {
-                                                        return (
-                                                            <div
-                                                                className="px-3"
-                                                                data-index={
-                                                                    index
-                                                                }
-                                                                key={index}
-                                                            >
-                                                                <div className="card">
-                                                                    <img
-                                                                        src={
-                                                                            data.course_thumbnail_url ===
-                                                                            null
-                                                                                ? courseimg
-                                                                                : data.course_thumbnail_url
-                                                                        }
-                                                                        className="card-img-top"
-                                                                        alt={
-                                                                            data.course_name
-                                                                        }
-                                                                    />
-                                                                    <div
-                                                                        className="text-right mt-2"
-                                                                        style={{
-                                                                            position:
-                                                                                "absolute",
-                                                                            right: "7px",
-                                                                        }}
-                                                                    >
-                                                                        <Dropdown>
-                                                                            <Dropdown.Toggle
-                                                                                variant="white"
-                                                                                className="btn text-dark bg-light btn-sm shadow-none caret-off"
-                                                                            >
-                                                                                <i className="fas fa-ellipsis-v"></i>
-                                                                            </Dropdown.Toggle>
-
-                                                                            <Dropdown.Menu>
-                                                                                <Dropdown.Item
-                                                                                    onClick={() => {
-                                                                                        this.toggleModal(
-                                                                                            "course",
-                                                                                            "DELETE"
-                                                                                        );
-                                                                                        this.setState(
-                                                                                            {
-                                                                                                selectedData:
-                                                                                                    data,
-                                                                                            }
-                                                                                        );
-                                                                                    }}
-                                                                                >
-                                                                                    <i className="far fa-trash-alt mr-1"></i>{" "}
-                                                                                    Delete
-                                                                                </Dropdown.Item>
-                                                                                {data.is_active ===
-                                                                                false ? (
-                                                                                    <Dropdown.Item
-                                                                                        onClick={() => {
-                                                                                            this.toggleModal(
-                                                                                                "course",
-                                                                                                "ENABLE"
-                                                                                            );
-                                                                                            this.setState(
-                                                                                                {
-                                                                                                    selectedData:
-                                                                                                        data,
-                                                                                                }
-                                                                                            );
-                                                                                        }}
-                                                                                    >
-                                                                                        <i className="far fa-check-circle mr-1"></i>{" "}
-                                                                                        Enable
-                                                                                    </Dropdown.Item>
-                                                                                ) : (
-                                                                                    <Dropdown.Item
-                                                                                        onClick={() => {
-                                                                                            this.toggleModal(
-                                                                                                "course",
-                                                                                                "DISABLE"
-                                                                                            );
-                                                                                            this.setState(
-                                                                                                {
-                                                                                                    selectedData:
-                                                                                                        data,
-                                                                                                }
-                                                                                            );
-                                                                                        }}
-                                                                                    >
-                                                                                        <i className="fas fa-ban mr-1"></i>{" "}
-                                                                                        Disable
-                                                                                    </Dropdown.Item>
-                                                                                )}
-                                                                            </Dropdown.Menu>
-                                                                        </Dropdown>
-                                                                    </div>
-                                                                    <Link
-                                                                        to={`/hod/course/${data.course_id}`}
-                                                                        className="text-decoration-none"
-                                                                        onClick={() => {
-                                                                            storeDispatch(
-                                                                                COURSE,
-                                                                                data.course_name
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <div
-                                                                            className="card-body primary-bg text-white p-2"
-                                                                            style={{
-                                                                                cursor: "pointer",
-                                                                            }}
-                                                                        >
-                                                                            {
-                                                                                data.course_name
-                                                                            }
-                                                                        </div>
-                                                                    </Link>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    }
-                                                )}
-                                            </Slider>
-                                        ) : (
-                                            "No data to display..."
-                                        )}
-                                    </div>
-                                </div>
+                                <CourseSection
+                                    {...this.props}
+                                    data={this.state.course_data}
+                                    loadData={this.loadCourseData}
+                                    url={this.url}
+                                />
                             </>
                         ) : (
                             ""

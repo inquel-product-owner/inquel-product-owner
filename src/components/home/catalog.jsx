@@ -41,9 +41,14 @@ const Catalog = (props) => {
 
     useEffect(() => {
         document.title = "Buy a course | IQ Labs Academy";
-        if (localStorage.getItem("Authorization")) {
+
+        if (
+            localStorage.getItem("Authorization") &&
+            localStorage.getItem("is_student")
+        ) {
             headers["Authorization"] = localStorage.getItem("Authorization");
         }
+
         loadCourses(page, tab);
         loadCategory();
         window.scrollTo(0, 0);

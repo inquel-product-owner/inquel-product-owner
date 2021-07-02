@@ -14,20 +14,57 @@ import { Link } from "react-router-dom";
 import dateFormat from "dateformat";
 import storeDispatch from "../../../redux/dispatch";
 import { COURSE } from "../../../redux/action";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 function dateTemplate(props) {
     return dateFormat(props.created_on, "dd/mm/yyyy");
 }
 
+function statusTemplate(props) {
+    return (
+        <div id="status" className="statustemp">
+            <span className="statustxt">
+                {props.is_active ? "Active" : "Inactive"}
+            </span>
+        </div>
+    );
+}
+
+function statusdetails(props) {
+    if (props.is_active) {
+        return (
+            <div className="statustemp e-activecolor">
+                <span className="statustxt e-activecolor">Active</span>
+            </div>
+        );
+    } else {
+        return (
+            <div className="statustemp e-inactivecolor">
+                <span className="statustxt e-inactivecolor">Inactive</span>
+            </div>
+        );
+    }
+}
+
 class CourseTable extends Component {
     constructor() {
         super(...arguments);
-        this.fields = { text: "text", value: "value" };
+        this.check = {
+            type: "CheckBox",
+        };
         this.excel = {
             type: "Excel",
         };
         this.Filter = {
             type: "Menu",
+        };
+        this.date = {
+            ...this.excel,
+            itemTemplate: dateTemplate,
+        };
+        this.status = {
+            ...this.check,
+            itemTemplate: statusdetails,
         };
         this.select = {
             persistSelection: true,
@@ -38,7 +75,7 @@ class CourseTable extends Component {
     }
 
     onQueryCellInfo(args) {
-        if (args.column.field === "status") {
+        if (args.column.field === "is_active") {
             if (args.cell.textContent === "Active") {
                 args.cell
                     .querySelector(".statustxt")
@@ -90,14 +127,62 @@ class CourseTable extends Component {
 
     viewTemplate = (props) => {
         return (
-            <Link to={`/${this.props.path}/course/${props.course_id}`}>
-                <button
-                    className="btn btn-link btn-sm shadow-none"
-                    onClick={() => storeDispatch(COURSE, props.course_name)}
+            <div className="d-flex">
+                <OverlayTrigger
+                    key="view"
+                    placement="top"
+                    overlay={
+                        <Tooltip id="tooltip" className="text-left">
+                            View
+                        </Tooltip>
+                    }
                 >
-                    <i className="fas fa-eye"></i>
-                </button>
-            </Link>
+                    <Link to={`${this.props.path}/course/${props.course_id}`}>
+                        <button
+                            className="btn btn-link btn-sm shadow-none"
+                            onClick={() =>
+                                storeDispatch(COURSE, props.course_name)
+                            }
+                        >
+                            <i className="far fa-eye"></i>
+                        </button>
+                    </Link>
+                </OverlayTrigger>
+                <OverlayTrigger
+                    key="delete"
+                    placement="top"
+                    overlay={
+                        <Tooltip id="tooltip" className="text-left">
+                            Delete
+                        </Tooltip>
+                    }
+                >
+                    <button
+                        className="btn btn-link btn-sm shadow-none"
+                        onClick={() => this.props.handleCRUD(props, "DELETE")}
+                    >
+                        <i className="far fa-trash-alt fa-sm"></i>
+                    </button>
+                </OverlayTrigger>
+                <OverlayTrigger
+                    key="enable/disable"
+                    placement="top"
+                    overlay={
+                        <Tooltip id="tooltip" className="text-left">
+                            Enable / Disable
+                        </Tooltip>
+                    }
+                >
+                    <button
+                        className="btn btn-link btn-sm shadow-none"
+                        onClick={() =>
+                            this.props.handleCRUD(props, "Enable/Disable")
+                        }
+                    >
+                        <i className="fas fa-ban fa-sm"></i>
+                    </button>
+                </OverlayTrigger>
+            </div>
         );
     };
 
@@ -116,7 +201,7 @@ class CourseTable extends Component {
                         }}
                         queryCellInfo={this.onQueryCellInfo.bind(this)}
                         dataBound={this.dataBound.bind(this)}
-                        filterSettings={this.Filter}
+                        filterSettings={this.excel}
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
@@ -126,55 +211,73 @@ class CourseTable extends Component {
                         rowDeselected={this.rowDeselected.bind(this)}
                     >
                         <ColumnsDirective>
-                            <ColumnDirective
-                                type="checkbox"
-                                allowSorting={false}
-                                allowFiltering={false}
-                            ></ColumnDirective>
+                            {this.props.check ? (
+                                <ColumnDirective
+                                    type="checkbox"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                />
+                            ) : (
+                                ""
+                            )}
                             <ColumnDirective
                                 field="course_id"
                                 headerText="Course ID"
                                 isPrimaryKey={true}
                                 visible={false}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="course_name"
                                 headerText="Course title"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
                             <ColumnDirective
                                 field="search_id"
                                 headerText="Course key"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
                             <ColumnDirective
                                 field="board"
                                 headerText="Board"
-                                filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
                                 field="type"
                                 headerText="Type"
-                                filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
-                            <ColumnDirective
-                                field="hod.hod_username"
-                                headerText="Created By"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="created_on"
-                                headerText="Created On"
-                                clipMode="EllipsisWithTooltip"
-                                template={dateTemplate}
-                                allowFiltering={false}
-                            />
-                            {this.props.path ? (
+                            {this.props.created_by ? (
+                                <ColumnDirective
+                                    field="hod.hod_username"
+                                    headerText="Created By"
+                                    clipMode="EllipsisWithTooltip"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.created_on ? (
+                                <ColumnDirective
+                                    field="created_on"
+                                    headerText="Created On"
+                                    clipMode="EllipsisWithTooltip"
+                                    template={dateTemplate}
+                                    filter={this.date}
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.status ? (
+                                <ColumnDirective
+                                    field="is_active"
+                                    headerText="Status"
+                                    filter={this.status}
+                                    clipMode="EllipsisWithTooltip"
+                                    template={statusTemplate}
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.action ? (
                                 <ColumnDirective
                                     headerText="Action"
                                     allowSorting={false}

@@ -21,6 +21,8 @@ const mapStateToProps = (state) => ({
     subject_data: state.storage.response,
     temp: state.storage.temp,
     subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
+    topic_name: state.content.topic_name,
 });
 
 class FavouritesFlashcard extends Component {
@@ -29,8 +31,6 @@ class FavouritesFlashcard extends Component {
         this.state = {
             isFlipped: false,
             showVideoModal: false,
-            chapter_name: "",
-            topic_name: "",
             data: [],
 
             sections: [],
@@ -53,11 +53,13 @@ class FavouritesFlashcard extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            page_loading: true,
+            page_loading: false,
 
             seconds: 0,
             isSlideshowPlaying: false,
         };
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicNum = this.props.match.params.topicNum;
@@ -1380,7 +1382,9 @@ class FavouritesFlashcard extends Component {
 
         if (type === "type_1") {
             await fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/`,
+                this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/type_one/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/`,
                 {
                     method: "POST",
                     headers: this.headers,
@@ -1419,7 +1423,9 @@ class FavouritesFlashcard extends Component {
                 });
         } else if (type === "type_2") {
             await fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/`,
+                this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/type_two/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/`,
                 {
                     method: "POST",
                     headers: this.headers,
@@ -1470,47 +1476,12 @@ class FavouritesFlashcard extends Component {
 
     // ---------- loads subject information ----------
 
-    loopTopicStructure = (array) => {
-        var topic_name = "";
-        array.forEach((a) => {
-            if (this.topicNum === a.topic_num) {
-                topic_name = a.topic_name;
-            } else if (Array.isArray(a.child) && a.child.length !== 0) {
-                topic_name = this.loopTopicStructure(a.child);
-            }
-        });
-        return topic_name;
-    };
-
     componentDidMount = () => {
         if (this.state.activeTab === "concept") {
             this.loadConceptData();
         } else {
             this.loadPracticeData();
         }
-
-        let chapter_name = "";
-        let topic_name = "";
-        // extract currently selected chapter name
-        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
-            if (
-                this.props.subject_data.chapters[i].chapter_id ===
-                this.chapterId
-            ) {
-                chapter_name = this.props.subject_data.chapters[i].chapter_name;
-                // Extracting topics from the chapter_structure
-                topic_name = this.loopTopicStructure(
-                    this.props.subject_data.chapters[i].topics
-                );
-            } else {
-                continue;
-            }
-        }
-        this.setState({
-            chapter_name: chapter_name,
-            topic_name: topic_name,
-            page_loading: false,
-        });
 
         document.addEventListener("keydown", this.handleKeys);
     };
@@ -1764,7 +1735,7 @@ class FavouritesFlashcard extends Component {
     };
 
     render() {
-        document.title = `${this.state.chapter_name} : learn - Student | IQLabs`;
+        document.title = `${this.props.chapter_name} : learn - Student | IQLabs`;
         let data = this.state.data || [];
         const section =
             this.state.sections[this.state.activeData] !== undefined
@@ -1781,7 +1752,7 @@ class FavouritesFlashcard extends Component {
                 {/* ----- Navbar ----- */}
                 <Header
                     name={this.props.subject_name}
-                    chapter_name={`${this.state.chapter_name} - ${this.state.topic_name}`}
+                    chapter_name={`${this.props.chapter_name} - ${this.props.topic_name}`}
                     goBack={this.props.history.goBack}
                 />
 

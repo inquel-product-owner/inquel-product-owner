@@ -20,6 +20,7 @@ import ErrorFallback from "../../common/ErrorFallback";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
+    course_name: state.content.course_name,
     chapter_name: state.content.chapter_name,
     topic_name: state.content.topic_name,
 });
@@ -77,6 +78,8 @@ class FlashCard extends Component {
             seconds: 0,
             isSlideshowPlaying: false,
         };
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicNum = this.props.match.params.topicNum;
@@ -95,7 +98,9 @@ class FlashCard extends Component {
     loadConceptData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/concepts/?topic_num=${this.topicNum}`
+                ? this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/concepts/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/concepts/?topic_num=${this.topicNum}`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -340,7 +345,9 @@ class FlashCard extends Component {
     loadPracticeData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_num=${this.topicNum}`
+                ? this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/type_one/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_num=${this.topicNum}`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -406,7 +413,9 @@ class FlashCard extends Component {
     loadType2Data = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/?topic_num=${this.topicNum}`
+                ? this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/type_two/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/?topic_num=${this.topicNum}`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -1670,7 +1679,9 @@ class FlashCard extends Component {
 
         if (type === "type_1") {
             await fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/`,
+                this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/type_one/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/`,
                 {
                     method: "POST",
                     headers: this.headers,
@@ -1709,7 +1720,9 @@ class FlashCard extends Component {
                 });
         } else if (type === "type_2") {
             await fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/`,
+                this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/type_two/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/`,
                 {
                     method: "POST",
                     headers: this.headers,
@@ -1816,7 +1829,9 @@ class FlashCard extends Component {
     loadMatchData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/match/?topic_num=${this.topicNum}`
+                ? this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/match/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/match/?topic_num=${this.topicNum}`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -2297,7 +2312,9 @@ class FlashCard extends Component {
             });
 
             fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/favourites/`,
+                this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/favourite/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/favourites/`,
                 {
                     method: "POST",
                     headers: this.headers,
@@ -2329,7 +2346,13 @@ class FlashCard extends Component {
                         });
                     }
                 })
-                .then((err) => console.log(err));
+                .catch((err) => {
+                    console.log(err);
+                    this.setState({
+                        errorMsg: "Cannot update bookmark at the moment!",
+                        showErrorAlert: true,
+                    });
+                });
         }
     };
 
@@ -2492,7 +2515,11 @@ class FlashCard extends Component {
             <>
                 {/* ----- Navbar ----- */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.subjectId
+                            ? this.props.subject_name
+                            : this.props.course_name
+                    }
                     chapter_name={`${this.props.chapter_name} - ${this.props.topic_name}`}
                     goBack={this.props.history.goBack}
                 />
@@ -2554,6 +2581,8 @@ class FlashCard extends Component {
                         subjectId={this.subjectId}
                         chapterId={this.chapterId}
                         topic_num={this.topicNum}
+                        subscriptionId={this.subscriptionId}
+                        courseId={this.courseId}
                         id={
                             this.state.activeTab === "concept"
                                 ? data[index].concepts_random_id

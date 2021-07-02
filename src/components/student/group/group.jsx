@@ -1,25 +1,25 @@
 import React, { Component } from "react";
-import Wrapper from "./wrapper";
-import courseimg from "../../assets/code.jpg";
+import Wrapper from "../wrapper";
+import courseimg from "../../../assets/code.jpg";
 import { Link } from "react-router-dom";
-import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import Loading from "../common/loader";
-import AlertBox from "../common/alert";
+import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import Slider from "react-slick";
 import { connect } from "react-redux";
-import storeDispatch from "../../redux/dispatch";
-import { COURSE } from "../../redux/action";
+import storeDispatch from "../../../redux/dispatch";
+import { SUBJECT } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
-    subscription_name: state.content.subscription_name,
+    group_name: state.content.group_name,
     profile: state.user.profile,
 });
 
-class Subscription extends Component {
+class Group extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            courses: [],
+            subjectItems: [],
 
             errorMsg: "",
             successMsg: "",
@@ -34,13 +34,12 @@ class Subscription extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
-        this.subscriptionId = this.props.match.params.subscriptionId;
     }
 
     componentDidMount = () => {
-        document.title = `${this.props.subscription_name} - Student | IQLabs`;
+        document.title = `${this.props.group_name} - Student | IQLabs`;
 
-        fetch(`${this.url}/student/sub/${this.subscriptionId}/`, {
+        fetch(`${this.url}/student/subject/`, {
             method: "GET",
             headers: this.headers,
         })
@@ -48,7 +47,7 @@ class Subscription extends Component {
             .then((result) => {
                 if (result.sts === true) {
                     this.setState({
-                        courses: result.data.courses,
+                        subjectItems: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -62,7 +61,7 @@ class Subscription extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
-                    errorMsg: "Cannot show courses at the moment!",
+                    errorMsg: "Something went wrong!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -94,11 +93,19 @@ class Subscription extends Component {
                         dots: false,
                     },
                 },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
             ],
         };
         return (
             <Wrapper
-                header={this.props.subscription_name}
+                header={this.props.group_name}
                 activeLink="dashboard"
                 history={this.props.history}
                 waterMark={this.props.profile}
@@ -131,23 +138,23 @@ class Subscription extends Component {
                         </li>
                         <li className="breadcrumb-item active">
                             <span className="font-weight-bold-600">
-                                Subscription:{" "}
+                                Group:{" "}
                             </span>
-                            {this.props.subscription_name}
+                            {this.props.group_name}
                         </li>
                     </ol>
                 </nav>
 
-                {/* Courses list */}
+                {/* Assigned subjects */}
                 <div className="card shadow-sm mb-4">
                     <div className="card-header">
-                        <h5 className="mb-0">Courses</h5>
+                        <h5 className="mb-0">Subjects</h5>
                     </div>
                     <div className="card-body">
-                        {this.state.courses &&
-                        this.state.courses.length !== 0 ? (
+                        {this.state.subjectItems &&
+                        this.state.subjectItems.length > 0 ? (
                             <Slider {...settings}>
-                                {(this.state.courses || []).map(
+                                {(this.state.subjectItems || []).map(
                                     (data, index) => {
                                         return (
                                             <div
@@ -156,26 +163,20 @@ class Subscription extends Component {
                                                 key={index}
                                             >
                                                 <Link
-                                                    to={`${this.props.match.url}/course/${data.course_id}`}
+                                                    to={`/dashboard/subject/${data.id}`}
                                                     className="text-decoration-none"
                                                     onClick={() =>
                                                         storeDispatch(
-                                                            COURSE,
-                                                            data.course_name
+                                                            SUBJECT,
+                                                            data.subject_name
                                                         )
                                                     }
                                                 >
                                                     <div className="card">
                                                         <img
-                                                            src={
-                                                                data.course_thumbnail_url
-                                                                    ? data.course_thumbnail_url
-                                                                    : courseimg
-                                                            }
+                                                            src={courseimg}
                                                             className="card-img-top"
-                                                            alt={
-                                                                data.course_name
-                                                            }
+                                                            alt="Course"
                                                         />
                                                         <div
                                                             className="card-body primary-bg text-white p-2"
@@ -183,7 +184,7 @@ class Subscription extends Component {
                                                                 cursor: "pointer",
                                                             }}
                                                         >
-                                                            {data.course_name}
+                                                            {data.subject_name}
                                                         </div>
                                                     </div>
                                                 </Link>
@@ -203,4 +204,4 @@ class Subscription extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Subscription);
+export default connect(mapStateToProps)(Group);

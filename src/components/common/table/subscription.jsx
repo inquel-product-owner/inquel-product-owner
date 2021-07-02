@@ -23,7 +23,6 @@ function durationTemplate(props) {
 class SubscriptionTable extends Component {
     constructor() {
         super(...arguments);
-        this.fields = { text: "text", value: "value" };
         this.check = {
             type: "CheckBox",
         };
@@ -33,33 +32,20 @@ class SubscriptionTable extends Component {
         this.Filter = {
             type: "Menu",
         };
+        this.date = {
+            ...this.excel,
+            itemTemplate: dateTemplate,
+        };
+        this.duration = {
+            ...this.excel,
+            itemTemplate: durationTemplate,
+        };
         this.select = {
             persistSelection: true,
             type: "Multiple",
             checkboxOnly: true,
         };
         this.toolbarOptions = ["Search"];
-    }
-
-    onQueryCellInfo(args) {
-        if (args.column.field === "status") {
-            if (args.cell.textContent === "Active") {
-                args.cell
-                    .querySelector(".statustxt")
-                    .classList.add("e-activecolor");
-                args.cell
-                    .querySelector(".statustemp")
-                    .classList.add("e-activecolor");
-            }
-            if (args.cell.textContent === "Inactive") {
-                args.cell
-                    .querySelector(".statustxt")
-                    .classList.add("e-inactivecolor");
-                args.cell
-                    .querySelector(".statustemp")
-                    .classList.add("e-inactivecolor");
-            }
-        }
     }
 
     dataBound() {
@@ -124,9 +110,8 @@ class SubscriptionTable extends Component {
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
-                        queryCellInfo={this.onQueryCellInfo.bind(this)}
                         dataBound={this.dataBound.bind(this)}
-                        filterSettings={this.Filter}
+                        filterSettings={this.excel}
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
@@ -140,29 +125,26 @@ class SubscriptionTable extends Component {
                                 type="checkbox"
                                 allowSorting={false}
                                 allowFiltering={false}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="subscription_id"
                                 headerText="Subscription ID"
                                 isPrimaryKey={true}
                                 visible={false}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="title"
                                 headerText="Name"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
                             <ColumnDirective
                                 field="search_id"
                                 headerText="Subscription ID"
-                                filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
                                 field="discounted_price"
                                 headerText="Pricing"
-                                filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
@@ -170,14 +152,14 @@ class SubscriptionTable extends Component {
                                 headerText="Duration"
                                 clipMode="EllipsisWithTooltip"
                                 template={durationTemplate}
-                                allowFiltering={false}
+                                filter={this.duration}
                             />
                             <ColumnDirective
                                 field="created_on"
                                 headerText="Created On"
                                 clipMode="EllipsisWithTooltip"
                                 template={dateTemplate}
-                                allowFiltering={false}
+                                filter={this.date}
                             />
                             {this.props.showAction ? (
                                 <ColumnDirective

@@ -11,68 +11,57 @@ import Paginations from "../common/pagination";
 import SubscriptionModal from "./subscriptionModal";
 import CourseTable from "../common/table/course";
 import { SingleContentDeleteModal } from "../common/modal/contentManagementModal";
+import { Link } from "react-router-dom";
 
 const Statistics = (props) => {
     return (
         <>
             <p className="small font-weight-bold">Quick Stats</p>
             <div className="row mb-4">
-                <div className="col-md-3 col-6 mb-3 mb-md-0">
-                    <div className="card shadow-sm p-2 h-100">
-                        <div className="card-body">
-                            <p className="small font-weight-bold mb-2">
-                                Total Courses
-                            </p>
-                            <h3 className="font-weight-bold">28,345</h3>
+                <div className="col-md-4 col-sm-6 mb-3 mb-md-0">
+                    <Link
+                        to={`${props.match.url}/statistics`}
+                        className="text-decoration-none text-dark"
+                    >
+                        <div className="card shadow-sm p-2 h-100">
+                            <div className="card-body">
+                                <p className="small font-weight-bold-600 mb-2">
+                                    Total Courses
+                                </p>
+                                <h3 className="font-weight-bold">28,345</h3>
+                            </div>
                         </div>
-                    </div>
+                    </Link>
                 </div>
-                <div className="col-md-3 col-6 mb-3 mb-md-0">
-                    <div className="card shadow-sm p-2 h-100">
-                        <div className="card-body">
-                            <p className="small font-weight-bold mb-2">
-                                Pending Approval
-                            </p>
-                            <h3
-                                className="font-weight-bold"
-                                style={{
-                                    color: "tomato",
-                                }}
-                            >
-                                120
-                            </h3>
+                <div className="col-md-4 col-sm-6 mb-3 mb-md-0">
+                    <Link
+                        to={`${props.match.url}/statistics`}
+                        className="text-decoration-none text-dark"
+                    >
+                        <div className="card shadow-sm p-2 h-100">
+                            <div className="card-body">
+                                <p className="small font-weight-bold-600 mb-2">
+                                    Total Subscribed Users
+                                </p>
+                                <h3 className="font-weight-bold">120</h3>
+                            </div>
                         </div>
-                    </div>
+                    </Link>
                 </div>
-                <div className="col-md-3 col-6 mb-3 mb-md-0">
-                    <div className="card shadow-sm p-2 h-100">
-                        <div className="card-body">
-                            <p className="small font-weight-bold mb-2">
-                                New Courses this month
-                            </p>
-                            <h3 className="font-weight-bold">
-                                89{" "}
-                                <span className="text-success">
-                                    <i className="fas fa-angle-double-up ml-2 fa-sm"></i>
-                                </span>
-                            </h3>
+                <div className="col-md-4 col-sm-6">
+                    <Link
+                        to={`${props.match.url}/statistics`}
+                        className="text-decoration-none text-dark"
+                    >
+                        <div className="card shadow-sm p-2 h-100">
+                            <div className="card-body">
+                                <p className="small font-weight-bold-600 mb-2">
+                                    Total Revenue
+                                </p>
+                                <h3 className="font-weight-bold">89</h3>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div className="col-md-3 col-6 mb-3 mb-md-0">
-                    <div className="card shadow-sm p-2 h-100">
-                        <div className="card-body">
-                            <p className="small font-weight-bold mb-2">
-                                Online learning
-                            </p>
-                            <h3 className="font-weight-bold">
-                                46%{" "}
-                                <span className="text-danger">
-                                    <i className="fas fa-angle-double-down ml-2 fa-sm"></i>
-                                </span>
-                            </h3>
-                        </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </>
@@ -596,7 +585,7 @@ class AdminDashboard extends Component {
                 />
 
                 {/* Stats */}
-                <Statistics />
+                <Statistics match={this.props.match} />
 
                 {/* Filter area */}
                 <div className="row align-items-center mb-3">
@@ -816,6 +805,9 @@ class AdminDashboard extends Component {
                                 <CourseTable
                                     data={this.state.hod_courses.results || []}
                                     handleID={this.handleID}
+                                    check={true}
+                                    created_by={true}
+                                    created_on={true}
                                 />
                                 <div className="card-body p-3">
                                     {this.state.hod_courses.count >

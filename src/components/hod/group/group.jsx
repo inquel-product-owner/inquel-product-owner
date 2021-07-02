@@ -10,9 +10,8 @@ import SubjectTable from "../../common/table/subject";
 import Paginations from "../../common/pagination";
 import AlertBox from "../../common/alert";
 import {
-    MultiContentDisableModal,
-    MultiContentEnableModal,
     MultiContentDeleteModal,
+    MultiContentEnableDisableModal,
 } from "../../common/modal/contentManagementModal";
 import { connect } from "react-redux";
 
@@ -111,40 +110,60 @@ class SubjectModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${this.url}/hod/group/${this.props.groupId}/subject/`, {
-            headers: this.headers,
-            method: "POST",
-            body: JSON.stringify({
-                subject_name: this.state.subjectName,
-                teacher_id: this.state.teacher_id,
-                subject: this.state.subject_code,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
+        if (this.state.subjectName === "") {
+            this.setState({
+                errorMsg: "Enter subject name",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (this.state.teacher_id === "") {
+            this.setState({
+                errorMsg: "Select teacher from the list",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (this.state.subject_code === "") {
+            this.setState({
+                errorMsg: "Select subject code from the list",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            fetch(`${this.url}/hod/group/${this.props.groupId}/subject/`, {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify({
+                    subject_name: this.state.subjectName,
+                    teacher_id: this.state.teacher_id,
+                    subject: this.state.subject_code,
+                }),
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                        });
+                        this.props.formSubmission();
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
                     this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission();
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
+                        errorMsg: "Something went wrong!",
                         showErrorAlert: true,
                         showLoader: false,
                     });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    showLoader: false,
                 });
-            });
+        }
     };
 
     handleInput = (event) => {
@@ -290,8 +309,7 @@ class HODGroup extends Component {
         this.state = {
             showModal: false,
             showSubject_DeleteModal: false,
-            showSubject_DisableModal: false,
-            showSubject_EnableModal: false,
+            showSubject_EnableDisableModal: false,
 
             subjectItems: [],
             groupItem: {},
@@ -365,15 +383,10 @@ class HODGroup extends Component {
         });
     };
 
-    handleDisable = () => {
+    handleEnableDisable = () => {
         this.setState({
-            showSubject_DisableModal: !this.state.showSubject_DisableModal,
-        });
-    };
-
-    handleEnable = () => {
-        this.setState({
-            showSubject_EnableModal: !this.state.showSubject_EnableModal,
+            showSubject_EnableDisableModal:
+                !this.state.showSubject_EnableDisableModal,
         });
     };
 
@@ -401,8 +414,7 @@ class HODGroup extends Component {
             this.setState({
                 showModal: false,
                 showSubject_DeleteModal: false,
-                showSubject_DisableModal: false,
-                showSubject_EnableModal: false,
+                showSubject_EnableDisableModal: false,
             });
         }, 1000);
         this.loadSubjectData();
@@ -475,28 +487,12 @@ class HODGroup extends Component {
                     ""
                 )}
 
-                {/* Subject Disable Modal */}
-                {this.state.showSubject_DisableModal ? (
-                    <MultiContentDisableModal
-                        show={this.state.showSubject_DisableModal}
-                        onHide={this.handleDisable}
-                        toggleModal={this.handleDisable}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/group/subject/`}
-                        data={this.state.selectedSubject}
-                        field="subject_ids"
-                        type="Subject"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Subject Enable Modal */}
-                {this.state.showSubject_EnableModal ? (
-                    <MultiContentEnableModal
-                        show={this.state.showSubject_EnableModal}
-                        onHide={this.handleEnable}
-                        toggleModal={this.handleEnable}
+                {/* Subject Enable Disable Modal */}
+                {this.state.showSubject_EnableDisableModal ? (
+                    <MultiContentEnableDisableModal
+                        show={this.state.showSubject_EnableDisableModal}
+                        onHide={this.handleEnableDisable}
+                        toggleModal={this.handleEnableDisable}
                         formSubmission={this.formSubmission}
                         url={`${this.url}/hod/group/subject/`}
                         data={this.state.selectedSubject}
@@ -572,7 +568,7 @@ class HODGroup extends Component {
                                 </button>
                                 <button
                                     className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.handleDisable}
+                                    onClick={this.handleEnableDisable}
                                 >
                                     Disable
                                 </button>

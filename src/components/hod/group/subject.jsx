@@ -136,37 +136,44 @@ class HODGroupSubject extends Component {
                                               <tr key={index}>
                                                   <td>{list.chapter_name}</td>
                                                   <td>
-                                                      {list.chapter_status ===
-                                                      "Yet to start" ? (
-                                                          <span className="text-danger">
+                                                      {list.chapter_status.toLowerCase() ===
+                                                      "yet to start" ? (
+                                                          <span className="text-danger text-capitalize">
                                                               {
                                                                   list.chapter_status
                                                               }
                                                           </span>
-                                                      ) : list.chapter_status ===
-                                                        "Approved" ? (
-                                                          <span className="text-success">
+                                                      ) : list.chapter_status.toLowerCase() ===
+                                                        "in progress" ? (
+                                                          <span className="text-warning text-capitalize">
                                                               {
                                                                   list.chapter_status
                                                               }
                                                           </span>
-                                                      ) : list.chapter_status ===
-                                                        "In Progress" ? (
-                                                          <span className="text-warning">
+                                                      ) : list.chapter_status.toLowerCase() ===
+                                                        "review" ? (
+                                                          <span className="text-primary text-capitalize">
                                                               {
                                                                   list.chapter_status
                                                               }
                                                           </span>
-                                                      ) : list.chapter_status ===
-                                                        "Review" ? (
-                                                          <span className="text-primary">
+                                                      ) : list.chapter_status.toLowerCase() ===
+                                                        "ready for review" ? (
+                                                          <span className="text-primary text-capitalize">
                                                               {
                                                                   list.chapter_status
                                                               }
                                                           </span>
-                                                      ) : list.chapter_status ===
-                                                        "Ready for review" ? (
-                                                          <span className="text-primary">
+                                                      ) : list.chapter_status.toLowerCase() ===
+                                                        "approved" ? (
+                                                          <span className="text-success text-capitalize">
+                                                              {
+                                                                  list.chapter_status
+                                                              }
+                                                          </span>
+                                                      ) : list.chapter_status.toLowerCase() ===
+                                                        "published to group" ? (
+                                                          <span className="text-success text-capitalize">
                                                               {
                                                                   list.chapter_status
                                                               }
