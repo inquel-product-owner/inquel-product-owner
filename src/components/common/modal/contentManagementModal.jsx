@@ -59,6 +59,11 @@ export class ContentUpdateModal extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: `Cannot update ${this.props.type} at the moment!`,
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -199,6 +204,11 @@ export class SingleContentDeleteModal extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: `Cannot delete ${this.props.type} at the moment!`,
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -341,9 +351,7 @@ export class MultiContentDeleteModal extends Component {
                         this.props.formSubmission();
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -351,6 +359,11 @@ export class MultiContentDeleteModal extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: `Cannot update ${this.props.type} at the moment!`,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 });
         } else {
             this.setState({
@@ -413,7 +426,7 @@ export class MultiContentDeleteModal extends Component {
                 <Modal.Footer>
                     <button
                         className="btn btn-link btn-sm shadow-none mr-2"
-                        onClick={this.props.toggleModal}
+                        onClick={this.props.onHide}
                     >
                         Cancel
                     </button>
@@ -443,8 +456,8 @@ export class MultiContentDeleteModal extends Component {
 
 // ----------------------------------------------------------------------
 
-// Single Content DISABLE modal
-export class SingleContentDisableModal extends Component {
+// Single Content ENABLE / DISABLE modal
+export class SingleContentEnableDisableModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -462,7 +475,7 @@ export class SingleContentDisableModal extends Component {
         };
     }
 
-    handleDisable = () => {
+    handleStatus = () => {
         this.setState({
             showSuccessAlert: false,
             showErrorAlert: false,
@@ -498,6 +511,11 @@ export class SingleContentDisableModal extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: `Cannot update status at the moment!`,
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -510,9 +528,7 @@ export class SingleContentDisableModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton>
-                    Disable {this.props.type}
-                </Modal.Header>
+                <Modal.Header closeButton>Update status</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="success"
@@ -540,7 +556,7 @@ export class SingleContentDisableModal extends Component {
                     </Alert>
 
                     <p className="mb-0">
-                        Are you sure that you want to disable{" "}
+                        Are you sure that you want to update status of{" "}
                         <span className="font-weight-bold-600">
                             {this.props.name}
                         </span>
@@ -550,13 +566,13 @@ export class SingleContentDisableModal extends Component {
                 <Modal.Footer>
                     <button
                         className="btn btn-link btn-sm shadow-none mr-2"
-                        onClick={this.props.toggleModal}
+                        onClick={this.props.onHide}
                     >
                         Cancel
                     </button>
                     <button
                         className="btn btn-primary btn-sm shadow-none"
-                        onClick={this.handleDisable}
+                        onClick={this.handleStatus}
                     >
                         {this.state.showLoader ? (
                             <Spinner
@@ -570,7 +586,7 @@ export class SingleContentDisableModal extends Component {
                         ) : (
                             ""
                         )}
-                        Disable
+                        Update
                     </button>
                 </Modal.Footer>
             </Modal>
@@ -578,8 +594,8 @@ export class SingleContentDisableModal extends Component {
     }
 }
 
-// Multi Content DISABLE modal
-export class MultiContentDisableModal extends Component {
+// Multi Content ENABLE / DISABLE modal
+export class MultiContentEnableDisableModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -597,7 +613,7 @@ export class MultiContentDisableModal extends Component {
         };
     }
 
-    handleDisable = () => {
+    handleStatus = () => {
         this.setState({
             showSuccessAlert: false,
             showErrorAlert: false,
@@ -628,9 +644,7 @@ export class MultiContentDisableModal extends Component {
                         this.props.formSubmission();
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -638,6 +652,11 @@ export class MultiContentDisableModal extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: `Cannot disable ${this.props.type} at the moment!`,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 });
         } else {
             this.setState({
@@ -658,7 +677,7 @@ export class MultiContentDisableModal extends Component {
                 centered
             >
                 <Modal.Header closeButton>
-                    Disable {this.props.type}
+                    Update {this.props.type}
                 </Modal.Header>
                 <Modal.Body>
                     <Alert
@@ -687,7 +706,7 @@ export class MultiContentDisableModal extends Component {
                     </Alert>
 
                     <p>
-                        Are you sure that you want to disable this{" "}
+                        Are you sure that you want to update this{" "}
                         {this.props.type}?
                     </p>
                     {this.props.data.map((item, index) => {
@@ -701,13 +720,13 @@ export class MultiContentDisableModal extends Component {
                 <Modal.Footer>
                     <button
                         className="btn btn-link btn-sm shadow-none mr-2"
-                        onClick={this.props.toggleModal}
+                        onClick={this.props.onHide}
                     >
                         Cancel
                     </button>
                     <button
                         className="btn btn-primary btn-sm shadow-none"
-                        onClick={this.handleDisable}
+                        onClick={this.handleStatus}
                     >
                         {this.state.showLoader ? (
                             <Spinner
@@ -721,295 +740,7 @@ export class MultiContentDisableModal extends Component {
                         ) : (
                             ""
                         )}
-                        Disable
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
-
-// ----------------------------------------------------------------------
-
-// Single Content ENABLE modal
-export class SingleContentEnableModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    handleEnable = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
-        });
-
-        let headers = {
-            method: this.props.method,
-            headers: this.headers,
-        };
-
-        if (this.props.data) {
-            headers["body"] = JSON.stringify(this.props.data);
-        }
-
-        fetch(`${this.props.url}`, headers)
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission();
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>
-                    Enable {this.props.type}
-                </Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-
-                    <p className="mb-0">
-                        Are you sure that you want to enable{" "}
-                        <span className="font-weight-bold-600">
-                            {this.props.name}
-                        </span>
-                        ?
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-link btn-sm shadow-none mr-2"
-                        onClick={this.props.toggleModal}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm shadow-none"
-                        onClick={this.handleEnable}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Enable
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
-
-// Multi Content ENABLE modal
-export class MultiContentEnableModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    handleEnable = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
-        });
-
-        if (this.props.data.length !== 0) {
-            let temp = [];
-            let body = {};
-            this.props.data.forEach((data) => {
-                temp.push(data.id);
-            });
-            body[this.props.field] = temp;
-
-            fetch(`${this.props.url}`, {
-                method: "PUT",
-                headers: this.headers,
-                body: JSON.stringify(body),
-            })
-                .then((res) => res.json())
-                .then((result) => {
-                    if (result.sts === true) {
-                        this.setState({
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
-                        });
-                        this.props.formSubmission();
-                    } else {
-                        this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
-                            showErrorAlert: true,
-                            showLoader: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else {
-            this.setState({
-                errorMsg: `Please select a ${this.props.type} to enable`,
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        }
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>
-                    Enable {this.props.type}
-                </Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-
-                    <p>
-                        Are you sure that you want to enable this{" "}
-                        {this.props.type}?
-                    </p>
-                    {this.props.data.map((item, index) => {
-                        return (
-                            <p className="small mb-2" key={index}>
-                                {index + 1}. {item.name}
-                            </p>
-                        );
-                    })}
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-link btn-sm shadow-none mr-2"
-                        onClick={this.props.toggleModal}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm shadow-none"
-                        onClick={this.handleEnable}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Enable
+                        Update
                     </button>
                 </Modal.Footer>
             </Modal>

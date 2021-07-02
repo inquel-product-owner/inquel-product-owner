@@ -68,7 +68,6 @@ function dateTemplate(props) {
 class TeacherTable extends Component {
     constructor() {
         super(...arguments);
-        this.fields = { text: "text", value: "value" };
         this.check = {
             type: "CheckBox",
         };
@@ -84,11 +83,11 @@ class TeacherTable extends Component {
             checkboxOnly: true,
         };
         this.status = {
-            type: "CheckBox",
+            ...this.check,
             itemTemplate: statusdetails,
         };
         this.date = {
-            type: "Excel",
+            ...this.excel,
             itemTemplate: dateTemplate,
         };
         this.toolbarOptions = ["Search"];
@@ -165,7 +164,7 @@ class TeacherTable extends Component {
                         }}
                         queryCellInfo={this.onQueryCellInfo.bind(this)}
                         dataBound={this.dataBound.bind(this)}
-                        filterSettings={this.Filter}
+                        filterSettings={this.excel}
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
@@ -179,30 +178,27 @@ class TeacherTable extends Component {
                                 type="checkbox"
                                 allowSorting={false}
                                 allowFiltering={false}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="id"
                                 visible={false}
                                 headerText="Teacher ID"
                                 isPrimaryKey={true}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="full_name"
                                 headerText="Name"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                                 template={nameTemplate}
                             />
                             <ColumnDirective
                                 field="username"
                                 headerText="Username"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
                             <ColumnDirective
                                 field="email"
                                 headerText="Email"
-                                filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
@@ -211,7 +207,7 @@ class TeacherTable extends Component {
                                 headerText="Registered On"
                                 clipMode="EllipsisWithTooltip"
                                 template={dateTemplate}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="is_active"
                                 headerText="Status"

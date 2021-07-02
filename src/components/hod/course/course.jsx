@@ -505,12 +505,12 @@ const ChapterListRender = (props) => {
                                       key={quiz_index}
                                   >
                                       <div className="row align-items-center">
-                                          <div className="col-md-6">
+                                          <div className="col-6">
                                               <p className="small text-dark font-weight-bold-600 mb-0">
                                                   {quiz.quiz_name}
                                               </p>
                                           </div>
-                                          <div className="col-md-6 text-right">
+                                          <div className="col-6 text-right">
                                               <Link
                                                   to={`${props.match.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
                                               >

@@ -78,15 +78,15 @@ class PersonalNotes extends Component {
         } else {
             body["question_id"] = this.props.id;
         }
+        let API_URL = this.props.courseId
+            ? `${this.url}/student/sub/${this.props.subscriptionId}/course/${this.props.courseId}/chapter/${this.props.chapterId}/personal_notes/`
+            : `${this.url}/student/subject/${this.props.subjectId}/chapter/${this.props.chapterId}/personalnotes/`;
 
-        fetch(
-            `${this.url}/student/subject/${this.props.subjectId}/chapter/${this.props.chapterId}/personalnotes/`,
-            {
-                headers: this.headers,
-                method: "POST",
-                body: JSON.stringify(body),
-            }
-        )
+        fetch(API_URL, {
+            headers: this.headers,
+            method: "POST",
+            body: JSON.stringify(body),
+        })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
@@ -123,14 +123,16 @@ class PersonalNotes extends Component {
             body["question"] = true;
         }
         body["personal_notes_id"] = this.state.personal_notes_id;
-        fetch(
-            `${this.url}/student/subject/${this.props.subjectId}/chapter/${this.props.chapterId}/personalnotes/`,
-            {
-                headers: this.headers,
-                method: "PUT",
-                body: JSON.stringify(body),
-            }
-        )
+        
+        let API_URL = this.props.courseId
+            ? `${this.url}/student/sub/${this.props.subscriptionId}/course/${this.props.courseId}/chapter/${this.props.chapterId}/personal_notes/`
+            : `${this.url}/student/subject/${this.props.subjectId}/chapter/${this.props.chapterId}/personalnotes/`;
+
+        fetch(API_URL, {
+            headers: this.headers,
+            method: "PUT",
+            body: JSON.stringify(body),
+        })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {

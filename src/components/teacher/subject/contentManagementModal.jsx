@@ -25,8 +25,9 @@ export function ChapterList(props) {
                     <span className="text-primary text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status.toLowerCase() ===
-                  "approved" ? (
+                ) : props.chapter.chapter_status.toLowerCase() === "approved" ||
+                  props.chapter.chapter_status.toLowerCase() ===
+                      "published to group" ? (
                     <span className="text-success text-capitalize">
                         {props.chapter.chapter_status}
                     </span>

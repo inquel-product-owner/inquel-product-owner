@@ -1178,7 +1178,7 @@ class TeacherChapters extends Component {
                                                                               }
                                                                           </p>
                                                                       </div>
-                                                                      <div className="col-6 d-flex align-items-center justify-content-end">
+                                                                      <div className="col-6 pr-0 d-flex align-items-center justify-content-end">
                                                                           {/* checks if both the permission exist */}
                                                                           {data.auto_test_perm ===
                                                                               true &&
@@ -1372,7 +1372,7 @@ class TeacherChapters extends Component {
                                                                 }
                                                             </p>
                                                         </div>
-                                                        <div className="col-6 d-flex align-items-center justify-content-end">
+                                                        <div className="col-6 pr-0 d-flex align-items-center justify-content-end">
                                                             <Link
                                                                 to={`${this.props.match.url}/quiz/${this.state.quiz.quiz_id}`}
                                                             >

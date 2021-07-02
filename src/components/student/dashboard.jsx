@@ -330,7 +330,7 @@ class Dashboard extends Component {
                     </div>
 
                     {/* Continue learning */}
-                    <h6 className="primary-text mb-3">Continue learning</h6>
+                    {/* <h6 className="primary-text mb-3">Continue learning</h6>
                     <div className="row mb-4">
                         <div className="col-md-2">
                             <div
@@ -446,16 +446,16 @@ class Dashboard extends Component {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
+
+                    {/* Courses */}
+                    <Courses />
 
                     {/* Group section */}
                     <Group
                         profile={this.props.profile}
                         group={this.state.groupData}
                     />
-
-                    {/* Courses */}
-                    <Courses />
 
                     {/* Recommended course */}
                     <div className="card shadow-sm mb-4">

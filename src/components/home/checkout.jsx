@@ -28,9 +28,14 @@ const Checkout = (props) => {
 
     useEffect(() => {
         document.title = "Checkout | IQ Labs Academy";
-        if (localStorage.getItem("Authorization")) {
+
+        if (
+            localStorage.getItem("Authorization") &&
+            localStorage.getItem("is_student")
+        ) {
             headers["Authorization"] = localStorage.getItem("Authorization");
         }
+
         window.scrollTo(0, 0);
         loadSubscriptionData();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps

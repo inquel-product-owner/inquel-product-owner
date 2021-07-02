@@ -9,29 +9,30 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { connect } from "react-redux";
 
 const mapStateToProps = (state) => ({
-    subject_data: state.storage.response,
-    subject_name: state.content.subject_name,
+    course_data: state.storage.response,
+    course_name: state.content.course_name,
     chapter_name: state.content.chapter_name,
 });
 
-class Summary extends Component {
+class CourseSummary extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            data: this.props.course_data.units,
             summaryData: "",
             chapterId: this.props.match.params.chapterId,
-            chapter_name: "",
+            chapter_name: this.props.chapter_name,
 
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
-
             numPages: null,
             pageNumber: 1,
         };
-        this.subjectId = this.props.match.params.subjectId;
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -45,7 +46,7 @@ class Summary extends Component {
     // loads summary data
     loadSummaryData = async () => {
         await fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/summary/`,
+            `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.state.chapterId}/summary/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -78,8 +79,6 @@ class Summary extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.chapter_name} : Summary - Student | IQLabs`;
-
         this.setState(
             {
                 chapterId: this.props.match.params.chapterId,
@@ -114,9 +113,10 @@ class Summary extends Component {
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
     render() {
+        document.title = `${this.state.chapter_name} : Summary - Student | IQLabs`;
         return (
             <Wrapper
-                header={this.props.subject_name}
+                header={this.props.course_name}
                 activeLink="dashboard"
                 history={this.props.history}
             >
@@ -142,13 +142,13 @@ class Summary extends Component {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-3">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard">
+                            <Link to="/hod">
                                 <i className="fas fa-home fa-sm"></i>
                             </Link>
                         </li>
                         <li className="breadcrumb-item">
                             <Link to="#" onClick={this.props.history.goBack}>
-                                {this.props.subject_name}
+                                {this.props.course_name}
                             </Link>
                         </li>
                         <li className="breadcrumb-item active">Summary</li>
@@ -164,47 +164,66 @@ class Summary extends Component {
                             <div className="row">
                                 {/* ----- chapter list ----- */}
                                 <div className="col-md-3 mb-2 mb-md-0 border-right">
-                                    <Nav
-                                        variant="pills"
-                                        className="flex-column"
-                                    >
-                                        {this.props.subject_data &&
-                                        Object.keys(this.props.subject_data)
-                                            .length !== 0
-                                            ? (
-                                                  this.props.subject_data
-                                                      .chapters || []
-                                              ).map((data, index) => {
+                                    {this.state.data.length !== 0
+                                        ? this.state.data.map(
+                                              (unit, unit_index) => {
                                                   return (
-                                                      <Nav.Item
-                                                          className="bg-light grey-item shadow-sm mb-2"
-                                                          key={index}
-                                                          onClick={() =>
-                                                              this.handleSelect(
-                                                                  data.chapter_id,
-                                                                  data.chapter_name
-                                                              )
-                                                          }
+                                                      <fieldset
+                                                          className="border-secondary mb-2"
+                                                          key={unit_index}
                                                       >
-                                                          <Nav.Link
-                                                              eventKey={
-                                                                  data.chapter_id
-                                                              }
-                                                              style={{
-                                                                  padding:
-                                                                      "12px",
-                                                                  cursor: "default",
-                                                              }}
+                                                          <legend className="text-secondary border-secondary">
+                                                              {unit.unit_name}
+                                                          </legend>
+                                                          {/* ----- Chapter list ----- */}
+                                                          <Nav
+                                                              variant="pills"
+                                                              className="flex-column"
                                                           >
-                                                              {
-                                                                  data.chapter_name
-                                                              }
-                                                          </Nav.Link>
-                                                      </Nav.Item>
+                                                              {(
+                                                                  unit.chapters ||
+                                                                  []
+                                                              ).map(
+                                                                  (
+                                                                      chapter,
+                                                                      chapter_index
+                                                                  ) => {
+                                                                      return (
+                                                                          <Nav.Item
+                                                                              className="bg-light grey-item shadow-sm mb-2"
+                                                                              key={
+                                                                                  chapter_index
+                                                                              }
+                                                                              onClick={() =>
+                                                                                  this.handleSelect(
+                                                                                      chapter.chapter_id,
+                                                                                      chapter.chapter_name
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <Nav.Link
+                                                                                  eventKey={
+                                                                                      chapter.chapter_id
+                                                                                  }
+                                                                                  style={{
+                                                                                      padding:
+                                                                                          "12px",
+                                                                                  }}
+                                                                              >
+                                                                                  {
+                                                                                      chapter.chapter_name
+                                                                                  }
+                                                                              </Nav.Link>
+                                                                          </Nav.Item>
+                                                                      );
+                                                                  }
+                                                              )}
+                                                          </Nav>
+                                                      </fieldset>
                                                   );
-                                              })
-                                            : null}
-                                    </Nav>
+                                              }
+                                          )
+                                        : ""}
                                 </div>
 
                                 {/* ----- Summary data ----- */}
@@ -323,7 +342,7 @@ class Summary extends Component {
                                                                               index
                                                                           }
                                                                       >
-                                                                          <div className="h5 font-weight-bold-600 mb-2">
+                                                                          <div className="h5 font-weight-bold-600 mb-3">
                                                                               {
                                                                                   data.summary_name
                                                                               }
@@ -347,7 +366,6 @@ class Summary extends Component {
                         </Tab.Container>
                     </div>
                 </div>
-
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}
             </Wrapper>
@@ -355,4 +373,4 @@ class Summary extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Summary);
+export default connect(mapStateToProps)(CourseSummary);

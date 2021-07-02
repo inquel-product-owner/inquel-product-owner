@@ -33,7 +33,6 @@ function nameTemplate(props) {
 class LeaderboardTable extends Component {
     constructor() {
         super(...arguments);
-        this.fields = { text: "text", value: "value" };
         this.check = {
             type: "CheckBox",
         };
@@ -50,6 +49,7 @@ class LeaderboardTable extends Component {
         };
         this.toolbarOptions = ["Search"];
     }
+
     onQueryCellInfo(args) {
         if (args.column.field === "is_active") {
             if (args.cell.textContent === "Active") {
@@ -74,6 +74,7 @@ class LeaderboardTable extends Component {
     dataBound() {
         this.gridInstance.autoFitColumns();
     }
+
     render() {
         return (
             <div className="control-pane">
@@ -88,7 +89,7 @@ class LeaderboardTable extends Component {
                         }}
                         queryCellInfo={this.onQueryCellInfo.bind(this)}
                         dataBound={this.dataBound.bind(this)}
-                        filterSettings={this.Filter}
+                        filterSettings={this.excel}
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
@@ -101,7 +102,7 @@ class LeaderboardTable extends Component {
                                 visible={false}
                                 headerText="ID"
                                 isPrimaryKey={true}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="profile_link"
                                 headerText=""
@@ -113,30 +114,25 @@ class LeaderboardTable extends Component {
                                 field="full_name"
                                 headerText="Name"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
                             <ColumnDirective
                                 field="grade"
                                 headerText="Grade"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
                             <ColumnDirective
                                 field="points"
                                 headerText="Points"
-                                filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
                                 field="subject_name"
                                 headerText="Subject"
-                                filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="institution_name"
                                 headerText="Institution"
-                                filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
                         </ColumnsDirective>

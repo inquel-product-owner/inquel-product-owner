@@ -57,9 +57,13 @@ const PopularCourse = (props) => {
     const [showSuccessAlert, setSuccessAlert] = useState(false);
 
     useEffect(() => {
-        if (localStorage.getItem("Authorization")) {
+        if (
+            localStorage.getItem("Authorization") &&
+            localStorage.getItem("is_student")
+        ) {
             headers["Authorization"] = localStorage.getItem("Authorization");
         }
+
         loadCourses();
         loadCategory();
     }, []);
@@ -175,175 +179,187 @@ const PopularCourse = (props) => {
                 }}
             />
 
-            <section className="course-container">
-                <h1 className="section-heading">Popular course</h1>
-                <div
-                    className="container position-relative"
-                    style={{ zIndex: 1 }}
-                >
-                    <div className="tabs">
-                        {(category || []).map((list, index) => {
-                            return (
-                                <div
-                                    key={index}
-                                    className={`tab ${
-                                        tab.code === list.code ? "active" : ""
-                                    }`}
-                                    onClick={() => {
-                                        setTab(list);
-                                        loadCourses(list.code);
-                                    }}
-                                >
-                                    <span className="icon">
-                                        <i className="fas fa-layer-group fa-sm"></i>
-                                    </span>{" "}
-                                    {list.title}
-                                </div>
-                            );
-                        })}
-                    </div>
-                    <div className="courses">
-                        <Slider {...settings}>
-                            {(courses || []).map((data, index) => {
+            {courses && courses.length !== 0 ? (
+                <section className="course-container">
+                    <h1 className="section-heading">Popular course</h1>
+                    <div
+                        className="container position-relative"
+                        style={{ zIndex: 1 }}
+                    >
+                        <div className="tabs">
+                            {(category || []).map((list, index) => {
                                 return (
                                     <div
-                                        className="px-md-2 px-2 mb-2"
-                                        data-index={index}
                                         key={index}
+                                        className={`tab ${
+                                            tab.code === list.code
+                                                ? "active"
+                                                : ""
+                                        }`}
+                                        onClick={() => {
+                                            setTab(list);
+                                            loadCourses(list.code);
+                                        }}
                                     >
-                                        <div className="card">
-                                            <div className="px-2 pt-2">
-                                                <img
-                                                    src={
-                                                        data
-                                                            .subscription_file_link
-                                                            .subscription_image_1
-                                                            ? data
-                                                                  .subscription_file_link
-                                                                  .subscription_image_1
-                                                            : courseimg
-                                                    }
-                                                    alt={data.title}
-                                                    className="card-img-top shadow-sm"
-                                                />
-                                            </div>
-                                            <div className="card-body p-3">
-                                                <p className="title text-truncate">
-                                                    {data.title}
-                                                </p>
-                                                <p className="description">
-                                                    {data.description.substring(
-                                                        0,
-                                                        60
-                                                    )}
-                                                    {data.description
-                                                        ? data.description
-                                                              .length > 60
-                                                            ? "..."
-                                                            : ""
-                                                        : ""}
-
-                                                    <span
-                                                        className="read-more ml-1"
-                                                        onClick={() => {
-                                                            toggleModal(true);
-                                                            setData(data);
-                                                        }}
-                                                    >
-                                                        Read more
-                                                    </span>
-                                                </p>
-                                                <div className="d-flex align-items-center mb-3">
-                                                    <span className="font-weight-bold light-bg primary-text rounded-pill small py-1 px-2 mr-2">
-                                                        <i className="fas fa-rupee-sign fa-sm"></i>{" "}
-                                                        {data.discounted_price}
-                                                    </span>
-                                                    {data.discounted_price <
-                                                    data.total_price ? (
-                                                        <span
-                                                            className="text-muted small"
-                                                            style={{
-                                                                textDecoration:
-                                                                    "line-through",
-                                                            }}
-                                                        >
-                                                            <i className="fas fa-rupee-sign fa-sm"></i>{" "}
-                                                            {data.total_price}
-                                                        </span>
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                </div>
-
-                                                {/* check if the subscription is free one */}
-                                                {data.enroll_now === true ? (
-                                                    <button
-                                                        className="btn btn-primary btn-sm btn-block shadow-none mt-auto"
-                                                        onClick={() =>
-                                                            handleFreeTrial(
-                                                                data.subscription_id
-                                                            )
-                                                        }
-                                                    >
-                                                        Free Trial
-                                                    </button>
-                                                ) : // check if the subscription is added in the cart
-                                                data.added_to_cart ? (
-                                                    <div className="mt-auto">
-                                                        <Link
-                                                            className="text-decoration-none"
-                                                            to="/cart"
-                                                        >
-                                                            <button className="btn btn-primary btn-sm btn-block shadow-none">
-                                                                Added to cart{" "}
-                                                                <i className="fas fa-check-circle fa-sm ml-1"></i>
-                                                            </button>
-                                                        </Link>
-                                                    </div>
-                                                ) : (
-                                                    // else show the enroll button
-                                                    <div className="mt-auto enroll">
-                                                        <Link
-                                                            to={`/checkout/${data.subscription_id}`}
-                                                            className="text-decoration-none"
-                                                        >
-                                                            <button className="btn btn-primary btn-sm btn-block shadow-none">
-                                                                Enroll now{" "}
-                                                                <i className="fas fa-arrow-right fa-sm ml-1"></i>
-                                                            </button>
-                                                        </Link>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
+                                        <span className="icon">
+                                            <i className="fas fa-layer-group fa-sm"></i>
+                                        </span>{" "}
+                                        {list.title}
                                     </div>
                                 );
                             })}
-                        </Slider>
-                    </div>
-                    <div className="course-btn">
-                        <Link to={`/catalog/${tab.code}`}>
-                            <button
-                                className="btn shadow-none"
-                                onClick={() => storeDispatch(TEMP, tab)}
-                            >
-                                MORE COURSE{" "}
-                                <i className="fas fa-arrow-right ml-1"></i>
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-                <div className="course-circle"></div>
+                        </div>
+                        <div className="courses">
+                            <Slider {...settings}>
+                                {(courses || []).map((data, index) => {
+                                    return (
+                                        <div
+                                            className="px-md-2 px-2 mb-2"
+                                            data-index={index}
+                                            key={index}
+                                        >
+                                            <div className="card">
+                                                <div className="px-2 pt-2">
+                                                    <img
+                                                        src={
+                                                            data
+                                                                .subscription_file_link
+                                                                .subscription_image_1
+                                                                ? data
+                                                                      .subscription_file_link
+                                                                      .subscription_image_1
+                                                                : courseimg
+                                                        }
+                                                        alt={data.title}
+                                                        className="card-img-top shadow-sm"
+                                                    />
+                                                </div>
+                                                <div className="card-body p-3">
+                                                    <p className="title text-truncate">
+                                                        {data.title}
+                                                    </p>
+                                                    <p className="description">
+                                                        {data.description.substring(
+                                                            0,
+                                                            60
+                                                        )}
+                                                        {data.description
+                                                            ? data.description
+                                                                  .length > 60
+                                                                ? "..."
+                                                                : ""
+                                                            : ""}
 
-                {/* Loading component */}
-                {isLoading ? (
-                    <div style={{ position: "absolute", zIndex: "100" }}>
-                        <Loading />
+                                                        <span
+                                                            className="read-more ml-1"
+                                                            onClick={() => {
+                                                                toggleModal(
+                                                                    true
+                                                                );
+                                                                setData(data);
+                                                            }}
+                                                        >
+                                                            Read more
+                                                        </span>
+                                                    </p>
+                                                    <div className="d-flex align-items-center mb-3">
+                                                        <span className="font-weight-bold light-bg primary-text rounded-pill small py-1 px-2 mr-2">
+                                                            <i className="fas fa-rupee-sign fa-sm"></i>{" "}
+                                                            {
+                                                                data.discounted_price
+                                                            }
+                                                        </span>
+                                                        {data.discounted_price <
+                                                        data.total_price ? (
+                                                            <span
+                                                                className="text-muted small"
+                                                                style={{
+                                                                    textDecoration:
+                                                                        "line-through",
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-rupee-sign fa-sm"></i>{" "}
+                                                                {
+                                                                    data.total_price
+                                                                }
+                                                            </span>
+                                                        ) : (
+                                                            ""
+                                                        )}
+                                                    </div>
+
+                                                    {/* check if the subscription is free one */}
+                                                    {data.enroll_now ===
+                                                    true ? (
+                                                        <button
+                                                            className="btn btn-primary btn-sm btn-block shadow-none mt-auto"
+                                                            onClick={() =>
+                                                                handleFreeTrial(
+                                                                    data.subscription_id
+                                                                )
+                                                            }
+                                                        >
+                                                            Free Trial
+                                                        </button>
+                                                    ) : // check if the subscription is added in the cart
+                                                    data.added_to_cart ? (
+                                                        <div className="mt-auto">
+                                                            <Link
+                                                                className="text-decoration-none"
+                                                                to="/cart"
+                                                            >
+                                                                <button className="btn btn-primary btn-sm btn-block shadow-none">
+                                                                    Added to
+                                                                    cart{" "}
+                                                                    <i className="fas fa-check-circle fa-sm ml-1"></i>
+                                                                </button>
+                                                            </Link>
+                                                        </div>
+                                                    ) : (
+                                                        // else show the enroll button
+                                                        <div className="mt-auto enroll">
+                                                            <Link
+                                                                to={`/checkout/${data.subscription_id}`}
+                                                                className="text-decoration-none"
+                                                            >
+                                                                <button className="btn btn-primary btn-sm btn-block shadow-none">
+                                                                    Enroll now{" "}
+                                                                    <i className="fas fa-arrow-right fa-sm ml-1"></i>
+                                                                </button>
+                                                            </Link>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </Slider>
+                        </div>
+                        <div className="course-btn">
+                            <Link to={`/catalog/${tab.code}`}>
+                                <button
+                                    className="btn shadow-none"
+                                    onClick={() => storeDispatch(TEMP, tab)}
+                                >
+                                    MORE COURSE{" "}
+                                    <i className="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </Link>
+                        </div>
                     </div>
-                ) : (
-                    ""
-                )}
-            </section>
+                    <div className="course-circle"></div>
+
+                    {/* Loading component */}
+                    {isLoading ? (
+                        <div style={{ position: "absolute", zIndex: "100" }}>
+                            <Loading />
+                        </div>
+                    ) : (
+                        ""
+                    )}
+                </section>
+            ) : null}
         </>
     );
 };

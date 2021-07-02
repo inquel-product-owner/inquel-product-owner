@@ -293,13 +293,14 @@ class AdminHodProfile extends Component {
     };
 
     loadGroupData = () => {
-        fetch(
-            `${this.url}/hod/${this.hodId}/group/?page=${this.state.activeGroupPage}`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
+        let API_URL =
+            this.state.activeGroupPage > 1
+                ? `${this.url}/hod/${this.hodId}/group/?page=${this.state.activeGroupPage}`
+                : `${this.url}/hod/${this.hodId}/group/`;
+        fetch(API_URL, {
+            headers: this.headers,
+            method: "GET",
+        })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
@@ -866,8 +867,6 @@ class AdminHodProfile extends Component {
                             <GroupTable
                                 groupItems={this.state.group}
                                 path="hod"
-                                view={false}
-                                check={false}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalGroupCount >

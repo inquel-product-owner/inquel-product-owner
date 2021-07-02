@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import { connect } from "react-redux";
+import { batch, connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
-import { TEMP } from "../../../redux/action";
+import { CHAPTER, TEMP, TOPIC } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_data: state.storage.response,
@@ -17,7 +17,6 @@ class Favourites extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showModal: false,
             favouritesData: {},
 
             chapterId: "",
@@ -50,7 +49,10 @@ class Favourites extends Component {
                 chapter_name: chapter_name,
                 page_loading: true,
             },
-            () => this.loadFavouritesData()
+            () => {
+                storeDispatch(CHAPTER, chapter_name);
+                this.loadFavouritesData();
+            }
         );
     };
 
@@ -169,7 +171,10 @@ class Favourites extends Component {
     };
 
     handleRouting = (data, type, topic_num) => {
-        storeDispatch(TEMP, data);
+        batch(() => {
+            storeDispatch(TEMP, data);
+            storeDispatch(TOPIC, this.loopSubjectData(topic_num));
+        });
         this.props.history.push(
             `${this.props.match.url}/${this.state.chapterId}/${topic_num}/${type}`
         );

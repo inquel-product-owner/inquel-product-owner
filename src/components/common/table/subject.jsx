@@ -42,7 +42,6 @@ function statusdetails(props) {
 class SubjectTable extends Component {
     constructor() {
         super(...arguments);
-        this.fields = { text: "text", value: "value" };
         this.check = {
             type: "CheckBox",
         };
@@ -53,7 +52,7 @@ class SubjectTable extends Component {
             type: "Menu",
         };
         this.status = {
-            type: "CheckBox",
+            ...this.check,
             itemTemplate: statusdetails,
         };
         this.select = {
@@ -147,7 +146,7 @@ class SubjectTable extends Component {
                         }}
                         queryCellInfo={this.onQueryCellInfo.bind(this)}
                         dataBound={this.dataBound.bind(this)}
-                        filterSettings={this.Filter}
+                        filterSettings={this.excel}
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
@@ -162,25 +161,23 @@ class SubjectTable extends Component {
                                     type="checkbox"
                                     allowSorting={false}
                                     allowFiltering={false}
-                                ></ColumnDirective>
+                                />
                             ) : null}
                             <ColumnDirective
                                 field="id"
                                 headerText="Subject ID"
                                 isPrimaryKey={true}
                                 visible={false}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="subject_name"
                                 headerText="Subject Name"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
                             {this.props.category === true ? (
                                 <ColumnDirective
                                     field="category"
                                     headerText="Category"
-                                    filter={this.excel}
                                     clipMode="EllipsisWithTooltip"
                                 />
                             ) : null}
@@ -188,7 +185,6 @@ class SubjectTable extends Component {
                                 <ColumnDirective
                                     field="sub_category"
                                     headerText="Sub category"
-                                    filter={this.excel}
                                     clipMode="EllipsisWithTooltip"
                                 />
                             ) : null}
@@ -196,7 +192,6 @@ class SubjectTable extends Component {
                                 <ColumnDirective
                                     field="discipline"
                                     headerText="Discipline"
-                                    filter={this.excel}
                                     clipMode="EllipsisWithTooltip"
                                 />
                             ) : null}
@@ -204,7 +199,6 @@ class SubjectTable extends Component {
                                 <ColumnDirective
                                     field="level"
                                     headerText="Level"
-                                    filter={this.excel}
                                     clipMode="EllipsisWithTooltip"
                                 />
                             ) : null}
@@ -212,7 +206,6 @@ class SubjectTable extends Component {
                                 <ColumnDirective
                                     field="subject"
                                     headerText="Subject"
-                                    filter={this.excel}
                                     clipMode="EllipsisWithTooltip"
                                 />
                             ) : null}

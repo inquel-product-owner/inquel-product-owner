@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import Wrapper from "./wrapper";
+import Wrapper from "../wrapper";
 import { Card, Accordion, Modal, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { batch, connect } from "react-redux";
-import { baseUrl, studentUrl } from "../../shared/baseUrl";
-import Loading from "../common/loader";
-import AlertBox from "../common/alert";
-import storeDispatch from "../../redux/dispatch";
+import { baseUrl, studentUrl } from "../../../shared/baseUrl";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import storeDispatch from "../../../redux/dispatch";
 import {
     CHAPTER,
     CYCLE,
@@ -16,7 +16,7 @@ import {
     SIMULATION,
     TEMP,
     TOPIC,
-} from "../../redux/action";
+} from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
@@ -440,34 +440,48 @@ const ChapterListRender = (props) => {
                                       key={quiz_index}
                                   >
                                       <div className="row align-items-center">
-                                          <div className="col-md-6">
+                                          <div className="col-5">
                                               <p className="small font-weight-bold-600 mb-0">
                                                   {quiz.quiz_name}
                                               </p>
                                           </div>
-                                          <div className="col-md-6 text-right">
-                                              <Link
-                                                  to={`${props.match.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
-                                              >
-                                                  <button
-                                                      className="btn btn-primary btn-sm shadow-none"
-                                                      onClick={() => {
-                                                          batch(() => {
-                                                              storeDispatch(
-                                                                  CHAPTER,
-                                                                  props.chapter
-                                                                      .chapter_name
-                                                              );
-                                                              storeDispatch(
-                                                                  QUIZ,
-                                                                  quiz.quiz_name
-                                                              );
-                                                          });
-                                                      }}
-                                                  >
-                                                      View
-                                                  </button>
-                                              </Link>
+                                          <div className="col-7">
+                                              <div className="row align-items-center">
+                                                  <div className="col-2"></div>
+                                                  <div className="col-2"></div>
+                                                  <div className="col-2"></div>
+                                                  <div className="col-2 small font-weight-bold-600">
+                                                      Points:{" "}
+                                                      {props.chapter
+                                                          .quiz_points || ""}
+                                                  </div>
+                                                  <div className="col-2"></div>
+                                                  <div className="col-2 text-right">
+                                                      <Link
+                                                          to={`${props.match.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
+                                                      >
+                                                          <button
+                                                              className="btn btn-primary btn-sm shadow-none"
+                                                              onClick={() => {
+                                                                  batch(() => {
+                                                                      storeDispatch(
+                                                                          CHAPTER,
+                                                                          props
+                                                                              .chapter
+                                                                              .chapter_name
+                                                                      );
+                                                                      storeDispatch(
+                                                                          QUIZ,
+                                                                          quiz.quiz_name
+                                                                      );
+                                                                  });
+                                                              }}
+                                                          >
+                                                              View
+                                                          </button>
+                                                      </Link>
+                                                  </div>
+                                              </div>
                                           </div>
                                       </div>
                                   </div>
@@ -728,7 +742,7 @@ class Course extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
-                    errorMsg: "Something went wrong!",
+                    errorMsg: "Cannot show chapter structure at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -853,11 +867,11 @@ class Course extends Component {
                             className="border-primary primary-text small font-weight-bold-600 mr-1 rounded-sm d-none d-md-block"
                             style={{ padding: "5px 10px" }}
                         >
-                            {/* {`Quiz Points: ${
-                                this.state.subjectItems.scored_quiz_points
-                                    ? this.state.subjectItems.scored_quiz_points
+                            {`Quiz Points: ${
+                                course_data.scored_quiz_points
+                                    ? course_data.scored_quiz_points
                                     : 0
-                            }`} */}
+                            }`}
                         </div>
                         <Link
                             to={`${this.props.match.url}/personal-notes`}
@@ -927,13 +941,11 @@ class Course extends Component {
 
                                 <Dropdown.Menu className="dropdown-menu-down-btn dropdown-menu-down">
                                     <Dropdown.Item className="d-md-none d-block">
-                                        {/* {`Quiz Points: ${
-                                            this.state.subjectItems
-                                                .scored_quiz_points
-                                                ? this.state.subjectItems
-                                                      .scored_quiz_points
+                                        {`Quiz Points: ${
+                                            course_data.scored_quiz_points
+                                                ? course_data.scored_quiz_points
                                                 : 0
-                                        }`} */}
+                                        }`}
                                     </Dropdown.Item>
                                     <Dropdown.Item
                                         as={Link}

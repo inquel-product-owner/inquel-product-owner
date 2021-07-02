@@ -35,6 +35,32 @@ function teacherView(props) {
     );
 }
 
+function statusTemplate(props) {
+    return (
+        <div id="status" className="statustemp">
+            <span className="statustxt">
+                {props.status ? "Active" : "Inactive"}
+            </span>
+        </div>
+    );
+}
+
+function statusdetails(props) {
+    if (props.status) {
+        return (
+            <div className="statustemp e-activecolor">
+                <span className="statustxt e-activecolor">Active</span>
+            </div>
+        );
+    } else {
+        return (
+            <div className="statustemp e-inactivecolor">
+                <span className="statustxt e-inactivecolor">Inactive</span>
+            </div>
+        );
+    }
+}
+
 function studentView(props) {
     return (
         <>
@@ -61,7 +87,6 @@ function detailsView(props) {
 class GroupTable extends Component {
     constructor() {
         super(...arguments);
-        this.fields = { text: "text", value: "value" };
         this.check = {
             type: "CheckBox",
         };
@@ -77,14 +102,39 @@ class GroupTable extends Component {
             checkboxOnly: true,
         };
         this.valid_from = {
-            type: "Excel",
+            ...this.excel,
             itemTemplate: valid_fromDate,
         };
         this.valid_to = {
-            type: "Excel",
+            ...this.excel,
             itemTemplate: valid_toDate,
         };
+        this.status = {
+            ...this.check,
+            itemTemplate: statusdetails,
+        };
         this.toolbarOptions = ["Search"];
+    }
+
+    onQueryCellInfo(args) {
+        if (args.column.field === "status") {
+            if (args.cell.textContent === "Active") {
+                args.cell
+                    .querySelector(".statustxt")
+                    .classList.add("e-activecolor");
+                args.cell
+                    .querySelector(".statustemp")
+                    .classList.add("e-activecolor");
+            }
+            if (args.cell.textContent === "Inactive") {
+                args.cell
+                    .querySelector(".statustxt")
+                    .classList.add("e-inactivecolor");
+                args.cell
+                    .querySelector(".statustemp")
+                    .classList.add("e-inactivecolor");
+            }
+        }
     }
 
     rowSelected() {
@@ -143,12 +193,12 @@ class GroupTable extends Component {
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
+                        queryCellInfo={this.onQueryCellInfo.bind(this)}
                         dataBound={this.dataBound.bind(this)}
-                        filterSettings={this.Filter}
+                        filterSettings={this.excel}
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
-                        allowTextWrap={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                         rowSelected={this.rowSelected.bind(this)}
@@ -160,7 +210,7 @@ class GroupTable extends Component {
                                     type="checkbox"
                                     allowSorting={false}
                                     allowFiltering={false}
-                                ></ColumnDirective>
+                                />
                             ) : (
                                 ""
                             )}
@@ -169,12 +219,11 @@ class GroupTable extends Component {
                                 headerText="Group ID"
                                 isPrimaryKey={true}
                                 visible={false}
-                            ></ColumnDirective>
+                            />
                             <ColumnDirective
                                 field="group_name"
                                 headerText="Group Name"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
                             <ColumnDirective
                                 field="group_description"
@@ -187,8 +236,17 @@ class GroupTable extends Component {
                                 field="level"
                                 headerText="Level"
                                 clipMode="EllipsisWithTooltip"
-                                filter={this.excel}
                             />
+                            {this.props.status ? (
+                                <ColumnDirective
+                                    field="status"
+                                    headerText="Status"
+                                    filter={this.status}
+                                    template={statusTemplate}
+                                />
+                            ) : (
+                                ""
+                            )}
                             {this.props.valid_from ? (
                                 <ColumnDirective
                                     field="valid_from"

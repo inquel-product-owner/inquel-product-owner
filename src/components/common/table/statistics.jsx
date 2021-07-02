@@ -10,22 +10,28 @@ import {
     Resize,
 } from "@syncfusion/ej2-react-grids";
 import "./grid-overview.css";
-import userimage from "../../../assets/user-v1.png";
-import { Link } from "react-router-dom";
 import dateFormat from "dateformat";
+
+function dateTemplate(props) {
+    return dateFormat(props.created_on, "dd/mm/yyyy");
+}
+
+function durationTemplate(props) {
+    return `${props.duration_in_months} Months ${props.duration_in_days} Days`;
+}
 
 function statusTemplate(props) {
     return (
         <div id="status" className="statustemp">
             <span className="statustxt">
-                {props.is_active ? "Active" : "Inactive"}
+                {props.status ? "Active" : "Inactive"}
             </span>
         </div>
     );
 }
 
 function statusdetails(props) {
-    if (props.is_active) {
+    if (props.status) {
         return (
             <div className="statustemp e-activecolor">
                 <span className="statustxt e-activecolor">Active</span>
@@ -40,42 +46,7 @@ function statusdetails(props) {
     }
 }
 
-function nameTemplate(props) {
-    return (
-        <div className="d-flex align-items-center">
-            <div className="empimg">
-                <img
-                    src={
-                        props.profile_link !== null
-                            ? props.profile_link
-                            : userimage
-                    }
-                    alt={props.full_name ? props.full_name : props.username}
-                    className="profile-pic"
-                />
-            </div>
-            <span id="Emptext">
-                {props.full_name ? props.full_name : props.username}
-            </span>
-        </div>
-    );
-}
-
-function dateTemplate(props) {
-    return dateFormat(props.date_joined, "dd/mm/yyyy");
-}
-
-function viewTemplate(props) {
-    return (
-        <Link to={`/admin/hod/${props.id}`}>
-            <button className="btn btn-link btn-sm shadow-none">
-                <i className="fas fa-eye"></i>
-            </button>
-        </Link>
-    );
-}
-
-class HODTable extends Component {
+class SubscriptionTable extends Component {
     constructor() {
         super(...arguments);
         this.check = {
@@ -87,25 +58,28 @@ class HODTable extends Component {
         this.menu = {
             type: "Menu",
         };
-        this.select = {
-            persistSelection: true,
-            type: "Multiple",
-            checkboxOnly: true,
-        };
         this.status = {
             ...this.check,
             itemTemplate: statusdetails,
+        };
+        this.duration = {
+            ...this.excel,
+            itemTemplate: durationTemplate,
         };
         this.date = {
             ...this.excel,
             itemTemplate: dateTemplate,
         };
-        this.formatOption = { type: "date", format: "dd/MM/yyyy" };
+        this.select = {
+            persistSelection: true,
+            type: "Multiple",
+            checkboxOnly: true,
+        };
         this.toolbarOptions = ["Search"];
     }
 
     onQueryCellInfo(args) {
-        if (args.column.field === "is_active") {
+        if (args.column.field === "status") {
             if (args.cell.textContent === "Active") {
                 args.cell
                     .querySelector(".statustxt")
@@ -134,9 +108,11 @@ class HODTable extends Component {
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
-                element.push(selectedrecords[index].id.toString());
+                element.push(selectedrecords[index].subscription_id.toString());
             }
-            if (this.props.handleHODId) this.props.handleHODId(element);
+            if (this.props.handleID) {
+                this.props.handleID(element);
+            }
         }
     }
 
@@ -145,11 +121,32 @@ class HODTable extends Component {
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
-                element.push(selectedrecords[index].id.toString());
+                element.push(selectedrecords[index].subscription_id.toString());
             }
-            if (this.props.handleHODId) this.props.handleHODId(element);
+            if (this.props.handleID) {
+                this.props.handleID(element);
+            }
         }
     }
+
+    viewTemplate = (props) => {
+        return (
+            <div className="d-flex">
+                <button
+                    className="btn btn-link btn-sm shadow-none"
+                    onClick={() => this.props.toggleEdit(props)}
+                >
+                    <i className="fas fa-edit fa-sm"></i>
+                </button>
+                <button
+                    className="btn btn-link btn-sm shadow-none"
+                    onClick={() => this.props.toggleDelete(props)}
+                >
+                    <i className="fas fa-trash fa-sm"></i>
+                </button>
+            </div>
+        );
+    };
 
     render() {
         return (
@@ -157,9 +154,10 @@ class HODTable extends Component {
                 <div className="control-section">
                     <GridComponent
                         id="overviewgrid"
-                        dataSource={this.props.hodItems}
+                        dataSource={this.props.data}
                         enableHover={true}
                         rowHeight={50}
+                        width={"100%"}
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
@@ -176,67 +174,60 @@ class HODTable extends Component {
                     >
                         <ColumnsDirective>
                             <ColumnDirective
-                                type="checkbox"
-                                allowSorting={false}
-                                allowFiltering={false}
-                            />
-                            <ColumnDirective
-                                field="id"
-                                visible={false}
-                                headerText="HOD ID"
+                                field="subscription_id"
+                                headerText="Subscription ID"
                                 isPrimaryKey={true}
+                                visible={false}
                             />
                             <ColumnDirective
-                                field="full_name"
+                                field="title"
                                 headerText="Name"
                                 clipMode="EllipsisWithTooltip"
-                                template={nameTemplate}
                             />
                             <ColumnDirective
-                                field="username"
-                                headerText="Username"
+                                field="search_id"
+                                headerText="Subscription ID"
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
-                                field="category"
-                                headerText="Category"
+                                field="discounted_price"
+                                headerText="Pricing"
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
-                                field="sub_category"
-                                headerText="Sub category"
+                                field="duration"
+                                headerText="Duration"
                                 clipMode="EllipsisWithTooltip"
+                                template={durationTemplate}
+                                filter={this.duration}
                             />
                             <ColumnDirective
-                                field="discipline"
-                                headerText="Discipline"
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="board"
-                                headerText="Board University"
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="date_joined"
-                                filter={this.date}
-                                headerText="Registered On"
+                                field="created_on"
+                                headerText="Created On"
                                 clipMode="EllipsisWithTooltip"
                                 template={dateTemplate}
+                                filter={this.date}
                             />
                             <ColumnDirective
-                                field="is_active"
+                                field="status"
                                 headerText="Status"
                                 filter={this.status}
-                                clipMode="EllipsisWithTooltip"
                                 template={statusTemplate}
                             />
                             <ColumnDirective
-                                headerText="Action"
-                                allowSorting={false}
-                                allowFiltering={false}
-                                template={viewTemplate}
-                                width="130"
+                                field="total_subscription"
+                                headerText="Total Subscription"
+                                clipMode="EllipsisWithTooltip"
+                            />
+                            <ColumnDirective
+                                field="free_subscription"
+                                headerText="Free Subscription"
+                                clipMode="EllipsisWithTooltip"
+                            />
+                            <ColumnDirective
+                                field="total_revenue"
+                                headerText="Total Revenue"
+                                clipMode="EllipsisWithTooltip"
                             />
                         </ColumnsDirective>
                         <Inject services={[Filter, Sort, Toolbar, Resize]} />
@@ -248,4 +239,4 @@ class HODTable extends Component {
     }
 }
 
-export default HODTable;
+export default SubscriptionTable;

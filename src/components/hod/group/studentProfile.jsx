@@ -232,72 +232,14 @@ class HODGroupStudentProfile extends Component {
                         <table className="table">
                             <thead className="primary-text">
                                 <tr>
-                                    <th scope="col">Courses subscribed</th>
+                                    <th scope="col">Subjects</th>
                                     <th scope="col">Valid from</th>
                                     <th scope="col">Valid to</th>
                                     <th scope="col">Status</th>
-                                    <th scope="col">Amount paid</th>
-                                    <th scope="col">Discount Applied</th>
-                                    <th scope="col">Quiz Points</th>
-                                    <th scope="col">Simulation</th>
-                                    <th scope="col" className="text-center">
-                                        Scorecard
-                                    </th>
+                                    <th scope="col">Group</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Mathematics 10th CBSE (Full course)</td>
-                                    <td>05/10/2020</td>
-                                    <td>10/10/2020</td>
-                                    <td>Persuing</td>
-                                    <td>2560</td>
-                                    <td>SP2020210001</td>
-                                    <td>212</td>
-                                    <td>First Class</td>
-                                    <td className="text-center">
-                                        <Link to="/hod/course/001">
-                                            <button className="btn btn-sm btn-primary">
-                                                <i className="fas fa-eye"></i>
-                                            </button>
-                                        </Link>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Physics</td>
-                                    <td>10/10/2020</td>
-                                    <td>02/03/2020</td>
-                                    <td>Persuing</td>
-                                    <td>3871</td>
-                                    <td>SP2020210001</td>
-                                    <td>436</td>
-                                    <td>Not Taken</td>
-                                    <td className="text-center">
-                                        <Link to="/hod/course/001">
-                                            <button className="btn btn-sm btn-primary">
-                                                <i className="fas fa-eye"></i>
-                                            </button>
-                                        </Link>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Chemistry</td>
-                                    <td>03/01/2020</td>
-                                    <td>07/07/2020</td>
-                                    <td>Completed</td>
-                                    <td>9568</td>
-                                    <td>SP2020210001</td>
-                                    <td>128</td>
-                                    <td>Distiction</td>
-                                    <td className="text-center">
-                                        <Link to="/hod/course/001">
-                                            <button className="btn btn-sm btn-primary">
-                                                <i className="fas fa-eye"></i>
-                                            </button>
-                                        </Link>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
