@@ -34,6 +34,7 @@ class TeacherSubject extends Component {
 
             showChapterModal: false,
             showChapter_EditModal: false,
+            showChapter_DeleteModal: false,
 
             showSemesterModal: false,
             showSemester_EditModal: false,
@@ -76,6 +77,13 @@ class TeacherSubject extends Component {
         this.setState({
             selectedChapter: data,
             showChapter_EditModal: !this.state.showChapter_EditModal,
+        });
+    };
+
+    toggleChapter_DeleteModal = (data) => {
+        this.setState({
+            selectedChapter: data,
+            showChapter_DeleteModal: !this.state.showChapter_DeleteModal,
         });
     };
 
@@ -199,6 +207,7 @@ class TeacherSubject extends Component {
             this.setState({
                 showChapterModal: false,
                 showChapter_EditModal: false,
+                showChapter_DeleteModal: false,
             });
         }, 1000);
         this.loadChapterData();
@@ -284,6 +293,23 @@ class TeacherSubject extends Component {
                         formSubmission={this.chapterFormSubmission}
                         subjectId={this.subjectId}
                         data={this.state.selectedChapter}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* ----- Chapter Delete modal ----- */}
+                {this.state.showChapter_DeleteModal ? (
+                    <SingleContentDeleteModal
+                        show={this.state.showChapter_DeleteModal}
+                        onHide={this.toggleChapter_DeleteModal}
+                        formSubmission={this.chapterFormSubmission}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/`}
+                        type="Chapter"
+                        name={this.state.selectedChapter.chapter_name}
+                        data={{
+                            chapter_id: this.state.selectedChapter.chapter_id,
+                        }}
                     />
                 ) : (
                     ""
@@ -429,6 +455,13 @@ class TeacherSubject extends Component {
                                                                       toggleChapter_EditModal={
                                                                           this
                                                                               .toggleChapter_EditModal
+                                                                      }
+                                                                      toggleChapter_DeleteModal={
+                                                                          this
+                                                                              .toggleChapter_DeleteModal
+                                                                      }
+                                                                      group={
+                                                                          true
                                                                       }
                                                                       url={
                                                                           this
@@ -624,6 +657,11 @@ class TeacherSubject extends Component {
                                                           this
                                                               .toggleChapter_EditModal
                                                       }
+                                                      toggleChapter_DeleteModal={
+                                                          this
+                                                              .toggleChapter_DeleteModal
+                                                      }
+                                                      group={true}
                                                       url={this.props.match.url}
                                                       permissions={
                                                           this.state.permissions

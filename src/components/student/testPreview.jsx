@@ -467,6 +467,7 @@ class TestPreview extends Component {
         await this.setState({
             currentSectionIndex: this.state.currentSectionIndex - 1,
         });
+        window.scrollTo(0, 0);
         window.MathJax.typeset();
     };
 
@@ -474,6 +475,7 @@ class TestPreview extends Component {
         await this.setState({
             currentSectionIndex: this.state.currentSectionIndex + 1,
         });
+        window.scrollTo(0, 0);
         window.MathJax.typeset();
     };
 
@@ -768,18 +770,12 @@ class TestPreview extends Component {
                             ) : (
                                 <>
                                     {/* ----- Header Info ----- */}
-                                    <div className="card card-body primary-bg text-white font-weight-bold-600 small shadow-sm py-3 mb-3">
+                                    <div className="card card-body primary-bg text-white shadow-sm py-3 mb-3">
                                         <div className="row align-items-center">
-                                            <div className="col-md-5">
-                                                {
-                                                    this.props.temp.data[0]
-                                                        .sections[
-                                                        this.state
-                                                            .currentSectionIndex
-                                                    ].section_description
-                                                }
+                                            <div className="col-md-5 font-weight-bold-600">
+                                                Exam Details
                                             </div>
-                                            <div className="col-md-7">
+                                            <div className="col-md-7 small font-weight-bold-600">
                                                 <div className="row align-items-center justify-content-end">
                                                     <div className="col-md-3">
                                                         Total questions:{" "}
@@ -832,6 +828,18 @@ class TestPreview extends Component {
                                         </div>
                                     </div>
 
+                                    {/* <div className="d-flex justify-content-center mb-3">
+                                        <div className="primary-bg text-white font-weight-bold-600 rounded-lg px-3 py-1">
+                                            {
+                                                this.props.temp.data[0]
+                                                    .sections[
+                                                    this.state
+                                                        .currentSectionIndex
+                                                ].section_description
+                                            }
+                                        </div>
+                                    </div> */}
+
                                     {(data || []).map((question, q_index) => {
                                         return question.type === "type_1" ? (
                                             <div
@@ -862,69 +870,65 @@ class TestPreview extends Component {
 
                                                                 {/* ---------- Options ---------- */}
 
-                                                                <div className="row">
-                                                                    {(
-                                                                        question.proper_answer ||
-                                                                        []
-                                                                    ).map(
-                                                                        (
-                                                                            option,
-                                                                            option_index
-                                                                        ) => {
-                                                                            return (
+                                                                {(
+                                                                    question.proper_answer ||
+                                                                    []
+                                                                ).map(
+                                                                    (
+                                                                        option,
+                                                                        option_index
+                                                                    ) => {
+                                                                        return (
+                                                                            <div
+                                                                                className="form-group"
+                                                                                key={
+                                                                                    option_index
+                                                                                }
+                                                                            >
                                                                                 <div
-                                                                                    className="col-md-6"
-                                                                                    key={
-                                                                                        option_index
-                                                                                    }
-                                                                                >
-                                                                                    <div className="form-group">
-                                                                                        <div
-                                                                                            className={`card shadow-sm ${
+                                                                                    className={`card shadow-sm ${
+                                                                                        (
+                                                                                            question.answer ||
+                                                                                            []
+                                                                                        )
+                                                                                            .map(
                                                                                                 (
-                                                                                                    question.answer ||
-                                                                                                    []
-                                                                                                )
-                                                                                                    .map(
-                                                                                                        (
-                                                                                                            data
-                                                                                                        ) =>
-                                                                                                            data.toLowerCase()
-                                                                                                    )
-                                                                                                    .includes(
-                                                                                                        option.content
-                                                                                                            ? option.content
-                                                                                                            : option.toLowerCase()
-                                                                                                    )
-                                                                                                    ? question.marks >
-                                                                                                      0
-                                                                                                        ? "success-bg 1"
-                                                                                                        : option.correct
-                                                                                                        ? "success-bg"
-                                                                                                        : "danger-bg"
-                                                                                                    : option.correct
-                                                                                                    ? "success-bg"
-                                                                                                    : "bg-white"
-                                                                                            }`}
-                                                                                        >
-                                                                                            <div
-                                                                                                className="card-body small font-weight-bold-600 pt-3 pb-0"
-                                                                                                dangerouslySetInnerHTML={{
-                                                                                                    __html: `<div class="mb-3">${
-                                                                                                        option.content !==
-                                                                                                        undefined
-                                                                                                            ? option.content
-                                                                                                            : option
-                                                                                                    }</div>`,
-                                                                                                }}
-                                                                                            ></div>
-                                                                                        </div>
-                                                                                    </div>
+                                                                                                    data
+                                                                                                ) =>
+                                                                                                    data.toLowerCase()
+                                                                                            )
+                                                                                            .includes(
+                                                                                                option.content
+                                                                                                    ? option.content
+                                                                                                    : option.toLowerCase()
+                                                                                            )
+                                                                                            ? question.marks >
+                                                                                              0
+                                                                                                ? "success-bg 1"
+                                                                                                : option.correct
+                                                                                                ? "success-bg"
+                                                                                                : "danger-bg"
+                                                                                            : option.correct
+                                                                                            ? "success-bg"
+                                                                                            : "bg-white"
+                                                                                    }`}
+                                                                                >
+                                                                                    <div
+                                                                                        className="card-body small font-weight-bold-600 pt-3 pb-0"
+                                                                                        dangerouslySetInnerHTML={{
+                                                                                            __html: `<div class="mb-3">${
+                                                                                                option.content !==
+                                                                                                undefined
+                                                                                                    ? option.content
+                                                                                                    : option
+                                                                                            }</div>`,
+                                                                                        }}
+                                                                                    ></div>
                                                                                 </div>
-                                                                            );
-                                                                        }
-                                                                    )}
-                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )}
 
                                                                 {/* ---------- Student answers ---------- */}
 
@@ -977,18 +981,28 @@ class TestPreview extends Component {
 
                                                                 {/* ----- Explanation ----- */}
 
-                                                                <button
-                                                                    className="btn btn-link btn-sm shadow-none"
-                                                                    onClick={() =>
-                                                                        this.toggleModal(
-                                                                            question.explanation,
-                                                                            question.audio
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="fas fa-info-circle mr-1"></i>{" "}
-                                                                    Explanation
-                                                                </button>
+                                                                {(question.audio &&
+                                                                    question
+                                                                        .audio
+                                                                        .length !==
+                                                                        0) ||
+                                                                question.explanation !==
+                                                                    "" ? (
+                                                                    <button
+                                                                        className="btn btn-link btn-sm shadow-none"
+                                                                        onClick={() =>
+                                                                            this.toggleModal(
+                                                                                question.explanation,
+                                                                                question.audio
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-info-circle mr-1"></i>{" "}
+                                                                        Explanation
+                                                                    </button>
+                                                                ) : (
+                                                                    ""
+                                                                )}
                                                             </div>
 
                                                             {/* ----- image preview ----- */}
@@ -1122,61 +1136,55 @@ class TestPreview extends Component {
 
                                                                                 {/* ---------- Options ---------- */}
 
-                                                                                <div className="row">
-                                                                                    {(
-                                                                                        question
-                                                                                            .sub_question[
+                                                                                {(
+                                                                                    question
+                                                                                        .sub_question[
+                                                                                        this
+                                                                                            .state
+                                                                                            .currentSubQuestionIndex[
                                                                                             this
                                                                                                 .state
-                                                                                                .currentSubQuestionIndex[
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .currentSectionIndex
-                                                                                            ][
-                                                                                                q_index
-                                                                                            ]
+                                                                                                .currentSectionIndex
+                                                                                        ][
+                                                                                            q_index
                                                                                         ]
-                                                                                            .proper_answer ||
-                                                                                        []
-                                                                                    ).map(
-                                                                                        (
-                                                                                            option,
-                                                                                            option_index
-                                                                                        ) => {
-                                                                                            return (
+                                                                                    ]
+                                                                                        .proper_answer ||
+                                                                                    []
+                                                                                ).map(
+                                                                                    (
+                                                                                        option,
+                                                                                        option_index
+                                                                                    ) => {
+                                                                                        return (
+                                                                                            <div
+                                                                                                className={`card shadow-sm mb-2 ${
+                                                                                                    option.correct !==
+                                                                                                    undefined
+                                                                                                        ? option.correct
+                                                                                                            ? "success-bg"
+                                                                                                            : "bg-white"
+                                                                                                        : ""
+                                                                                                }`}
+                                                                                                key={
+                                                                                                    option_index
+                                                                                                }
+                                                                                            >
                                                                                                 <div
-                                                                                                    className="col-md-6"
-                                                                                                    key={
-                                                                                                        option_index
-                                                                                                    }
-                                                                                                >
-                                                                                                    <div
-                                                                                                        className={`card shadow-sm mb-2 ${
-                                                                                                            option.correct !==
+                                                                                                    className="card-body small font-weight-bold-600 pt-3 pb-0"
+                                                                                                    dangerouslySetInnerHTML={{
+                                                                                                        __html: `<div class="mb-3">${
+                                                                                                            option.content !==
                                                                                                             undefined
-                                                                                                                ? option.correct
-                                                                                                                    ? "success-bg"
-                                                                                                                    : "bg-white"
-                                                                                                                : ""
-                                                                                                        }`}
-                                                                                                    >
-                                                                                                        <div
-                                                                                                            className="card-body small font-weight-bold-600 pt-3 pb-0"
-                                                                                                            dangerouslySetInnerHTML={{
-                                                                                                                __html: `<div class="mb-3">${
-                                                                                                                    option.content !==
-                                                                                                                    undefined
-                                                                                                                        ? option.content
-                                                                                                                        : option
-                                                                                                                }</div>`,
-                                                                                                            }}
-                                                                                                        ></div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            );
-                                                                                        }
-                                                                                    )}
-                                                                                </div>
+                                                                                                                ? option.content
+                                                                                                                : option
+                                                                                                        }</div>`,
+                                                                                                    }}
+                                                                                                ></div>
+                                                                                            </div>
+                                                                                        );
+                                                                                    }
+                                                                                )}
 
                                                                                 {/* ---------- Navigation button ---------- */}
 
@@ -1270,18 +1278,28 @@ class TestPreview extends Component {
 
                                                                 {/* ----- Explanation ----- */}
 
-                                                                <button
-                                                                    className="btn btn-link btn-sm shadow-none"
-                                                                    onClick={() =>
-                                                                        this.toggleModal(
-                                                                            question.explanation,
-                                                                            question.audio
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="fas fa-info-circle mr-1"></i>{" "}
-                                                                    Explanation
-                                                                </button>
+                                                                {(question.audio &&
+                                                                    question
+                                                                        .audio
+                                                                        .length !==
+                                                                        0) ||
+                                                                question.explanation !==
+                                                                    "" ? (
+                                                                    <button
+                                                                        className="btn btn-link btn-sm shadow-none"
+                                                                        onClick={() =>
+                                                                            this.toggleModal(
+                                                                                question.explanation,
+                                                                                question.audio
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-info-circle mr-1"></i>{" "}
+                                                                        Explanation
+                                                                    </button>
+                                                                ) : (
+                                                                    ""
+                                                                )}
                                                             </div>
                                                         </div>
 

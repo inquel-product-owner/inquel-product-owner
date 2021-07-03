@@ -26,6 +26,9 @@ function nameTemplate(props) {
                     className="profile-pic"
                 />
             </div>
+            <span id="Emptext">
+                {props.full_name ? props.full_name : props.username}
+            </span>
         </div>
     );
 }
@@ -42,33 +45,7 @@ class LeaderboardTable extends Component {
         this.Filter = {
             type: "Menu",
         };
-        this.select = {
-            persistSelection: true,
-            type: "Multiple",
-            checkboxOnly: true,
-        };
         this.toolbarOptions = ["Search"];
-    }
-
-    onQueryCellInfo(args) {
-        if (args.column.field === "is_active") {
-            if (args.cell.textContent === "Active") {
-                args.cell
-                    .querySelector(".statustxt")
-                    .classList.add("e-activecolor");
-                args.cell
-                    .querySelector(".statustemp")
-                    .classList.add("e-activecolor");
-            }
-            if (args.cell.textContent === "Inactive") {
-                args.cell
-                    .querySelector(".statustxt")
-                    .classList.add("e-inactivecolor");
-                args.cell
-                    .querySelector(".statustemp")
-                    .classList.add("e-inactivecolor");
-            }
-        }
     }
 
     dataBound() {
@@ -81,19 +58,16 @@ class LeaderboardTable extends Component {
                 <div className="control-section">
                     <GridComponent
                         id="overviewgrid"
-                        dataSource={this.props.leaderBoard}
+                        dataSource={this.props.data}
                         enableHover={true}
                         rowHeight={50}
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
-                        queryCellInfo={this.onQueryCellInfo.bind(this)}
                         dataBound={this.dataBound.bind(this)}
                         filterSettings={this.excel}
                         allowFiltering={true}
                         allowSorting={true}
-                        allowSelection={true}
-                        selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                     >
                         <ColumnsDirective>
@@ -104,37 +78,39 @@ class LeaderboardTable extends Component {
                                 isPrimaryKey={true}
                             />
                             <ColumnDirective
-                                field="profile_link"
-                                headerText=""
-                                allowSorting={false}
-                                allowFiltering={false}
-                                template={nameTemplate}
+                                field="key"
+                                headerText="Sl No"
+                                clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
                                 field="full_name"
                                 headerText="Name"
                                 clipMode="EllipsisWithTooltip"
+                                template={nameTemplate}
                             />
                             <ColumnDirective
-                                field="grade"
-                                headerText="Grade"
+                                field="course_name"
+                                headerText="Course Title"
                                 clipMode="EllipsisWithTooltip"
                             />
-                            <ColumnDirective
-                                field="points"
-                                headerText="Points"
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="subject_name"
-                                headerText="Subject"
-                                clipMode="EllipsisWithTooltip"
-                            />
-                            <ColumnDirective
-                                field="institution_name"
-                                headerText="Institution"
-                                clipMode="EllipsisWithTooltip"
-                            />
+                            {this.props.points ? (
+                                <ColumnDirective
+                                    field="points"
+                                    headerText="Points"
+                                    clipMode="EllipsisWithTooltip"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.average ? (
+                                <ColumnDirective
+                                    field="average"
+                                    headerText="Weighted Average"
+                                    clipMode="EllipsisWithTooltip"
+                                />
+                            ) : (
+                                ""
+                            )}
                         </ColumnsDirective>
                         <Inject services={[Filter, Sort, Toolbar, Resize]} />
                     </GridComponent>

@@ -82,7 +82,8 @@ class HomeLeaderboard extends Component {
                                 <Tab eventKey="quiz" title="Quiz Masters">
                                     <div className="card shadow-sm">
                                         <LeaderboardTable
-                                            leaderBoard={this.state.leaderBoard}
+                                            data={this.state.leaderBoard}
+                                            points={true}
                                         />
                                         <div className="card-body p-3">
                                             {this.state.totalQuizCount >
@@ -109,7 +110,8 @@ class HomeLeaderboard extends Component {
                                 <Tab eventKey="course" title="Course Toppers">
                                     <div className="card shadow-sm">
                                         <LeaderboardTable
-                                            leaderBoard={this.state.leaderBoard}
+                                            data={this.state.leaderBoard}
+                                            average={true}
                                         />
                                         <div className="card-body p-3">
                                             {this.state.totalCourseCount >

@@ -648,184 +648,187 @@ class HODCyclePreview extends Component {
                                       {/* ---------- Question preview ---------- */}
                                       <div className="card shadow-sm w-100">
                                           <div className="card-body d-flex">
-                                              <div className="row">
-                                                  {/* ----- Main Question ----- */}
-                                                  <div className="col-md-6">
-                                                      <div
-                                                          dangerouslySetInnerHTML={{
-                                                              __html: data.question,
-                                                          }}
-                                                      ></div>
-                                                  </div>
-                                                  {/* ----- Sub Question ----- */}
-                                                  <div className="col-md-6">
-                                                      <div className="d-flex align-items-start justify-content">
-                                                          <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
-                                                              {`${
-                                                                  q_index + 1
-                                                              }.${
-                                                                  this.state
-                                                                      .currentSubQuestionIndex[
-                                                                      q_index
-                                                                  ] + 1
-                                                              }`}
-                                                          </button>
+                                              <div className="w-100">
+                                                  <div className="row">
+                                                      {/* ----- Main Question ----- */}
+                                                      <div className="col-md-6">
+                                                          <div
+                                                              dangerouslySetInnerHTML={{
+                                                                  __html: data.question,
+                                                              }}
+                                                          ></div>
+                                                      </div>
+                                                      {/* ----- Sub Question ----- */}
+                                                      <div className="col-md-6">
+                                                          <div className="d-flex align-items-start justify-content">
+                                                              <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
+                                                                  {`${
+                                                                      q_index +
+                                                                      1
+                                                                  }.${
+                                                                      this.state
+                                                                          .currentSubQuestionIndex[
+                                                                          q_index
+                                                                      ] + 1
+                                                                  }`}
+                                                              </button>
 
-                                                          {/* ---------- Sub Question preview ---------- */}
-                                                          <div className="card w-100">
-                                                              <div className="card secondary-bg py-2 px-3 mb-2">
-                                                                  <div
-                                                                      dangerouslySetInnerHTML={{
-                                                                          __html: data
-                                                                              .sub_question[
+                                                              {/* ---------- Sub Question preview ---------- */}
+                                                              <div className="card w-100">
+                                                                  <div className="card secondary-bg py-2 px-3 mb-2">
+                                                                      <div
+                                                                          dangerouslySetInnerHTML={{
+                                                                              __html: data
+                                                                                  .sub_question[
+                                                                                  this
+                                                                                      .state
+                                                                                      .currentSubQuestionIndex[
+                                                                                      q_index
+                                                                                  ]
+                                                                              ]
+                                                                                  .question,
+                                                                          }}
+                                                                      ></div>
+                                                                  </div>
+                                                                  {data
+                                                                      .sub_question[
+                                                                      this.state
+                                                                          .currentSubQuestionIndex[
+                                                                          q_index
+                                                                      ]
+                                                                  ].mcq
+                                                                      ? data.sub_question[
+                                                                            this
+                                                                                .state
+                                                                                .currentSubQuestionIndex[
+                                                                                q_index
+                                                                            ]
+                                                                        ].options.map(
+                                                                            (
+                                                                                options,
+                                                                                index
+                                                                            ) => {
+                                                                                return (
+                                                                                    <div
+                                                                                        className={`card shadow-sm mb-2 ${
+                                                                                            options.correct
+                                                                                                ? "success-bg"
+                                                                                                : "bg-light"
+                                                                                        }`}
+                                                                                        key={
+                                                                                            index
+                                                                                        }
+                                                                                    >
+                                                                                        <div className="card-body small font-weight-bold-600 pt-3 pb-0">
+                                                                                            <div
+                                                                                                dangerouslySetInnerHTML={{
+                                                                                                    __html: `<div class="mb-3">${options.content}</div>`,
+                                                                                                }}
+                                                                                            ></div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                );
+                                                                            }
+                                                                        )
+                                                                      : ""}
+                                                                  {data
+                                                                      .sub_question[
+                                                                      this.state
+                                                                          .currentSubQuestionIndex[
+                                                                          q_index
+                                                                      ]
+                                                                  ].fill_in
+                                                                      ? data.sub_question[
+                                                                            this
+                                                                                .state
+                                                                                .currentSubQuestionIndex[
+                                                                                q_index
+                                                                            ]
+                                                                        ].fillin_answer.map(
+                                                                            (
+                                                                                fill_in,
+                                                                                index
+                                                                            ) => {
+                                                                                return (
+                                                                                    <div
+                                                                                        className="card shadow-sm bg-light mb-2"
+                                                                                        key={
+                                                                                            index
+                                                                                        }
+                                                                                    >
+                                                                                        <div className="card-body small font-weight-bold-600 py-3">
+                                                                                            {
+                                                                                                fill_in
+                                                                                            }
+                                                                                        </div>
+                                                                                    </div>
+                                                                                );
+                                                                            }
+                                                                        )
+                                                                      : ""}
+                                                                  <div className="d-flex align-items-center justify-content-center mt-2">
+                                                                      <button
+                                                                          className="btn btn-sm primary-text shadow-none"
+                                                                          onClick={() =>
+                                                                              this.handleSubQPrev(
+                                                                                  q_index
+                                                                              )
+                                                                          }
+                                                                          disabled={
                                                                               this
                                                                                   .state
                                                                                   .currentSubQuestionIndex[
                                                                                   q_index
-                                                                              ]
-                                                                          ]
-                                                                              .question,
-                                                                      }}
-                                                                  ></div>
-                                                              </div>
-                                                              {data
-                                                                  .sub_question[
-                                                                  this.state
-                                                                      .currentSubQuestionIndex[
-                                                                      q_index
-                                                                  ]
-                                                              ].mcq
-                                                                  ? data.sub_question[
-                                                                        this
-                                                                            .state
-                                                                            .currentSubQuestionIndex[
-                                                                            q_index
-                                                                        ]
-                                                                    ].options.map(
-                                                                        (
-                                                                            options,
-                                                                            index
-                                                                        ) => {
-                                                                            return (
-                                                                                <div
-                                                                                    className={`card shadow-sm mb-2 ${
-                                                                                        options.correct
-                                                                                            ? "success-bg"
-                                                                                            : "bg-light"
-                                                                                    }`}
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                >
-                                                                                    <div className="card-body small font-weight-bold-600 pt-3 pb-0">
-                                                                                        <div
-                                                                                            dangerouslySetInnerHTML={{
-                                                                                                __html: `<div class="mb-3">${options.content}</div>`,
-                                                                                            }}
-                                                                                        ></div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            );
-                                                                        }
-                                                                    )
-                                                                  : ""}
-                                                              {data
-                                                                  .sub_question[
-                                                                  this.state
-                                                                      .currentSubQuestionIndex[
-                                                                      q_index
-                                                                  ]
-                                                              ].fill_in
-                                                                  ? data.sub_question[
-                                                                        this
-                                                                            .state
-                                                                            .currentSubQuestionIndex[
-                                                                            q_index
-                                                                        ]
-                                                                    ].fillin_answer.map(
-                                                                        (
-                                                                            fill_in,
-                                                                            index
-                                                                        ) => {
-                                                                            return (
-                                                                                <div
-                                                                                    className="card shadow-sm bg-light mb-2"
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                >
-                                                                                    <div className="card-body small font-weight-bold-600 py-3">
-                                                                                        {
-                                                                                            fill_in
-                                                                                        }
-                                                                                    </div>
-                                                                                </div>
-                                                                            );
-                                                                        }
-                                                                    )
-                                                                  : ""}
-                                                              <div className="d-flex align-items-center justify-content-center mt-2">
-                                                                  <button
-                                                                      className="btn btn-sm primary-text shadow-none"
-                                                                      onClick={() =>
-                                                                          this.handleSubQPrev(
-                                                                              q_index
-                                                                          )
-                                                                      }
-                                                                      disabled={
-                                                                          this
-                                                                              .state
-                                                                              .currentSubQuestionIndex[
-                                                                              q_index
-                                                                          ] ===
-                                                                          0
-                                                                              ? true
-                                                                              : false
-                                                                      }
-                                                                  >
-                                                                      <i className="fas fa-arrow-circle-left fa-lg"></i>
-                                                                  </button>
-                                                                  <div className="border-primary small font-weight-bold-600 rounded-lg px-3 py-1 mx-3">
-                                                                      {this
-                                                                          .state
-                                                                          .currentSubQuestionIndex[
-                                                                          q_index
-                                                                      ] +
-                                                                          1}{" "}
-                                                                      /{" "}
-                                                                      {
-                                                                          this
-                                                                              .state
-                                                                              .totalSubQuestion[
-                                                                              q_index
-                                                                          ]
-                                                                      }
-                                                                  </div>
-                                                                  <button
-                                                                      className="btn btn-sm primary-text shadow-none"
-                                                                      onClick={() =>
-                                                                          this.handleSubQNext(
-                                                                              q_index
-                                                                          )
-                                                                      }
-                                                                      disabled={
-                                                                          this
+                                                                              ] ===
+                                                                              0
+                                                                                  ? true
+                                                                                  : false
+                                                                          }
+                                                                      >
+                                                                          <i className="fas fa-arrow-circle-left fa-lg"></i>
+                                                                      </button>
+                                                                      <div className="border-primary small font-weight-bold-600 rounded-lg px-3 py-1 mx-3">
+                                                                          {this
                                                                               .state
                                                                               .currentSubQuestionIndex[
                                                                               q_index
                                                                           ] +
-                                                                              1 <
-                                                                          this
-                                                                              .state
-                                                                              .totalSubQuestion[
-                                                                              q_index
-                                                                          ]
-                                                                              ? false
-                                                                              : true
-                                                                      }
-                                                                  >
-                                                                      <i className="fas fa-arrow-circle-right fa-lg"></i>
-                                                                  </button>
+                                                                              1}{" "}
+                                                                          /{" "}
+                                                                          {
+                                                                              this
+                                                                                  .state
+                                                                                  .totalSubQuestion[
+                                                                                  q_index
+                                                                              ]
+                                                                          }
+                                                                      </div>
+                                                                      <button
+                                                                          className="btn btn-sm primary-text shadow-none"
+                                                                          onClick={() =>
+                                                                              this.handleSubQNext(
+                                                                                  q_index
+                                                                              )
+                                                                          }
+                                                                          disabled={
+                                                                              this
+                                                                                  .state
+                                                                                  .currentSubQuestionIndex[
+                                                                                  q_index
+                                                                              ] +
+                                                                                  1 <
+                                                                              this
+                                                                                  .state
+                                                                                  .totalSubQuestion[
+                                                                                  q_index
+                                                                              ]
+                                                                                  ? false
+                                                                                  : true
+                                                                          }
+                                                                      >
+                                                                          <i className="fas fa-arrow-circle-right fa-lg"></i>
+                                                                      </button>
+                                                                  </div>
                                                               </div>
                                                           </div>
                                                       </div>

@@ -116,6 +116,20 @@ export function ChapterList(props) {
                         >
                             <i className="far fa-edit fa-sm mr-1"></i> Edit
                         </Dropdown.Item>
+                        {props.group ? (
+                            <Dropdown.Item
+                                onClick={() =>
+                                    props.toggleChapter_DeleteModal(
+                                        props.chapter
+                                    )
+                                }
+                            >
+                                <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                Delete
+                            </Dropdown.Item>
+                        ) : (
+                            ""
+                        )}
                     </Dropdown.Menu>
                 </Dropdown>
             </td>

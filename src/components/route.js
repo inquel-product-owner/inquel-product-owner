@@ -39,7 +39,6 @@ import HODGroupSubject from "./hod/group/subject";
 import HODGroupConfiguration from "./hod/group/configuration";
 import HODGroupDetails from "./hod/group/details";
 import HODGroupStudents from "./hod/group/student";
-import HODGroupStudentProfile from "./hod/group/studentProfile";
 import HODGroupTeachers from "./hod/group/teacher";
 
 import HODTeacherStudentList from "./hod/profileList";
@@ -135,9 +134,11 @@ import Favourites from "./student/group/favourites";
 import FavouritesFlashcard from "./student/flashcard/bookmarkFlashcard";
 import FlashCard from "./student/flashcard/learnFlashCard";
 
+import CycleTest from "./student/cycle/";
 import CycleDirectExam from "./student/cycle/directExam";
 import CycleAutoExam from "./student/cycle/autoExam";
 
+import SemesterExam from "./student/semester";
 import SemesterDirectExam from "./student/semester/directExam";
 import SemesterAutoExam from "./student/semester/autoExam";
 
@@ -402,7 +403,7 @@ const routes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <HODGroupStudentProfile {...props} />
+                    <HODStudentProfile {...props} />
                 )
             }
         />
@@ -1613,6 +1614,18 @@ const routes = (
 
         <Route
             exact
+            path="/dashboard/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <CycleTest {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/dashboard/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/auto"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -1665,6 +1678,18 @@ const routes = (
 
         {/* --------------- Semester exam --------------- */}
 
+        <Route
+            exact
+            path="/dashboard/subject/:subjectId/semester/:semesterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <SemesterExam {...props} />
+                )
+            }
+        />
         <Route
             exact
             path="/dashboard/subject/:subjectId/semester/:semesterId/auto"
@@ -1829,6 +1854,18 @@ const routes = (
         />
         <Route
             exact
+            path="/dashboard/subscription/:subscriptionId/course/:courseId/chapter/:chapterId/cycle/:cycleTestId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <CycleTest {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/dashboard/subscription/:subscriptionId/course/:courseId/chapter/:chapterId/cycle/:cycleTestId/auto"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -1872,6 +1909,18 @@ const routes = (
                     <Redirect to="/login" />
                 ) : (
                     <QuizLevelExam {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subscription/:subscriptionId/course/:courseId/semester/:semesterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <SemesterExam {...props} />
                 )
             }
         />
