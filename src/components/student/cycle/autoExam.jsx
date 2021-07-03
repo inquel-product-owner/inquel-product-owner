@@ -270,7 +270,7 @@ class CycleAutoExam extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
-                    errorMsg: "Something went wrong!",
+                    errorMsg: "Cannot submit test at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -283,6 +283,7 @@ class CycleAutoExam extends Component {
         await this.setState({
             currentSectionIndex: this.state.currentSectionIndex + 1,
         });
+        window.scrollTo(0, 0);
         window.MathJax.typeset();
     };
 
@@ -290,6 +291,7 @@ class CycleAutoExam extends Component {
         await this.setState({
             currentSectionIndex: this.state.currentSectionIndex - 1,
         });
+        window.scrollTo(0, 0);
         window.MathJax.typeset();
     };
 
@@ -581,142 +583,140 @@ class CycleAutoExam extends Component {
                                     }}
                                 ></div>
 
-                                <div className="row small">
-                                    {/* ----- MCQ ----- */}
-                                    {data.content.mcq === true ? (
-                                        (data.content.options || []).map(
-                                            (option, option_index) => {
-                                                return (
-                                                    <div
-                                                        className="col-md-6 mb-3"
-                                                        key={option_index}
-                                                    >
-                                                        <div
-                                                            className="card card-body secondary-bg shadow-sm small font-weight-bold-600 pt-3 pb-0"
-                                                            onClick={() =>
-                                                                this.handleMCQ(
-                                                                    option.content,
-                                                                    index,
-                                                                    data.content
-                                                                        .mcq_answers >
-                                                                        1
-                                                                        ? "checkbox"
-                                                                        : "radio"
-                                                                )
-                                                            }
-                                                        >
-                                                            {data.content
-                                                                .mcq_answers !==
-                                                            undefined ? (
-                                                                data.content
-                                                                    .mcq_answers >
-                                                                1 ? (
-                                                                    <div className="custom-control custom-checkbox">
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            className="custom-control-input"
-                                                                            id={`customCheck1${index}-${option_index}`}
-                                                                            value={
-                                                                                option.content
-                                                                            }
-                                                                            checked={
-                                                                                answerSection.length !==
-                                                                                0
-                                                                                    ? answerSection[
-                                                                                          index
-                                                                                      ]
-                                                                                          .answer
-                                                                                          .length !==
-                                                                                      0
-                                                                                        ? answerSection[
-                                                                                              index
-                                                                                          ].answer.includes(
-                                                                                              option.content
-                                                                                          )
-                                                                                            ? true
-                                                                                            : false
-                                                                                        : false
-                                                                                    : false
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) => {
-                                                                                this.handleEventChange(
-                                                                                    e,
-                                                                                    index
-                                                                                );
-                                                                            }}
-                                                                        />
-                                                                        <label
-                                                                            className="custom-control-label"
-                                                                            htmlFor={`customCheck1${index}-${option_index}`}
-                                                                            dangerouslySetInnerHTML={{
-                                                                                __html: `<div class="mb-3">${option.content}</div>`,
-                                                                            }}
-                                                                        ></label>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="custom-control custom-radio">
-                                                                        <input
-                                                                            type="radio"
-                                                                            id={`customRadio1${index}-${option_index}`}
-                                                                            name={`customRadio${index}`}
-                                                                            className="custom-control-input"
-                                                                            value={
-                                                                                option.content
-                                                                            }
-                                                                            checked={
-                                                                                answerSection.length !==
-                                                                                0
-                                                                                    ? answerSection[
-                                                                                          index
-                                                                                      ]
-                                                                                          .answer
-                                                                                          .length !==
-                                                                                      0
-                                                                                        ? answerSection[
-                                                                                              index
-                                                                                          ].answer.includes(
-                                                                                              option.content
-                                                                                          )
-                                                                                            ? true
-                                                                                            : false
-                                                                                        : false
-                                                                                    : false
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) => {}}
-                                                                        />
-                                                                        <label
-                                                                            className="custom-control-label"
-                                                                            htmlFor={`customRadio1${index}-${option_index}`}
-                                                                            dangerouslySetInnerHTML={{
-                                                                                __html: `<div class="mb-3">${option.content}</div>`,
-                                                                            }}
-                                                                        ></label>
-                                                                    </div>
-                                                                )
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                        )
-                                    ) : // ----- True or false -----
-                                    data.content.boolean === true ? (
-                                        (
-                                            data.content.boolean_question || []
-                                        ).map((option, boolean_index) => {
+                                {/* ----- MCQ ----- */}
+                                {data.content.mcq === true ? (
+                                    (data.content.options || []).map(
+                                        (option, option_index) => {
                                             return (
                                                 <div
-                                                    className="col-md-6 mb-3"
+                                                    className="form-group"
+                                                    key={option_index}
+                                                >
+                                                    <div
+                                                        className="card card-body shadow-sm small font-weight-bold-600 pt-3 pb-0"
+                                                        onClick={() =>
+                                                            this.handleMCQ(
+                                                                option.content,
+                                                                index,
+                                                                data.content
+                                                                    .mcq_answers >
+                                                                    1
+                                                                    ? "checkbox"
+                                                                    : "radio"
+                                                            )
+                                                        }
+                                                    >
+                                                        {data.content
+                                                            .mcq_answers !==
+                                                        undefined ? (
+                                                            data.content
+                                                                .mcq_answers >
+                                                            1 ? (
+                                                                <div className="custom-control custom-checkbox">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="custom-control-input"
+                                                                        id={`customCheck1${index}-${option_index}`}
+                                                                        value={
+                                                                            option.content
+                                                                        }
+                                                                        checked={
+                                                                            answerSection.length !==
+                                                                            0
+                                                                                ? answerSection[
+                                                                                      index
+                                                                                  ]
+                                                                                      .answer
+                                                                                      .length !==
+                                                                                  0
+                                                                                    ? answerSection[
+                                                                                          index
+                                                                                      ].answer.includes(
+                                                                                          option.content
+                                                                                      )
+                                                                                        ? true
+                                                                                        : false
+                                                                                    : false
+                                                                                : false
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            this.handleEventChange(
+                                                                                e,
+                                                                                index
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                    <label
+                                                                        className="custom-control-label"
+                                                                        htmlFor={`customCheck1${index}-${option_index}`}
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: `<div class="mb-3">${option.content}</div>`,
+                                                                        }}
+                                                                    ></label>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="custom-control custom-radio">
+                                                                    <input
+                                                                        type="radio"
+                                                                        id={`customRadio1${index}-${option_index}`}
+                                                                        name={`customRadio${index}`}
+                                                                        className="custom-control-input"
+                                                                        value={
+                                                                            option.content
+                                                                        }
+                                                                        checked={
+                                                                            answerSection.length !==
+                                                                            0
+                                                                                ? answerSection[
+                                                                                      index
+                                                                                  ]
+                                                                                      .answer
+                                                                                      .length !==
+                                                                                  0
+                                                                                    ? answerSection[
+                                                                                          index
+                                                                                      ].answer.includes(
+                                                                                          option.content
+                                                                                      )
+                                                                                        ? true
+                                                                                        : false
+                                                                                    : false
+                                                                                : false
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {}}
+                                                                    />
+                                                                    <label
+                                                                        className="custom-control-label"
+                                                                        htmlFor={`customRadio1${index}-${option_index}`}
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: `<div class="mb-3">${option.content}</div>`,
+                                                                        }}
+                                                                    ></label>
+                                                                </div>
+                                                            )
+                                                        ) : (
+                                                            ""
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                    )
+                                ) : // ----- True or false -----
+                                data.content.boolean === true ? (
+                                    (data.content.boolean_question || []).map(
+                                        (option, boolean_index) => {
+                                            return (
+                                                <div
+                                                    className="form-group"
                                                     key={boolean_index}
                                                 >
                                                     <div
-                                                        className="card card-body secondary-bg shadow-sm small font-weight-bold-600 p-3"
+                                                        className="card card-body shadow-sm small font-weight-bold-600 p-3"
                                                         onClick={() =>
                                                             this.handleBoolean(
                                                                 option.content,
@@ -766,9 +766,11 @@ class CycleAutoExam extends Component {
                                                     </div>
                                                 </div>
                                             );
-                                        })
-                                    ) : // ----- Fill in answers -----
-                                    data.content.fill_in === true ? (
+                                        }
+                                    )
+                                ) : // ----- Fill in answers -----
+                                data.content.fill_in === true ? (
+                                    <div className="row">
                                         <div
                                             className="col-md-6 mb-3"
                                             key={index}
@@ -798,8 +800,8 @@ class CycleAutoExam extends Component {
                                                 autoComplete="off"
                                             />
                                         </div>
-                                    ) : null}
-                                </div>
+                                    </div>
+                                ) : null}
 
                                 {/* ----- Multiple choice notes ----- */}
                                 {data.content.mcq_answers !== undefined ? (
@@ -921,6 +923,7 @@ class CycleAutoExam extends Component {
                                             )}
                                         </div>
                                     </div>
+
                                     {/* ---------- Sub question ---------- */}
                                     <div className="col-md-6">
                                         <div className="d-flex align-items-start justify-content">
@@ -970,7 +973,7 @@ class CycleAutoExam extends Component {
                                                           ) => {
                                                               return (
                                                                   <div
-                                                                      className="card shadow-sm mb-2 pinkrange-bg"
+                                                                      className="card shadow-sm mb-2"
                                                                       key={
                                                                           option_index
                                                                       }

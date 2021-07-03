@@ -370,12 +370,18 @@ class TestResult extends Component {
                                             );
                                         }
                                     )}
+
+                                    <small className="mt-2 text-muted">
+                                        <i className="fas fa-info-circle fa-sm mr-1"></i>{" "}
+                                        Click on the attempt sequence icon to
+                                        view the result
+                                    </small>
                                 </div>
                             </div>
                         </ErrorBoundary>
                     </div>
                 </div>
-                
+
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}
             </>
