@@ -72,6 +72,8 @@ class CycleTest extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.cycleTestId = this.props.match.params.cycleTestId;
@@ -92,7 +94,9 @@ class CycleTest extends Component {
 
     loadCycleTestData = () => {
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/?cycle_test_id=${this.cycleTestId}`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/cycletest/${this.cycleTestId}/`
+                : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/?cycle_test_id=${this.cycleTestId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -129,7 +133,9 @@ class CycleTest extends Component {
         });
 
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/start/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/cycletest/${this.cycleTestId}/auto/start/`
+                : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/start/`,
             {
                 method: "POST",
                 headers: this.headers,
