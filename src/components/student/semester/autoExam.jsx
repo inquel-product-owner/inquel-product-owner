@@ -16,6 +16,7 @@ const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
     semester_name: state.content.semester_name,
     examData: state.storage.examData,
+    course_name: state.content.course_name,
 });
 
 class SemesterAutoExam extends Component {
@@ -47,6 +48,8 @@ class SemesterAutoExam extends Component {
         this.startTimer = this.startTimer.bind(this);
         this.countDown = this.countDown.bind(this);
 
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.semesterId = this.props.match.params.semesterId;
         this.url = baseUrl + studentUrl;
@@ -110,7 +113,9 @@ class SemesterAutoExam extends Component {
     // loads sections and question data
     loadSemesterExamData = async () => {
         await fetch(
-            `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/semester/${this.semesterId}/auto/`
+                : `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -177,7 +182,9 @@ class SemesterAutoExam extends Component {
     // loads exam start and end time info
     loadExamInfo = () => {
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/start/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/semester/${this.semesterId}/auto/start/`
+                : `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/start/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -228,7 +235,9 @@ class SemesterAutoExam extends Component {
         clearInterval(this.timer);
 
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/semester/${this.semesterId}/auto/`
+                : `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/`,
             {
                 method: "POST",
                 headers: this.headers,
@@ -1175,7 +1184,11 @@ class SemesterAutoExam extends Component {
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.courseId
+                            ? this.props.course_name
+                            : this.props.subject_name
+                    }
                     chapter_name={this.props.semester_name}
                     goBack={this.props.history.goBack}
                 />

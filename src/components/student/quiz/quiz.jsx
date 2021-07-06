@@ -13,6 +13,7 @@ const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
     chapter_name: state.content.chapter_name,
     quiz_name: state.content.quiz_name,
+    course_name: state.content.course_name,
 });
 
 class Quiz extends Component {
@@ -32,6 +33,8 @@ class Quiz extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.quizId = this.props.match.params.quizId;
@@ -46,7 +49,9 @@ class Quiz extends Component {
 
     loadQuizData = () => {
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/quiz/`
+                : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -79,7 +84,7 @@ class Quiz extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.quiz_name} : Quiz - Student | IQLabs`;
+        document.title = `${this.props.quiz_name} - Student | IQLabs`;
 
         this.loadQuizData();
     };
@@ -90,7 +95,9 @@ class Quiz extends Component {
         });
 
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/quiz/`
+                : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/`,
             {
                 method: "POST",
                 headers: this.headers,
@@ -129,7 +136,11 @@ class Quiz extends Component {
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.courseId
+                            ? this.props.course_name
+                            : this.props.subject_name
+                    }
                     chapter_name={`${this.props.chapter_name} - ${
                         this.props.quiz_name || ""
                     }`}

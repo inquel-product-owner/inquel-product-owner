@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import Wrapper from "./wrapper";
 import { Tabs, Tab, OverlayTrigger, Tooltip, Dropdown } from "react-bootstrap";
 import courseimg from "../../assets/code.jpg";
@@ -12,6 +12,7 @@ import SubscriptionModal from "./subscriptionModal";
 import CourseTable from "../common/table/course";
 import { SingleContentDeleteModal } from "../common/modal/contentManagementModal";
 import { Link } from "react-router-dom";
+import DetailModal from "../common/modal/courseDetail";
 
 const Statistics = (props) => {
     return (
@@ -69,6 +70,9 @@ const Statistics = (props) => {
 };
 
 const CourseCard = (props) => {
+    const [showModal, toggleModal] = useState(false);
+    const [selectedData, setData] = useState("");
+
     const returnImage = (list) => {
         let URL = "";
         if (list.subscription_file_link) {
@@ -88,6 +92,15 @@ const CourseCard = (props) => {
 
     return (
         <>
+            {showModal ? (
+                <DetailModal
+                    show={showModal}
+                    onHide={() => toggleModal(false)}
+                    data={selectedData}
+                />
+            ) : (
+                ""
+            )}
             <div className="row mt-3">
                 {props.data.results && props.data.results.length !== 0
                     ? props.data.results.map((list, index) => {
@@ -106,46 +119,67 @@ const CourseCard = (props) => {
                                                   : list.title
                                           }
                                       />
-                                      <div className="card-body primary-bg text-white p-3">
-                                          <p className="mb-0">
+                                      <div className="card-body p-3">
+                                          <p
+                                              className="text-truncate font-weight-bold-600 mb-0"
+                                              style={{ fontSize: "15px" }}
+                                          >
                                               {list.course_name
                                                   ? list.course_name
                                                   : list.title}
                                           </p>
+
                                           {!props.course ? (
                                               <div className="mt-2">
-                                                  <div className="d-flex small mb-1">
-                                                      <span className="font-weight-bold bg-white primary-text rounded-pill small py-1 px-2 mr-1">
-                                                          ₹{" "}
+                                                  <p className="small mb-3">
+                                                      {list.description.substring(
+                                                          0,
+                                                          60
+                                                      )}
+                                                      ...
+                                                      <span
+                                                          className="primary-text font-weight-bold-600 ml-1"
+                                                          style={{
+                                                              cursor: "pointer",
+                                                          }}
+                                                          onClick={() => {
+                                                              toggleModal(true);
+                                                              setData(list);
+                                                          }}
+                                                      >
+                                                          More details
+                                                      </span>
+                                                  </p>
+                                                  <div className="d-flex align-items-center">
+                                                      <span className="font-weight-bold light-bg primary-text rounded-pill small py-1 px-2 mr-2">
+                                                          <i className="fas fa-rupee-sign fa-sm"></i>{" "}
                                                           {
                                                               list.discounted_price
                                                           }
                                                       </span>
-                                                      <span className="font-weight-bold bg-white primary-text rounded-pill small py-1 px-2">
-                                                          <i className="far fa-clock"></i>{" "}
-                                                          {`${list.duration_in_months} Months ${list.duration_in_days} Days`}
-                                                      </span>
-                                                  </div>
-                                                  <p
-                                                      className="small mb-0"
-                                                      title={list.description}
-                                                  >
-                                                      {list.description.substring(
-                                                          0,
-                                                          200
+                                                      {list.discounted_price <
+                                                      list.total_price ? (
+                                                          <span
+                                                              className="text-muted small"
+                                                              style={{
+                                                                  textDecoration:
+                                                                      "line-through",
+                                                              }}
+                                                          >
+                                                              <i className="fas fa-rupee-sign fa-sm"></i>{" "}
+                                                              {list.total_price}
+                                                          </span>
+                                                      ) : (
+                                                          ""
                                                       )}
-                                                      {list.description
-                                                          ? list.description
-                                                                .length > 200
-                                                              ? "..."
-                                                              : ""
-                                                          : ""}
-                                                  </p>
+                                                  </div>
                                               </div>
                                           ) : (
                                               ""
                                           )}
                                       </div>
+
+                                      {/* Dropdown */}
                                       <div
                                           className="text-right mt-2"
                                           style={{

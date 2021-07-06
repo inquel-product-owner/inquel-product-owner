@@ -600,28 +600,122 @@ class Subject extends Component {
         this.subjectId = this.props.match.params.subjectId;
     }
 
-    toggleCollapse = (index) => {
-        this.setState({
-            chapterEventKey: this.state.chapterEventKey !== index ? index : "",
-        });
+    componentDidMount = () => {
+        document.title = `${this.props.subject_name} - Student | IQLabs`;
+
+        this.loadSubjectData();
     };
 
-    toggleTopicCollapse = (key, chapter_index) => {
-        let topicEventKey = this.state.topicEventKey;
-        if (topicEventKey.length !== 0 && topicEventKey[chapter_index]) {
-            if (topicEventKey[chapter_index].includes(key)) {
-                topicEventKey[chapter_index].splice(
-                    topicEventKey[chapter_index].indexOf(key),
-                    1
-                );
-            } else {
-                topicEventKey[chapter_index].push(key);
-            }
-        }
+    // loads chapter, topic and semester data
+    loadSubjectData = () => {
+        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    let topics = [];
+                    let all_chapters = [];
+                    let semester_chapters = [];
+                    let topicKey = [];
+                    if (
+                        result.data.chapters &&
+                        Object.keys(result.data.chapters).length !== 0
+                    ) {
+                        for (let i = 0; i < result.data.chapters.length; i++) {
+                            // Extracting topics from the chapter_structure
+                            topics.push(
+                                this.loopTopicStructure(
+                                    result.data.chapters[i].topics
+                                )
+                            );
 
-        this.setState({
-            topicEventKey: topicEventKey,
-        });
+                            // function to load completed topic list from API
+                            this.loadTopicCompletedData(
+                                result.data.chapters[i].chapter_id,
+                                i
+                            );
+
+                            // Gets all chapter id from the chapters list
+                            all_chapters.push(
+                                result.data.chapters[i].chapter_id
+                            );
+
+                            // Topic event key
+                            topicKey.push([]);
+                            if (
+                                this.state.topicEventKey.length !== 0 &&
+                                this.state.topicEventKey[i] !== undefined
+                            ) {
+                                if (this.state.topicEventKey[i].length !== 0) {
+                                    topicKey[i] = this.state.topicEventKey[i];
+                                }
+                            }
+
+                            // call the cycle reduction api on loop
+                            for (
+                                let j = 0;
+                                j < result.data.chapters[i].cycle_tests.length;
+                                j++
+                            ) {
+                                this.handleCycleTestReduction(
+                                    result.data.chapters[i].chapter_id,
+                                    result.data.chapters[i].cycle_tests[j]
+                                        .cycle_test_id
+                                );
+                            }
+                        }
+                        for (let i = 0; i < result.data.semesters.length; i++) {
+                            // Gets all chapter id from the semester list
+                            for (
+                                let j = 0;
+                                j < result.data.semesters[i].chapters.length;
+                                j++
+                            ) {
+                                semester_chapters.push(
+                                    result.data.semesters[i].chapters[j]
+                                );
+                            }
+
+                            // call the semester reduction api on loop
+                            this.handleSemesterReduction(
+                                result.data.semesters[i].semester_id
+                            );
+                        }
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
+                    }
+
+                    // redux store dispatcher
+                    storeDispatch(RESPONSE, result.data);
+                    storeDispatch(TEMP, {});
+
+                    this.setState({
+                        subjectItems: result.data,
+                        topics: topics,
+                        all_chapters: all_chapters,
+                        semester_chapters: semester_chapters,
+                        topicEventKey: topicKey,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     // Loads topic completion data
@@ -721,103 +815,6 @@ class Subject extends Component {
             }
         });
         return result;
-    };
-
-    // loads chapter, topic and semester data
-    loadSubjectData = () => {
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    let topics = [];
-                    let all_chapters = [];
-                    let semester_chapters = [];
-                    let topicKey = [];
-                    if (
-                        result.data.chapters &&
-                        Object.keys(result.data.chapters).length !== 0
-                    ) {
-                        for (let i = 0; i < result.data.chapters.length; i++) {
-                            // Extracting topics from the chapter_structure
-                            topics.push(
-                                this.loopTopicStructure(
-                                    result.data.chapters[i].topics
-                                )
-                            );
-                            // function to load completed topic list from API
-                            this.loadTopicCompletedData(
-                                result.data.chapters[i].chapter_id,
-                                i
-                            );
-                            // Gets all chapter id from the chapters list
-                            all_chapters.push(
-                                result.data.chapters[i].chapter_id
-                            );
-                            // Topic event key
-                            topicKey.push([]);
-                            if (
-                                this.state.topicEventKey.length !== 0 &&
-                                this.state.topicEventKey[i] !== undefined
-                            ) {
-                                if (this.state.topicEventKey[i].length !== 0) {
-                                    topicKey[i] = this.state.topicEventKey[i];
-                                }
-                            }
-                        }
-                        for (let i = 0; i < result.data.semesters.length; i++) {
-                            // Gets all chapter id from the semester list
-                            for (
-                                let j = 0;
-                                j < result.data.semesters[i].chapters.length;
-                                j++
-                            ) {
-                                semester_chapters.push(
-                                    result.data.semesters[i].chapters[j]
-                                );
-                            }
-                        }
-                    } else {
-                        this.setState({
-                            page_loading: false,
-                        });
-                    }
-
-                    // redux store dispatcher
-                    storeDispatch(RESPONSE, result.data);
-                    storeDispatch(TEMP, {});
-
-                    this.setState({
-                        subjectItems: result.data,
-                        topics: topics,
-                        all_chapters: all_chapters,
-                        semester_chapters: semester_chapters,
-                        topicEventKey: topicKey,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
-            });
-    };
-
-    componentDidMount = () => {
-        document.title = `${this.props.subject_name} - Student | IQLabs`;
-
-        this.loadSubjectData();
     };
 
     // Topic completion toggle
@@ -1070,6 +1067,63 @@ class Subject extends Component {
                 </div>
             </div>
         );
+    };
+
+    // handle chapter and topic collapse
+    toggleCollapse = (index) => {
+        this.setState({
+            chapterEventKey: this.state.chapterEventKey !== index ? index : "",
+        });
+    };
+
+    toggleTopicCollapse = (key, chapter_index) => {
+        let topicEventKey = this.state.topicEventKey;
+        if (topicEventKey.length !== 0 && topicEventKey[chapter_index]) {
+            if (topicEventKey[chapter_index].includes(key)) {
+                topicEventKey[chapter_index].splice(
+                    topicEventKey[chapter_index].indexOf(key),
+                    1
+                );
+            } else {
+                topicEventKey[chapter_index].push(key);
+            }
+        }
+
+        this.setState({
+            topicEventKey: topicEventKey,
+        });
+    };
+
+    // Reduction API for cycle test
+    handleCycleTestReduction = (chapter_id, cycle_test_id) => {
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/chapter/${chapter_id}/cycletest/reduce/?cycle_test_id=${cycle_test_id}`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {})
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // Reduction API for semester
+    handleSemesterReduction = (semester_id) => {
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/semester/${semester_id}/reduce/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {})
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     render() {

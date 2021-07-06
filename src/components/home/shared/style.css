@@ -362,7 +362,7 @@
     .feature-dot-btn {
         width: 16px;
         height: 16px;
-        margin: 8px;
+        margin: 7px;
     }
     .feature-dot-btn > .feature-dot-btns {
         width: 8px;
@@ -383,7 +383,7 @@
         font-size: 13px;
     }
     .feature-dot-btn {
-        margin: 6px;
+        margin: 5px;
     }
 }
 

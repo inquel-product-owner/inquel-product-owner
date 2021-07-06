@@ -13,6 +13,7 @@ import ErrorFallback from "../common/ErrorFallback";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
+    course_name: state.content.course_name,
 });
 
 function remarksCondition(data) {
@@ -172,6 +173,8 @@ class TestResult extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -214,7 +217,9 @@ class TestResult extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.subject_name} : Test result - Student | IQLabs`;
+        document.title = `${
+            this.courseId ? this.props.course_name : this.props.subject_name
+        } : Test analysis - Student | IQLabs`;
 
         this.loadTestResultData();
     };
@@ -224,7 +229,11 @@ class TestResult extends Component {
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.courseId
+                            ? this.props.course_name
+                            : this.props.subject_name
+                    }
                     chapter_name=""
                     goBack={this.props.history.goBack}
                 />
