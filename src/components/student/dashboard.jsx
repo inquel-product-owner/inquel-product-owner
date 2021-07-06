@@ -265,6 +265,8 @@ class Dashboard extends Component {
     componentDidMount = () => {
         document.title = "Dashboard - Student | IQLabs";
 
+        window.scrollTo(0, 0);
+
         this.fetchGroup();
     };
 
@@ -328,125 +330,6 @@ class Dashboard extends Component {
                             <h3 className="primary-text mb-0">WELCOME BACK</h3>
                         </div>
                     </div>
-
-                    {/* Continue learning */}
-                    {/* <h6 className="primary-text mb-3">Continue learning</h6>
-                    <div className="row mb-4">
-                        <div className="col-md-2">
-                            <div
-                                className="card light-bg shadow-sm"
-                                style={{
-                                    cursor: "pointer",
-                                }}
-                            >
-                                <div className="card-body p-3">
-                                    <img
-                                        src={courseimg}
-                                        className="img-fluid rounded shadow-sm mb-2"
-                                        alt="Course"
-                                    />
-                                    <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                        Course
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-2">
-                            <div
-                                className="card light-bg shadow-sm"
-                                style={{
-                                    cursor: "pointer",
-                                }}
-                            >
-                                <div className="card-body p-3">
-                                    <img
-                                        src={courseimg}
-                                        className="img-fluid rounded shadow-sm mb-2"
-                                        alt="Course"
-                                    />
-                                    <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                        Course
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-2">
-                            <div
-                                className="card light-bg shadow-sm"
-                                style={{
-                                    cursor: "pointer",
-                                }}
-                            >
-                                <div className="card-body p-3">
-                                    <img
-                                        src={courseimg}
-                                        className="img-fluid rounded shadow-sm mb-2"
-                                        alt="Course"
-                                    />
-                                    <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                        Course
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-2">
-                            <div
-                                className="card light-bg shadow-sm"
-                                style={{
-                                    cursor: "pointer",
-                                }}
-                            >
-                                <div className="card-body p-3">
-                                    <img
-                                        src={courseimg}
-                                        className="img-fluid rounded shadow-sm mb-2"
-                                        alt="Course"
-                                    />
-                                    <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                        Course
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-2">
-                            <div
-                                className="card light-bg shadow-sm"
-                                style={{
-                                    cursor: "pointer",
-                                }}
-                            >
-                                <div className="card-body p-3">
-                                    <img
-                                        src={courseimg}
-                                        className="img-fluid rounded shadow-sm mb-2"
-                                        alt="Course"
-                                    />
-                                    <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                        Course
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-2">
-                            <div
-                                className="card light-bg shadow-sm"
-                                style={{
-                                    cursor: "pointer",
-                                }}
-                            >
-                                <div className="card-body p-3">
-                                    <img
-                                        src={courseimg}
-                                        className="img-fluid rounded shadow-sm mb-2"
-                                        alt="Course"
-                                    />
-                                    <p className="primary-text font-weight-bold-600 text-center mb-0">
-                                        Course
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
 
                     {/* Courses */}
                     <Courses />

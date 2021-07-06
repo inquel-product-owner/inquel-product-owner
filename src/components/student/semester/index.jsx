@@ -9,6 +9,7 @@ import { Modal } from "react-bootstrap";
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
     semester_name: state.content.semester_name,
+    course_name: state.content.course_name,
 });
 
 function InstructionModal(props) {
@@ -71,6 +72,8 @@ class SemesterExam extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.semesterId = this.props.match.params.semesterId;
         this.url = baseUrl + studentUrl;
@@ -90,7 +93,9 @@ class SemesterExam extends Component {
 
     loadSemesterExamData = () => {
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/semester/${this.semesterId}/`
+                : `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -127,7 +132,9 @@ class SemesterExam extends Component {
         });
 
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/start/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/semester/${this.semesterId}/auto/start/`
+                : `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/start/`,
             {
                 method: "POST",
                 headers: this.headers,
@@ -160,7 +167,11 @@ class SemesterExam extends Component {
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.courseId
+                            ? this.props.course_name
+                            : this.props.subject_name
+                    }
                     chapter_name=""
                     goBack={this.props.history.goBack}
                 />

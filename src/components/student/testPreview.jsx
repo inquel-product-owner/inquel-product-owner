@@ -14,6 +14,7 @@ import ErrorFallback from "../common/ErrorFallback";
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
     temp: state.storage.temp,
+    course_name: state.content.course_name,
 });
 
 const ExplanationModal = (props) => {
@@ -110,6 +111,7 @@ class TestPreview extends Component {
             totalSubQuestion: [],
             currentSubQuestionIndex: [],
             totalQuestion: 0,
+            section_marks: [],
 
             selectedImageData: [],
             startIndex: 0,
@@ -120,6 +122,8 @@ class TestPreview extends Component {
             numPages: null,
             pageNumber: 1,
         };
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.cycleTestId = this.props.match.params.cycleTestId;
         this.semesterId = this.props.match.params.semesterId;
@@ -139,6 +143,7 @@ class TestPreview extends Component {
         let totalSubQuestion = [];
         let currentSubQuestionIndex = [];
         let totalQuestion = 0;
+        let section_marks = [];
         this.props.temp.data.forEach((data) => {
             if (
                 data.cycle_test_id === this.cycleTestId ||
@@ -149,6 +154,7 @@ class TestPreview extends Component {
                     questions = [];
                     let total = [];
                     let current = [];
+                    let temp_section_marks = 0;
 
                     // question looping
                     for (let i = 0; i < section.questions.length; i++) {
@@ -157,6 +163,7 @@ class TestPreview extends Component {
                         let videoTitle = "";
                         let videoPath = "";
                         totalQuestion++;
+                        temp_section_marks += section.questions[i].marks;
 
                         // type one
                         if (section.questions[i].sub_question === undefined) {
@@ -420,9 +427,11 @@ class TestPreview extends Component {
                             });
                         }
                     }
+
                     totalSubQuestion.push(total);
                     currentSubQuestionIndex.push(current);
                     sections.push(questions);
+                    section_marks.push(temp_section_marks);
                 });
             }
         });
@@ -432,6 +441,7 @@ class TestPreview extends Component {
             currentSubQuestionIndex: currentSubQuestionIndex,
             totalSection: sections.length,
             totalQuestion: totalQuestion,
+            section_marks: section_marks,
         });
         window.MathJax.typeset();
     };
@@ -589,7 +599,11 @@ class TestPreview extends Component {
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.courseId
+                            ? this.props.course_name
+                            : this.props.subject_name
+                    }
                     chapter_name={
                         this.props.temp.cycle_test_name ||
                         this.props.temp.semester_name
@@ -757,73 +771,119 @@ class TestPreview extends Component {
                                     {/* ----- Header Info ----- */}
                                     <div className="card card-body primary-bg text-white shadow-sm py-3 mb-3">
                                         <div className="row align-items-center">
-                                            <div className="col-md-5 font-weight-bold-600">
+                                            <div className="col-md-2 font-weight-bold-600">
                                                 Exam Details
                                             </div>
-                                            <div className="col-md-7 small font-weight-bold-600">
-                                                <div className="row align-items-center justify-content-end">
-                                                    <div className="col-md-3">
-                                                        Total questions:{" "}
-                                                        {this.state
-                                                            .totalQuestion <= 8
-                                                            ? `0${this.state.totalQuestion}`
-                                                            : this.state
-                                                                  .totalQuestion}
-                                                    </div>
-                                                    <div className="col-md-3">
-                                                        Scored marks:{" "}
-                                                        {this.props.temp.data[0]
-                                                            .student_scored_marks <=
-                                                        8
-                                                            ? `0${this.props.temp.data[0].student_scored_marks}`
-                                                            : this.props.temp
-                                                                  .data[0]
-                                                                  .student_scored_marks}
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        Submitted On:{" "}
-                                                        {dateFormat(
+                                            <div className="col-md-2 small">
+                                                Total questions:{" "}
+                                                {this.state.totalQuestion <= 9
+                                                    ? `0${this.state.totalQuestion}`
+                                                    : this.state.totalQuestion}
+                                            </div>
+                                            <div className="col-md-2 small">
+                                                Scored marks:{" "}
+                                                {this.props.temp.data[0]
+                                                    .student_scored_marks <= 9
+                                                    ? `0${this.props.temp.data[0].student_scored_marks}`
+                                                    : this.props.temp.data[0]
+                                                          .student_scored_marks}
+                                                /
+                                                {this.props.temp.data[0]
+                                                    .total_marks <= 9
+                                                    ? `0${this.props.temp.data[0].total_marks}`
+                                                    : this.props.temp.data[0]
+                                                          .total_marks}
+                                            </div>
+                                            <div className="col-md-2 small">
+                                                Percentage:{" "}
+                                                {
+                                                    this.props.temp.data[0]
+                                                        .student_percentage
+                                                }
+                                                %
+                                            </div>
+                                            <div className="col-md-3 small">
+                                                Submitted On:{" "}
+                                                {dateFormat(
+                                                    this.props.temp.submit_time,
+                                                    "dd-mm-yyyy"
+                                                )}
+                                            </div>
+                                            <div className="col-md-1 small font-weight-bold-600">
+                                                <div
+                                                    className="text-center rounded py-2"
+                                                    style={{
+                                                        backgroundColor:
                                                             this.props.temp
-                                                                .submit_time,
-                                                            "dd-mm-yyyy"
-                                                        )}
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <div
-                                                            className="text-center rounded py-2"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    this.props
-                                                                        .temp
-                                                                        .data[0]
-                                                                        .color,
-                                                                textTransform:
-                                                                    "capitalize",
-                                                            }}
-                                                        >
-                                                            {
-                                                                this.props.temp
-                                                                    .data[0]
-                                                                    .remarks
-                                                            }
-                                                        </div>
-                                                    </div>
+                                                                .data[0].color,
+                                                        textTransform:
+                                                            "capitalize",
+                                                    }}
+                                                >
+                                                    {
+                                                        this.props.temp.data[0]
+                                                            .remarks
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* <div className="d-flex justify-content-center mb-3">
-                                        <div className="primary-bg text-white font-weight-bold-600 rounded-lg px-3 py-1">
-                                            {
-                                                this.props.temp.data[0]
-                                                    .sections[
-                                                    this.state
-                                                        .currentSectionIndex
-                                                ].section_description
-                                            }
+                                    {/* section details */}
+                                    <div className="row justify-content-center mb-3">
+                                        <div className="col-md-4 secondary-bg primary-text rounded-lg px-3 py-2">
+                                            <div className="row align-items-center">
+                                                <div className="col-md-6 font-weight-bold-600">
+                                                    {
+                                                        this.props.temp.data[0]
+                                                            .sections[
+                                                            this.state
+                                                                .currentSectionIndex
+                                                        ].section_description
+                                                    }
+                                                </div>
+                                                <div className="col-md-6 small font-weight-bold-600">
+                                                    Scored marks:{" "}
+                                                    {this.state.section_marks[
+                                                        this.state
+                                                            .currentSectionIndex
+                                                    ] <= 9
+                                                        ? `0${
+                                                              this.state
+                                                                  .section_marks[
+                                                                  this.state
+                                                                      .currentSectionIndex
+                                                              ]
+                                                          }`
+                                                        : this.state
+                                                              .section_marks[
+                                                              this.state
+                                                                  .currentSectionIndex
+                                                          ]}
+                                                    /
+                                                    {this.props.temp.data[0]
+                                                        .sections[
+                                                        this.state
+                                                            .currentSectionIndex
+                                                    ].section_total_marks <= 9
+                                                        ? `0${
+                                                              this.props.temp
+                                                                  .data[0]
+                                                                  .sections[
+                                                                  this.state
+                                                                      .currentSectionIndex
+                                                              ]
+                                                                  .section_total_marks
+                                                          }`
+                                                        : this.props.temp
+                                                              .data[0].sections[
+                                                              this.state
+                                                                  .currentSectionIndex
+                                                          ].section_total_marks}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div> */}
+                                    </div>
 
                                     {(data || []).map((question, q_index) => {
                                         return question.type === "type_1" ? (

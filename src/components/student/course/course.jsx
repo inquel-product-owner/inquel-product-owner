@@ -992,22 +992,48 @@ class Course extends Component {
                     let topics = [];
                     let chapterEventKey = [];
                     let topicEventKey = [];
+
+                    // unit loop
                     if (result.data.units && result.data.units.length !== 0) {
-                        result.data.units.forEach((data, unit_index) => {
+                        result.data.units.forEach((data) => {
                             let temp = [];
                             let temp_topics = [];
+
+                            // chapter loop
                             if (data.chapters && data.chapters.length !== 0) {
-                                data.chapters.forEach(
-                                    (chapter, chapter_index) => {
-                                        temp.push([]);
-                                        // Extracting topics from the chapter_structure
-                                        temp_topics.push(
-                                            this.loopTopicStructure(
-                                                chapter.topics
-                                            )
-                                        );
+                                data.chapters.forEach((chapter) => {
+                                    // topic event key
+                                    temp.push([]);
+
+                                    // Extracting topics from the chapter_structure
+                                    temp_topics.push(
+                                        this.loopTopicStructure(chapter.topics)
+                                    );
+
+                                    // call the cycle reduction api on loop
+                                    if (
+                                        chapter.cycle_tests &&
+                                        chapter.cycle_tests.length !== 0
+                                    ) {
+                                        // cycle loop
+                                        chapter.cycle_tests.forEach((cycle) => {
+                                            this.handleCycleTestReduction(
+                                                chapter.chapter_id,
+                                                cycle.cycle_test_id
+                                            );
+                                        });
                                     }
-                                );
+                                });
+                            }
+
+                            // semester loop
+                            if (data.semesters && data.semesters.length !== 0) {
+                                data.semesters.forEach((semester) => {
+                                    // call the semester reduction api on loop
+                                    this.handleSemesterReduction(
+                                        semester.semester_id
+                                    );
+                                });
                             }
                             chapterEventKey.push([]);
                             topicEventKey.push(temp);
@@ -1020,7 +1046,6 @@ class Course extends Component {
                             data: result.data,
                             chapterEventKey: chapterEventKey,
                             topicEventKey: topicEventKey,
-                            page_loading: false,
                             topics: topics,
                         },
                         () => {
@@ -1113,7 +1138,6 @@ class Course extends Component {
                                                 all_topics_completed,
                                             topics_remarks: topics_remarks,
                                             chapter_remarks: chapter_remarks,
-                                            page_loading: false,
                                         },
                                         () => {
                                             this.handleTopicStatus(result.data);
@@ -1166,6 +1190,7 @@ class Course extends Component {
 
         this.setState({
             topics: topics,
+            page_loading: false,
         });
     };
 
@@ -1326,6 +1351,7 @@ class Course extends Component {
             });
     };
 
+    // handle chapter and topic collapse
     toggleChapterCollapse = (key, unit_index) => {
         let chapterEventKey = this.state.chapterEventKey;
         if (chapterEventKey.length !== 0 && chapterEventKey[unit_index]) {
@@ -1364,6 +1390,38 @@ class Course extends Component {
         this.setState({
             topicEventKey: topicEventKey,
         });
+    };
+
+    // Reduction API for cycle test
+    handleCycleTestReduction = (chapter_id, cycle_test_id) => {
+        fetch(
+            `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${chapter_id}/cycletest/${cycle_test_id}/reduce/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {})
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // Reduction API for semester
+    handleSemesterReduction = (semester_id) => {
+        fetch(
+            `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/semester/${semester_id}/reduce/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {})
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     render() {

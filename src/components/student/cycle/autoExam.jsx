@@ -17,6 +17,7 @@ const mapStateToProps = (state) => ({
     chapter_name: state.content.chapter_name,
     cycle_name: state.content.cycle_name,
     examData: state.storage.examData,
+    course_name: state.content.course_name,
 });
 
 class CycleAutoExam extends Component {
@@ -1186,7 +1187,11 @@ class CycleAutoExam extends Component {
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.courseId
+                            ? this.props.course_name
+                            : this.props.subject_name
+                    }
                     chapter_name={`${this.props.chapter_name} - ${this.props.cycle_name}`}
                     goBack={this.props.history.goBack}
                 />

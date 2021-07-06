@@ -10,6 +10,7 @@ const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
     chapter_name: state.content.chapter_name,
     cycle_name: state.content.cycle_name,
+    course_name: state.content.course_name,
 });
 
 function InstructionModal(props) {
@@ -171,7 +172,11 @@ class CycleTest extends Component {
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.courseId
+                            ? this.props.course_name
+                            : this.props.subject_name
+                    }
                     chapter_name={this.props.chapter_name}
                     goBack={this.props.history.goBack}
                 />

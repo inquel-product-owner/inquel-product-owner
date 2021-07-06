@@ -20,6 +20,7 @@ const mapStateToProps = (state) => ({
     chapter_name: state.content.chapter_name,
     quiz_name: state.content.quiz_name,
     temp: state.storage.temp,
+    course_name: state.content.course_name,
 });
 
 class QuizCountDown extends Component {
@@ -257,6 +258,9 @@ class QuizLevelExam extends Component {
             isPlaying: false,
             iv: "",
         };
+
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.quizId = this.props.match.params.quizId;
@@ -366,7 +370,9 @@ class QuizLevelExam extends Component {
 
     loadQuestionData = () => {
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/?level_complexity=${this.state.level.complexity}&level_id=${this.levelId}`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/?level_complexity=${this.state.level.complexity}&level_id=${this.levelId}`
+                : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/?level_complexity=${this.state.level.complexity}&level_id=${this.levelId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -661,10 +667,11 @@ class QuizLevelExam extends Component {
                     this.state.total_points > 0 ? this.state.total_points : 0,
             };
             let response = this.handleEncrypt(JSON.stringify(body));
-            console.log(body);
 
             fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
+                this.courseId
+                    ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`
+                    : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
                 {
                     method: "POST",
                     headers: this.headers,
@@ -1546,7 +1553,7 @@ class QuizLevelExam extends Component {
     render() {
         document.title = `${
             this.state.level.level_name || ""
-        } : Quiz - Student | IQLabs`;
+        } - Student | IQLabs`;
 
         const data = this.state.question;
         const index = this.state.currentQuestion;
@@ -1558,7 +1565,11 @@ class QuizLevelExam extends Component {
             <>
                 {/* ----- Navbar ----- */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.courseId
+                            ? this.props.course_name
+                            : this.props.subject_name
+                    }
                     chapter_name={`${this.props.chapter_name} - ${
                         this.props.quiz_name
                     } - ${this.state.level.level_name || ""}`}

@@ -25,7 +25,7 @@ class HODSettings extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            page_loading: false, // change it to false after integration
+            page_loading: false,
         };
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
