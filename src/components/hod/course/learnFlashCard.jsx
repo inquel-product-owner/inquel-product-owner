@@ -2136,26 +2136,31 @@ class HODCourseFlashCard extends Component {
 
     toggleTab = (type) => {
         clearInterval(this.slideInterval);
-        this.setState({
-            activeTab: type,
-            activeData: 0,
-            totalItems: "",
-            concepts: [],
-            currentSubQuestionIndex: [],
-            explanation: [],
-            practice: [],
-            sections: [],
-            totalSubQuestion: [],
-            page_loading: true,
-            isSlideshowPlaying: false,
-        });
-        if (type === "concept") {
-            this.loadConceptData();
-        } else if (type === "practice") {
-            this.loadPracticeData();
-        } else if (type === "match") {
-            this.loadMatchData();
-        }
+        this.setState(
+            {
+                activeTab: type,
+                activeData: 0,
+                totalItems: "",
+                concepts: [],
+                practice: [],
+                match: [],
+                currentSubQuestionIndex: [],
+                explanation: [],
+                sections: [],
+                totalSubQuestion: [],
+                page_loading: true,
+                isSlideshowPlaying: false,
+            },
+            () => {
+                if (type === "concept") {
+                    this.loadConceptData();
+                } else if (type === "practice") {
+                    this.loadPracticeData();
+                } else if (type === "match") {
+                    this.loadMatchData();
+                }
+            }
+        );
     };
 
     // ---------- Image & Video ----------

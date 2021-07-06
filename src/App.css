@@ -1080,3 +1080,30 @@ legend {
     opacity: 1;
     transform: translateX(0);
 }
+
+/* -=-=-=-=-= Settings page =-=-=-=-=- */
+
+.settings {
+    background-color: #f7f7f7 !important;
+}
+
+.settings-tab {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 4px;
+    border-radius: 3px;
+    border-left: 2px solid #f7f7f7;
+}
+
+.settings-tab:hover,
+.settings-tab.active {
+    background-color: white;
+    color: var(--primary);
+    border-left: 2px solid var(--primary);
+}
+
+.settings-tab:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}

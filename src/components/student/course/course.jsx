@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import Wrapper from "../wrapper";
-import { Card, Accordion, Modal, Dropdown } from "react-bootstrap";
+import {
+    Card,
+    Accordion,
+    Modal,
+    Dropdown,
+    OverlayTrigger,
+    Tooltip,
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { batch, connect } from "react-redux";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl";
@@ -21,6 +28,24 @@ import {
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
 });
+
+function Lock() {
+    return (
+        <OverlayTrigger
+            key="top"
+            placement="top"
+            overlay={
+                <Tooltip id="tooltip">
+                    Complete the topics to unlock cycle test
+                </Tooltip>
+            }
+        >
+            <button className="btn btn-sm primary-text shadow-none">
+                <i className="fas fa-lock"></i>
+            </button>
+        </OverlayTrigger>
+    );
+}
 
 const CourseDetail = (props) => {
     return (
@@ -147,29 +172,106 @@ const UnitListRender = (props) => {
                                                         key={semester_index}
                                                     >
                                                         <div className="row align-items-center">
-                                                            <div className="col-6">
+                                                            <div className="col-5">
                                                                 <p className="small font-weight-bold-600 mb-0">
                                                                     {
                                                                         semester.semester_name
                                                                     }
                                                                 </p>
                                                             </div>
-                                                            <div className="col-6 text-right">
-                                                                <Link
-                                                                    to={`${props.match.url}/semester/${semester.semester_id}`}
-                                                                >
-                                                                    <button
-                                                                        className="btn btn-primary btn-sm shadow-none"
-                                                                        onClick={() => {
-                                                                            storeDispatch(
-                                                                                SEMESTER,
-                                                                                semester.semester_name
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </Link>
+                                                            <div className="col-7 small font-weight-bold-600">
+                                                                <div className="row align-items-center">
+                                                                    <div className="col-2"></div>
+                                                                    <div className="col-2"></div>
+                                                                    <div className="col-2"></div>
+                                                                    <div className="col-2">
+                                                                        {semester.remarks &&
+                                                                        semester.color ? (
+                                                                            <div
+                                                                                className="text-white text-center p-2 rounded"
+                                                                                style={{
+                                                                                    backgroundColor:
+                                                                                        semester.color,
+                                                                                    textTransform:
+                                                                                        "capitalize",
+                                                                                }}
+                                                                            >
+                                                                                {
+                                                                                    semester.remarks
+                                                                                }
+                                                                            </div>
+                                                                        ) : (
+                                                                            ""
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="col-2"></div>
+                                                                    <div className="col-2 text-right">
+                                                                        {semester.chapters_completed ===
+                                                                        true ? (
+                                                                            // Check if semester exam is created or not
+                                                                            semester.direct_question ===
+                                                                                false &&
+                                                                            semester.auto_test_question ===
+                                                                                false ? (
+                                                                                // if not then display the error message in tooltip
+                                                                                <OverlayTrigger
+                                                                                    key="top"
+                                                                                    placement="top"
+                                                                                    overlay={
+                                                                                        <Tooltip id="tooltip">
+                                                                                            Semester
+                                                                                            exam
+                                                                                            is
+                                                                                            not
+                                                                                            created
+                                                                                            yet
+                                                                                        </Tooltip>
+                                                                                    }
+                                                                                >
+                                                                                    <button className="btn btn-sm primary-text">
+                                                                                        <i className="fas fa-lock"></i>
+                                                                                    </button>
+                                                                                </OverlayTrigger>
+                                                                            ) : // if exist, then redirect them to appropriate cycle test
+                                                                            semester.direct_question ===
+                                                                              true ? (
+                                                                                <Link
+                                                                                    to={`${props.match.url}/semester/${semester.semester_id}/direct`}
+                                                                                >
+                                                                                    <button
+                                                                                        className="btn btn-primary btn-sm shadow-none"
+                                                                                        onClick={() => {
+                                                                                            storeDispatch(
+                                                                                                SEMESTER,
+                                                                                                semester.semester_name
+                                                                                            );
+                                                                                        }}
+                                                                                    >
+                                                                                        View
+                                                                                    </button>
+                                                                                </Link>
+                                                                            ) : (
+                                                                                <Link
+                                                                                    to={`${props.match.url}/semester/${semester.semester_id}`}
+                                                                                >
+                                                                                    <button
+                                                                                        className="btn btn-primary btn-sm shadow-none"
+                                                                                        onClick={() => {
+                                                                                            storeDispatch(
+                                                                                                SEMESTER,
+                                                                                                semester.semester_name
+                                                                                            );
+                                                                                        }}
+                                                                                    >
+                                                                                        View
+                                                                                    </button>
+                                                                                </Link>
+                                                                            )
+                                                                        ) : (
+                                                                            <Lock />
+                                                                        )}
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -351,9 +453,96 @@ const ChapterListRender = (props) => {
                                     </button>
                                 )}
                             </div>
+                            <div className="col-2">
+                                {props.chapter_remarks[props.unit_index] ? (
+                                    props.chapter_remarks[props.unit_index][
+                                        props.chapter_index
+                                    ] ? (
+                                        props.chapter_remarks[props.unit_index][
+                                            props.chapter_index
+                                        ][props.chapter.chapter_id] ? (
+                                            props.chapter_remarks[
+                                                props.unit_index
+                                            ][props.chapter_index][
+                                                props.chapter.chapter_id
+                                            ].remarks ? (
+                                                <div
+                                                    className="text-white text-center p-2 rounded"
+                                                    style={{
+                                                        backgroundColor:
+                                                            props
+                                                                .chapter_remarks[
+                                                                props.unit_index
+                                                            ][
+                                                                props
+                                                                    .chapter_index
+                                                            ][
+                                                                props.chapter
+                                                                    .chapter_id
+                                                            ].color,
+                                                        textTransform:
+                                                            "capitalize",
+                                                    }}
+                                                >
+                                                    {
+                                                        props.chapter_remarks[
+                                                            props.unit_index
+                                                        ][props.chapter_index][
+                                                            props.chapter
+                                                                .chapter_id
+                                                        ].remarks
+                                                    }
+                                                </div>
+                                            ) : (
+                                                ""
+                                            )
+                                        ) : null
+                                    ) : null
+                                ) : null}
+                            </div>
                             <div className="col-2"></div>
-                            <div className="col-2"></div>
-                            <div className="col-2"></div>
+                            <div className="col-2 text-right">
+                                <button
+                                    className={`btn btn-sm shadow-none ${
+                                        props.topics.length !== 0 &&
+                                        props.topics_completed.length !== 0
+                                            ? props.topics_completed.length ===
+                                              props.data.units.length
+                                                ? props.topics[
+                                                      props.unit_index
+                                                  ][props.chapter_index] &&
+                                                  props.topics_completed[
+                                                      props.unit_index
+                                                  ][props.chapter_index]
+                                                    ? props.topics[
+                                                          props.unit_index
+                                                      ][props.chapter_index]
+                                                          .length ===
+                                                      props.topics_completed[
+                                                          props.unit_index
+                                                      ][props.chapter_index]
+                                                          .length
+                                                        ? "text-success"
+                                                        : "text-muted"
+                                                    : "text-muted"
+                                                : "text-muted"
+                                            : "text-muted"
+                                    }`}
+                                    style={{
+                                        fontSize: "18px",
+                                    }}
+                                    onClick={(event) => {
+                                        props.handleAllTopicCompletion(
+                                            props.unit_index,
+                                            props.chapter_index,
+                                            props.chapter.chapter_id
+                                        );
+                                        event.stopPropagation();
+                                    }}
+                                >
+                                    <i className="fas fa-check-circle"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -390,35 +579,140 @@ const ChapterListRender = (props) => {
                                           key={cycle_index}
                                       >
                                           <div className="row align-items-center">
-                                              <div className="col-6">
+                                              <div className="col-5">
                                                   <p className="small font-weight-bold-600 mb-0">
                                                       {cycle.cycle_test_name}
                                                   </p>
                                               </div>
-                                              <div className="col-6 text-right">
-                                                  <Link
-                                                      to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}`}
-                                                  >
-                                                      <button
-                                                          className="btn btn-primary btn-sm shadow-none"
-                                                          onClick={() => {
-                                                              batch(() => {
-                                                                  storeDispatch(
-                                                                      CHAPTER,
-                                                                      props
-                                                                          .chapter
-                                                                          .chapter_name
-                                                                  );
-                                                                  storeDispatch(
-                                                                      CYCLE,
-                                                                      cycle.cycle_test_name
-                                                                  );
-                                                              });
-                                                          }}
-                                                      >
-                                                          View
-                                                      </button>
-                                                  </Link>
+                                              <div className="col-7 small font-weight-bold-600">
+                                                  <div className="row align-items-center">
+                                                      <div className="col-2"></div>
+                                                      <div className="col-2"></div>
+                                                      <div className="col-2"></div>
+                                                      <div className="col-2">
+                                                          {cycle.remarks &&
+                                                          cycle.color ? (
+                                                              <div
+                                                                  className="text-white text-center p-2 rounded"
+                                                                  style={{
+                                                                      backgroundColor:
+                                                                          cycle.color,
+                                                                      textTransform:
+                                                                          "capitalize",
+                                                                  }}
+                                                              >
+                                                                  {
+                                                                      cycle.remarks
+                                                                  }
+                                                              </div>
+                                                          ) : (
+                                                              ""
+                                                          )}
+                                                      </div>
+                                                      <div className="col-2"></div>
+                                                      <div className="col-2 text-right">
+                                                          {props
+                                                              .all_topics_completed[
+                                                              props.unit_index
+                                                          ] ? (
+                                                              // Check if all the topics are completed
+                                                              props
+                                                                  .all_topics_completed[
+                                                                  props
+                                                                      .unit_index
+                                                              ][
+                                                                  props
+                                                                      .chapter_index
+                                                              ] === true ? (
+                                                                  // Check if cycle test is created or not
+                                                                  cycle.direct_question ===
+                                                                      false &&
+                                                                  cycle.auto_test_question ===
+                                                                      false ? (
+                                                                      // if not then display the error message in tooltip
+                                                                      <OverlayTrigger
+                                                                          key="top"
+                                                                          placement="top"
+                                                                          overlay={
+                                                                              <Tooltip id="tooltip">
+                                                                                  Cycle
+                                                                                  test
+                                                                                  is
+                                                                                  not
+                                                                                  created
+                                                                                  yet
+                                                                              </Tooltip>
+                                                                          }
+                                                                      >
+                                                                          <button className="btn btn-sm primary-text shadow-none">
+                                                                              <i className="fas fa-lock"></i>
+                                                                          </button>
+                                                                      </OverlayTrigger>
+                                                                  ) : // if exist, then redirect them to appropriate cycle test
+                                                                  cycle.direct_question ===
+                                                                    true ? (
+                                                                      <Link
+                                                                          to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}/direct`}
+                                                                      >
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm shadow-none"
+                                                                              onClick={() => {
+                                                                                  batch(
+                                                                                      () => {
+                                                                                          storeDispatch(
+                                                                                              CHAPTER,
+                                                                                              props
+                                                                                                  .chapter
+                                                                                                  .chapter_name
+                                                                                          );
+                                                                                          storeDispatch(
+                                                                                              CYCLE,
+                                                                                              cycle.cycle_test_name
+                                                                                          );
+                                                                                      }
+                                                                                  );
+                                                                              }}
+                                                                          >
+                                                                              View
+                                                                          </button>
+                                                                      </Link>
+                                                                  ) : (
+                                                                      <Link
+                                                                          to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}`}
+                                                                      >
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm shadow-none"
+                                                                              onClick={() => {
+                                                                                  batch(
+                                                                                      () => {
+                                                                                          storeDispatch(
+                                                                                              CHAPTER,
+                                                                                              props
+                                                                                                  .chapter
+                                                                                                  .chapter_name
+                                                                                          );
+                                                                                          storeDispatch(
+                                                                                              CYCLE,
+                                                                                              cycle.cycle_test_name
+                                                                                          );
+                                                                                      }
+                                                                                  );
+                                                                              }}
+                                                                          >
+                                                                              View
+                                                                          </button>
+                                                                      </Link>
+                                                                  )
+                                                              ) : (
+                                                                  // if not then display the error message in tooltip
+                                                                  <Lock />
+                                                              )
+                                                          ) : (
+                                                              // if not then display the error message in tooltip
+                                                              <Lock />
+                                                          )}
+                                                      </div>
+                                                  </div>
                                               </div>
                                           </div>
                                       </div>
@@ -571,32 +865,29 @@ const TopicListRender = (props) => {
                                     {props.topics.topic_num}
                                 </div>
                                 <div className="w-100">
-                                    <Link
-                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.topic_num}/learn`}
+                                    <button
+                                        className="btn btn-light btn-sm shadow-none"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            props.handleCheckup(
+                                                props.chapter.chapter_id,
+                                                props.topics.topic_num
+                                            );
+                                            batch(() => {
+                                                storeDispatch(
+                                                    CHAPTER,
+                                                    props.chapter.chapter_name
+                                                );
+                                                storeDispatch(
+                                                    TOPIC,
+                                                    props.topics.topic_name
+                                                );
+                                            });
+                                        }}
                                     >
-                                        <button
-                                            className="btn btn-light btn-sm shadow-none"
-                                            onClick={() => {
-                                                batch(() => {
-                                                    batch(() => {
-                                                        storeDispatch(
-                                                            CHAPTER,
-                                                            props.chapter
-                                                                .chapter_name
-                                                        );
-                                                        storeDispatch(
-                                                            TOPIC,
-                                                            props.topics
-                                                                .topic_name
-                                                        );
-                                                    });
-                                                });
-                                            }}
-                                        >
-                                            {props.topics.topic_name}
-                                            <i className="fas fa-external-link-alt fa-xs ml-2"></i>
-                                        </button>
-                                    </Link>
+                                        {props.topics.topic_name}
+                                        <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -607,7 +898,53 @@ const TopicListRender = (props) => {
                             <div className="col-2"></div>
                             <div className="col-2"></div>
                             <div className="col-2"></div>
-                            <div className="col-2"></div>
+                            <div className="col-2">
+                                {props.topics_remarks[props.unit_index] ? (
+                                    props.topics_remarks[props.unit_index][
+                                        props.chapter_index
+                                    ] ? (
+                                        props.topics_remarks[props.unit_index][
+                                            props.chapter_index
+                                        ][props.topics.topic_num] ? (
+                                            props.topics_remarks[
+                                                props.unit_index
+                                            ][props.chapter_index][
+                                                props.topics.topic_num
+                                            ].remarks ? (
+                                                <div
+                                                    className="text-white text-center p-2 rounded"
+                                                    style={{
+                                                        backgroundColor:
+                                                            props
+                                                                .topics_remarks[
+                                                                props.unit_index
+                                                            ][
+                                                                props
+                                                                    .chapter_index
+                                                            ][
+                                                                props.topics
+                                                                    .topic_num
+                                                            ].color,
+                                                        textTransform:
+                                                            "capitalize",
+                                                    }}
+                                                >
+                                                    {
+                                                        props.topics_remarks[
+                                                            props.unit_index
+                                                        ][props.chapter_index][
+                                                            props.topics
+                                                                .topic_num
+                                                        ].remarks
+                                                    }
+                                                </div>
+                                            ) : (
+                                                ""
+                                            )
+                                        ) : null
+                                    ) : null
+                                ) : null}
+                            </div>
                             <div className="col-2">
                                 {props.topics.next_topic ? (
                                     <Link
@@ -642,7 +979,47 @@ const TopicListRender = (props) => {
                                     ""
                                 )}
                             </div>
-                            <div className="col-2"></div>
+                            <div className="col-2 text-right">
+                                <button
+                                    className={`btn btn-sm shadow-none ${
+                                        props.topics_completed[props.unit_index]
+                                            ? props.topics_completed[
+                                                  props.unit_index
+                                              ][props.chapter_index]
+                                                ? props.topics_completed[
+                                                      props.unit_index
+                                                  ][props.chapter_index]
+                                                    ? props.topics_completed[
+                                                          props.unit_index
+                                                      ][
+                                                          props.chapter_index
+                                                      ].includes(
+                                                          props.topics.topic_num
+                                                      )
+                                                        ? "text-success"
+                                                        : "text-muted"
+                                                    : "text-muted"
+                                                : "text-muted"
+                                            : "text-muted"
+                                    }`}
+                                    style={{
+                                        fontSize: "18px",
+                                    }}
+                                    onClick={(event) => {
+                                        props.handleTopicCompletion(
+                                            props.topics.topic_num,
+                                            props.topics.topic_name,
+                                            props.unit_index,
+                                            props.chapter_index,
+                                            props.chapter.chapter_id
+                                        );
+
+                                        event.stopPropagation();
+                                    }}
+                                >
+                                    <i className="fas fa-check-circle"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -669,6 +1046,12 @@ class Course extends Component {
             data: {},
             chapterEventKey: [],
             topicEventKey: [],
+
+            topics: [],
+            topics_completed: [],
+            topics_remarks: [],
+            chapter_remarks: [],
+            all_topics_completed: [],
 
             errorMsg: "",
             successMsg: "",
@@ -704,27 +1087,45 @@ class Course extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    let topics = [];
                     let chapterEventKey = [];
                     let topicEventKey = [];
                     if (result.data.units && result.data.units.length !== 0) {
-                        result.data.units.forEach((data) => {
+                        result.data.units.forEach((data, unit_index) => {
                             let temp = [];
+                            let temp_topics = [];
                             if (data.chapters && data.chapters.length !== 0) {
-                                data.chapters.forEach(() => {
-                                    temp.push([]);
-                                });
+                                data.chapters.forEach(
+                                    (chapter, chapter_index) => {
+                                        temp.push([]);
+                                        // Extracting topics from the chapter_structure
+                                        temp_topics.push(
+                                            this.loopTopicStructure(
+                                                chapter.topics
+                                            )
+                                        );
+                                    }
+                                );
                             }
                             chapterEventKey.push([]);
                             topicEventKey.push(temp);
+                            topics.push(temp_topics);
                         });
                     }
 
-                    this.setState({
-                        data: result.data,
-                        chapterEventKey: chapterEventKey,
-                        topicEventKey: topicEventKey,
-                        page_loading: false,
-                    });
+                    this.setState(
+                        {
+                            data: result.data,
+                            chapterEventKey: chapterEventKey,
+                            topicEventKey: topicEventKey,
+                            page_loading: false,
+                            topics: topics,
+                        },
+                        () => {
+                            // function to load completed topic list from API
+                            this.loadTopicCompletedData();
+                        }
+                    );
 
                     // redux store dispatcher
                     batch(() => {
@@ -743,6 +1144,280 @@ class Course extends Component {
                 console.log(err);
                 this.setState({
                     errorMsg: "Cannot show chapter structure at the moment!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+    };
+
+    // Loads topic completion data
+    loadTopicCompletedData = () => {
+        let topics_completed = [];
+        let all_topics_completed = [];
+        let topics_remarks = [];
+        let chapter_remarks = [];
+
+        if (this.state.data.units && this.state.data.units.length !== 0) {
+            // unit loop
+            this.state.data.units.forEach((data, unit_index) => {
+                topics_completed.push([]);
+                all_topics_completed.push([]);
+                topics_remarks.push([]);
+                chapter_remarks.push([]);
+
+                if (data.chapters && data.chapters.length !== 0) {
+                    // chapter loop
+                    data.chapters.forEach((chapter, chapter_index) => {
+                        fetch(
+                            `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${chapter.chapter_id}/topics/`,
+                            {
+                                method: "GET",
+                                headers: this.headers,
+                            }
+                        )
+                            .then((res) => res.json())
+                            .then((result) => {
+                                if (result.sts === true) {
+                                    topics_completed[unit_index][
+                                        chapter_index
+                                    ] = result.data.topics_completed
+                                        ? Array.isArray(
+                                              result.data.topics_completed
+                                          )
+                                            ? result.data.topics_completed
+                                            : []
+                                        : [];
+
+                                    all_topics_completed[unit_index][
+                                        chapter_index
+                                    ] = result.data.all_topics_completed
+                                        ? result.data.all_topics_completed
+                                        : "";
+
+                                    topics_remarks[unit_index][chapter_index] =
+                                        result.data.topics_remarks
+                                            ? result.data.topics_remarks
+                                            : "";
+
+                                    chapter_remarks[unit_index][chapter_index] =
+                                        result.data.chapter_remarks
+                                            ? result.data.chapter_remarks
+                                            : "";
+
+                                    this.setState(
+                                        {
+                                            topics_completed: topics_completed,
+                                            all_topics_completed:
+                                                all_topics_completed,
+                                            topics_remarks: topics_remarks,
+                                            chapter_remarks: chapter_remarks,
+                                            page_loading: false,
+                                        },
+                                        () => {
+                                            this.handleTopicStatus(result.data);
+                                        }
+                                    );
+                                } else {
+                                    this.setState({
+                                        errorMsg: result.msg,
+                                        showErrorAlert: true,
+                                        page_loading: false,
+                                    });
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                                this.setState({
+                                    errorMsg: "Something went wrong!",
+                                    showErrorAlert: true,
+                                    page_loading: false,
+                                });
+                            });
+                    });
+                }
+            });
+        }
+    };
+
+    // Updating the completed topics data in topics state
+    handleTopicStatus = (data) => {
+        let topics = [...this.state.topics];
+        let topics_completed = [...this.state.topics_completed];
+
+        if (data && Object.keys(data).length !== 0) {
+            for (let i = 0; i < topics.length; i++) {
+                for (let j = 0; j < topics[i].length; j++) {
+                    for (let k = 0; k < topics[i][j].length; k++) {
+                        if (topics_completed[i][j]) {
+                            if (
+                                topics_completed[i][j].includes(
+                                    topics[i][j][k].topic_num
+                                )
+                            ) {
+                                topics[i][j][k].isCompleted = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        this.setState({
+            topics: topics,
+        });
+    };
+
+    // Flatten the chapter_structure array of objects
+    loopTopicStructure = (array) => {
+        var result = [];
+        array.forEach((a) => {
+            result.push({
+                topic_num: a.topic_num,
+                topic_name: a.topic_name,
+                isCompleted: false,
+            });
+            if (Array.isArray(a.child)) {
+                result = result.concat(this.loopTopicStructure(a.child));
+            }
+        });
+        return result;
+    };
+
+    // handle content checkup
+    handleCheckup = (chapter_id, topic_num) => {
+        this.setState({
+            page_loading: true,
+        });
+        fetch(
+            `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${chapter_id}/${topic_num}/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    if (
+                        result.data.concepts_exists === true ||
+                        result.data.mcq_exists === true ||
+                        result.data.type_two_exists === true ||
+                        result.data.match_exists === true
+                    ) {
+                        this.props.history.push(
+                            `${this.props.match.url}/chapter/${chapter_id}/${topic_num}/learn`
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: "Content not available",
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+    };
+
+    // Topic completion toggle
+    handleTopicCompletion = (
+        topic_num,
+        topic_name,
+        unit_index,
+        chapter_index,
+        chapter_id
+    ) => {
+        let topics = [...this.state.topics];
+        let temp = {};
+
+        for (let i = 0; i < topics[unit_index][chapter_index].length; i++) {
+            if (
+                topics[unit_index][chapter_index][i].topic_num === topic_num &&
+                topics[unit_index][chapter_index][i].topic_name === topic_name
+            ) {
+                topics[unit_index][chapter_index][i].isCompleted =
+                    !topics[unit_index][chapter_index][i].isCompleted;
+            }
+            temp[topics[unit_index][chapter_index][i].topic_num] =
+                topics[unit_index][chapter_index][i].isCompleted;
+        }
+
+        this.handleTopicCompletionSubmit(temp, chapter_id);
+    };
+
+    // All topic completion toggle
+    handleAllTopicCompletion = (unit_index, chapter_index, chapter_id) => {
+        let topics = [...this.state.topics];
+        let topics_completed = [...this.state.topics_completed];
+        let temp = {};
+
+        for (let i = 0; i < topics[unit_index][chapter_index].length; i++) {
+            if (
+                topics[unit_index][chapter_index].length ===
+                topics_completed[unit_index][chapter_index].length
+            ) {
+                topics[unit_index][chapter_index][i].isCompleted = false;
+            } else {
+                topics[unit_index][chapter_index][i].isCompleted = true;
+            }
+            temp[topics[unit_index][chapter_index][i].topic_num] =
+                topics[unit_index][chapter_index][i].isCompleted;
+        }
+
+        this.handleTopicCompletionSubmit(temp, chapter_id);
+    };
+
+    // Submit topic completion
+    handleTopicCompletionSubmit = (data, chapter_id) => {
+        this.setState({
+            page_loading: true,
+        });
+
+        fetch(
+            `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${chapter_id}/topics/`,
+            {
+                method: "POST",
+                headers: this.headers,
+                body: JSON.stringify({ topic_num: data }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState(
+                        {
+                            successMsg: "Topic completion updated",
+                            showSuccessAlert: true,
+                        },
+                        () => {
+                            this.loadCourseData();
+                        }
+                    );
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
                     showErrorAlert: true,
                     page_loading: false,
                 });
@@ -1043,7 +1718,17 @@ class Course extends Component {
                             {course_data &&
                             Object.keys(course_data).length !== 0 ? (
                                 <UnitListRender
+                                    {...this.props}
                                     data={course_data}
+                                    topics={this.state.topics}
+                                    topics_completed={
+                                        this.state.topics_completed
+                                    }
+                                    all_topics_completed={
+                                        this.state.all_topics_completed
+                                    }
+                                    topics_remarks={this.state.topics_remarks}
+                                    chapter_remarks={this.state.chapter_remarks}
                                     chapterEventKey={this.state.chapterEventKey}
                                     topicEventKey={this.state.topicEventKey}
                                     toggleChapterCollapse={
@@ -1052,7 +1737,13 @@ class Course extends Component {
                                     toggleTopicCollapse={
                                         this.toggleTopicCollapse
                                     }
-                                    {...this.props}
+                                    handleAllTopicCompletion={
+                                        this.handleAllTopicCompletion
+                                    }
+                                    handleTopicCompletion={
+                                        this.handleTopicCompletion
+                                    }
+                                    handleCheckup={this.handleCheckup}
                                 />
                             ) : null}
                         </div>
