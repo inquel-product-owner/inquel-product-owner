@@ -48,6 +48,8 @@ class CycleAutoExam extends Component {
         this.startTimer = this.startTimer.bind(this);
         this.countDown = this.countDown.bind(this);
 
+        this.subscriptionId = this.props.match.params.subscriptionId;
+        this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.cycleTestId = this.props.match.params.cycleTestId;
@@ -112,7 +114,9 @@ class CycleAutoExam extends Component {
     // loads sections and question data
     loadCycleTestData = async () => {
         await fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/?cycle_test_id=${this.cycleTestId}`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/cycletest/${this.cycleTestId}/auto/`
+                : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/?cycle_test_id=${this.cycleTestId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -179,7 +183,9 @@ class CycleAutoExam extends Component {
     // loads exam start and end time info
     loadExamInfo = () => {
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/start/?cycle_test_id=${this.cycleTestId}`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/cycletest/${this.cycleTestId}/auto/start/`
+                : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/start/?cycle_test_id=${this.cycleTestId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -230,7 +236,9 @@ class CycleAutoExam extends Component {
         clearInterval(this.timer);
 
         fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/`,
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/cycletest/${this.cycleTestId}/auto/`
+                : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/`,
             {
                 method: "POST",
                 headers: this.headers,

@@ -208,65 +208,21 @@ const UnitListRender = (props) => {
                                                                     <div className="col-2 text-right">
                                                                         {semester.chapters_completed ===
                                                                         true ? (
-                                                                            // Check if semester exam is created or not
-                                                                            semester.direct_question ===
-                                                                                false &&
-                                                                            semester.auto_test_question ===
-                                                                                false ? (
-                                                                                // if not then display the error message in tooltip
-                                                                                <OverlayTrigger
-                                                                                    key="top"
-                                                                                    placement="top"
-                                                                                    overlay={
-                                                                                        <Tooltip id="tooltip">
-                                                                                            Semester
-                                                                                            exam
-                                                                                            is
-                                                                                            not
-                                                                                            created
-                                                                                            yet
-                                                                                        </Tooltip>
-                                                                                    }
+                                                                            <Link
+                                                                                to={`${props.match.url}/semester/${semester.semester_id}`}
+                                                                            >
+                                                                                <button
+                                                                                    className="btn btn-primary btn-sm shadow-none"
+                                                                                    onClick={() => {
+                                                                                        storeDispatch(
+                                                                                            SEMESTER,
+                                                                                            semester.semester_name
+                                                                                        );
+                                                                                    }}
                                                                                 >
-                                                                                    <button className="btn btn-sm primary-text">
-                                                                                        <i className="fas fa-lock"></i>
-                                                                                    </button>
-                                                                                </OverlayTrigger>
-                                                                            ) : // if exist, then redirect them to appropriate cycle test
-                                                                            semester.direct_question ===
-                                                                              true ? (
-                                                                                <Link
-                                                                                    to={`${props.match.url}/semester/${semester.semester_id}/direct`}
-                                                                                >
-                                                                                    <button
-                                                                                        className="btn btn-primary btn-sm shadow-none"
-                                                                                        onClick={() => {
-                                                                                            storeDispatch(
-                                                                                                SEMESTER,
-                                                                                                semester.semester_name
-                                                                                            );
-                                                                                        }}
-                                                                                    >
-                                                                                        View
-                                                                                    </button>
-                                                                                </Link>
-                                                                            ) : (
-                                                                                <Link
-                                                                                    to={`${props.match.url}/semester/${semester.semester_id}`}
-                                                                                >
-                                                                                    <button
-                                                                                        className="btn btn-primary btn-sm shadow-none"
-                                                                                        onClick={() => {
-                                                                                            storeDispatch(
-                                                                                                SEMESTER,
-                                                                                                semester.semester_name
-                                                                                            );
-                                                                                        }}
-                                                                                    >
-                                                                                        View
-                                                                                    </button>
-                                                                                </Link>
-                                                                            )
+                                                                                    View
+                                                                                </button>
+                                                                            </Link>
                                                                         ) : (
                                                                             <Lock />
                                                                         )}
@@ -624,85 +580,31 @@ const ChapterListRender = (props) => {
                                                                   props
                                                                       .chapter_index
                                                               ] === true ? (
-                                                                  // Check if cycle test is created or not
-                                                                  cycle.direct_question ===
-                                                                      false &&
-                                                                  cycle.auto_test_question ===
-                                                                      false ? (
-                                                                      // if not then display the error message in tooltip
-                                                                      <OverlayTrigger
-                                                                          key="top"
-                                                                          placement="top"
-                                                                          overlay={
-                                                                              <Tooltip id="tooltip">
-                                                                                  Cycle
-                                                                                  test
-                                                                                  is
-                                                                                  not
-                                                                                  created
-                                                                                  yet
-                                                                              </Tooltip>
-                                                                          }
+                                                                  <Link
+                                                                      to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}`}
+                                                                  >
+                                                                      <button
+                                                                          className="btn btn-primary btn-sm shadow-none"
+                                                                          onClick={() => {
+                                                                              batch(
+                                                                                  () => {
+                                                                                      storeDispatch(
+                                                                                          CHAPTER,
+                                                                                          props
+                                                                                              .chapter
+                                                                                              .chapter_name
+                                                                                      );
+                                                                                      storeDispatch(
+                                                                                          CYCLE,
+                                                                                          cycle.cycle_test_name
+                                                                                      );
+                                                                                  }
+                                                                              );
+                                                                          }}
                                                                       >
-                                                                          <button className="btn btn-sm primary-text shadow-none">
-                                                                              <i className="fas fa-lock"></i>
-                                                                          </button>
-                                                                      </OverlayTrigger>
-                                                                  ) : // if exist, then redirect them to appropriate cycle test
-                                                                  cycle.direct_question ===
-                                                                    true ? (
-                                                                      <Link
-                                                                          to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}/direct`}
-                                                                      >
-                                                                          <button
-                                                                              className="btn btn-primary btn-sm shadow-none"
-                                                                              onClick={() => {
-                                                                                  batch(
-                                                                                      () => {
-                                                                                          storeDispatch(
-                                                                                              CHAPTER,
-                                                                                              props
-                                                                                                  .chapter
-                                                                                                  .chapter_name
-                                                                                          );
-                                                                                          storeDispatch(
-                                                                                              CYCLE,
-                                                                                              cycle.cycle_test_name
-                                                                                          );
-                                                                                      }
-                                                                                  );
-                                                                              }}
-                                                                          >
-                                                                              View
-                                                                          </button>
-                                                                      </Link>
-                                                                  ) : (
-                                                                      <Link
-                                                                          to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}`}
-                                                                      >
-                                                                          <button
-                                                                              className="btn btn-primary btn-sm shadow-none"
-                                                                              onClick={() => {
-                                                                                  batch(
-                                                                                      () => {
-                                                                                          storeDispatch(
-                                                                                              CHAPTER,
-                                                                                              props
-                                                                                                  .chapter
-                                                                                                  .chapter_name
-                                                                                          );
-                                                                                          storeDispatch(
-                                                                                              CYCLE,
-                                                                                              cycle.cycle_test_name
-                                                                                          );
-                                                                                      }
-                                                                                  );
-                                                                              }}
-                                                                          >
-                                                                              View
-                                                                          </button>
-                                                                      </Link>
-                                                                  )
+                                                                          View
+                                                                      </button>
+                                                                  </Link>
                                                               ) : (
                                                                   // if not then display the error message in tooltip
                                                                   <Lock />

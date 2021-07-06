@@ -580,7 +580,7 @@ const GroupSection = (props) => {
         setData(value);
     };
 
-    return props.data && props.data.length !== 0 ? (
+    return (
         <>
             {/* Delete Modal */}
             {showModal ? (
@@ -780,7 +780,7 @@ const GroupSection = (props) => {
                 )}
             </div>
         </>
-    ) : null;
+    );
 };
 
 const SubjectSection = (props) => {
@@ -811,7 +811,7 @@ const SubjectSection = (props) => {
         setData(value);
     };
 
-    return props.data && props.data.length !== 0 ? (
+    return (
         <>
             {/* Create modal */}
             {showModal && type === "ADD" ? (
@@ -914,7 +914,7 @@ const SubjectSection = (props) => {
                 </div>
             </div>
         </>
-    ) : null;
+    );
 };
 
 const CourseSection = (props) => {
@@ -962,7 +962,7 @@ const CourseSection = (props) => {
         props.loadData();
     };
 
-    return props.data && props.data.length !== 0 ? (
+    return (
         <>
             {/* Delete Modal */}
             {showModal && type === "DELETE" ? (
@@ -1164,7 +1164,7 @@ const CourseSection = (props) => {
                 )}
             </div>
         </>
-    ) : null;
+    );
 };
 
 class HODDashboard extends Component {
