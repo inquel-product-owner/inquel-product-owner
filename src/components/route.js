@@ -33,6 +33,7 @@ import AdminMasterData from "./admin/masterData";
 import HODLogin from "./hod/login";
 import HODDashboard from "./hod/dashboard";
 import HODProfile from "./hod/profile";
+import HODSettings from "./hod/settings/settings";
 
 import HODGroup from "./hod/group/group";
 import HODGroupSubject from "./hod/group/subject";
@@ -820,6 +821,18 @@ const routes = (
                     <Redirect to="/hod/login" />
                 ) : (
                     <HODProfile {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/settings"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSettings {...props} />
                 )
             }
         />

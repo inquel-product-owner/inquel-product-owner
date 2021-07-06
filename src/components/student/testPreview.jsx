@@ -168,103 +168,88 @@ class TestPreview extends Component {
                                 section.questions[i].files.length !== 0
                             ) {
                                 // image
-                                if (
-                                    section.questions[i].files[0].type1_image_1
-                                ) {
+                                if (section.questions[i].files.type1_image_1) {
                                     images.push({
-                                        title: section.questions[i].files[0]
+                                        title: section.questions[i].files
                                             .type1_image_1_title,
                                         file_name: "",
                                         image: null,
-                                        path: section.questions[i].files[0]
+                                        path: section.questions[i].files
                                             .type1_image_1,
                                     });
                                 }
-                                if (
-                                    section.questions[i].files[0].type1_image_2
-                                ) {
+                                if (section.questions[i].files.type1_image_2) {
                                     images.push({
-                                        title: section.questions[i].files[0]
+                                        title: section.questions[i].files
                                             .type1_image_2_title,
                                         file_name: "",
                                         image: null,
-                                        path: section.questions[i].files[0]
+                                        path: section.questions[i].files
                                             .type1_image_2,
                                     });
                                 }
-                                if (
-                                    section.questions[i].files[0].type1_image_3
-                                ) {
+                                if (section.questions[i].files.type1_image_3) {
                                     images.push({
-                                        title: section.questions[i].files[0]
+                                        title: section.questions[i].files
                                             .type1_image_3_title,
                                         file_name: "",
                                         image: null,
-                                        path: section.questions[i].files[0]
+                                        path: section.questions[i].files
                                             .type1_image_3,
                                     });
                                 }
-                                if (
-                                    section.questions[i].files[0].type1_image_4
-                                ) {
+                                if (section.questions[i].files.type1_image_4) {
                                     images.push({
-                                        title: section.questions[i].files[0]
+                                        title: section.questions[i].files
                                             .type1_image_4_title,
                                         file_name: "",
                                         image: null,
-                                        path: section.questions[i].files[0]
+                                        path: section.questions[i].files
                                             .type1_image_4,
                                     });
                                 }
 
                                 // audio
-                                if (
-                                    section.questions[i].files[0].type1_audio_1
-                                ) {
+                                if (section.questions[i].files.type1_audio_1) {
                                     audio.push({
-                                        title: section.questions[i].files[0]
+                                        title: section.questions[i].files
                                             .type1_audio_1_title,
                                         file_name: "",
                                         audio: null,
-                                        path: section.questions[i].files[0]
+                                        path: section.questions[i].files
                                             .type1_audio_1,
                                     });
                                 }
-                                if (
-                                    section.questions[i].files[0].type1_audio_2
-                                ) {
+                                if (section.questions[i].files.type1_audio_2) {
                                     audio.push({
-                                        title: section.questions[i].files[0]
+                                        title: section.questions[i].files
                                             .type1_audio_2_title,
                                         file_name: "",
                                         audio: null,
-                                        path: section.questions[i].files[0]
+                                        path: section.questions[i].files
                                             .type1_audio_2,
                                     });
                                 }
 
                                 // video
                                 if (
-                                    section.questions[i].files[0]
-                                        .paste_video_url
+                                    section.questions[i].files.paste_video_url
                                 ) {
                                     videoPath =
-                                        section.questions[i].files[0]
+                                        section.questions[i].files
                                             .paste_video_url;
                                 }
-                                if (
-                                    section.questions[i].files[0].type1_video_1
-                                ) {
+                                if (section.questions[i].files.type1_video_1) {
                                     videoPath =
-                                        section.questions[i].files[0]
+                                        section.questions[i].files
                                             .type1_video_1;
                                 }
                                 if (
-                                    section.questions[i].files[0]
+                                    section.questions[i].files
                                         .type1_video_1_title
                                 ) {
                                     videoTitle =
-                                        section.questions[i].files[0]
+                                        section.questions[i].files
                                             .type1_video_1_title;
                                 }
                             }

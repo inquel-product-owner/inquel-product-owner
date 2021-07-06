@@ -45,6 +45,14 @@ class FlashCard extends Component {
             isFlipped: false,
             showVideoModal: false,
             showNotesModal: false,
+
+            checkup: {
+                concepts_exists: false,
+                match_exists: false,
+                mcq_exists: false,
+                type_two_exists: false,
+            },
+
             concepts: [],
             practice: [],
             match: [],
@@ -92,6 +100,90 @@ class FlashCard extends Component {
         };
         this.slideInterval = 0;
     }
+
+    // ---------- loads subject information ----------
+
+    componentDidMount = () => {
+        document.title = `${this.props.topic_name} : learn - Student | IQLabs`;
+        this.setState({
+            practice: [],
+            concepts: [],
+            match: [],
+        });
+
+        let apiURL = this.courseId
+            ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/`
+            : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/checkup/?topic_num=${this.topicNum}`;
+
+        // checkup API
+        fetch(apiURL, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    let checkup = this.state.checkup;
+                    checkup.concepts_exists = result.data.concepts_exists;
+                    checkup.mcq_exists = result.data.mcq_exists;
+                    checkup.type_two_exists = result.data.type_two_exists;
+                    checkup.match_exists = result.data.match_exists;
+
+                    this.setState(
+                        {
+                            checkup: checkup,
+                        },
+                        () => {
+                            if (this.state.checkup.concepts_exists) {
+                                this.setState({
+                                    activeTab: "concept",
+                                });
+                                this.loadConceptData();
+                            } else if (
+                                this.state.checkup.mcq_exists ||
+                                this.state.checkup.type_two_exists
+                            ) {
+                                this.setState({
+                                    activeTab: "practice",
+                                });
+                                this.loadPracticeData();
+                            } else if (this.state.checkup.match_exists) {
+                                this.setState({
+                                    activeTab: "match",
+                                });
+                                this.loadMatchData();
+                            } else {
+                                this.setState({
+                                    errorMsg: "Content not available",
+                                    showErrorAlert: true,
+                                    page_loading: false,
+                                });
+                            }
+                        }
+                    );
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+
+        document.addEventListener("keydown", this.handleKeys);
+    };
+
+    componentWillUnmount = () => {
+        document.removeEventListener("keydown", this.handleKeys);
+    };
 
     // ---------- loads concepts data ----------
 
@@ -172,19 +264,40 @@ class FlashCard extends Component {
                 </p>
                 <div className="row justify-content-center w-100">
                     <div className="col-lg-3 col-md-6">
-                        <button
-                            className="btn btn-primary btn-block shadow-none"
-                            onClick={() => {
-                                this.setState({
-                                    activeTab: "practice",
-                                    activeData: 0,
-                                    page_loading: true,
-                                });
-                                this.loadPracticeData();
-                            }}
-                        >
-                            Try Practice Mode
-                        </button>
+                        {this.state.checkup.mcq_exists ||
+                        this.state.checkup.type_two_exists ? (
+                            <button
+                                className="btn btn-primary btn-block shadow-none"
+                                onClick={() => {
+                                    this.setState({
+                                        practice: [],
+                                        activeTab: "practice",
+                                        activeData: 0,
+                                        page_loading: true,
+                                    });
+                                    this.loadPracticeData();
+                                }}
+                            >
+                                Try Practice Mode
+                            </button>
+                        ) : this.state.checkup.match_exists ? (
+                            <button
+                                className="btn btn-primary btn-block shadow-none"
+                                onClick={() => {
+                                    this.setState({
+                                        match: [],
+                                        activeTab: "match",
+                                        activeData: 0,
+                                        page_loading: true,
+                                    });
+                                    this.loadMatchData();
+                                }}
+                            >
+                                Try Match Mode
+                            </button>
+                        ) : (
+                            ""
+                        )}
 
                         <button
                             className="btn btn-link btn-block shadow-none"
@@ -636,19 +749,39 @@ class FlashCard extends Component {
                 <p className="mb-4">You just completed all the Practices</p>
                 <div className="row justify-content-center w-100">
                     <div className="col-lg-3 col-md-6">
-                        <button
-                            className="btn btn-primary btn-block shadow-none"
-                            onClick={() => {
-                                this.setState({
-                                    activeTab: "match",
-                                    activeData: 0,
-                                    page_loading: true,
-                                });
-                                this.loadMatchData();
-                            }}
-                        >
-                            Try Match Mode
-                        </button>
+                        {this.state.checkup.match_exists ? (
+                            <button
+                                className="btn btn-primary btn-block shadow-none"
+                                onClick={() => {
+                                    this.setState({
+                                        match: [],
+                                        activeTab: "match",
+                                        activeData: 0,
+                                        page_loading: true,
+                                    });
+                                    this.loadMatchData();
+                                }}
+                            >
+                                Try Match Mode
+                            </button>
+                        ) : this.state.checkup.concepts_exists ? (
+                            <button
+                                className="btn btn-primary btn-block shadow-none"
+                                onClick={() => {
+                                    this.setState({
+                                        concepts: [],
+                                        activeTab: "concept",
+                                        activeData: 0,
+                                        page_loading: true,
+                                    });
+                                    this.loadConceptData();
+                                }}
+                            >
+                                Try Concept Mode
+                            </button>
+                        ) : (
+                            ""
+                        )}
 
                         <button
                             className="btn btn-link btn-block shadow-none"
@@ -2099,24 +2232,6 @@ class FlashCard extends Component {
         );
     };
 
-    // ---------- loads subject information ----------
-
-    componentDidMount = () => {
-        document.title = `${this.props.topic_name} : learn - Student | IQLabs`;
-
-        this.loadConceptData();
-        this.setState({
-            practice: [],
-            concepts: [],
-        });
-
-        document.addEventListener("keydown", this.handleKeys);
-    };
-
-    componentWillUnmount = () => {
-        document.removeEventListener("keydown", this.handleKeys);
-    };
-
     // ---------- Navigation ----------
 
     handleKeys = (event) => {
@@ -2191,26 +2306,31 @@ class FlashCard extends Component {
 
     toggleTab = (type) => {
         clearInterval(this.slideInterval);
-        this.setState({
-            activeTab: type,
-            activeData: 0,
-            totalItems: "",
-            concepts: [],
-            currentSubQuestionIndex: [],
-            explanation: [],
-            practice: [],
-            sections: [],
-            totalSubQuestion: [],
-            page_loading: true,
-            isSlideshowPlaying: false,
-        });
-        if (type === "concept") {
-            this.loadConceptData();
-        } else if (type === "practice") {
-            this.loadPracticeData();
-        } else if (type === "match") {
-            this.loadMatchData();
-        }
+        this.setState(
+            {
+                activeTab: type,
+                activeData: 0,
+                totalItems: "",
+                concepts: [],
+                practice: [],
+                match: [],
+                currentSubQuestionIndex: [],
+                explanation: [],
+                sections: [],
+                totalSubQuestion: [],
+                page_loading: true,
+                isSlideshowPlaying: false,
+            },
+            () => {
+                if (type === "concept") {
+                    this.loadConceptData();
+                } else if (type === "practice") {
+                    this.loadPracticeData();
+                } else if (type === "match") {
+                    this.loadMatchData();
+                }
+            }
+        );
     };
 
     // ---------- Image & Video ----------
@@ -2606,52 +2726,86 @@ class FlashCard extends Component {
                             <div className="col-md-11">
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
-                                        <span className="small primary-text font-weight-bold-600 mb-0 mr-3">
-                                            STUDY
-                                        </span>
-                                        <button
-                                            className={`btn ${
-                                                this.state.activeTab ===
-                                                "concept"
-                                                    ? "btn-primary"
-                                                    : "btn-primary-invert"
-                                            } btn-sm mr-3 shadow-none`}
-                                            onClick={() =>
-                                                this.toggleTab("concept")
-                                            }
-                                        >
-                                            Concept
-                                        </button>
-                                        <button
-                                            className={`btn ${
-                                                this.state.activeTab ===
-                                                "practice"
-                                                    ? "btn-primary"
-                                                    : "btn-primary-invert"
-                                            } btn-sm mr-3 shadow-none`}
-                                            onClick={() =>
-                                                this.toggleTab("practice")
-                                            }
-                                        >
-                                            Practice
-                                        </button>
-                                        <span className="small primary-text font-weight-bold-600 mb-0 mr-3">
-                                            PLAY
-                                        </span>
-                                        <button
-                                            className={`btn ${
-                                                this.state.activeTab === "match"
-                                                    ? "btn-primary"
-                                                    : "btn-primary-invert"
-                                            } btn-sm shadow-none`}
-                                            onClick={() =>
-                                                this.toggleTab("match")
-                                            }
-                                        >
-                                            Match
-                                        </button>
+                                        {this.state.checkup.concepts_exists ||
+                                        this.state.checkup.mcq_exists ||
+                                        this.state.checkup.type_two_exists ? (
+                                            <>
+                                                <span className="small primary-text font-weight-bold-600 mb-0 mr-3">
+                                                    STUDY
+                                                </span>
+                                                {this.state.checkup
+                                                    .concepts_exists ? (
+                                                    <button
+                                                        className={`btn ${
+                                                            this.state
+                                                                .activeTab ===
+                                                            "concept"
+                                                                ? "btn-primary"
+                                                                : "btn-primary-invert"
+                                                        } btn-sm mr-3 shadow-none`}
+                                                        onClick={() =>
+                                                            this.toggleTab(
+                                                                "concept"
+                                                            )
+                                                        }
+                                                    >
+                                                        Concept
+                                                    </button>
+                                                ) : (
+                                                    ""
+                                                )}
+                                                {this.state.checkup
+                                                    .mcq_exists ||
+                                                this.state.checkup
+                                                    .type_two_exists ? (
+                                                    <button
+                                                        className={`btn ${
+                                                            this.state
+                                                                .activeTab ===
+                                                            "practice"
+                                                                ? "btn-primary"
+                                                                : "btn-primary-invert"
+                                                        } btn-sm mr-3 shadow-none`}
+                                                        onClick={() =>
+                                                            this.toggleTab(
+                                                                "practice"
+                                                            )
+                                                        }
+                                                    >
+                                                        Practice
+                                                    </button>
+                                                ) : (
+                                                    ""
+                                                )}
+                                            </>
+                                        ) : (
+                                            ""
+                                        )}
+                                        {this.state.checkup.match_exists ? (
+                                            <>
+                                                <span className="small primary-text font-weight-bold-600 mb-0 mr-3">
+                                                    PLAY
+                                                </span>
+                                                <button
+                                                    className={`btn ${
+                                                        this.state.activeTab ===
+                                                        "match"
+                                                            ? "btn-primary"
+                                                            : "btn-primary-invert"
+                                                    } btn-sm shadow-none`}
+                                                    onClick={() =>
+                                                        this.toggleTab("match")
+                                                    }
+                                                >
+                                                    Match
+                                                </button>
+                                            </>
+                                        ) : (
+                                            ""
+                                        )}
                                     </div>
                                     <div className="col-md-6 text-right">
+                                        {/* bookmark button */}
                                         {this.state.activeTab !== "match" ? (
                                             <OverlayTrigger
                                                 key="top6"
@@ -2689,6 +2843,16 @@ class FlashCard extends Component {
                                                         );
                                                         this.pauseSlideshow();
                                                     }}
+                                                    disabled={
+                                                        this.state.checkup
+                                                            .concepts_exists ||
+                                                        this.state.checkup
+                                                            .mcq_exists ||
+                                                        this.state.checkup
+                                                            .type_two_exists
+                                                            ? false
+                                                            : true
+                                                    }
                                                 >
                                                     <i
                                                         className={`${
@@ -2711,6 +2875,7 @@ class FlashCard extends Component {
                                             ""
                                         )}
 
+                                        {/* audio button */}
                                         {this.state.activeTab === "concept"
                                             ? data[index] && data[index].content
                                                 ? (
@@ -2842,6 +3007,16 @@ class FlashCard extends Component {
                                                             );
                                                             this.pauseSlideshow();
                                                         }}
+                                                        disabled={
+                                                            this.state.checkup
+                                                                .concepts_exists ||
+                                                            this.state.checkup
+                                                                .mcq_exists ||
+                                                            this.state.checkup
+                                                                .type_two_exists
+                                                                ? false
+                                                                : true
+                                                        }
                                                     >
                                                         <i
                                                             className="fas fa-pencil-ruler fa-sm"

@@ -14,6 +14,8 @@ import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import storeDispatch from "../../../redux/dispatch";
 import { TEMP } from "../../../redux/action";
+import Slider from "react-slick";
+import courseimg from "../../../assets/code.jpg";
 
 const ConfigurationSection = (props) => {
     function customDataValidation(data) {
@@ -215,6 +217,7 @@ class AdminHodProfile extends Component {
 
             hodItems: [],
             group: [],
+            courses: [],
             permissions: {},
             category: [],
             subcategory: [],
@@ -261,6 +264,7 @@ class AdminHodProfile extends Component {
                     this.setState(
                         {
                             hodItems: result.data,
+                            courses: result.data.courses,
                             permissions: permissions,
                             page_loading: false,
                         },
@@ -618,6 +622,32 @@ class AdminHodProfile extends Component {
     };
 
     render() {
+        var settings = {
+            dots: true,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 3,
+            slidesToScroll: 3,
+            initialSlide: 0,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2,
+                        dots: true,
+                    },
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+            ],
+        };
         return (
             <Wrapper
                 history={this.props.history}
@@ -890,56 +920,41 @@ class AdminHodProfile extends Component {
                                 <h5>Courses configured</h5>
                             </div>
                             <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-3 mb-3">
-                                        <div className="card shadow">
-                                            <div className="card-body text-center">
-                                                Add +
-                                            </div>
-                                            <div className="card-footer primary-bg">
-                                                <p className="text-white small mb-0">
-                                                    Chemistry 10th
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <div className="card shadow">
-                                            <div className="card-body text-center">
-                                                Add +
-                                            </div>
-                                            <div className="card-footer primary-bg">
-                                                <p className="text-white small mb-0">
-                                                    Chemistry 10th
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-3 mb-3">
-                                        <div className="card shadow">
-                                            <div className="card-body text-center">
-                                                Add +
-                                            </div>
-                                            <div className="card-footer primary-bg">
-                                                <p className="text-white small mb-0">
-                                                    Chemistry 10th
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-3">
-                                        <div className="card shadow">
-                                            <div className="card-body text-center">
-                                                Add +
-                                            </div>
-                                            <div className="card-footer primary-bg">
-                                                <p className="text-white small mb-0">
-                                                    Chemistry 10th
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {this.state.courses &&
+                                this.state.courses.length !== 0 ? (
+                                    <Slider {...settings}>
+                                        {(this.state.courses || []).map(
+                                            (data, index) => {
+                                                return (
+                                                    <div
+                                                        className="px-3"
+                                                        data-index={index}
+                                                        key={index}
+                                                    >
+                                                        <div className="card">
+                                                            <img
+                                                                src={
+                                                                    data.course_thumbnail_url
+                                                                        ? data.course_thumbnail_url
+                                                                        : courseimg
+                                                                }
+                                                                className="card-img-top"
+                                                                alt={
+                                                                    data.course_name
+                                                                }
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                {
+                                                                    data.course_name
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                    </Slider>
+                                ) : 'No data to display...'}
                             </div>
                         </div>
                     </div>

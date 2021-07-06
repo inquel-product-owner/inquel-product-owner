@@ -977,6 +977,7 @@ class HODTeacherStudentList extends Component {
                 }
                 activeLink="profiles"
                 history={this.props.history}
+                hideBackButton={true}
             >
                 {/* Alert message */}
                 <AlertBox

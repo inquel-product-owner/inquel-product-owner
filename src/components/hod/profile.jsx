@@ -537,7 +537,7 @@ class HODProfile extends Component {
                     this.setState({
                         errorMsg: result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -546,7 +546,7 @@ class HODProfile extends Component {
                 this.setState({
                     errorMsg: "Something went wrong!",
                     showErrorAlert: true,
-                    showLoader: false,
+                    page_loading: false,
                 });
             });
     };
@@ -555,8 +555,9 @@ class HODProfile extends Component {
         return (
             <Wrapper
                 header="My Profile"
-                activeLink="dashboard"
+                activeLink="account"
                 history={this.props.history}
+                hideBackButton={true}
             >
                 {/* Alert message */}
                 <AlertBox
