@@ -50,6 +50,21 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
+                    <Link to="/teacher/profile">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">My Profile</Tooltip>}
+                        >
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "account" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i className="fas fa-user-circle"></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
                 </div>
                 <div className="mt-auto">
                     <Link to="/">
@@ -61,21 +76,25 @@ class SideNav extends Component {
                             <button className="btn sidebar-btn btn-sm mb-2">
                                 <i
                                     className="far fa-question-circle"
-                                    style={{ marginLeft: "-1.5px" }}
+                                    style={{ marginLeft: "-1px" }}
                                 ></i>
                             </button>
                         </OverlayTrigger>
                     </Link>
-                    <Link to="/">
+                    <Link to="/teacher/settings">
                         <OverlayTrigger
                             key="right"
                             placement="right"
                             overlay={<Tooltip id="tooltip">Settings</Tooltip>}
                         >
-                            <button className="btn sidebar-btn btn-sm mb-3">
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "settings" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
                                 <i
                                     className="fas fa-cog"
-                                    style={{ marginLeft: "-1.5px" }}
+                                    style={{ marginLeft: "-1px" }}
                                 ></i>
                             </button>
                         </OverlayTrigger>

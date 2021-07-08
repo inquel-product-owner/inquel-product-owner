@@ -909,9 +909,9 @@ const GroupSection = (props) => {
                         <GroupTable
                             groupItems={props.data}
                             path="hod"
+                            check={true}
                             status={true}
                             view={true}
-                            check={true}
                             hasEdit={true}
                             handleGroupId={handleGroupId}
                             handleEdit={(data) => {

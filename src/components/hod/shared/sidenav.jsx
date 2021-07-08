@@ -77,7 +77,7 @@ class SideNav extends Component {
                         >
                             <button
                                 className={`btn sidebar-btn ${
-                                    active === "setting" ? "active" : ""
+                                    active === "settings" ? "active" : ""
                                 } btn-sm mb-3`}
                             >
                                 <i

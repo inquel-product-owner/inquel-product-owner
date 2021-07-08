@@ -896,7 +896,8 @@ class AdminHodProfile extends Component {
                             </div>
                             <GroupTable
                                 groupItems={this.state.group}
-                                path="hod"
+                                path={`admin/hod/${this.hodId}`}
+                                view={true}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalGroupCount >

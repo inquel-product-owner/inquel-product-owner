@@ -782,17 +782,15 @@ class TestPreview extends Component {
                                             </div>
                                             <div className="col-md-2 small">
                                                 Scored marks:{" "}
-                                                {this.props.temp.data[0]
-                                                    .student_scored_marks <= 9
-                                                    ? `0${this.props.temp.data[0].student_scored_marks}`
-                                                    : this.props.temp.data[0]
-                                                          .student_scored_marks}
+                                                {
+                                                    this.props.temp.data[0]
+                                                        .student_scored_marks
+                                                }
                                                 /
-                                                {this.props.temp.data[0]
-                                                    .total_marks <= 9
-                                                    ? `0${this.props.temp.data[0].total_marks}`
-                                                    : this.props.temp.data[0]
-                                                          .total_marks}
+                                                {
+                                                    this.props.temp.data[0]
+                                                        .total_marks
+                                                }
                                             </div>
                                             <div className="col-md-2 small">
                                                 Percentage:{" "}
@@ -833,7 +831,7 @@ class TestPreview extends Component {
                                     <div className="row justify-content-center mb-3">
                                         <div className="col-md-4 secondary-bg primary-text rounded-lg px-3 py-2">
                                             <div className="row align-items-center">
-                                                <div className="col-md-6 font-weight-bold-600">
+                                                <div className="col-6 font-weight-bold-600">
                                                     {
                                                         this.props.temp.data[0]
                                                             .sections[
@@ -842,44 +840,23 @@ class TestPreview extends Component {
                                                         ].section_description
                                                     }
                                                 </div>
-                                                <div className="col-md-6 small font-weight-bold-600">
+                                                <div className="col-6 small font-weight-bold-600">
                                                     Scored marks:{" "}
-                                                    {this.state.section_marks[
+                                                    {
                                                         this.state
-                                                            .currentSectionIndex
-                                                    ] <= 9
-                                                        ? `0${
-                                                              this.state
-                                                                  .section_marks[
-                                                                  this.state
-                                                                      .currentSectionIndex
-                                                              ]
-                                                          }`
-                                                        : this.state
-                                                              .section_marks[
-                                                              this.state
-                                                                  .currentSectionIndex
-                                                          ]}
+                                                            .section_marks[
+                                                            this.state
+                                                                .currentSectionIndex
+                                                        ]
+                                                    }
                                                     /
-                                                    {this.props.temp.data[0]
-                                                        .sections[
-                                                        this.state
-                                                            .currentSectionIndex
-                                                    ].section_total_marks <= 9
-                                                        ? `0${
-                                                              this.props.temp
-                                                                  .data[0]
-                                                                  .sections[
-                                                                  this.state
-                                                                      .currentSectionIndex
-                                                              ]
-                                                                  .section_total_marks
-                                                          }`
-                                                        : this.props.temp
-                                                              .data[0].sections[
-                                                              this.state
-                                                                  .currentSectionIndex
-                                                          ].section_total_marks}
+                                                    {
+                                                        this.props.temp.data[0]
+                                                            .sections[
+                                                            this.state
+                                                                .currentSectionIndex
+                                                        ].section_total_marks
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
@@ -940,7 +917,9 @@ class TestPreview extends Component {
                                                                                                 (
                                                                                                     data
                                                                                                 ) =>
-                                                                                                    data.toLowerCase()
+                                                                                                    option.content
+                                                                                                        ? data
+                                                                                                        : data.toLowerCase()
                                                                                             )
                                                                                             .includes(
                                                                                                 option.content
@@ -949,11 +928,12 @@ class TestPreview extends Component {
                                                                                             )
                                                                                             ? question.marks >
                                                                                               0
-                                                                                                ? "success-bg 1"
+                                                                                                ? "success-bg"
                                                                                                 : option.correct
                                                                                                 ? "success-bg"
                                                                                                 : "danger-bg"
-                                                                                            : option.correct
+                                                                                            : option.correct ===
+                                                                                              true
                                                                                             ? "success-bg"
                                                                                             : "bg-white"
                                                                                     }`}
@@ -1092,7 +1072,7 @@ class TestPreview extends Component {
 
                                                                 <div className="row mb-2">
                                                                     {/* ---------- Student answers ---------- */}
-                                                                    <div className="col-md-5">
+                                                                    <div className="col-md-5 order-2 order-md-1">
                                                                         <div
                                                                             className="card"
                                                                             id="drop-area"
@@ -1110,7 +1090,8 @@ class TestPreview extends Component {
                                                                                         sub_answer,
                                                                                         sub_index
                                                                                     ) => {
-                                                                                        return (
+                                                                                        return sub_answer
+                                                                                            .answer[0] ? (
                                                                                             <div
                                                                                                 key={
                                                                                                     sub_index
@@ -1128,7 +1109,7 @@ class TestPreview extends Component {
                                                                                                     }}
                                                                                                 ></div>
                                                                                             </div>
-                                                                                        );
+                                                                                        ) : null;
                                                                                     }
                                                                                 )}
                                                                             </div>
@@ -1137,8 +1118,8 @@ class TestPreview extends Component {
 
                                                                     {/* ----- Sub Question ----- */}
 
-                                                                    <div className="col-md-7">
-                                                                        <div className="d-flex align-items-start justify-content">
+                                                                    <div className="col-md-7 mb-3 mb-md-0 order-1 order-md-2">
+                                                                        <div className="d-flex align-items-start justify-content h-100">
                                                                             <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
                                                                                 {`${
                                                                                     q_index +
@@ -1158,7 +1139,7 @@ class TestPreview extends Component {
                                                                             </button>
 
                                                                             {/* ---------- Sub Question preview ---------- */}
-                                                                            <div className="card light-bg w-100">
+                                                                            <div className="card light-bg w-100 d-flex flex-column h-100">
                                                                                 <div className="card secondary-bg py-2 px-3 mb-2">
                                                                                     <div
                                                                                         dangerouslySetInnerHTML={{
@@ -1233,7 +1214,7 @@ class TestPreview extends Component {
 
                                                                                 {/* ---------- Navigation button ---------- */}
 
-                                                                                <div className="d-flex align-items-center justify-content-center mt-2">
+                                                                                <div className="d-flex align-items-center justify-content-center mt-auto">
                                                                                     <button
                                                                                         className="btn btn-sm primary-text shadow-none"
                                                                                         onClick={() =>

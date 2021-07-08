@@ -12,7 +12,7 @@ import storeDispatch from "../../redux/dispatch";
 import { PROFILE } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
-    profileData: state.user.profile,
+    profile_data: state.user.profile,
 });
 
 class ImageUploadModal extends Component {
@@ -232,7 +232,7 @@ class HODProfile extends Component {
         super(props);
         this.state = {
             showModal: false,
-            hodItems: this.props.profileData,
+            profile: this.props.profile_data,
 
             errorMsg: "",
             successMsg: "",
@@ -266,7 +266,7 @@ class HODProfile extends Component {
                 if (result.sts === true) {
                     storeDispatch(PROFILE, result.data);
                     this.setState({
-                        hodItems: result.data,
+                        profile: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -332,7 +332,7 @@ class HODProfile extends Component {
                     <ImageUploadModal
                         show={this.state.showModal}
                         onHide={this.toggleModal}
-                        profile_link={this.state.hodItems.profile_link}
+                        profile_link={this.state.profile.profile_link}
                         formSubmission={this.formSubmission}
                     />
                 ) : (
@@ -351,13 +351,13 @@ class HODProfile extends Component {
                     <div className="position-relative">
                         <img
                             src={
-                                this.state.hodItems.length !== 0
-                                    ? this.state.hodItems.profile_link !== null
-                                        ? this.state.hodItems.profile_link
+                                this.state.profile.length !== 0
+                                    ? this.state.profile.profile_link !== null
+                                        ? this.state.profile.profile_link
                                         : userpic
                                     : userpic
                             }
-                            alt={this.state.hodItems.full_name}
+                            alt={this.state.profile.full_name}
                             className="rounded-circle shadow square-img mx-auto mb-2"
                         />
                         <button
@@ -373,10 +373,10 @@ class HODProfile extends Component {
                         </button>
                     </div>
                     <h4 className="text-white">
-                        {this.state.hodItems.full_name}
+                        {this.state.profile.full_name}
                     </h4>
                     <span className="secondary-bg rounded-pill py-1 px-3 small font-weight-bold-600">
-                        @{this.state.hodItems.username}
+                        @{this.state.profile.username}
                     </span>
                 </div>
 
@@ -395,7 +395,7 @@ class HODProfile extends Component {
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     First Name
                                                 </p>
-                                                {this.state.hodItems.first_name}
+                                                {this.state.profile.first_name}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
@@ -403,7 +403,7 @@ class HODProfile extends Component {
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     Last Name
                                                 </p>
-                                                {this.state.hodItems.last_name}
+                                                {this.state.profile.last_name}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
@@ -411,7 +411,7 @@ class HODProfile extends Component {
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     Username
                                                 </p>
-                                                {this.state.hodItems.username}
+                                                {this.state.profile.username}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
@@ -419,7 +419,7 @@ class HODProfile extends Component {
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     Email
                                                 </p>
-                                                {this.state.hodItems.email}
+                                                {this.state.profile.email}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
@@ -428,10 +428,10 @@ class HODProfile extends Component {
                                                     Mobile number
                                                 </p>
                                                 {
-                                                    this.state.hodItems
+                                                    this.state.profile
                                                         .country_code
                                                 }
-                                                {this.state.hodItems.phone_num}
+                                                {this.state.profile.phone_num}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
@@ -440,20 +440,20 @@ class HODProfile extends Component {
                                                     Office phone
                                                 </p>
                                                 {
-                                                    this.state.hodItems
+                                                    this.state.profile
                                                         .office_phone_num
                                                 }
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
-                                            <div className="form-group">
+                                            <div>
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     Date of Birth
                                                 </p>
                                                 {dateFormat(
-                                                    this.state.hodItems
+                                                    this.state.profile
                                                         .date_of_birth,
-                                                    "dd-mm-yyyy"
+                                                    "mmmm dS, yyyy"
                                                 )}
                                             </div>
                                         </div>
@@ -468,58 +468,58 @@ class HODProfile extends Component {
                                     <h5 className="primary-text mb-4">
                                         Address
                                     </h5>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             Address line
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
-                                            {this.state.hodItems.address}
+                                            {this.state.profile.address}
                                         </div>
                                     </div>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             City
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
-                                            {this.state.hodItems.city}
+                                            {this.state.profile.city}
                                         </div>
                                     </div>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             District
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
-                                            {this.state.hodItems.district}
+                                            {this.state.profile.district}
                                         </div>
                                     </div>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             State
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
-                                            {this.state.hodItems.state}
+                                            {this.state.profile.state}
                                         </div>
                                     </div>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             Country
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
-                                            {this.state.hodItems.country}
+                                            {this.state.profile.country}
                                         </div>
                                     </div>
-                                    <div className="row">
+                                    <div className="row align-items-center">
                                         <div className="col-3 font-weight-bold-600 small">
                                             Pincode
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
-                                            {this.state.hodItems.pincode}
+                                            {this.state.profile.pincode}
                                         </div>
                                     </div>
                                 </div>
@@ -532,59 +532,56 @@ class HODProfile extends Component {
                                     <h5 className="primary-text mb-4">
                                         Institution Details
                                     </h5>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             Department Name
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
-                                            {
-                                                this.state.hodItems
-                                                    .department_name
-                                            }
+                                            {this.state.profile.department_name}
                                         </div>
                                     </div>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             Department details
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
                                             {
-                                                this.state.hodItems
+                                                this.state.profile
                                                     .department_details
                                             }
                                         </div>
                                     </div>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             Office address
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
-                                            {this.state.hodItems.office_address}
+                                            {this.state.profile.office_address}
                                         </div>
                                     </div>
-                                    <div className="row mb-3">
+                                    <div className="row align-items-center mb-3">
                                         <div className="col-3 font-weight-bold-600 small">
                                             Additional details 1
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
                                             {
-                                                this.state.hodItems
+                                                this.state.profile
                                                     .additional_details_1
                                             }
                                         </div>
                                     </div>
-                                    <div className="row">
+                                    <div className="row align-items-center">
                                         <div className="col-3 font-weight-bold-600 small">
                                             Additional details 2
                                         </div>
                                         <div className="col-1">-</div>
                                         <div className="col-8">
                                             {
-                                                this.state.hodItems
+                                                this.state.profile
                                                     .additional_details_2
                                             }
                                         </div>
@@ -599,19 +596,19 @@ class HODProfile extends Component {
                                     <h5 className="primary-text mb-4">
                                         Watermark Image
                                     </h5>
-                                    {this.state.hodItems.watermark_image !==
+                                    {this.state.profile.watermark_image !==
                                         null &&
-                                    this.state.hodItems.watermark_image !==
+                                    this.state.profile.watermark_image !==
                                         "" ? (
                                         <div className="row">
                                             <div className="col-lg-3 col-md-4 col-6">
                                                 <img
                                                     src={
-                                                        this.state.hodItems
+                                                        this.state.profile
                                                             .watermark_image
                                                     }
                                                     alt={
-                                                        this.state.hodItems
+                                                        this.state.profile
                                                             .full_name
                                                     }
                                                     className="img-fluid"
@@ -630,7 +627,7 @@ class HODProfile extends Component {
                                     <h6 className="primary-text mb-4">
                                         Configurations
                                     </h6>
-                                    {this.state.hodItems.permissions !==
+                                    {this.state.profile.permissions !==
                                     undefined ? (
                                         <>
                                             <div className="row align-items-center small mb-3">
@@ -641,7 +638,7 @@ class HODProfile extends Component {
                                                 </div>
                                                 <div className="col-6">
                                                     {
-                                                        this.state.hodItems
+                                                        this.state.profile
                                                             .permissions
                                                             .category
                                                     }
@@ -655,7 +652,7 @@ class HODProfile extends Component {
                                                 </div>
                                                 <div className="col-6">
                                                     {
-                                                        this.state.hodItems
+                                                        this.state.profile
                                                             .permissions
                                                             .sub_category
                                                     }
@@ -669,7 +666,7 @@ class HODProfile extends Component {
                                                 </div>
                                                 <div className="col-6">
                                                     {
-                                                        this.state.hodItems
+                                                        this.state.profile
                                                             .permissions
                                                             .discipline
                                                     }
@@ -683,7 +680,7 @@ class HODProfile extends Component {
                                                 </div>
                                                 <div className="col-6">
                                                     {
-                                                        this.state.hodItems
+                                                        this.state.profile
                                                             .permissions.board
                                                     }
                                                 </div>
@@ -696,7 +693,7 @@ class HODProfile extends Component {
                                                 </div>
                                                 <div className="col-6">
                                                     {dateFormat(
-                                                        this.state.hodItems
+                                                        this.state.profile
                                                             .permissions
                                                             .valid_from,
                                                         "dd/mm/yyyy"
@@ -711,7 +708,7 @@ class HODProfile extends Component {
                                                 </div>
                                                 <div className="col-6">
                                                     {dateFormat(
-                                                        this.state.hodItems
+                                                        this.state.profile
                                                             .permissions
                                                             .valid_to,
                                                         "dd/mm/yyyy"
@@ -727,7 +724,7 @@ class HODProfile extends Component {
                                     <h6 className="primary-text mb-4">
                                         Permissions
                                     </h6>
-                                    {this.state.hodItems.permissions !==
+                                    {this.state.profile.permissions !==
                                     undefined ? (
                                         <>
                                             <div className="row mb-2">
@@ -737,7 +734,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .prog_sco_card ===
                                                     true ? (
@@ -754,7 +751,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .type_1_q === true ? (
                                                         <i className="fas fa-check-circle text-success"></i>
@@ -770,7 +767,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .type_2_q === true ? (
                                                         <i className="fas fa-check-circle text-success"></i>
@@ -786,7 +783,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions.quiz ===
                                                     true ? (
                                                         <i className="fas fa-check-circle text-success"></i>
@@ -802,7 +799,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions.match ===
                                                     true ? (
                                                         <i className="fas fa-check-circle text-success"></i>
@@ -818,7 +815,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .copy_download ===
                                                     true ? (
@@ -835,7 +832,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions.summary ===
                                                     true ? (
                                                         <i className="fas fa-check-circle text-success"></i>
@@ -851,7 +848,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .direct_q === true ? (
                                                         <i className="fas fa-check-circle text-success"></i>
@@ -867,7 +864,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .config_course ===
                                                     true ? (
@@ -884,7 +881,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .sim_exam === true ? (
                                                         <i className="fas fa-check-circle text-success"></i>
@@ -900,7 +897,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .lock_test === true ? (
                                                         <i className="fas fa-check-circle text-success"></i>
@@ -916,7 +913,7 @@ class HODProfile extends Component {
                                                     </p>
                                                 </div>
                                                 <div className="col-2 text-right">
-                                                    {this.state.hodItems
+                                                    {this.state.profile
                                                         .permissions
                                                         .android_app ===
                                                     true ? (

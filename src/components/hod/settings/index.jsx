@@ -40,7 +40,7 @@ class HODSettings extends Component {
         document.title = "Settings - HOD | IQLabs";
     };
 
-    loadHodData = () => {
+    fetchProfile = () => {
         fetch(`${this.url}/hod/profile/`, {
             method: "GET",
             headers: this.headers,
@@ -50,7 +50,6 @@ class HODSettings extends Component {
                 if (result.sts === true) {
                     storeDispatch(PROFILE, result.data);
                     this.setState({
-                        hodItems: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -75,7 +74,7 @@ class HODSettings extends Component {
         return (
             <Wrapper
                 header="Settings"
-                activeLink="setting"
+                activeLink="settings"
                 history={this.props.history}
                 hideBackButton={true}
             >
@@ -160,11 +159,11 @@ class HODSettings extends Component {
                     <div className="col-md-10">
                         <div className="card" style={{ minHeight: "75vh" }}>
                             {this.state.tab === "profile" ? (
-                                <UpdateProfile loadData={this.loadHodData} />
+                                <UpdateProfile loadData={this.fetchProfile} />
                             ) : this.state.tab === "password" ? (
-                                <UpdatePassword loadData={this.loadHodData} />
+                                <UpdatePassword loadData={this.fetchProfile} />
                             ) : this.state.tab === "watermark" ? (
-                                <UpdateWatermark loadData={this.loadHodData} />
+                                <UpdateWatermark loadData={this.fetchProfile} />
                             ) : (
                                 ""
                             )}

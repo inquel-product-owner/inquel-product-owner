@@ -1,21 +1,18 @@
 import React, { Component } from "react";
 import Wrapper from "./wrapper";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import Select from "react-select";
 import { Spinner, Modal, Alert } from "react-bootstrap";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import Loading from "../common/loader";
 import userpic from "../../assets/user-v1.png";
 import AlertBox from "../common/alert";
 import dateFormat from "dateformat";
-import { country } from "../../shared/countries.js";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import { PROFILE } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
-    profileData: state.user.profile,
+    profile_data: state.user.profile,
 });
 
 class ImageUploadModal extends Component {
@@ -234,16 +231,13 @@ class Profile extends Component {
         super(props);
         this.state = {
             showModal: false,
-            studentItems: this.props.profileData,
-            showEditOption: false,
+            profile: this.props.profile_data,
 
-            page_loading: false,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            showImageLoader: false,
-            showLoader: false,
+            page_loading: false,
         };
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -254,40 +248,8 @@ class Profile extends Component {
         };
     }
 
-    toggleModal = () => {
-        this.setState({
-            showModal: !this.state.showModal,
-        });
-    };
-
-    toggleEdit = () => {
-        this.setState({
-            showEditOption: !this.state.showEditOption,
-        });
-    };
-
-    handleInput = (event) => {
-        let data = this.state.studentItems;
-        data[event.target.name] = event.target.value;
-        this.setState({
-            studentItems: data,
-        });
-    };
-
-    handleDate = (event) => {
-        let data = this.state.studentItems;
-        data.date_of_birth = dateFormat(event.target.value, "yyyy-mm-dd");
-        this.setState({
-            studentItems: data,
-        });
-    };
-
-    handleSelect = (event) => {
-        let data = this.state.studentItems;
-        data.country_code = event.value;
-        this.setState({
-            studentItems: data,
-        });
+    componentDidMount = () => {
+        document.title = "My Profile - Student | IQLabs";
     };
 
     loadStudentData = () => {
@@ -300,7 +262,7 @@ class Profile extends Component {
                 if (result.sts === true) {
                     storeDispatch(PROFILE, result.data);
                     this.setState({
-                        studentItems: result.data,
+                        profile: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -321,70 +283,10 @@ class Profile extends Component {
             });
     };
 
-    componentDidMount = () => {
-        document.title = "My Profile - Student | IQLabs";
-    };
-
-    handleSubmit = (event) => {
-        event.preventDefault();
+    toggleModal = () => {
         this.setState({
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: true,
+            showModal: !this.state.showModal,
         });
-
-        fetch(`${this.url}/student/profile/`, {
-            method: "PUT",
-            headers: this.headers,
-            body: JSON.stringify({
-                first_name: this.state.studentItems.first_name,
-                last_name: this.state.studentItems.last_name,
-                username: this.state.studentItems.username,
-                phone_num:
-                    this.state.studentItems.country_code +
-                    this.state.studentItems.phone_num,
-                date_of_birth: dateFormat(
-                    this.state.studentItems.date_of_birth,
-                    "yyyy-mm-dd"
-                ),
-                description: this.state.studentItems.description,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    this.setState(
-                        {
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
-                        },
-                        () => {
-                            setTimeout(() => {
-                                this.setState({
-                                    showEditOption: false,
-                                    page_loading: true,
-                                });
-                                this.loadStudentData();
-                            }, 1000);
-                        }
-                    );
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
-            });
     };
 
     formSubmission = () => {
@@ -397,27 +299,13 @@ class Profile extends Component {
         }, 1000);
     };
 
-    renderValue = (data) => {
-        return (
-            <span>
-                <img
-                    src={data.flag}
-                    alt=""
-                    className="img-fluid"
-                    width="25px"
-                    height="auto"
-                />{" "}
-                {data.isoCode} - {data.dialCode}
-            </span>
-        );
-    };
-
     render() {
         return (
             <Wrapper
                 header="My Profile"
-                activeLink="dashboard"
+                activeLink="account"
                 history={this.props.history}
+                hideBackButton={true}
             >
                 {/* Alert message */}
                 <AlertBox
@@ -442,421 +330,70 @@ class Profile extends Component {
                     <ImageUploadModal
                         show={this.state.showModal}
                         onHide={this.toggleModal}
-                        profile_link={this.state.studentItems.profile_link}
+                        profile_link={this.state.profile.profile_link}
                         formSubmission={this.formSubmission}
                     />
                 ) : (
                     ""
                 )}
 
-                <div className="row align-items-center mb-3">
-                    <div className="col-8">
-                        {/* Breadcrumb */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb">
-                                <li className="breadcrumb-item">
-                                    <Link to="/dashboard">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    My Profile
-                                </li>
-                            </ol>
-                        </nav>
+                {/* ---------- Image header card ---------- */}
+                <div
+                    className="container shadow d-flex flex-column align-items-center p-3 mb-4"
+                    style={{
+                        background:
+                            "linear-gradient(90deg, rgba(98,16,18,0.9336776947106968) 0%, rgba(239,210,172,0.9392799356070554) 100%)",
+                        borderRadius: "12px",
+                    }}
+                >
+                    <div className="position-relative">
+                        <img
+                            src={
+                                this.state.profile.length !== 0
+                                    ? this.state.profile.profile_link !== null
+                                        ? this.state.profile.profile_link
+                                        : userpic
+                                    : userpic
+                            }
+                            alt={this.state.profile.full_name}
+                            className="rounded-circle shadow square-img mx-auto mb-2"
+                        />
+                        <button
+                            className="btn btn-light btn-sm rounded-circle shadow"
+                            onClick={() => this.toggleModal("profile")}
+                            style={{
+                                position: "absolute",
+                                bottom: "10px",
+                                right: "15px",
+                            }}
+                        >
+                            <i className="fas fa-upload"></i>
+                        </button>
                     </div>
-                    <div className="col-4 text-right">
-                        {!this.state.showEditOption ? (
-                            <button
-                                className="btn btn-primary btn-sm"
-                                onClick={this.toggleEdit}
-                            >
-                                <i className="far fa-edit mr-1"></i>
-                                Edit Profile
-                            </button>
-                        ) : null}
-                    </div>
+                    <h4 className="text-white">
+                        {this.state.profile.full_name}
+                    </h4>
+                    <span className="secondary-bg rounded-pill py-1 px-3 small font-weight-bold-600">
+                        @{this.state.profile.username}
+                    </span>
                 </div>
 
-                <div className="row">
-                    <div className="col-md-3 pl-md-4 mb-3 mb-md-0">
-                        <div className="card shadow-sm">
-                            <div className="card-body">
-                                <div style={{ position: "relative" }}>
-                                    <img
-                                        src={
-                                            this.state.studentItems.length !== 0
-                                                ? this.state.studentItems
-                                                      .profile_link !== null
-                                                    ? this.state.studentItems
-                                                          .profile_link
-                                                    : userpic
-                                                : userpic
-                                        }
-                                        alt={this.state.studentItems.full_name}
-                                        className="img-fluid rounded-lg shadow-sm mb-3"
-                                    />
-                                    <button
-                                        className="btn btn-light secondary-bg borders btn-block btn-sm shadow-none"
-                                        onClick={this.toggleModal}
-                                        style={{
-                                            position: "absolute",
-                                            bottom: "10px",
-                                        }}
-                                    >
-                                        Upload Profile Pic
-                                    </button>
-                                </div>
-                                <p className="primary-text font-weight-bold-600 mb-2">
-                                    {this.state.studentItems.full_name} - @
-                                    {this.state.studentItems.username}
-                                </p>
-                                <p className="small mb-0">
-                                    {this.state.studentItems.email}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-md-9 pr-md-4">
-                        {this.state.showEditOption ? (
-                            <div className="card shadow-sm">
-                                <form
-                                    onSubmit={this.handleSubmit}
-                                    autoComplete="off"
-                                >
-                                    <div className="card-body">
-                                        <h6 className="primary-text mb-3">
-                                            Personal Details
-                                        </h6>
-                                        <div className="row gutters">
-                                            <div className="col-lg-4 col-sm-6 col-12">
-                                                <div className="form-group">
-                                                    <label htmlFor="first_name">
-                                                        First Name
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="first_name"
-                                                        id="first_name"
-                                                        className="form-control border-secondary"
-                                                        value={
-                                                            this.state
-                                                                .studentItems
-                                                                .first_name
-                                                        }
-                                                        onChange={
-                                                            this.handleInput
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-4 col-sm-6 col-12">
-                                                <div className="form-group">
-                                                    <label htmlFor="last_name">
-                                                        Last Name
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="last_name"
-                                                        id="last_name"
-                                                        className="form-control border-secondary"
-                                                        value={
-                                                            this.state
-                                                                .studentItems
-                                                                .last_name
-                                                        }
-                                                        onChange={
-                                                            this.handleInput
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-4 col-sm-6 col-12">
-                                                <div className="form-group">
-                                                    <label htmlFor="username">
-                                                        Username
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        name="username"
-                                                        id="username"
-                                                        className="form-control border-secondary"
-                                                        value={
-                                                            this.state
-                                                                .studentItems
-                                                                .username
-                                                        }
-                                                        onChange={
-                                                            this.handleInput
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                <div className="form-group">
-                                                    <label htmlFor="phone_num">
-                                                        Phone
-                                                    </label>
-                                                    <div className="d-flex border-secondary rounded-lg">
-                                                        <div
-                                                            style={{
-                                                                width: "35%",
-                                                            }}
-                                                        >
-                                                            <Select
-                                                                className="basic-single border-right"
-                                                                defaultValue={{
-                                                                    label: this
-                                                                        .state
-                                                                        .studentItems
-                                                                        .country_code
-                                                                        ? this
-                                                                              .state
-                                                                              .studentItems
-                                                                              .country_code
-                                                                        : "Country code",
-                                                                    value: this
-                                                                        .state
-                                                                        .studentItems
-                                                                        .country_code
-                                                                        ? this
-                                                                              .state
-                                                                              .studentItems
-                                                                              .country_code
-                                                                        : "Country code",
-                                                                }}
-                                                                isSearchable={
-                                                                    false
-                                                                }
-                                                                name="country_code"
-                                                                options={country.map(
-                                                                    (list) => {
-                                                                        return {
-                                                                            value: list.dialCode,
-                                                                            label: this.renderValue(
-                                                                                list
-                                                                            ),
-                                                                        };
-                                                                    }
-                                                                )}
-                                                                onChange={
-                                                                    this
-                                                                        .handleSelect
-                                                                }
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <input
-                                                                type="text"
-                                                                name="phone_num"
-                                                                id="phone"
-                                                                className="form-control form-control-lg"
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                                value={
-                                                                    this.state
-                                                                        .studentItems
-                                                                        .phone_num
-                                                                }
-                                                                placeholder="Enter phone number"
-                                                                required
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                <div className="form-group">
-                                                    <label htmlFor="date_of_birth">
-                                                        Date of Birth
-                                                    </label>
-                                                    <input
-                                                        type="date"
-                                                        name="date_of_birth"
-                                                        id="date_of_birth"
-                                                        className="form-control border-secondary"
-                                                        value={dateFormat(
-                                                            this.state
-                                                                .studentItems
-                                                                .date_of_birth,
-                                                            "yyyy-mm-dd"
-                                                        )}
-                                                        onChange={
-                                                            this.handleDate
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* <div className="dropdown-divider"></div>
-
-                                                <h6 className="primary-text my-3">
-                                                    Address
-                                                </h6>
-                                                <div className="row gutters">
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="city">
-                                                                City
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="city"
-                                                                id="city"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .studentItems
-                                                                        .city
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="district">
-                                                                District
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="district"
-                                                                id="district"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .studentItems
-                                                                        .district
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="state">
-                                                                State
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="state"
-                                                                id="state"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .studentItems
-                                                                        .state
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <div className="form-group">
-                                                            <label htmlFor="country">
-                                                                Country
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                name="country"
-                                                                id="country"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .studentItems
-                                                                        .country
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div> */}
-
-                                        <div className="dropdown-divider"></div>
-
-                                        <h6 className="primary-text my-3">
-                                            About Me
-                                        </h6>
-                                        <div className="form-group">
-                                            <label htmlFor="description">
-                                                Description
-                                            </label>
-                                            <textarea
-                                                name="description"
-                                                id="description"
-                                                rows="4"
-                                                className="form-control border-secondary"
-                                                onChange={this.handleInput}
-                                            >
-                                                {
-                                                    this.state.studentItems
-                                                        .description
-                                                }
-                                            </textarea>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-6">
-                                                <button
-                                                    className="btn btn-secondary btn-sm btn-block"
-                                                    onClick={this.toggleEdit}
-                                                >
-                                                    Close
-                                                </button>
-                                            </div>
-                                            <div className="col-6">
-                                                <button className="btn btn-primary btn-block btn-sm">
-                                                    {this.state.showLoader ? (
-                                                        <Spinner
-                                                            as="span"
-                                                            animation="border"
-                                                            size="sm"
-                                                            role="status"
-                                                            aria-hidden="true"
-                                                            className="mr-2"
-                                                        />
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                    Save
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        ) : (
-                            // Profile details GET
-                            <div className="card shadow-sm">
+                <div className="container">
+                    <div className="row justify-content-center">
+                        {/* ---------- Left column ---------- */}
+                        <div className="col-md-9 px-0">
+                            <div className="card shadow-sm mb-3">
                                 <div className="card-body">
-                                    <h6 className="primary-text mb-3">
+                                    <h5 className="primary-text mb-4">
                                         Personal Details
-                                    </h6>
+                                    </h5>
                                     <div className="row gutters">
                                         <div className="col-lg-4 col-sm-6 col-12">
                                             <div className="form-group">
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     First Name
                                                 </p>
-                                                {
-                                                    this.state.studentItems
-                                                        .first_name
-                                                }
+                                                {this.state.profile.first_name}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
@@ -864,10 +401,7 @@ class Profile extends Component {
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     Last Name
                                                 </p>
-                                                {
-                                                    this.state.studentItems
-                                                        .last_name
-                                                }
+                                                {this.state.profile.last_name}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
@@ -875,10 +409,7 @@ class Profile extends Component {
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     Username
                                                 </p>
-                                                {
-                                                    this.state.studentItems
-                                                        .username
-                                                }
+                                                {this.state.profile.username}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
@@ -886,103 +417,132 @@ class Profile extends Component {
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     Email
                                                 </p>
-                                                {this.state.studentItems.email}
+                                                {this.state.profile.email}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
                                             <div className="form-group">
                                                 <p className="small font-weight-bold-600 mb-2">
-                                                    Phone
+                                                    Mobile number
                                                 </p>
                                                 {
-                                                    this.state.studentItems
+                                                    this.state.profile
                                                         .country_code
                                                 }
-                                                {
-                                                    this.state.studentItems
-                                                        .phone_num
-                                                }
+                                                {this.state.profile.phone_num}
                                             </div>
                                         </div>
                                         <div className="col-lg-4 col-sm-6 col-12">
-                                            <div className="form-group">
+                                            <div>
                                                 <p className="small font-weight-bold-600 mb-2">
                                                     Date of Birth
                                                 </p>
                                                 {dateFormat(
-                                                    this.state.studentItems
+                                                    this.state.profile
                                                         .date_of_birth,
-                                                    "dd-mm-yyyy"
+                                                    "mmmm dS, yyyy"
                                                 )}
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
 
-                                    {/* <div className="dropdown-divider"></div>
+                            {/* ----- Address details card ----- */}
 
-                                            <h6 className="primary-text my-3">
-                                                Address
-                                            </h6>
-                                            <div className="row gutters">
-                                                <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            City
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .city
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            District
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .district
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            State
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .state
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                    <div className="form-group">
-                                                        <p className="small font-weight-bold-600 mb-2">
-                                                            Country
-                                                        </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .country
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div> */}
-
-                                    <div className="form-group">
-                                        <p className="small font-weight-bold-600 mb-2">
-                                            About
-                                        </p>
-                                        {this.state.studentItems.description}
+                            <div className="card shadow-sm mb-3">
+                                <div className="card-body">
+                                    <h5 className="primary-text mb-4">
+                                        Address
+                                    </h5>
+                                    <div className="row align-items-center mb-3">
+                                        <div className="col-3 font-weight-bold-600 small">
+                                            Address line
+                                        </div>
+                                        <div className="col-1">-</div>
+                                        <div className="col-8">
+                                            {this.state.profile.address}
+                                        </div>
+                                    </div>
+                                    <div className="row align-items-center mb-3">
+                                        <div className="col-3 font-weight-bold-600 small">
+                                            City
+                                        </div>
+                                        <div className="col-1">-</div>
+                                        <div className="col-8">
+                                            {this.state.profile.city}
+                                        </div>
+                                    </div>
+                                    <div className="row align-items-center mb-3">
+                                        <div className="col-3 font-weight-bold-600 small">
+                                            District
+                                        </div>
+                                        <div className="col-1">-</div>
+                                        <div className="col-8">
+                                            {this.state.profile.district}
+                                        </div>
+                                    </div>
+                                    <div className="row align-items-center mb-3">
+                                        <div className="col-3 font-weight-bold-600 small">
+                                            State
+                                        </div>
+                                        <div className="col-1">-</div>
+                                        <div className="col-8">
+                                            {this.state.profile.state}
+                                        </div>
+                                    </div>
+                                    <div className="row align-items-center mb-3">
+                                        <div className="col-3 font-weight-bold-600 small">
+                                            Country
+                                        </div>
+                                        <div className="col-1">-</div>
+                                        <div className="col-8">
+                                            {this.state.profile.country}
+                                        </div>
+                                    </div>
+                                    <div className="row align-items-center">
+                                        <div className="col-3 font-weight-bold-600 small">
+                                            Pincode
+                                        </div>
+                                        <div className="col-1">-</div>
+                                        <div className="col-8">
+                                            {this.state.profile.pincode}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        )}
+
+                            {/* ----- Institution details card ----- */}
+
+                            <div className="card shadow-sm mb-3">
+                                <div className="card-body">
+                                    <h5 className="primary-text mb-4">
+                                        Institution Details
+                                    </h5>
+                                    <div className="row align-items-center mb-3">
+                                        <div className="col-3 font-weight-bold-600 small">
+                                            Institution Name
+                                        </div>
+                                        <div className="col-1">-</div>
+                                        <div className="col-8">
+                                            {
+                                                this.state.profile
+                                                    .institution_name
+                                            }
+                                        </div>
+                                    </div>
+                                    <div className="row align-items-center">
+                                        <div className="col-3 font-weight-bold-600 small">
+                                            Mentor Email ID
+                                        </div>
+                                        <div className="col-1">-</div>
+                                        <div className="col-8">
+                                            {this.state.profile.mentor_email}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
