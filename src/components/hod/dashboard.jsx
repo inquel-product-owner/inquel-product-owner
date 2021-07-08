@@ -29,10 +29,214 @@ import Select from "react-select";
 import storeDispatch from "../../redux/dispatch";
 import { COURSE, GROUP } from "../../redux/action";
 import CourseTable from "../common/table/course";
+import dateFormat from "dateformat";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
 });
+
+class GroupEditModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            group_name: this.props.data.group_name,
+            valid_from: "",
+            valid_to: "",
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    componentDidMount = () => {
+        this.setState({
+            valid_from: `${dateFormat(
+                this.props.data.valid_from,
+                "yyyy-mm-dd"
+            )} 00:00:00`,
+            valid_to: `${dateFormat(
+                this.props.data.valid_to,
+                "yyyy-mm-dd"
+            )} 00:00:00`,
+        });
+    };
+
+    handleInput = (event) => {
+        this.setState({
+            group_name: event.target.value,
+        });
+    };
+
+    handleDate = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+        this.setState({
+            [name]: `${dateFormat(value, "yyyy-mm-dd")} 00:00:00`,
+        });
+    };
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+
+        this.setState({
+            showLoader: true,
+        });
+
+        fetch(`${this.url}/hod/group/${this.props.data.id}/`, {
+            headers: this.headers,
+            method: "PATCH",
+            body: JSON.stringify({
+                group_name: this.state.group_name,
+                valid_from: this.state.valid_from,
+                valid_to: this.state.valid_to,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Edit Group</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        className="sticky-top"
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        className="sticky-top"
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <div className="form-group">
+                        <label htmlFor="subject">Group name</label>
+                        <input
+                            type="text"
+                            name="group_name"
+                            id="group_name"
+                            className="form-control form-control-lg borders"
+                            onChange={this.handleInput}
+                            value={this.state.group_name}
+                            placeholder="Enter group name"
+                            autoComplete="off"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="valid_from">Valid from</label>
+                        <input
+                            type="date"
+                            name="valid_from"
+                            id="valid_from"
+                            className="form-control borders"
+                            min={this.props.hod_valid_from}
+                            max={this.props.hod_valid_to}
+                            onChange={this.handleDate}
+                            value={dateFormat(
+                                this.state.valid_from,
+                                "yyyy-mm-dd"
+                            )}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="valid_to">Valid to</label>
+                        <input
+                            type="date"
+                            name="valid_to"
+                            id="valid_to"
+                            className="form-control borders"
+                            min={this.props.hod_valid_from}
+                            max={this.props.hod_valid_to}
+                            onChange={this.handleDate}
+                            value={dateFormat(
+                                this.state.valid_to,
+                                "yyyy-mm-dd"
+                            )}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-primary btn-block shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Save changes
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
 
 class SubjectModal extends Component {
     constructor() {
@@ -554,12 +758,14 @@ const GroupSection = (props) => {
         ],
     };
     const [tab, setTab] = useState("table");
-    const [selected_data, setData] = useState({});
+    const [selected_data, setData] = useState([]);
     const [showModal, toggleModal] = useState(false);
+    const [showEditModal, toggleEditModal] = useState(false);
 
     const formSubmission = () => {
         setTimeout(() => {
-            toggleModal(!showModal);
+            toggleModal(false);
+            toggleEditModal(false);
         }, 1000);
         props.loadData();
     };
@@ -592,6 +798,20 @@ const GroupSection = (props) => {
                     data={selected_data}
                     field="group_ids"
                     type="Group"
+                />
+            ) : (
+                ""
+            )}
+
+            {/* Edit Modal */}
+            {showEditModal ? (
+                <GroupEditModal
+                    show={showEditModal}
+                    onHide={() => toggleEditModal(!showEditModal)}
+                    formSubmission={formSubmission}
+                    data={selected_data}
+                    hod_valid_from={props.hod_valid_from}
+                    hod_valid_to={props.hod_valid_to}
                 />
             ) : (
                 ""
@@ -692,7 +912,12 @@ const GroupSection = (props) => {
                             status={true}
                             view={true}
                             check={true}
+                            hasEdit={true}
                             handleGroupId={handleGroupId}
+                            handleEdit={(data) => {
+                                setData(data);
+                                toggleEditModal(true);
+                            }}
                         />
                         <div className="card-body p-3">
                             {props.totalCount > paginationCount ? (
@@ -736,6 +961,17 @@ const GroupSection = (props) => {
                                                     </Dropdown.Toggle>
 
                                                     <Dropdown.Menu>
+                                                        <Dropdown.Item
+                                                            onClick={() => {
+                                                                setData(data);
+                                                                toggleEditModal(
+                                                                    true
+                                                                );
+                                                            }}
+                                                        >
+                                                            <i className="far fa-edit mr-1"></i>{" "}
+                                                            Edit
+                                                        </Dropdown.Item>
                                                         <Dropdown.Item
                                                             onClick={() => {
                                                                 handleGroupId([
@@ -1176,6 +1412,9 @@ class HODDashboard extends Component {
             course_data: [],
             selectedData: [],
 
+            hod_valid_from: "",
+            hod_valid_to: "",
+
             activeGroupPage: 1,
             totalGroupCount: 0,
             activeSubjectPage: 1,
@@ -1212,6 +1451,14 @@ class HODDashboard extends Component {
                     this.setState({
                         group_data: result.data.results,
                         totalGroupCount: result.data.count,
+                        hod_valid_from: dateFormat(
+                            result.data.hod_valid_from,
+                            "yyyy-mm-dd"
+                        ),
+                        hod_valid_to: dateFormat(
+                            result.data.hod_valid_to,
+                            "yyyy-mm-dd"
+                        ),
                         page_loading: false,
                     });
                 } else {
@@ -1359,6 +1606,8 @@ class HODDashboard extends Component {
                 <GroupSection
                     {...this.props}
                     data={this.state.group_data}
+                    hod_valid_from={this.state.hod_valid_from}
+                    hod_valid_to={this.state.hod_valid_to}
                     loadData={this.loadGroupData}
                     totalCount={this.state.totalGroupCount}
                     activePage={this.state.activeGroupPage}

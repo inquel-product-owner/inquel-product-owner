@@ -183,12 +183,6 @@ class HODGroupTeachers extends Component {
                                                                                     </div>
                                                                                 </div>
                                                                             </th>
-                                                                            <th scope="col">
-                                                                                Exams
-                                                                            </th>
-                                                                            <th scope="col">
-                                                                                Quizes
-                                                                            </th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -252,8 +246,6 @@ class HODGroupTeachers extends Component {
                                                                                                 }
                                                                                             )}
                                                                                         </td>
-                                                                                        <td></td>
-                                                                                        <td></td>
                                                                                     </tr>
                                                                                 );
                                                                             }

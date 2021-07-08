@@ -107,7 +107,7 @@ const UpdatePassword = () => {
             setResponseMsg("Invalid password!");
             setErrorAlert(true);
             setLoading(false);
-        } else if (new_passwrod.length < 12 && confirm_password.length < 12) {
+        } else if (new_passwrod.length < 8 && confirm_password.length < 8) {
             setResponseMsg("Invalid password!");
             setErrorAlert(true);
             setLoading(false);
