@@ -11,69 +11,93 @@ class SideNav extends Component {
                 className={`text-center light-bg ${
                     this.props.shownav ? "active" : ""
                 }`}
-                style={{ overflow: "unset" }}
+                style={{ display: "flex", flexDirection: "column" }}
             >
-                <Link to="/admin">
-                    <OverlayTrigger
-                        key="right"
-                        placement="right"
-                        overlay={<Tooltip id="tooltip">Dashboard</Tooltip>}
-                    >
-                        <button
-                            className={`btn sidebar-btn ${
-                                active === "dashboard" ? "active" : ""
-                            } btn-sm mb-3`}
+                <div>
+                    <Link to="/admin">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Dashboard</Tooltip>}
                         >
-                            <i
-                                className="fas fa-tachometer-alt"
-                                style={{ marginLeft: "-1.5px" }}
-                            ></i>
-                        </button>
-                    </OverlayTrigger>
-                </Link>
-                <Link to="/admin/profiles">
-                    <OverlayTrigger
-                        key="right"
-                        placement="right"
-                        overlay={<Tooltip id="tooltip">Profiles</Tooltip>}
-                    >
-                        <button
-                            className={`btn sidebar-btn ${
-                                active === "profiles" ? "active" : ""
-                            } btn-sm mb-3`}
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "dashboard" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i
+                                    className="fas fa-tachometer-alt"
+                                    style={{ marginLeft: "-1.5px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
+                    <Link to="/admin/profiles">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Profiles</Tooltip>}
                         >
-                            <i
-                                className="fas fa-users"
-                                style={{ marginLeft: "-2.5px" }}
-                            ></i>
-                        </button>
-                    </OverlayTrigger>
-                </Link>
-                <Dropdown drop="right" key="right">
-                    <OverlayTrigger
-                        key="right"
-                        placement="right"
-                        overlay={<Tooltip id="tooltip">Master Data</Tooltip>}
-                    >
-                        <Dropdown.Toggle
-                            variant="white"
-                            className={`btn sidebar-btn btn-sm shadow-none caret-off ${
-                                active === "data" ? "active" : ""
-                            }`}
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "profiles" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i
+                                    className="fas fa-users"
+                                    style={{ marginLeft: "-2.5px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
+                    <Dropdown drop="right" key="right">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={
+                                <Tooltip id="tooltip">Master Data</Tooltip>
+                            }
                         >
-                            <i className="fas fa-database"></i>
-                        </Dropdown.Toggle>
-                    </OverlayTrigger>
+                            <Dropdown.Toggle
+                                variant="white"
+                                className={`btn sidebar-btn btn-sm shadow-none caret-off ${
+                                    active === "data" ? "active" : ""
+                                }`}
+                            >
+                                <i className="fas fa-database"></i>
+                            </Dropdown.Toggle>
+                        </OverlayTrigger>
 
-                    <Dropdown.Menu className="dropdown-menu-right">
-                        <Dropdown.Item as={Link} to="/admin/master-data">
-                            Master Data
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/admin/discounts">
-                            Discount Configuration
-                        </Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
+                        <Dropdown.Menu className="dropdown-menu-right">
+                            <Dropdown.Item as={Link} to="/admin/master-data">
+                                Master Data
+                            </Dropdown.Item>
+                            <Dropdown.Item as={Link} to="/admin/discounts">
+                                Discount Configuration
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+                <div className="mt-auto">
+                    <Link to="/admin/settings">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Settings</Tooltip>}
+                        >
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "settings" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i
+                                    className="fas fa-cog"
+                                    style={{ marginLeft: "-1px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
+                </div>
             </div>
         );
     }

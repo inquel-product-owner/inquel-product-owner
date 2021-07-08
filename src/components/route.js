@@ -23,17 +23,20 @@ import AdminHodProfile from "./admin/hod/profile";
 import AdminHodTeacherList from "./admin/hod/teacherList";
 import AdminHodStudentList from "./admin/hod/studentList";
 import AdminHodStudentProfile from "./admin/hod/studentProfile";
+import AdminHODGroup from "./admin/hod/group";
 
-import AdminCourseView from "./admin/viewCourse";
+// import AdminCourseView from "./admin/viewCourse";
 import AdminDiscountConfiguration from "./admin/discountConfiguration";
 import AdminMasterData from "./admin/masterData";
+
+import AdminSettings from "./admin/settings/";
 
 // -------------------- HOD Imports --------------------
 
 import HODLogin from "./hod/login";
 import HODDashboard from "./hod/dashboard";
 import HODProfile from "./hod/profile";
-import HODSettings from "./hod/settings/settings";
+import HODSettings from "./hod/settings/";
 
 import HODGroup from "./hod/group/group";
 import HODGroupSubject from "./hod/group/subject";
@@ -112,6 +115,7 @@ import TeacherLevelPreview from "./teacher/quiz/levelPreview";
 import TeacherEmailVerify from "./teacher/emailVerification";
 import TeacherLogin from "./teacher/login";
 import TeacherProfile from "./teacher/profile";
+import TeacherSettings from "./teacher/settings/";
 
 // -------------------- Student Imports --------------------
 
@@ -153,6 +157,7 @@ import EmailVerify from "./student/emailVerification";
 import StudentLogin from "./student/login";
 import StudentRegister from "./student/register";
 import Profile from "./student/profile";
+import StudentSettings from "./student/settings/";
 
 import StudyPlanner from "./student/study-planner/";
 
@@ -260,6 +265,17 @@ const routes = (
             }
         />
         <Route
+            exact
+            path="/admin/hod/:hodId/group/:groupId"
+            render={(props) =>
+                !localStorage.getItem("Inquel-Auth") ? (
+                    <Redirect to="/admin/login" />
+                ) : (
+                    <AdminHODGroup {...props} />
+                )
+            }
+        />
+        <Route
             path="/admin/student/:studentId"
             render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
@@ -269,7 +285,7 @@ const routes = (
                 )
             }
         />
-        <Route
+        {/* <Route
             path="/admin/course/:courseId"
             render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
@@ -278,7 +294,7 @@ const routes = (
                     <AdminCourseView {...props} />
                 )
             }
-        />
+        /> */}
         <Route
             path="/admin/hod/:hodId/teacher"
             render={(props) =>
@@ -317,6 +333,17 @@ const routes = (
                     <Redirect to="/admin/login" />
                 ) : (
                     <AdminMasterData {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/admin/settings"
+            render={(props) =>
+                !localStorage.getItem("Inquel-Auth") ? (
+                    <Redirect to="/admin/login" />
+                ) : (
+                    <AdminSettings {...props} />
                 )
             }
         />
@@ -860,18 +887,6 @@ const routes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <TeacherDashboard {...props} />
-                )
-            }
-        />
-        <Route
-            exact
-            path="/teacher/profile"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_teacher") ? (
-                    <Redirect to="/teacher/login" />
-                ) : (
-                    <TeacherProfile {...props} />
                 )
             }
         />
@@ -1484,6 +1499,30 @@ const routes = (
         />
         <Route
             exact
+            path="/teacher/profile"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <TeacherProfile {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/settings"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <TeacherSettings {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/teacher/account/activation/:tokenId"
             render={(props) => <TeacherEmailVerify {...props} />}
         />
@@ -2030,6 +2069,18 @@ const routes = (
 
         {/* --------------- Login, Registration, Verification routings --------------- */}
 
+        <Route
+            exact
+            path="/dashboard/settings"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <StudentSettings {...props} />
+                )
+            }
+        />
         <Route
             exact
             path="/login"

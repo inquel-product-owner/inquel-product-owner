@@ -1,6 +1,6 @@
 import React from "react";
 import dateFormat from "dateformat";
-import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import { connect } from "react-redux";
@@ -22,7 +22,7 @@ class UpdateProfile extends React.Component {
             showErrorAlert: false,
             showSuccessAlert: false,
         };
-        this.url = baseUrl + hodUrl;
+        this.url = baseUrl + teacherUrl;
         this.headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -64,23 +64,10 @@ class UpdateProfile extends React.Component {
         let data = this.state.data;
         delete data.permissions;
 
-        fetch(`${this.url}/hod/profile/`, {
+        fetch(`${this.url}/teacher/profile/`, {
             method: "PUT",
             headers: this.headers,
             body: JSON.stringify(data),
-            // body: JSON.stringify({
-            //     first_name: data.first_name,
-            //     last_name: data.last_name,
-            //     username: data.username,
-            //     phone_num: data.phone_num,
-            //     date_of_birth: dateFormat(data.date_of_birth, "yyyy-mm-dd"),
-            //     description: data.description,
-            //     department_name: data.department_name,
-            //     department_details: data.department_details,
-            //     office_address: data.office_address,
-            //     additional_details_1: data.additional_details_1,
-            //     additional_details_2: data.additional_details_2,
-            // }),
         })
             .then((res) => res.json())
             .then((result) => {
@@ -90,7 +77,7 @@ class UpdateProfile extends React.Component {
                         showSuccessAlert: true,
                         isLoading: false,
                     });
-                    this.props.loadData();
+                    this.props.fetchProfile();
                 } else {
                     this.setState({
                         responseMsg: result.msg,
@@ -265,7 +252,7 @@ class UpdateProfile extends React.Component {
                                                     <input
                                                         type="text"
                                                         name="phone_num"
-                                                        id="phone_num"
+                                                        id="phone"
                                                         className="form-control form-control-lg"
                                                         onChange={
                                                             this.handleInput
@@ -273,73 +260,6 @@ class UpdateProfile extends React.Component {
                                                         value={
                                                             this.state.data
                                                                 .phone_num
-                                                        }
-                                                        placeholder="Enter phone number"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="form-group">
-                                            <label htmlFor="office_phone_num">
-                                                Office phone{" "}
-                                                <span className="text-danger font-weight-bold">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <div className="d-flex border-secondary rounded-lg">
-                                                <div
-                                                    style={{
-                                                        width: "35%",
-                                                    }}
-                                                >
-                                                    <Select
-                                                        className="basic-single border-right"
-                                                        isSearchable={false}
-                                                        name="country_code"
-                                                        value={country.map(
-                                                            (list) => {
-                                                                return list.dialCode ===
-                                                                    this.state
-                                                                        .data
-                                                                        .country_code
-                                                                    ? {
-                                                                          value: list.dialCode,
-                                                                          label: this.renderValue(
-                                                                              list
-                                                                          ),
-                                                                      }
-                                                                    : "";
-                                                            }
-                                                        )}
-                                                        options={country.map(
-                                                            (list) => {
-                                                                return {
-                                                                    value: list.dialCode,
-                                                                    label: this.renderValue(
-                                                                        list
-                                                                    ),
-                                                                };
-                                                            }
-                                                        )}
-                                                        onChange={
-                                                            this.handleSelect
-                                                        }
-                                                        required
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        name="office_phone_num"
-                                                        id="office_phone_num"
-                                                        className="form-control form-control-lg"
-                                                        onChange={
-                                                            this.handleInput
-                                                        }
-                                                        value={
-                                                            this.state.data
-                                                                .office_phone_num
                                                         }
                                                         placeholder="Enter phone number"
                                                         required
@@ -374,7 +294,7 @@ class UpdateProfile extends React.Component {
                                 <div className="row">
                                     <div className="col-lg-6 col-md-8">
                                         <div className="form-group">
-                                            <label htmlFor="address">
+                                            <label htmlFor="city">
                                                 Address line
                                             </label>
                                             <input
@@ -435,7 +355,7 @@ class UpdateProfile extends React.Component {
                                             />
                                         </div>
                                         <div>
-                                            <label htmlFor="pincode">
+                                            <label htmlFor="country">
                                                 Pincode
                                             </label>
                                             <input
@@ -458,12 +378,27 @@ class UpdateProfile extends React.Component {
                                     <div className="col-lg-6 col-md-8">
                                         <div className="form-group">
                                             <label htmlFor="department_name">
-                                                Department Name
+                                                Designation
                                             </label>
                                             <input
                                                 type="text"
-                                                name="department_name"
-                                                id="department_name"
+                                                name="designation"
+                                                id="designation"
+                                                className="form-control border-secondary"
+                                                value={
+                                                    this.state.data.designation
+                                                }
+                                                onChange={this.handleInput}
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label htmlFor="department_name">
+                                                Institution Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="instituiton_name"
+                                                id="instituiton_name"
                                                 className="form-control border-secondary"
                                                 value={
                                                     this.state.data
@@ -472,14 +407,14 @@ class UpdateProfile extends React.Component {
                                                 onChange={this.handleInput}
                                             />
                                         </div>
-                                        <div className="form-group">
+                                        <div>
                                             <label htmlFor="department_details">
-                                                Department details
+                                                Institution details
                                             </label>
                                             <input
                                                 type="text"
-                                                name="department_details"
-                                                id="department_details"
+                                                name="instituiton_details"
+                                                id="instituiton_details"
                                                 className="form-control border-secondary"
                                                 value={
                                                     this.state.data
@@ -487,54 +422,6 @@ class UpdateProfile extends React.Component {
                                                 }
                                                 onChange={this.handleInput}
                                             />
-                                        </div>
-                                        <div className="form-group">
-                                            <label htmlFor="office_address">
-                                                Office address
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="office_address"
-                                                id="office_address"
-                                                className="form-control border-secondary"
-                                                value={
-                                                    this.state.data
-                                                        .office_address
-                                                }
-                                                onChange={this.handleInput}
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label htmlFor="additional_details_1">
-                                                Additional details 1
-                                            </label>
-                                            <textarea
-                                                name="additional_details_1"
-                                                id="additional_details_1"
-                                                rows="4"
-                                                className="form-control border-secondary"
-                                                onChange={this.handleInput}
-                                                value={
-                                                    this.state.data
-                                                        .additional_details_1
-                                                }
-                                            ></textarea>
-                                        </div>
-                                        <div>
-                                            <label htmlFor="additional_details_2">
-                                                Additional details 2
-                                            </label>
-                                            <textarea
-                                                name="additional_details_2"
-                                                id="additional_details_2"
-                                                rows="4"
-                                                className="form-control border-secondary"
-                                                onChange={this.handleInput}
-                                                value={
-                                                    this.state.data
-                                                        .additional_details_2
-                                                }
-                                            ></textarea>
                                         </div>
                                     </div>
                                 </div>

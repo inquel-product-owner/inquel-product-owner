@@ -62,6 +62,10 @@ const PopularCourse = (props) => {
             localStorage.getItem("is_student")
         ) {
             headers["Authorization"] = localStorage.getItem("Authorization");
+        } else {
+            if (headers.Authorization) {
+                delete headers.Authorization;
+            }
         }
 
         loadCourses();
@@ -89,8 +93,6 @@ const PopularCourse = (props) => {
             })
             .catch((err) => {
                 console.log(err);
-                setResponseMsg("Something went wrong!");
-                setErrorAlert(true);
                 setLoading(false);
             });
     };
@@ -111,8 +113,6 @@ const PopularCourse = (props) => {
             })
             .catch((err) => {
                 console.log(err);
-                setResponseMsg("Something went wrong!");
-                setErrorAlert(true);
                 setLoading(false);
             });
     };
