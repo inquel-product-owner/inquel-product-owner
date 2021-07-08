@@ -11,8 +11,9 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import "./grid-overview.css";
 import { Link } from "react-router-dom";
-import store from "../../../redux/store";
 import dateFormat from "dateformat";
+import { GROUP } from "../../../redux/action";
+import storeDispatch from "../../../redux/dispatch";
 
 function valid_fromDate(props) {
     return dateFormat(props.valid_from, "dd/mm/yyyy");
@@ -27,7 +28,10 @@ function teacherView(props) {
         <>
             <span>{props.teachers.length}</span>
             <Link to={`/hod/group/${props.id}/teacher`}>
-                <button className="btn btn-light btn-sm ml-2 shadow-sm shadow-none">
+                <button
+                    className="btn btn-light btn-sm ml-2 shadow-sm shadow-none"
+                    onClick={() => storeDispatch(GROUP, props.group_name)}
+                >
                     <i className="fas fa-eye fa-sm"></i>
                 </button>
             </Link>
@@ -66,7 +70,10 @@ function studentView(props) {
         <>
             <span>{props.students.length}</span>
             <Link to={`/hod/group/${props.id}/student`}>
-                <button className="btn btn-light btn-sm ml-2 shadow-sm shadow-none">
+                <button
+                    className="btn btn-light btn-sm ml-2 shadow-sm shadow-none"
+                    onClick={() => storeDispatch(GROUP, props.group_name)}
+                >
                     <i className="fas fa-eye fa-sm"></i>
                 </button>
             </Link>
@@ -77,7 +84,10 @@ function studentView(props) {
 function detailsView(props) {
     return (
         <Link to={`/hod/group/${props.id}/details`}>
-            <button className="btn btn-light btn-sm shadow-sm shadow-none">
+            <button
+                className="btn btn-light btn-sm shadow-sm shadow-none"
+                onClick={() => storeDispatch(GROUP, props.group_name)}
+            >
                 <i className="fas fa-eye fa-sm"></i>
             </button>
         </Link>
@@ -159,20 +169,28 @@ class GroupTable extends Component {
         }
     }
 
-    dispatch = (data) => {
-        store.dispatch({ type: "GROUP", payload: data });
-    };
-
     viewTemplate = (props) => {
         return (
-            <Link to={`/${this.props.path}/group/${props.id}`}>
-                <button
-                    className="btn btn-link btn-sm shadow-none"
-                    onClick={() => this.dispatch(props.group_name)}
-                >
-                    <i className="fas fa-eye"></i>
-                </button>
-            </Link>
+            <div className="d-flex">
+                <Link to={`/${this.props.path}/group/${props.id}`}>
+                    <button
+                        className="btn btn-link btn-sm shadow-none"
+                        onClick={() => storeDispatch(GROUP, props.group_name)}
+                    >
+                        <i className="fas fa-eye"></i>
+                    </button>
+                </Link>
+                {this.props.hasEdit === true ? (
+                    <button
+                        className="btn btn-link btn-sm shadow-none ml-1"
+                        onClick={() => this.props.handleEdit(props)}
+                    >
+                        <i className="fas fa-edit fa-sm"></i>
+                    </button>
+                ) : (
+                    ""
+                )}
+            </div>
         );
     };
 

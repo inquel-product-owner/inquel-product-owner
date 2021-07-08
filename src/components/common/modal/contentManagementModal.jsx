@@ -415,13 +415,15 @@ export class MultiContentDeleteModal extends Component {
                         Are you sure that you want to delete this{" "}
                         {this.props.type}?
                     </p>
-                    {this.props.data.map((item, index) => {
-                        return (
-                            <p className="small mb-2" key={index}>
-                                {index + 1}. {item.name}
-                            </p>
-                        );
-                    })}
+                    {this.props.data
+                        ? (this.props.data || []).map((item, index) => {
+                              return (
+                                  <p className="small mb-2" key={index}>
+                                      {index + 1}. {item.name}
+                                  </p>
+                              );
+                          })
+                        : ""}
                 </Modal.Body>
                 <Modal.Footer>
                     <button

@@ -99,39 +99,6 @@ class DiscountModal extends Component {
                 price_exists: this.props.data.price_exists || false,
             };
 
-            // if (
-            //     (this.props.data.min_points !== "" &&
-            //         this.props.data.min_points !== 0 &&
-            //         this.props.data.min_points !== null) ||
-            //     (this.props.data.max_points !== "" &&
-            //         this.props.data.max_points !== 0 &&
-            //         this.props.data.max_points !== null) ||
-            //     (this.props.data.deduction_points !== "" &&
-            //         this.props.data.deduction_points !== 0 &&
-            //         this.props.data.deduction_points !== null) ||
-            //     (this.props.data.points_in_decimal !== "" &&
-            //         this.props.data.points_in_decimal !== 0 &&
-            //         this.props.data.points_in_decimal !== null)
-            // ) {
-            //     tempObj.points_exists = true;
-            // } else if (
-            //     this.props.data.percentage !== "" &&
-            //     this.props.data.percentage !== 0 &&
-            //     this.props.data.percentage !== null
-            // ) {
-            //     tempObj.percent_exists = true;
-            // } else if (
-            //     this.props.data.fixed_price !== "" &&
-            //     this.props.data.fixed_price !== 0 &&
-            //     this.props.data.fixed_price !== null
-            // ) {
-            //     tempObj.price_exists = true;
-            // } else {
-            //     tempObj.points_exists = false;
-            //     tempObj.percent_exists = false;
-            //     tempObj.price_exists = false;
-            // }
-
             this.setState(
                 {
                     data: tempObj,

@@ -27,6 +27,7 @@ class HODSimulationSection extends Component {
                     question_type: "",
                     category: "",
                     total_questions: "",
+                    any_questions: "",
                     marks: "",
                 },
             ],
@@ -103,6 +104,7 @@ class HODSimulationSection extends Component {
                                 question_type: result.data[i].question_type,
                                 category: result.data[i].category,
                                 total_questions: result.data[i].total_questions,
+                                any_questions: result.data[i].any_questions,
                                 marks: result.data[i].marks,
                             });
                         }
@@ -146,6 +148,8 @@ class HODSimulationSection extends Component {
             section[index].section_name = event.target.value;
         } else if (type === "questions") {
             section[index].total_questions = event.target.value;
+        } else if (type === "any_questions") {
+            section[index].any_questions = event.target.value;
         } else if (type === "marks") {
             section[index].marks = event.target.value;
         }
@@ -215,6 +219,12 @@ class HODSimulationSection extends Component {
                 showErrorAlert: true,
                 page_loading: false,
             });
+        } else if (section[index].any_questions === "") {
+            this.setState({
+                errorMsg: "Enter any questions",
+                showErrorAlert: true,
+                page_loading: false,
+            });
         } else {
             if (section[index].section_id === "") {
                 this.handlePOST(section, index);
@@ -235,6 +245,7 @@ class HODSimulationSection extends Component {
                     question_type: section[index].question_type,
                     category: section[index].category,
                     total_questions: Number(section[index].total_questions),
+                    any_questions: Number(section[index].any_questions),
                     marks: Number(section[index].marks),
                 }),
             }
@@ -284,6 +295,7 @@ class HODSimulationSection extends Component {
                     question_type: section[index].question_type,
                     category: section[index].category,
                     total_questions: Number(section[index].total_questions),
+                    any_questions: Number(section[index].any_questions),
                     marks: Number(section[index].marks),
                 }),
             }
@@ -326,6 +338,7 @@ class HODSimulationSection extends Component {
             question_type: "",
             category: "",
             total_questions: "",
+            any_questions: "",
             marks: "",
         });
         this.setState({
@@ -374,6 +387,7 @@ class HODSimulationSection extends Component {
                                         question_type: "",
                                         category: "",
                                         total_questions: "",
+                                        any_questions: "",
                                         marks: "",
                                     });
                                     this.setState({
@@ -413,6 +427,7 @@ class HODSimulationSection extends Component {
                             question_type: "",
                             category: "",
                             total_questions: "",
+                            any_questions: "",
                             marks: "",
                         });
                         this.setState({
