@@ -197,7 +197,7 @@ class HODSubjectChapter extends Component {
                     }
                 >
                     <div className="row align-items-center">
-                        <div className="col-4">
+                        <div className="col-3">
                             <div className="row align-items-center">
                                 <div className="col-1">
                                     {data.child && data.child.length !== 0 ? (
@@ -225,11 +225,11 @@ class HODSubjectChapter extends Component {
                             </div>
                         </div>
 
-                        <div className="col-8">
+                        <div className="col-9">
                             <div className="row align-items-center">
-                                <div className="col-2"></div>
-                                <div className="col-2"></div>
-                                <div className="col-2">
+                                <div className="col"></div>
+                                <div className="col"></div>
+                                <div className="col">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/match`}
                                     >
@@ -250,7 +250,7 @@ class HODSubjectChapter extends Component {
                                         </button>
                                     </Link>
                                 </div>
-                                <div className="col-2">
+                                <div className="col">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/concepts`}
                                     >
@@ -271,7 +271,7 @@ class HODSubjectChapter extends Component {
                                         </button>
                                     </Link>
                                 </div>
-                                <div className="col-2">
+                                <div className="col">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/typeone`}
                                     >
@@ -292,7 +292,7 @@ class HODSubjectChapter extends Component {
                                         </button>
                                     </Link>
                                 </div>
-                                <div className="col-2">
+                                <div className="col">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/typetwo`}
                                     >
@@ -313,6 +313,7 @@ class HODSubjectChapter extends Component {
                                         </button>
                                     </Link>
                                 </div>
+                                <div className="col">{data.next_topic}</div>
                             </div>
                         </div>
                     </div>
@@ -493,15 +494,16 @@ class HODSubjectChapter extends Component {
                     <div style={{ minWidth: "1100px" }}>
                         <div className="card-header tomato-bg primary-text font-weight-bold-600">
                             <div className="row align-items-center">
-                                <div className="col-4">Topic structure</div>
-                                <div className="col-8 small primary-text font-weight-bold">
+                                <div className="col-3">Topic structure</div>
+                                <div className="col-9 small primary-text font-weight-bold">
                                     <div className="row justify-content-end">
-                                        <div className="col-2">Summary</div>
-                                        <div className="col-2">Notes</div>
-                                        <div className="col-2">Match</div>
-                                        <div className="col-2">Concept</div>
-                                        <div className="col-2">Type 1 Q</div>
-                                        <div className="col-2">Type 2 Q</div>
+                                        <div className="col">Summary</div>
+                                        <div className="col">Notes</div>
+                                        <div className="col">Match</div>
+                                        <div className="col">Concept</div>
+                                        <div className="col">Type 1 Q</div>
+                                        <div className="col">Type 2 Q</div>
+                                        <div className="col">Next Topic</div>
                                     </div>
                                 </div>
                             </div>
@@ -525,7 +527,7 @@ class HODSubjectChapter extends Component {
                                         }}
                                     >
                                         <div className="row align-items-center">
-                                            <div className="col-4">
+                                            <div className="col-3">
                                                 <div className="row align-items-center">
                                                     <div className="col-1">
                                                         <span>
@@ -556,7 +558,7 @@ class HODSubjectChapter extends Component {
                                                 </div>
                                             </div>
 
-                                            <div className="col-8">
+                                            <div className="col-9">
                                                 <div className="row align-items-center">
                                                     <div className="col-2">
                                                         {this.state.chapters
@@ -585,7 +587,7 @@ class HODSubjectChapter extends Component {
                                                             ""
                                                         )}
                                                     </div>
-                                                    <div className="col-2">
+                                                    <div className="col-2 pl-0">
                                                         {this.state.chapters
                                                             .topics &&
                                                         Object.keys(

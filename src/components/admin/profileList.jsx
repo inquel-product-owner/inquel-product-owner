@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Wrapper from "./wrapper";
-import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
+import { Tabs, Tab, Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
 import Select from "react-select";
@@ -16,6 +16,7 @@ import {
 } from "../common/modal/userManagementModal";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
+import NotificationModal from "../common/modal/notification";
 
 class HODModal extends Component {
     constructor(props) {
@@ -798,6 +799,9 @@ class AdminHODAndStudentList extends Component {
             showStudent_EnableDisableModal: false,
 
             activeTab: "hod",
+            notify_all: false,
+            showNotificationModal: false,
+
             hodItems: [],
             studentItems: [],
             selectedHOD: [],
@@ -912,6 +916,24 @@ class AdminHODAndStudentList extends Component {
 
         this.loadHodData();
         this.loadStudentData();
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (!this.props.location.hash) {
+            if (this.state.activeTab === "student") {
+                this.setState({
+                    activeTab: "hod",
+                });
+            }
+        } else {
+            if (
+                this.props.location.hash.substring(1) !== this.state.activeTab
+            ) {
+                this.setState({
+                    activeTab: this.props.location.hash.substring(1),
+                });
+            }
+        }
     };
 
     handleDelete = () => {
@@ -1124,6 +1146,36 @@ class AdminHODAndStudentList extends Component {
                     ""
                 )}
 
+                {/* Notification Modal */}
+                {this.state.showNotificationModal ? (
+                    <NotificationModal
+                        show={this.state.showNotificationModal}
+                        onHide={() => {
+                            this.setState({
+                                showNotificationModal: false,
+                            });
+                        }}
+                        url={
+                            this.state.activeTab === "hod"
+                                ? `${this.url}/admin/hod/notify/`
+                                : `${this.url}/admin/student/notify/`
+                        }
+                        data={
+                            this.state.activeTab === "hod"
+                                ? this.state.selectedHOD
+                                : this.state.selectedStudent
+                        }
+                        field={
+                            this.state.activeTab === "hod"
+                                ? "hod_id"
+                                : "student_id"
+                        }
+                        notify_all={this.state.notify_all}
+                    />
+                ) : (
+                    ""
+                )}
+
                 <div className="row align-items-center mb-3">
                     <div className="col-md-6">
                         {/* Breadcrumb */}
@@ -1160,11 +1212,73 @@ class AdminHODAndStudentList extends Component {
                             Delete
                         </button>
                         <button
-                            className="btn btn-primary btn-sm shadow-none"
+                            className="btn btn-primary btn-sm shadow-none mr-1"
                             onClick={this.handleEnableDisable}
                         >
                             Enable / Disable
                         </button>
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="primary"
+                                id="dropdown-basic"
+                                className="btn-sm shadow-none"
+                            >
+                                Notify
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu className="dropdown-menu-down dropdown-menu-down-btn">
+                                <Dropdown.Item
+                                    onClick={() => {
+                                        this.setState({
+                                            showNotificationModal: true,
+                                            notify_all: true,
+                                        });
+                                    }}
+                                >
+                                    Notify All
+                                </Dropdown.Item>
+                                <div className="dropdown-divider"></div>
+                                <Dropdown.Item
+                                    onClick={() => {
+                                        if (this.state.activeTab === "hod") {
+                                            if (
+                                                this.state.selectedHOD
+                                                    .length !== 0
+                                            ) {
+                                                this.setState({
+                                                    showNotificationModal: true,
+                                                    notify_all: false,
+                                                });
+                                            } else {
+                                                this.setState({
+                                                    errorMsg:
+                                                        "Select hod to send notification",
+                                                    showErrorAlert: true,
+                                                });
+                                            }
+                                        } else {
+                                            if (
+                                                this.state.selectedStudent
+                                                    .length !== 0
+                                            ) {
+                                                this.setState({
+                                                    showNotificationModal: true,
+                                                    notify_all: false,
+                                                });
+                                            } else {
+                                                this.setState({
+                                                    errorMsg:
+                                                        "Select student to send notification",
+                                                    showErrorAlert: true,
+                                                });
+                                            }
+                                        }
+                                    }}
+                                >
+                                    Notify Selected
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
                 </div>
 

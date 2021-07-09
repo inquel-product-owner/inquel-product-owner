@@ -270,41 +270,47 @@ class TeacherCycleDirectEvaluation extends Component {
             page_loading: true,
         });
 
-        fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/direct/publish/`,
-            {
-                method: "POST",
-                headers: this.headers,
-                body: JSON.stringify({
-                    chapter_id: this.chapterId,
-                    student_username: this.state.selectedStudent,
-                }),
+        if (this.state.student_list) {
+            for (let i = 0; i < this.state.student_list.length; i++) {
+                fetch(
+                    `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/direct/publish/`,
+                    {
+                        method: "POST",
+                        headers: this.headers,
+                        body: JSON.stringify({
+                            chapter_id: this.chapterId,
+                            student_username: this.state.student_list[i],
+                        }),
+                    }
+                )
+                    .then((res) => res.json())
+                    .then((result) => {
+                        if (result.sts === true) {
+                            this.setState({
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.msg,
+                                showErrorAlert: true,
+                                page_loading: false,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.setState({
+                            errorMsg: "Something went wrong!",
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    });
             }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        page_loading: false,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
+            this.setState({
+                page_loading: false,
             });
+        }
     };
 
     onDocumentLoadSuccess = ({ numPages }) => {

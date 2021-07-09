@@ -5,7 +5,7 @@ import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import { ForgotPasswordModal } from "../common/forgotPassword";
 import storeDispatch from "../../redux/dispatch";
-import { PROFILE } from "../../redux/action";
+import { NOTIFICATION, PROFILE } from "../../redux/action";
 
 class HODLogin extends Component {
     constructor(props) {
@@ -48,6 +48,7 @@ class HODLogin extends Component {
     setLocalStorage = (data) => {
         localStorage.clear();
         storeDispatch(PROFILE, {});
+        storeDispatch(NOTIFICATION, []);
         localStorage.setItem("Authorization", `Token ${data.token}`);
         localStorage.setItem("is_hod", data.is_hod);
 

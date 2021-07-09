@@ -9,6 +9,7 @@ import Loading from "../common/loader";
 import Paginations from "../common/pagination";
 import StudentTable from "../common/table/student";
 import AlertBox from "../common/alert";
+import NotificationModal from "../common/modal/notification";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -23,6 +24,9 @@ class TeacherGroupStudents extends Component {
             selectedStudent: [],
             activeStudentPage: 1,
             totalStudentCount: 0,
+
+            notify_all: false,
+            showNotificationModal: false,
 
             errorMsg: "",
             successMsg: "",
@@ -133,6 +137,24 @@ class TeacherGroupStudents extends Component {
                     }}
                 />
 
+                {/* Notification Modal */}
+                {this.state.showNotificationModal ? (
+                    <NotificationModal
+                        show={this.state.showNotificationModal}
+                        onHide={() => {
+                            this.setState({
+                                showNotificationModal: false,
+                            });
+                        }}
+                        url={`${this.url}/teacher/group/${this.groupId}/student/notify/`}
+                        data={this.state.selectedStudent}
+                        field="student_id"
+                        notify_all={this.state.notify_all}
+                    />
+                ) : (
+                    ""
+                )}
+
                 {/* Filter area */}
                 <div className="row align-items-center mb-3">
                     <div className="col-md-6">
@@ -170,9 +192,36 @@ class TeacherGroupStudents extends Component {
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu className="dropdown-menu-down dropdown-menu-down-btn">
-                                    <Dropdown.Item>Notify All</Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => {
+                                            this.setState({
+                                                showNotificationModal: true,
+                                                notify_all: true,
+                                            });
+                                        }}
+                                    >
+                                        Notify All
+                                    </Dropdown.Item>
                                     <div className="dropdown-divider"></div>
-                                    <Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => {
+                                            if (
+                                                this.state.selectedStudent
+                                                    .length !== 0
+                                            ) {
+                                                this.setState({
+                                                    showNotificationModal: true,
+                                                    notify_all: false,
+                                                });
+                                            } else {
+                                                this.setState({
+                                                    errorMsg:
+                                                        "Select student to send notification",
+                                                    showErrorAlert: true,
+                                                });
+                                            }
+                                        }}
+                                    >
                                         Notify Selected
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
