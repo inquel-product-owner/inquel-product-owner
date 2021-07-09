@@ -19,3 +19,4 @@ export const PROFILE = "PROFILE";
 export const RESPONSE = "RESPONSE";
 export const TEMP = "TEMP";
 export const EXAMDATA = "EXAMDATA";
+export const NOTIFICATION = "NOTIFICATION";

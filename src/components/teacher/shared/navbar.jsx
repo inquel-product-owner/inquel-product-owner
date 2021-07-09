@@ -7,7 +7,8 @@ import { baseUrl, accountsUrl, teacherUrl } from "../../../shared/baseUrl";
 import { Logout } from "../../common/modal/idleLogoutModal";
 import { connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
-import { PROFILE } from "../../../redux/action";
+import { NOTIFICATION, PROFILE } from "../../../redux/action";
+import { NotificationDropdown } from "../../common/modal/notification";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -26,6 +27,15 @@ class Header extends Component {
         };
     }
 
+    componentDidMount = () => {
+        if (
+            this.props.profile &&
+            Object.keys(this.props.profile).length === 0
+        ) {
+            this.loadProfileData();
+        }
+    };
+
     loadProfileData = () => {
         fetch(`${baseUrl + teacherUrl}/teacher/profile/`, {
             method: "GET",
@@ -42,15 +52,6 @@ class Header extends Component {
             });
     };
 
-    componentDidMount = () => {
-        if (
-            this.props.profile &&
-            Object.keys(this.props.profile).length === 0
-        ) {
-            this.loadProfileData();
-        }
-    };
-
     handleLogout = () => {
         fetch(`${this.url}/logout/`, {
             headers: this.headers,
@@ -63,6 +64,7 @@ class Header extends Component {
                     isLoggedOut: true,
                 });
                 storeDispatch(PROFILE, {});
+                storeDispatch(NOTIFICATION, []);
             })
             .catch((err) => {
                 console.log(err);
@@ -103,9 +105,14 @@ class Header extends Component {
 
                         <div className="col-md-3 col-6 d-flex justify-content-end pr-0">
                             <Nav className="ml-auto">
-                                <Nav.Link href="/">
-                                    <i className="far fa-bell mr-2 mt-2"></i>
-                                </Nav.Link>
+                                {/* Notification */}
+                                <NotificationDropdown
+                                    path="/teacher"
+                                    url={`${baseUrl}${teacherUrl}/teacher/notification/`}
+                                    headers={this.headers}
+                                />
+
+                                {/* Profile */}
                                 <Dropdown>
                                     <Dropdown.Toggle
                                         variant="light"

@@ -278,22 +278,6 @@ label {
     box-shadow: none !important;
 }
 
-/* input[type="search"] {
-    outline: none;
-    border: none;
-    border-bottom: 1px solid var(--primary);
-    border-radius: 0;
-    background-color: transparent;
-}
-
-input[type="search"]:focus {
-    outline: none;
-    background-color: transparent;
-    box-shadow: none;
-    border: none;
-    border-bottom: 1px solid var(--primary);
-} */
-
 .custom-file-label {
     z-index: 0 !important;
     overflow: hidden;
@@ -409,6 +393,20 @@ input[type="search"]:focus {
     border-radius: 50%;
 }
 
+.profile-img-circle-md {
+    height: 32px;
+    width: 32px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-img-circle-lg {
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
 .square-img {
     width: 150px;
     height: 150px;
@@ -498,6 +496,83 @@ input[type="search"]:focus {
     left: 80%;
     position: absolute;
     top: -8px;
+}
+
+/* -=-=-=-=-= Notification dropdown =-=-=-=-=- */
+
+.notification .dropdown-menu {
+    width: 325px;
+    padding: 0;
+}
+
+.notification .dropdown-menu-down::before {
+    left: 88% !important;
+}
+.notification .dropdown-menu-down::after {
+    left: 88% !important;
+}
+
+.notification .dropdown-header {
+    padding: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.notification .dropdown-header .mark-all-read {
+    font-size: 13px;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.notification .dropdown-item {
+    padding: 15px;
+    background-color: var(--light);
+    cursor: default;
+}
+
+.notification .dropdown-item:hover,
+.notification .dropdown-item:focus {
+    background-color: var(--light-pink) !important;
+}
+
+.notification .dropdown-item .name {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.notification .dropdown-item .name span,
+.notification .dropdown-item .date {
+    font-size: 11px;
+}
+
+.notification .dropdown-item .message {
+    white-space: normal;
+}
+
+.notification .dropdown-footer {
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 400;
+    text-align: center;
+    color: var(--primary);
+}
+
+.notification .dropdown-footer:hover {
+    text-decoration: underline;
+}
+
+.notification .badge {
+    position: absolute;
+    right: 20%;
+    top: 12.5%;
+    width: 12px;
+    height: 12px;
+    background-color: var(--danger);
+    border-radius: 50%;
+    font-size: 7.5px;
+    color: white;
 }
 
 /* -=-=-=-=-= Border =-=-=-=-=- */

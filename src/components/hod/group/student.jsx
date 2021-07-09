@@ -10,6 +10,7 @@ import StudentTable from "../../common/table/student";
 import AlertBox from "../../common/alert";
 import { UserRemoveModal } from "../../common/modal/userManagementModal";
 import { connect } from "react-redux";
+import NotificationModal from "../../common/modal/notification";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -22,6 +23,7 @@ class StudentAssignModal extends Component {
         this.state = {
             studentId: [],
             studentItem: [],
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -263,10 +265,14 @@ class HODGroupStudents extends Component {
         this.state = {
             showStudentModal: false,
             showStudent_RemoveModal: false,
+
             studentItem: [],
             selectedStudent: [],
             activeStudentPage: 1,
             totalStudentCount: 0,
+
+            notify_all: false,
+            showNotificationModal: false,
 
             errorMsg: "",
             successMsg: "",
@@ -429,6 +435,24 @@ class HODGroupStudents extends Component {
                     ""
                 )}
 
+                {/* Notification Modal */}
+                {this.state.showNotificationModal ? (
+                    <NotificationModal
+                        show={this.state.showNotificationModal}
+                        onHide={() => {
+                            this.setState({
+                                showNotificationModal: false,
+                            });
+                        }}
+                        url={`${this.url}/hod/group/${this.groupId}/student/notify/`}
+                        data={this.state.selectedStudent}
+                        field="student_id"
+                        notify_all={this.state.notify_all}
+                    />
+                ) : (
+                    ""
+                )}
+
                 {/* Filter area */}
                 <div className="row align-items-center">
                     <div className="col-md-6">
@@ -478,9 +502,36 @@ class HODGroupStudents extends Component {
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu className="dropdown-menu-down dropdown-menu-down-btn">
-                                    <Dropdown.Item>Notify All</Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => {
+                                            this.setState({
+                                                showNotificationModal: true,
+                                                notify_all: true,
+                                            });
+                                        }}
+                                    >
+                                        Notify All
+                                    </Dropdown.Item>
                                     <div className="dropdown-divider"></div>
-                                    <Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => {
+                                            if (
+                                                this.state.selectedStudent
+                                                    .length !== 0
+                                            ) {
+                                                this.setState({
+                                                    showNotificationModal: true,
+                                                    notify_all: false,
+                                                });
+                                            } else {
+                                                this.setState({
+                                                    errorMsg:
+                                                        "Select student to send notification",
+                                                    showErrorAlert: true,
+                                                });
+                                            }
+                                        }}
+                                    >
                                         Notify Selected
                                     </Dropdown.Item>
                                 </Dropdown.Menu>

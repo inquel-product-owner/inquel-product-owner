@@ -341,7 +341,7 @@ class TeacherDashboard extends Component {
                 </div>
 
                 {/* Subject Table */}
-                <div className="card shadow-sm mb-4">
+                <div className="card shadow-sm">
                     <div className="card-header">
                         <h5 className="mb-0">Subjects</h5>
                     </div>

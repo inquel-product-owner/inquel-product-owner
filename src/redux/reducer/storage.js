@@ -1,9 +1,10 @@
-import { RESPONSE, EXAMDATA, TEMP } from "../action";
+import { RESPONSE, EXAMDATA, TEMP, NOTIFICATION } from "../action";
 
 let initialState = {
     response: {},
     temp: {},
     examData: {},
+    notification: [],
 };
 
 const storageReducer = (state = initialState, action) => {
@@ -14,6 +15,8 @@ const storageReducer = (state = initialState, action) => {
             return { ...state, temp: action.payload };
         case EXAMDATA:
             return { ...state, examData: action.payload };
+        case NOTIFICATION:
+            return { ...state, notification: action.payload };
         default:
             return state;
     }

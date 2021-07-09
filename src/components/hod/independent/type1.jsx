@@ -7,7 +7,7 @@ import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import FileModal from "../shared/fileExplorer";
 import { QuestionDataFormat } from "../../common/function/dataFormating";
-import ExplanationModal from "../../common/modal/explanationModal";
+import ExplanationModal from "../../common/modal/explanation";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,

@@ -76,6 +76,7 @@ import HODSimulationType1 from "./hod/simulation/type1";
 import HODSimulationType2 from "./hod/simulation/type2";
 
 import HODEmailVerification from "./hod/emailVerification";
+import HODNotification from "./hod/notification";
 
 // -------------------- Teacher Imports --------------------
 
@@ -116,6 +117,7 @@ import TeacherEmailVerify from "./teacher/emailVerification";
 import TeacherLogin from "./teacher/login";
 import TeacherProfile from "./teacher/profile";
 import TeacherSettings from "./teacher/settings/";
+import TeacherNotification from "./teacher/notification";
 
 // -------------------- Student Imports --------------------
 
@@ -160,6 +162,7 @@ import Profile from "./student/profile";
 import StudentSettings from "./student/settings/";
 
 import StudyPlanner from "./student/study-planner/";
+import StudentNotification from "./student/notification";
 
 // -------------------- General Imports --------------------
 
@@ -832,6 +835,21 @@ const routes = (
             }
         />
 
+        {/* --------------- Notification --------------- */}
+
+        <Route
+            exact
+            path="/hod/notification"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODNotification {...props} />
+                )
+            }
+        />
+
         {/* ---------- Account & Login ---------- */}
 
         <Route
@@ -1483,6 +1501,21 @@ const routes = (
             }
         />
 
+        {/* --------------- Notification --------------- */}
+
+        <Route
+            exact
+            path="/teacher/notification"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <TeacherNotification {...props} />
+                )
+            }
+        />
+
         {/* --------------- Login, account activation --------------- */}
 
         <Route
@@ -2063,6 +2096,21 @@ const routes = (
                     <Redirect to="/login" />
                 ) : (
                     <StudyPlanner {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Notification --------------- */}
+
+        <Route
+            exact
+            path="/dashboard/notification"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <StudentNotification {...props} />
                 )
             }
         />

@@ -1576,8 +1576,9 @@ class HODCourseConfig extends Component {
                             <div className="card-header font-weight-bold-600">
                                 Items ready for course creation
                             </div>
-                            <div className="card-body pt-2">
+                            <div className="card-body pt-0">
                                 {/* chapters */}
+                                <p className="primary-text font-weight-bold-600">Chapters</p>
                                 <div className="form-row">
                                     {this.state.chapters.length !== 0
                                         ? this.state.chapters.map(
@@ -1667,9 +1668,10 @@ class HODCourseConfig extends Component {
                                         : ""}
                                 </div>
 
-                                <div className="dropdown-divider mb-3"></div>
+                                <div className="dropdown-divider"></div>
 
                                 {/* semesters */}
+                                <p className="primary-text font-weight-bold-600">Exams</p>
                                 <div className="form-row">
                                     {this.state.semesters.length !== 0
                                         ? this.state.semesters.map(

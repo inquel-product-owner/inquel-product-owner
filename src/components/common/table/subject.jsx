@@ -11,7 +11,8 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import "./grid-overview.css";
 import { Link } from "react-router-dom";
-import store from "../../../redux/store";
+import storeDispatch from "../../../redux/dispatch";
+import { SUBJECT } from "../../../redux/action";
 
 function statusTemplate(props) {
     return (
@@ -114,20 +115,30 @@ class SubjectTable extends Component {
         }
     }
 
-    dispatch = (data) => {
-        store.dispatch({ type: "SUBJECT", payload: data });
-    };
-
     viewTemplate = (props) => {
         return (
-            <Link to={`/${this.props.path}/subject/${props.id}`}>
-                <button
-                    className="btn btn-link btn-sm shadow-none"
-                    onClick={() => this.dispatch(props.subject_name)}
-                >
-                    <i className="fas fa-eye"></i>
-                </button>
-            </Link>
+            <div className="d-flex">
+                <Link to={`/${this.props.path}/subject/${props.id}`}>
+                    <button
+                        className="btn btn-link btn-sm shadow-none"
+                        onClick={() =>
+                            storeDispatch(SUBJECT, props.subject_name)
+                        }
+                    >
+                        <i className="fas fa-eye"></i>
+                    </button>
+                </Link>
+                {this.props.hasEdit === true ? (
+                    <button
+                        className="btn btn-link btn-sm shadow-none ml-1"
+                        onClick={() => this.props.handleEdit(props)}
+                    >
+                        <i className="fas fa-edit fa-sm"></i>
+                    </button>
+                ) : (
+                    ""
+                )}
+            </div>
         );
     };
 

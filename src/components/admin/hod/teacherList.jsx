@@ -39,8 +39,6 @@ const TeacherInfoSection = (props) => {
                                         </div>
                                     </div>
                                 </th>
-                                <th scope="col">Exams</th>
-                                <th scope="col">Quizes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -93,8 +91,6 @@ const TeacherInfoSection = (props) => {
                                                 }
                                             )}
                                         </td>
-                                        <td></td>
-                                        <td></td>
                                     </tr>
                                 );
                             })}
