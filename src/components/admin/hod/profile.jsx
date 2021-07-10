@@ -809,15 +809,15 @@ class AdminHodProfile extends Component {
                                     Office Number
                                 </p>
                                 <p className="text-break mb-0">
-                                    {this.state.hodItems.secondary_phone_num}
+                                    {this.state.hodItems.office_phone_num}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-4">
                                 <p className="mb-1 font-weight-bold-600">
-                                    Institution
+                                    Department
                                 </p>
                                 <p className="text-break mb-0">
-                                    {this.state.permissions.institution_name}
+                                    {this.state.hodItems.department_name}
                                 </p>
                             </div>
 
@@ -859,6 +859,22 @@ class AdminHodProfile extends Component {
                                 </p>
                                 <p className="text-break mb-0">
                                     {this.state.hodItems.country}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-4">
+                                <p className="mb-1 font-weight-bold-600">
+                                    Pincode
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.hodItems.pincode}
+                                </p>
+                            </div>
+                            <div className="col-md-3 col-sm-4 col-6 mb-4">
+                                <p className="mb-1 font-weight-bold-600">
+                                    Department Details
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.hodItems.department_details}
                                 </p>
                             </div>
                             <div className="col-md-3 col-sm-4 col-6 mb-4">
@@ -955,7 +971,9 @@ class AdminHodProfile extends Component {
                                             }
                                         )}
                                     </Slider>
-                                ) : 'No data to display...'}
+                                ) : (
+                                    "No data to display..."
+                                )}
                             </div>
                         </div>
                     </div>

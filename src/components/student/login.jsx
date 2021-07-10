@@ -12,6 +12,7 @@ import TopNavbar from "../home/shared/navbar";
 import { ForgotPasswordModal } from "../common/forgotPassword";
 import storeDispatch from "../../redux/dispatch";
 import { NOTIFICATION, PROFILE } from "../../redux/action/index.js";
+import { batch } from "react-redux";
 
 class StudentLogin extends Component {
     constructor(props) {
@@ -77,8 +78,11 @@ class StudentLogin extends Component {
 
     setLocalStorage = async (data) => {
         localStorage.clear();
-        storeDispatch(PROFILE, {});
-        storeDispatch(NOTIFICATION, []);
+        batch(() => {
+            storeDispatch(PROFILE, {});
+            storeDispatch(NOTIFICATION, []);
+        });
+
         localStorage.setItem("Authorization", `Token ${data.token}`);
         localStorage.setItem("is_student", data.is_student);
         await this.loadProfileData(data.token);

@@ -1157,8 +1157,8 @@ class AdminHODAndStudentList extends Component {
                         }}
                         url={
                             this.state.activeTab === "hod"
-                                ? `${this.url}/admin/hod/notify/`
-                                : `${this.url}/admin/student/notify/`
+                                ? `${this.url}/hod/notify/`
+                                : `${this.url}/student/notify/`
                         }
                         data={
                             this.state.activeTab === "hod"

@@ -730,6 +730,149 @@ class SubjectModal extends Component {
     }
 }
 
+class SubjectEditModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            subject_name: this.props.data.subject_name,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleInput = (event) => {
+        this.setState({
+            subject_name: event.target.value,
+        });
+    };
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+
+        this.setState({
+            showLoader: true,
+        });
+
+        fetch(`${this.url}/hod/group/subject/`, {
+            headers: this.headers,
+            method: "PATCH",
+            body: JSON.stringify({
+                subject_id: this.props.data.id,
+                subject_name: this.state.subject_name,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Edit Subject</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <label htmlFor="subject">Subject name</label>
+                    <input
+                        type="text"
+                        name="subject_name"
+                        id="subject_name"
+                        className="form-control form-control-lg borders"
+                        onChange={this.handleInput}
+                        value={this.state.subject_name}
+                        placeholder="Enter subject name"
+                        autoComplete="off"
+                        required
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-primary btn-block shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Save changes
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
 const GroupSection = (props) => {
     const settings = {
         dots: true,
@@ -1023,10 +1166,12 @@ const SubjectSection = (props) => {
     const [selected_data, setData] = useState({});
     const [showModal, toggleModal] = useState(false);
     const [type, setType] = useState("");
+    const [showEditModal, toggleEditModal] = useState(false);
 
     const formSubmission = () => {
         setTimeout(() => {
             toggleModal(!showModal);
+            toggleEditModal(!showEditModal);
         }, 1000);
         props.loadData();
     };
@@ -1090,6 +1235,18 @@ const SubjectSection = (props) => {
                 ""
             )}
 
+            {/* Edit Modal */}
+            {showEditModal ? (
+                <SubjectEditModal
+                    show={showEditModal}
+                    onHide={() => toggleEditModal(!showEditModal)}
+                    formSubmission={formSubmission}
+                    data={selected_data}
+                />
+            ) : (
+                ""
+            )}
+
             <div className="card shadow-sm mb-4">
                 <div className="card-header">
                     <div className="row align-items-center">
@@ -1137,7 +1294,12 @@ const SubjectSection = (props) => {
                     discipline={true}
                     level={true}
                     subject={true}
+                    hasEdit={true}
                     handleSubjectId={handleSubjectId}
+                    handleEdit={(data) => {
+                        setData(data);
+                        toggleEditModal(true);
+                    }}
                 />
                 <div className="card-body p-3">
                     {props.totalCount > paginationCount ? (

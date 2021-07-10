@@ -5,7 +5,7 @@ import logo from "../../../assets/Iq-labs-01.svg";
 import userpic from "../../../assets/user-v1.png";
 import { baseUrl, accountsUrl, studentUrl } from "../../../shared/baseUrl";
 import { Logout } from "../../common/modal/idleLogoutModal";
-import { connect } from "react-redux";
+import { batch, connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
 import { NOTIFICATION, PROFILE } from "../../../redux/action";
 import { NotificationDropdown } from "../../common/modal/notification";
@@ -65,8 +65,10 @@ class Header extends Component {
                 this.setState({
                     isLoggedOut: true,
                 });
-                storeDispatch(PROFILE, {});
-                storeDispatch(NOTIFICATION, []);
+                batch(() => {
+                    storeDispatch(PROFILE, {});
+                    storeDispatch(NOTIFICATION, []);
+                });
             })
             .catch((err) => {
                 console.log(err);

@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { baseUrl, adminPathUrl } from "../../../shared/baseUrl";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
+import dateFormat from "dateformat";
 
 class AdminHodStudentProfile extends Component {
     constructor(props) {
@@ -174,6 +175,14 @@ class AdminHodStudentProfile extends Component {
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
+                        <p className="mb-1 font-weight-bold-600">
+                            Mentor Email
+                        </p>
+                        <p className="text-break mb-0">
+                            {this.state.studentItems.mentor_email}
+                        </p>
+                    </div>
+                    <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Mobile</p>
                         <p className="text-break mb-0">
                             {this.state.studentItems.country_code}
@@ -181,16 +190,15 @@ class AdminHodStudentProfile extends Component {
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
-                        <p className="mb-1 font-weight-bold-600">Institution</p>
-                        <p className="text-break mb-0">XYZ</p>
-                    </div>
-                    <div className="col-md-2 col-sm-4 col-6">
-                        <p className="mb-1 font-weight-bold-600">Standard</p>
-                        <p className="text-break mb-0">XYZ</p>
-                    </div>
-                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                        <p className="mb-1 font-weight-bold-600">Referral</p>
-                        <p className="text-break mb-0">XYZ</p>
+                        <p className="mb-1 font-weight-bold-600">
+                            Date of Birth
+                        </p>
+                        <p className="text-break mb-0">
+                            {dateFormat(
+                                this.state.studentItems.date_of_birth,
+                                "dS mmm, yyyy"
+                            )}
+                        </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Address</p>
@@ -220,6 +228,18 @@ class AdminHodStudentProfile extends Component {
                         <p className="mb-1 font-weight-bold-600">Country</p>
                         <p className="text-break mb-0">
                             {this.state.studentItems.country}
+                        </p>
+                    </div>
+                    <div className="col-md-2 col-sm-4 col-6">
+                        <p className="mb-1 font-weight-bold-600">Pincode</p>
+                        <p className="text-break mb-0">
+                            {this.state.studentItems.pincode}
+                        </p>
+                    </div>
+                    <div className="col-md-2 col-sm-4 col-6 mb-3">
+                        <p className="mb-1 font-weight-bold-600">Institution</p>
+                        <p className="text-break mb-0">
+                            {this.state.studentItems.institution_name}
                         </p>
                     </div>
                 </div>

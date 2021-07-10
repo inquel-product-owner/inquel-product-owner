@@ -337,10 +337,11 @@ class SubjectEditModal extends Component {
             showLoader: true,
         });
 
-        fetch(`${this.url}/hod/subject/${this.props.data.id}/`, {
+        fetch(`${this.url}/hod/group/subject/`, {
             headers: this.headers,
-            method: "PUT",
+            method: "PATCH",
             body: JSON.stringify({
+                subject_id: this.props.data.id,
                 subject_name: this.state.subject_name,
             }),
         })

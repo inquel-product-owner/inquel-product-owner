@@ -25,7 +25,6 @@ import AdminHodStudentList from "./admin/hod/studentList";
 import AdminHodStudentProfile from "./admin/hod/studentProfile";
 import AdminHODGroup from "./admin/hod/group";
 
-// import AdminCourseView from "./admin/viewCourse";
 import AdminDiscountConfiguration from "./admin/discountConfiguration";
 import AdminMasterData from "./admin/masterData";
 
@@ -288,16 +287,6 @@ const routes = (
                 )
             }
         />
-        {/* <Route
-            path="/admin/course/:courseId"
-            render={(props) =>
-                !localStorage.getItem("Inquel-Auth") ? (
-                    <Redirect to="/admin/login" />
-                ) : (
-                    <AdminCourseView {...props} />
-                )
-            }
-        /> */}
         <Route
             path="/admin/hod/:hodId/teacher"
             render={(props) =>
