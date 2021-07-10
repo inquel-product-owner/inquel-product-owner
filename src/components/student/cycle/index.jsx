@@ -66,6 +66,7 @@ class CycleTest extends Component {
         this.state = {
             cycleTestItem: [],
             showInstruction: false,
+            total_marks: 0,
 
             errorMsg: "",
             successMsg: "",
@@ -106,8 +107,15 @@ class CycleTest extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    let total_marks = 0;
+                    if (result.data && result.data.auto_test) {
+                        result.data.auto_test.forEach((data) => {
+                            total_marks += data.total_marks;
+                        });
+                    }
                     this.setState({
                         cycleTestItem: result.data,
+                        total_marks: total_marks,
                         page_loading: false,
                     });
                 } else {
@@ -210,15 +218,18 @@ class CycleTest extends Component {
                 />
 
                 <div className="exam-section">
-                    <div className="container-fluid mb-5">
+                    <div
+                        className="container-fluid"
+                        style={{ marginBottom: "6rem" }}
+                    >
                         {/* ----- Section details ----- */}
                         <div className="row justify-content-center">
                             <div className="col-md-8">
                                 <div className="row align-items-center font-weight-bold-600 primary-text mb-3">
-                                    <div className="col-6">
+                                    <div className="col-md-6 text-center text-md-left mb-2 mb-md-0">
                                         {this.props.cycle_name}
                                     </div>
-                                    <div className="col-6 text-right">
+                                    <div className="col text-center text-md-right">
                                         Duration:{" "}
                                         {
                                             this.state.cycleTestItem
@@ -226,13 +237,28 @@ class CycleTest extends Component {
                                         }{" "}
                                         mins
                                     </div>
+                                    <div className="col text-center text-md-right">
+                                        Total marks: {this.state.total_marks}
+                                    </div>
                                 </div>
 
                                 <div className="card card-body secondary-bg shadow-sm mb-3">
                                     <div className="row align-items-center font-weight-bold-600 small">
-                                        <div className="col-8">Sections</div>
-                                        <div className="col-4">
-                                            No. of Questions
+                                        <div className="col-md-5 text-center text-md-left font-weight-bold mb-2 mb-md-0">
+                                            Section description
+                                        </div>
+                                        <div className="col-md-7">
+                                            <div className="row align-items-center">
+                                                <div className="col-4">
+                                                    Total Questions
+                                                </div>
+                                                <div className="col-4">
+                                                    Answer any
+                                                </div>
+                                                <div className="col-4">
+                                                    Section wise marks
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -249,16 +275,32 @@ class CycleTest extends Component {
                                                           key={index}
                                                       >
                                                           <div className="row align-items-center small">
-                                                              <div className="col-8">
+                                                              <div className="col-md-5 text-center text-md-left font-weight-bold-600 mb-2 mb-md-0">
                                                                   {
                                                                       data.section_name
                                                                   }
                                                               </div>
-                                                              <div className="col-4">
-                                                                  {
-                                                                      data.total_questions
-                                                                  }{" "}
-                                                                  Questions
+                                                              <div className="col-md-7">
+                                                                  <div className="row">
+                                                                      <div className="col-4">
+                                                                          {
+                                                                              data.total_questions
+                                                                          }{" "}
+                                                                          Questions
+                                                                      </div>
+                                                                      <div className="col-4">
+                                                                          {
+                                                                              data.any_questions
+                                                                          }{" "}
+                                                                          Questions
+                                                                      </div>
+                                                                      <div className="col-4">
+                                                                          {
+                                                                              data.total_marks
+                                                                          }{" "}
+                                                                          Mark
+                                                                      </div>
+                                                                  </div>
                                                               </div>
                                                           </div>
                                                       </div>

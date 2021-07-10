@@ -1103,6 +1103,36 @@ audio {
     flex-flow: row wrap;
 }
 
+/* -=-=-=-=-= match play =-=-=-=-=- */
+
+.match-row {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: space-around;
+}
+
+.match-column {
+    -ms-flex: 30%;
+    flex: 30%;
+    max-width: 30%;
+    padding: 0 4px;
+}
+
+.match-column .card {
+    min-height: 100px;
+}
+
+@media screen and (max-width: 600px) {
+    .match-column {
+        -ms-flex: 50%;
+        flex: 50%;
+        max-width: 50%;
+    }
+}
+
 /* -=-=-=-=-= fieldset & legend =-=-=-=-=- */
 
 fieldset {

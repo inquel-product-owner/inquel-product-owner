@@ -344,7 +344,15 @@ class TeacherIndependentSubject extends Component {
                                                       <td>
                                                           {data.semester_name}
                                                       </td>
-                                                      <td></td>
+                                                      <td>
+                                                          {data.publish ? (
+                                                              <span className="text-success">
+                                                                  Published
+                                                              </span>
+                                                          ) : (
+                                                              ""
+                                                          )}
+                                                      </td>
                                                       <td></td>
                                                       <td></td>
                                                       <td className="d-flex justify-content-end">
