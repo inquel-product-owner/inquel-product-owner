@@ -1820,7 +1820,6 @@ class HODCourseFlashCard extends Component {
 
                     this.setState(
                         {
-                            // chunk the array and shuffling it
                             match: data,
                             activeData: 0,
                             totalItems: data.length,
@@ -1829,6 +1828,7 @@ class HODCourseFlashCard extends Component {
                             if (result.data.next !== null) {
                                 this.loadMatchData(result.data.next);
                             } else {
+                                // chunk the array and shuffling it
                                 this.setState(
                                     {
                                         match: this.chunk(
@@ -1840,11 +1840,8 @@ class HODCourseFlashCard extends Component {
                                     () => {
                                         // prepare first set of data in shuffle
                                         this.setState({
-                                            match_temp: this.chunk(
-                                                this.divideMatch(
-                                                    this.state.match
-                                                ),
-                                                3
+                                            match_temp: this.divideMatch(
+                                                this.state.match
                                             ),
                                         });
                                     }
@@ -1891,15 +1888,16 @@ class HODCourseFlashCard extends Component {
                         terms.id = [];
                         terms.type = [];
                     } else {
+                        // else shuffle the match terms and definition
                         color = "danger-bg";
                         setTimeout(async () => {
                             terms.id = [];
                             terms.type = [];
                             await this.setState({
                                 match_terms: terms,
-                                match_temp: this.chunk(
-                                    this.divideMatch(this.state.match, "false"),
-                                    3
+                                match_temp: this.divideMatch(
+                                    this.state.match,
+                                    "false"
                                 ),
                             });
                             window.MathJax.typeset();
@@ -1932,9 +1930,8 @@ class HODCourseFlashCard extends Component {
                             },
                             async () => {
                                 await this.setState({
-                                    match_temp: this.chunk(
-                                        this.divideMatch(this.state.match),
-                                        3
+                                    match_temp: this.divideMatch(
+                                        this.state.match
                                     ),
                                 });
                                 window.MathJax.typeset();
@@ -2003,42 +2000,38 @@ class HODCourseFlashCard extends Component {
                 </button>
             </div>
         ) : (
-            <div className="row">
-                {this.state.match_temp.map((data, index) => {
+            <div className="match-row" style={{ minHeight: "80vh" }}>
+                {(this.state.match_temp || []).map((item, index) => {
                     return (
-                        <div className="col-lg-3 col-md-4 col-6" key={index}>
-                            {data.map((item, index) => {
-                                return (
-                                    <div
-                                        className={`card card-body shadow-sm mb-3 user-select-none ${
-                                            terms.id.includes(item.match_id) &&
-                                            terms.type[
-                                                terms.id.indexOf(item.match_id)
-                                            ] === this.matchType(item)
-                                                ? this.state.match_color
-                                                : "match-bg"
-                                        } ${
-                                            ids.includes(item.match_id)
-                                                ? "visible"
-                                                : "invisible"
-                                        }`}
-                                        key={index}
-                                        style={{ cursor: "default" }}
-                                        onClick={() =>
-                                            this.handleMatch(
-                                                item.match_id,
-                                                this.matchType(item)
-                                            )
-                                        }
-                                        dangerouslySetInnerHTML={{
-                                            __html:
-                                                item.match_terms !== undefined
-                                                    ? item.match_terms
-                                                    : item.match_definition,
-                                        }}
-                                    ></div>
-                                );
-                            })}
+                        <div className="match-column" key={index}>
+                            <div
+                                className={`card card-body shadow-sm mb-4 user-select-none ${
+                                    terms.id.includes(item.match_id) &&
+                                    terms.type[
+                                        terms.id.indexOf(item.match_id)
+                                    ] === this.matchType(item)
+                                        ? this.state.match_color
+                                        : "match-bg"
+                                } ${
+                                    ids.includes(item.match_id)
+                                        ? "d-block"
+                                        : "d-none"
+                                }`}
+                                key={index}
+                                style={{ cursor: "default" }}
+                                onClick={() =>
+                                    this.handleMatch(
+                                        item.match_id,
+                                        this.matchType(item)
+                                    )
+                                }
+                                dangerouslySetInnerHTML={{
+                                    __html:
+                                        item.match_terms !== undefined
+                                            ? item.match_terms
+                                            : item.match_definition,
+                                }}
+                            ></div>
                         </div>
                     );
                 })}

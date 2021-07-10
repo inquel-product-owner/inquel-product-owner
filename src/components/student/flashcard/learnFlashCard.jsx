@@ -2006,7 +2006,6 @@ class FlashCard extends Component {
 
                     this.setState(
                         {
-                            // chunk the array and shuffling it
                             match: data,
                             activeData: 0,
                             totalItems: data.length,
@@ -2015,6 +2014,7 @@ class FlashCard extends Component {
                             if (result.data.next !== null) {
                                 this.loadMatchData(result.data.next);
                             } else {
+                                // chunk the array and shuffling it
                                 this.setState(
                                     {
                                         match: this.chunk(
@@ -2026,11 +2026,8 @@ class FlashCard extends Component {
                                     () => {
                                         // prepare first set of data in shuffle
                                         this.setState({
-                                            match_temp: this.chunk(
-                                                this.divideMatch(
-                                                    this.state.match
-                                                ),
-                                                3
+                                            match_temp: this.divideMatch(
+                                                this.state.match
                                             ),
                                         });
                                     }
@@ -2077,15 +2074,16 @@ class FlashCard extends Component {
                         terms.id = [];
                         terms.type = [];
                     } else {
+                        // else shuffle the match terms and definition
                         color = "danger-bg";
                         setTimeout(async () => {
                             terms.id = [];
                             terms.type = [];
                             await this.setState({
                                 match_terms: terms,
-                                match_temp: this.chunk(
-                                    this.divideMatch(this.state.match, "false"),
-                                    3
+                                match_temp: this.divideMatch(
+                                    this.state.match,
+                                    "false"
                                 ),
                             });
                             window.MathJax.typeset();
@@ -2118,9 +2116,8 @@ class FlashCard extends Component {
                             },
                             async () => {
                                 await this.setState({
-                                    match_temp: this.chunk(
-                                        this.divideMatch(this.state.match),
-                                        3
+                                    match_temp: this.divideMatch(
+                                        this.state.match
                                     ),
                                 });
                                 window.MathJax.typeset();
@@ -2189,42 +2186,38 @@ class FlashCard extends Component {
                 </button>
             </div>
         ) : (
-            <div className="row">
-                {(this.state.match_temp || []).map((data, index) => {
+            <div className="match-row" style={{ minHeight: "80vh" }}>
+                {(this.state.match_temp || []).map((item, index) => {
                     return (
-                        <div className="col-lg-3 col-md-4 col-6" key={index}>
-                            {(data || []).map((item, index) => {
-                                return (
-                                    <div
-                                        className={`card card-body shadow-sm mb-3 user-select-none ${
-                                            terms.id.includes(item.match_id) &&
-                                            terms.type[
-                                                terms.id.indexOf(item.match_id)
-                                            ] === this.matchType(item)
-                                                ? this.state.match_color
-                                                : "match-bg"
-                                        } ${
-                                            ids.includes(item.match_id)
-                                                ? "visible"
-                                                : "invisible"
-                                        }`}
-                                        key={index}
-                                        style={{ cursor: "default" }}
-                                        onClick={() =>
-                                            this.handleMatch(
-                                                item.match_id,
-                                                this.matchType(item)
-                                            )
-                                        }
-                                        dangerouslySetInnerHTML={{
-                                            __html:
-                                                item.match_terms !== undefined
-                                                    ? item.match_terms
-                                                    : item.match_definition,
-                                        }}
-                                    ></div>
-                                );
-                            })}
+                        <div className="match-column" key={index}>
+                            <div
+                                className={`card card-body shadow-sm mb-4 user-select-none ${
+                                    terms.id.includes(item.match_id) &&
+                                    terms.type[
+                                        terms.id.indexOf(item.match_id)
+                                    ] === this.matchType(item)
+                                        ? this.state.match_color
+                                        : "match-bg"
+                                } ${
+                                    ids.includes(item.match_id)
+                                        ? "d-block"
+                                        : "d-none"
+                                }`}
+                                key={index}
+                                style={{ cursor: "default" }}
+                                onClick={() =>
+                                    this.handleMatch(
+                                        item.match_id,
+                                        this.matchType(item)
+                                    )
+                                }
+                                dangerouslySetInnerHTML={{
+                                    __html:
+                                        item.match_terms !== undefined
+                                            ? item.match_terms
+                                            : item.match_definition,
+                                }}
+                            ></div>
                         </div>
                     );
                 })}
@@ -2722,122 +2715,269 @@ class FlashCard extends Component {
                     {/* ---------- Header tab section ---------- */}
 
                     <div className="light-bg p-3 mt-1 mb-3">
-                        <div className="row justify-content-center">
-                            <div className="col-md-11">
-                                <div className="row align-items-center">
-                                    <div className="col-md-6">
-                                        {this.state.checkup.concepts_exists ||
-                                        this.state.checkup.mcq_exists ||
-                                        this.state.checkup.type_two_exists ? (
-                                            <>
-                                                <span className="small primary-text font-weight-bold-600 mb-0 mr-3">
-                                                    STUDY
-                                                </span>
-                                                {this.state.checkup
-                                                    .concepts_exists ? (
-                                                    <button
-                                                        className={`btn ${
-                                                            this.state
-                                                                .activeTab ===
-                                                            "concept"
-                                                                ? "btn-primary"
-                                                                : "btn-primary-invert"
-                                                        } btn-sm mr-3 shadow-none`}
-                                                        onClick={() =>
-                                                            this.toggleTab(
-                                                                "concept"
-                                                            )
-                                                        }
-                                                    >
-                                                        Concept
-                                                    </button>
-                                                ) : (
-                                                    ""
-                                                )}
-                                                {this.state.checkup
-                                                    .mcq_exists ||
-                                                this.state.checkup
-                                                    .type_two_exists ? (
-                                                    <button
-                                                        className={`btn ${
-                                                            this.state
-                                                                .activeTab ===
-                                                            "practice"
-                                                                ? "btn-primary"
-                                                                : "btn-primary-invert"
-                                                        } btn-sm mr-3 shadow-none`}
-                                                        onClick={() =>
-                                                            this.toggleTab(
-                                                                "practice"
-                                                            )
-                                                        }
-                                                    >
-                                                        Practice
-                                                    </button>
-                                                ) : (
-                                                    ""
-                                                )}
-                                            </>
-                                        ) : (
-                                            ""
-                                        )}
-                                        {this.state.checkup.match_exists ? (
-                                            <>
-                                                <span className="small primary-text font-weight-bold-600 mb-0 mr-3">
-                                                    PLAY
-                                                </span>
+                        <div className="container">
+                            <div className="row align-items-center">
+                                <div className="col-md-6 mb-2 mb-md-0">
+                                    {this.state.checkup.concepts_exists ||
+                                    this.state.checkup.mcq_exists ||
+                                    this.state.checkup.type_two_exists ? (
+                                        <>
+                                            <span className="small primary-text font-weight-bold-600 mb-0 mr-3">
+                                                STUDY
+                                            </span>
+                                            {this.state.checkup
+                                                .concepts_exists ? (
                                                 <button
                                                     className={`btn ${
                                                         this.state.activeTab ===
-                                                        "match"
+                                                        "concept"
                                                             ? "btn-primary"
                                                             : "btn-primary-invert"
-                                                    } btn-sm shadow-none`}
+                                                    } btn-sm mr-3 shadow-none`}
                                                     onClick={() =>
-                                                        this.toggleTab("match")
+                                                        this.toggleTab(
+                                                            "concept"
+                                                        )
                                                     }
                                                 >
-                                                    Match
+                                                    Concept
                                                 </button>
-                                            </>
-                                        ) : (
-                                            ""
-                                        )}
-                                    </div>
-                                    <div className="col-md-6 text-right">
-                                        {/* bookmark button */}
-                                        {this.state.activeTab !== "match" ? (
-                                            <OverlayTrigger
-                                                key="top6"
-                                                placement="top"
-                                                overlay={
-                                                    <Tooltip id="tooltip1">
-                                                        {data[index] !==
-                                                        undefined
-                                                            ? data[index]
-                                                                  .favourite !==
-                                                              undefined
-                                                                ? data[index]
-                                                                      .favourite ===
-                                                                  true
-                                                                    ? "Bookmarked"
-                                                                    : `Bookmark this ${
-                                                                          this
-                                                                              .state
-                                                                              .activeTab ===
-                                                                          "concept"
-                                                                              ? "concept"
-                                                                              : "question"
-                                                                      }`
-                                                                : "Bookmark"
-                                                            : "Bookmark"}
-                                                    </Tooltip>
+                                            ) : (
+                                                ""
+                                            )}
+                                            {this.state.checkup.mcq_exists ||
+                                            this.state.checkup
+                                                .type_two_exists ? (
+                                                <button
+                                                    className={`btn ${
+                                                        this.state.activeTab ===
+                                                        "practice"
+                                                            ? "btn-primary"
+                                                            : "btn-primary-invert"
+                                                    } btn-sm mr-3 shadow-none`}
+                                                    onClick={() =>
+                                                        this.toggleTab(
+                                                            "practice"
+                                                        )
+                                                    }
+                                                >
+                                                    Practice
+                                                </button>
+                                            ) : (
+                                                ""
+                                            )}
+                                        </>
+                                    ) : (
+                                        ""
+                                    )}
+                                    {this.state.checkup.match_exists ? (
+                                        <>
+                                            <span className="small primary-text font-weight-bold-600 mb-0 mr-3">
+                                                PLAY
+                                            </span>
+                                            <button
+                                                className={`btn ${
+                                                    this.state.activeTab ===
+                                                    "match"
+                                                        ? "btn-primary"
+                                                        : "btn-primary-invert"
+                                                } btn-sm shadow-none`}
+                                                onClick={() =>
+                                                    this.toggleTab("match")
                                                 }
                                             >
+                                                Match
+                                            </button>
+                                        </>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
+                                <div className="col-md-6 text-center text-md-right">
+                                    {/* bookmark button */}
+                                    {this.state.activeTab !== "match" ? (
+                                        <OverlayTrigger
+                                            key="top6"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="tooltip1">
+                                                    {data[index] !== undefined
+                                                        ? data[index]
+                                                              .favourite !==
+                                                          undefined
+                                                            ? data[index]
+                                                                  .favourite ===
+                                                              true
+                                                                ? "Bookmarked"
+                                                                : `Bookmark this ${
+                                                                      this.state
+                                                                          .activeTab ===
+                                                                      "concept"
+                                                                          ? "concept"
+                                                                          : "question"
+                                                                  }`
+                                                            : "Bookmark"
+                                                        : "Bookmark"}
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <button
+                                                className="btn btn-primary btn-sm rounded-circle shadow-none"
+                                                onClick={() => {
+                                                    this.handleBookmark(
+                                                        data,
+                                                        index
+                                                    );
+                                                    this.pauseSlideshow();
+                                                }}
+                                                disabled={
+                                                    this.state.checkup
+                                                        .concepts_exists ||
+                                                    this.state.checkup
+                                                        .mcq_exists ||
+                                                    this.state.checkup
+                                                        .type_two_exists
+                                                        ? false
+                                                        : true
+                                                }
+                                            >
+                                                <i
+                                                    className={`${
+                                                        data[index]
+                                                            ? data[index]
+                                                                  .favourite ===
+                                                              true
+                                                                ? "fas secondary-text"
+                                                                : "far"
+                                                            : "far"
+                                                    } fa-bookmark fa-sm`}
+                                                    style={{
+                                                        marginLeft: "1px",
+                                                        marginRight: "1px",
+                                                    }}
+                                                ></i>
+                                            </button>
+                                        </OverlayTrigger>
+                                    ) : (
+                                        ""
+                                    )}
+
+                                    {/* audio button */}
+                                    {this.state.activeTab === "concept"
+                                        ? data[index] && data[index].content
+                                            ? (
+                                                  data[index].content.audio ||
+                                                  []
+                                              ).map((audio, audio_index) => {
+                                                  return audio.path !== "" ? (
+                                                      <OverlayTrigger
+                                                          trigger="click"
+                                                          rootClose
+                                                          key={`popover${audio_index}`}
+                                                          placement="bottom"
+                                                          overlay={
+                                                              <Popover
+                                                                  id={`popover-positioned-bottom${audio_index}`}
+                                                              >
+                                                                  {audio.title !==
+                                                                  "" ? (
+                                                                      <Popover.Title>
+                                                                          {
+                                                                              audio.title
+                                                                          }
+                                                                      </Popover.Title>
+                                                                  ) : (
+                                                                      ""
+                                                                  )}
+                                                                  <Popover.Content
+                                                                      style={{
+                                                                          overflow:
+                                                                              "auto",
+                                                                      }}
+                                                                  >
+                                                                      <audio
+                                                                          src={
+                                                                              audio.path
+                                                                          }
+                                                                          autoPlay
+                                                                          controls
+                                                                          controlsList="nodownload"
+                                                                      ></audio>
+                                                                  </Popover.Content>
+                                                              </Popover>
+                                                          }
+                                                      >
+                                                          <button
+                                                              className="btn btn-primary btn-sm rounded-circle ml-3 shadow-none"
+                                                              onClick={
+                                                                  this
+                                                                      .pauseSlideshow
+                                                              }
+                                                              key={audio_index}
+                                                          >
+                                                              <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                          </button>
+                                                      </OverlayTrigger>
+                                                  ) : (
+                                                      ""
+                                                  );
+                                              })
+                                            : ""
+                                        : ""}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ---------- Main content ---------- */}
+
+                    <div className="container mb-3">
+                        {this.state.activeTab === "concept" ? (
+                            data.length !== 0 ? (
+                                this.conceptRender(data, index)
+                            ) : (
+                                <NoContentToDisplay />
+                            )
+                        ) : this.state.activeTab === "practice" ? (
+                            data.length !== 0 ? (
+                                this.practiceRender(
+                                    data,
+                                    index,
+                                    section,
+                                    explanation
+                                )
+                            ) : (
+                                <NoContentToDisplay />
+                            )
+                        ) : this.state.activeTab === "match" ? (
+                            this.matchRender()
+                        ) : (
+                            <NoContentToDisplay />
+                        )}
+                    </div>
+
+                    {/* ---------- Footer ---------- */}
+
+                    {this.state.activeTab !== "match" ? (
+                        <div className="secondary-bg p-3">
+                            <div className="container">
+                                <div className="row align-items-center">
+                                    {/* ---------- Personal Notes button ---------- */}
+                                    <div className="col-md-4 col-6 order-2 order-md-1">
+                                        <OverlayTrigger
+                                            key="top7"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="tooltip1">
+                                                    Personal notes
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <div className="d-inline">
                                                 <button
                                                     className="btn btn-primary btn-sm rounded-circle shadow-none"
                                                     onClick={() => {
-                                                        this.handleBookmark(
+                                                        this.toggleNotesModal(
                                                             data,
                                                             index
                                                         );
@@ -2855,439 +2995,265 @@ class FlashCard extends Component {
                                                     }
                                                 >
                                                     <i
-                                                        className={`${
-                                                            data[index]
-                                                                ? data[index]
-                                                                      .favourite ===
-                                                                  true
-                                                                    ? "fas secondary-text"
-                                                                    : "far"
-                                                                : "far"
-                                                        } fa-bookmark fa-sm`}
+                                                        className="fas fa-pencil-ruler fa-sm"
                                                         style={{
+                                                            marginBottom: "5px",
                                                             marginLeft: "1px",
+                                                        }}
+                                                    ></i>
+                                                </button>
+                                                {data[index] ? (
+                                                    Object.entries(
+                                                        data[index]
+                                                            .personal_notes
+                                                    ).length !== 0 ? (
+                                                        <span
+                                                            className="position-absolute text-danger"
+                                                            style={{
+                                                                marginTop:
+                                                                    "-6px",
+                                                                marginLeft:
+                                                                    "-5px",
+                                                                fontSize: "8px",
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-circle fa-sm"></i>
+                                                        </span>
+                                                    ) : (
+                                                        ""
+                                                    )
+                                                ) : (
+                                                    ""
+                                                )}
+                                            </div>
+                                        </OverlayTrigger>
+                                    </div>
+
+                                    {/* ---------- Pagination ---------- */}
+
+                                    <div className="col-md-4 d-flex align-items-center justify-content-center small order-1 order-md-2">
+                                        {/* ----- Previous page button ----- */}
+
+                                        {index === 0 ? (
+                                            <button
+                                                className="btn btn-link btn-sm mr-2 shadow-none"
+                                                disabled
+                                            >
+                                                <i className="fas fa-angle-double-left fa-lg"></i>
+                                            </button>
+                                        ) : (
+                                            <OverlayTrigger
+                                                key="top1"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip1">
+                                                        First slide
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-link btn-sm mr-2 shadow-none"
+                                                    onClick={
+                                                        this.handleFirstSlide
+                                                    }
+                                                    disabled={
+                                                        index === 0
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    <i className="fas fa-angle-double-left fa-lg"></i>
+                                                </button>
+                                            </OverlayTrigger>
+                                        )}
+
+                                        {/* ----- Previous slide button ----- */}
+
+                                        {index === 0 ? (
+                                            <button
+                                                className="btn btn-link btn-sm mr-2 shadow-none"
+                                                disabled
+                                            >
+                                                <i className="fas fa-chevron-left"></i>
+                                            </button>
+                                        ) : (
+                                            <OverlayTrigger
+                                                key="top2"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip2">
+                                                        Previous slide
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-link btn-sm mr-2 shadow-none"
+                                                    onClick={() =>
+                                                        this.handlePrev(
+                                                            data,
+                                                            index
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        index === 0
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    <i className="fas fa-chevron-left"></i>
+                                                </button>
+                                            </OverlayTrigger>
+                                        )}
+
+                                        {/* ----- Pagination number ----- */}
+
+                                        <div
+                                            className="d-inline border-primary primary-text font-weight-bold-600 rounded-lg"
+                                            style={{
+                                                padding: "5px 10px",
+                                            }}
+                                        >
+                                            <span className="mr-1">
+                                                {total !== 0
+                                                    ? index + 1 < total
+                                                        ? index <= 9
+                                                            ? `0${index + 1}`
+                                                            : index + 1
+                                                        : total <= 9
+                                                        ? `0${total}`
+                                                        : total
+                                                    : 0}
+                                            </span>
+                                            <span>/</span>
+                                            <span className="ml-1">
+                                                {total <= 9
+                                                    ? `0${total}`
+                                                    : total}
+                                            </span>
+                                        </div>
+
+                                        {/* ----- Next slide button ----- */}
+
+                                        {index < total ? (
+                                            <OverlayTrigger
+                                                key="top3"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip3">
+                                                        Next slide
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-link btn-sm ml-2 shadow-none"
+                                                    onClick={() =>
+                                                        this.handleNext(
+                                                            data,
+                                                            index
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        index < total
+                                                            ? false
+                                                            : true
+                                                    }
+                                                >
+                                                    <i className="fas fa-chevron-right"></i>
+                                                </button>
+                                            </OverlayTrigger>
+                                        ) : (
+                                            <button
+                                                className="btn btn-link btn-sm ml-2 shadow-none"
+                                                disabled
+                                            >
+                                                <i className="fas fa-chevron-right"></i>
+                                            </button>
+                                        )}
+
+                                        {/* ----- Next page button ----- */}
+
+                                        {index + 1 >= total ? (
+                                            <button
+                                                className="btn btn-link btn-sm ml-2 shadow-none"
+                                                disabled
+                                            >
+                                                <i className="fas fa-angle-double-right fa-lg"></i>
+                                            </button>
+                                        ) : (
+                                            <OverlayTrigger
+                                                key="top4"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip4">
+                                                        Last slide
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-link btn-sm ml-2 shadow-none"
+                                                    onClick={
+                                                        this.handleLastSlide
+                                                    }
+                                                    disabled={
+                                                        index + 1 >= total
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    <i className="fas fa-angle-double-right fa-lg"></i>
+                                                </button>
+                                            </OverlayTrigger>
+                                        )}
+                                    </div>
+
+                                    {/* ---------- Slideshow button ---------- */}
+
+                                    {this.state.activeTab === "concept" ? (
+                                        <div className="col-md-4 col-6 text-right order-3">
+                                            <OverlayTrigger
+                                                key="top5"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip4">
+                                                        {this.state
+                                                            .isSlideshowPlaying
+                                                            ? "Pause"
+                                                            : "Play"}{" "}
+                                                        slideshow
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-primary btn-sm rounded-circle shadow-none"
+                                                    onClick={
+                                                        this.handleSlideShow
+                                                    }
+                                                    disabled={
+                                                        total === 0 ||
+                                                        total === ""
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    <i
+                                                        className={`fas ${
+                                                            this.state
+                                                                .isSlideshowPlaying
+                                                                ? "fa-pause"
+                                                                : "fa-play"
+                                                        } fa-sm`}
+                                                        style={{
+                                                            marginLeft: "3px",
                                                             marginRight: "1px",
+                                                            marginBottom: "5px",
                                                         }}
                                                     ></i>
                                                 </button>
                                             </OverlayTrigger>
-                                        ) : (
-                                            ""
-                                        )}
-
-                                        {/* audio button */}
-                                        {this.state.activeTab === "concept"
-                                            ? data[index] && data[index].content
-                                                ? (
-                                                      data[index].content
-                                                          .audio || []
-                                                  ).map(
-                                                      (audio, audio_index) => {
-                                                          return audio.path !==
-                                                              "" ? (
-                                                              <OverlayTrigger
-                                                                  trigger="click"
-                                                                  rootClose
-                                                                  key={`popover${audio_index}`}
-                                                                  placement="bottom"
-                                                                  overlay={
-                                                                      <Popover
-                                                                          id={`popover-positioned-bottom${audio_index}`}
-                                                                      >
-                                                                          {audio.title !==
-                                                                          "" ? (
-                                                                              <Popover.Title>
-                                                                                  {
-                                                                                      audio.title
-                                                                                  }
-                                                                              </Popover.Title>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
-                                                                          <Popover.Content
-                                                                              style={{
-                                                                                  overflow:
-                                                                                      "auto",
-                                                                              }}
-                                                                          >
-                                                                              <audio
-                                                                                  src={
-                                                                                      audio.path
-                                                                                  }
-                                                                                  autoPlay
-                                                                                  controls
-                                                                                  controlsList="nodownload"
-                                                                              ></audio>
-                                                                          </Popover.Content>
-                                                                      </Popover>
-                                                                  }
-                                                              >
-                                                                  <button
-                                                                      className="btn btn-primary btn-sm rounded-circle ml-3 shadow-none"
-                                                                      onClick={
-                                                                          this
-                                                                              .pauseSlideshow
-                                                                      }
-                                                                      key={
-                                                                          audio_index
-                                                                      }
-                                                                  >
-                                                                      <i className="fas fa-volume-up buttton fa-sm"></i>
-                                                                  </button>
-                                                              </OverlayTrigger>
-                                                          ) : (
-                                                              ""
-                                                          );
-                                                      }
-                                                  )
-                                                : ""
-                                            : ""}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ---------- Main content ---------- */}
-
-                    <div className="container-fluid mb-3">
-                        <div className="row justify-content-center">
-                            <div className="col-md-11">
-                                {this.state.activeTab === "concept" ? (
-                                    data.length !== 0 ? (
-                                        this.conceptRender(data, index)
-                                    ) : (
-                                        <NoContentToDisplay />
-                                    )
-                                ) : this.state.activeTab === "practice" ? (
-                                    data.length !== 0 ? (
-                                        this.practiceRender(
-                                            data,
-                                            index,
-                                            section,
-                                            explanation
-                                        )
-                                    ) : (
-                                        <NoContentToDisplay />
-                                    )
-                                ) : this.state.activeTab === "match" ? (
-                                    this.matchRender()
-                                ) : (
-                                    <NoContentToDisplay />
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ---------- Footer ---------- */}
-
-                    {this.state.activeTab !== "match" ? (
-                        <div className="secondary-bg p-3">
-                            <div className="row align-items-center justify-content-center">
-                                <div className="col-md-11">
-                                    <div className="row align-items-center">
-                                        {/* ---------- Personal Notes button ---------- */}
-                                        <div className="col-md-4">
-                                            <OverlayTrigger
-                                                key="top7"
-                                                placement="top"
-                                                overlay={
-                                                    <Tooltip id="tooltip1">
-                                                        Personal notes
-                                                    </Tooltip>
-                                                }
-                                            >
-                                                <div className="d-inline">
-                                                    <button
-                                                        className="btn btn-primary btn-sm rounded-circle shadow-none"
-                                                        onClick={() => {
-                                                            this.toggleNotesModal(
-                                                                data,
-                                                                index
-                                                            );
-                                                            this.pauseSlideshow();
-                                                        }}
-                                                        disabled={
-                                                            this.state.checkup
-                                                                .concepts_exists ||
-                                                            this.state.checkup
-                                                                .mcq_exists ||
-                                                            this.state.checkup
-                                                                .type_two_exists
-                                                                ? false
-                                                                : true
-                                                        }
-                                                    >
-                                                        <i
-                                                            className="fas fa-pencil-ruler fa-sm"
-                                                            style={{
-                                                                marginBottom:
-                                                                    "5px",
-                                                                marginLeft:
-                                                                    "1px",
-                                                            }}
-                                                        ></i>
-                                                    </button>
-                                                    {data[index] ? (
-                                                        Object.entries(
-                                                            data[index]
-                                                                .personal_notes
-                                                        ).length !== 0 ? (
-                                                            <span
-                                                                className="position-absolute text-danger"
-                                                                style={{
-                                                                    marginTop:
-                                                                        "-6px",
-                                                                    marginLeft:
-                                                                        "-5px",
-                                                                    fontSize:
-                                                                        "8px",
-                                                                }}
-                                                            >
-                                                                <i className="fas fa-circle fa-sm"></i>
-                                                            </span>
-                                                        ) : (
-                                                            ""
-                                                        )
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                </div>
-                                            </OverlayTrigger>
                                         </div>
-
-                                        {/* ---------- Pagination ---------- */}
-
-                                        <div className="col-md-4 d-flex align-items-center justify-content-center small">
-                                            {/* ----- Previous page button ----- */}
-
-                                            {index === 0 ? (
-                                                <button
-                                                    className="btn btn-link btn-sm mr-2 shadow-none"
-                                                    disabled
-                                                >
-                                                    <i className="fas fa-angle-double-left fa-lg"></i>
-                                                </button>
-                                            ) : (
-                                                <OverlayTrigger
-                                                    key="top1"
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip id="tooltip1">
-                                                            First slide
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <button
-                                                        className="btn btn-link btn-sm mr-2 shadow-none"
-                                                        onClick={
-                                                            this
-                                                                .handleFirstSlide
-                                                        }
-                                                        disabled={
-                                                            index === 0
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        <i className="fas fa-angle-double-left fa-lg"></i>
-                                                    </button>
-                                                </OverlayTrigger>
-                                            )}
-
-                                            {/* ----- Previous slide button ----- */}
-
-                                            {index === 0 ? (
-                                                <button
-                                                    className="btn btn-link btn-sm mr-2 shadow-none"
-                                                    disabled
-                                                >
-                                                    <i className="fas fa-chevron-left"></i>
-                                                </button>
-                                            ) : (
-                                                <OverlayTrigger
-                                                    key="top2"
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip id="tooltip2">
-                                                            Previous slide
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <button
-                                                        className="btn btn-link btn-sm mr-2 shadow-none"
-                                                        onClick={() =>
-                                                            this.handlePrev(
-                                                                data,
-                                                                index
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            index === 0
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        <i className="fas fa-chevron-left"></i>
-                                                    </button>
-                                                </OverlayTrigger>
-                                            )}
-
-                                            {/* ----- Pagination number ----- */}
-
-                                            <div
-                                                className="d-inline border-primary primary-text font-weight-bold-600 rounded-lg"
-                                                style={{
-                                                    padding: "5px 10px",
-                                                }}
-                                            >
-                                                <span className="mr-1">
-                                                    {total !== 0
-                                                        ? index + 1 < total
-                                                            ? index <= 9
-                                                                ? `0${
-                                                                      index + 1
-                                                                  }`
-                                                                : index + 1
-                                                            : total <= 9
-                                                            ? `0${total}`
-                                                            : total
-                                                        : 0}
-                                                </span>
-                                                <span>/</span>
-                                                <span className="ml-1">
-                                                    {total <= 9
-                                                        ? `0${total}`
-                                                        : total}
-                                                </span>
-                                            </div>
-
-                                            {/* ----- Next slide button ----- */}
-
-                                            {index < total ? (
-                                                <OverlayTrigger
-                                                    key="top3"
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip id="tooltip3">
-                                                            Next slide
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <button
-                                                        className="btn btn-link btn-sm ml-2 shadow-none"
-                                                        onClick={() =>
-                                                            this.handleNext(
-                                                                data,
-                                                                index
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            index < total
-                                                                ? false
-                                                                : true
-                                                        }
-                                                    >
-                                                        <i className="fas fa-chevron-right"></i>
-                                                    </button>
-                                                </OverlayTrigger>
-                                            ) : (
-                                                <button
-                                                    className="btn btn-link btn-sm ml-2 shadow-none"
-                                                    disabled
-                                                >
-                                                    <i className="fas fa-chevron-right"></i>
-                                                </button>
-                                            )}
-
-                                            {/* ----- Next page button ----- */}
-
-                                            {index + 1 >= total ? (
-                                                <button
-                                                    className="btn btn-link btn-sm ml-2 shadow-none"
-                                                    disabled
-                                                >
-                                                    <i className="fas fa-angle-double-right fa-lg"></i>
-                                                </button>
-                                            ) : (
-                                                <OverlayTrigger
-                                                    key="top4"
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip id="tooltip4">
-                                                            Last slide
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <button
-                                                        className="btn btn-link btn-sm ml-2 shadow-none"
-                                                        onClick={
-                                                            this.handleLastSlide
-                                                        }
-                                                        disabled={
-                                                            index + 1 >= total
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        <i className="fas fa-angle-double-right fa-lg"></i>
-                                                    </button>
-                                                </OverlayTrigger>
-                                            )}
-                                        </div>
-
-                                        {/* ---------- Slideshow button ---------- */}
-
-                                        {this.state.activeTab === "concept" ? (
-                                            <div className="col-md-4 text-right">
-                                                <OverlayTrigger
-                                                    key="top5"
-                                                    placement="top"
-                                                    overlay={
-                                                        <Tooltip id="tooltip4">
-                                                            {this.state
-                                                                .isSlideshowPlaying
-                                                                ? "Pause"
-                                                                : "Play"}{" "}
-                                                            slideshow
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    <button
-                                                        className="btn btn-primary btn-sm rounded-circle shadow-none"
-                                                        onClick={
-                                                            this.handleSlideShow
-                                                        }
-                                                        disabled={
-                                                            total === 0 ||
-                                                            total === ""
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        <i
-                                                            className={`fas ${
-                                                                this.state
-                                                                    .isSlideshowPlaying
-                                                                    ? "fa-pause"
-                                                                    : "fa-play"
-                                                            } fa-sm`}
-                                                            style={{
-                                                                marginLeft:
-                                                                    "3px",
-                                                                marginRight:
-                                                                    "1px",
-                                                                marginBottom:
-                                                                    "5px",
-                                                            }}
-                                                        ></i>
-                                                    </button>
-                                                </OverlayTrigger>
-                                            </div>
-                                        ) : (
-                                            ""
-                                        )}
-                                    </div>
+                                    ) : (
+                                        ""
+                                    )}
                                 </div>
                             </div>
                         </div>
