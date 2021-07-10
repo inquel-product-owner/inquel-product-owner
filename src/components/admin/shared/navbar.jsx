@@ -5,9 +5,9 @@ import logo from "../../../assets/Iq-labs-01.svg";
 import userpic from "../../../assets/user-v1.png";
 import { baseUrl, adminPathUrl } from "../../../shared/baseUrl";
 import { AdminLogout } from "../../common/modal/idleLogoutModal";
-import { connect } from "react-redux";
+import { batch, connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
-import { PROFILE } from "../../../redux/action";
+import { NOTIFICATION, PROFILE } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -67,7 +67,10 @@ class Header extends Component {
                 this.setState({
                     isLoggedOut: true,
                 });
-                storeDispatch(PROFILE, {});
+                batch(() => {
+                    storeDispatch(PROFILE, {});
+                    storeDispatch(NOTIFICATION, []);
+                });
             })
             .catch((err) => {
                 console.log(err);

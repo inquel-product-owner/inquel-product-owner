@@ -7,6 +7,7 @@ import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import { connect } from "react-redux";
+import dateFormat from "dateformat";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -16,7 +17,7 @@ class HODStudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            student_data: [],
+            studentItems: [],
             subject_data: [],
 
             errorMsg: "",
@@ -47,7 +48,7 @@ class HODStudentProfile extends Component {
             .then((result) => {
                 if (result.sts === true) {
                     this.setState({
-                        student_data: result.data,
+                        studentItems: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -128,25 +129,25 @@ class HODStudentProfile extends Component {
                             <div className="col-md-2 col-3">
                                 <img
                                     src={
-                                        this.state.student_data.profile_link !==
+                                        this.state.studentItems.profile_link !==
                                         null
-                                            ? this.state.student_data
+                                            ? this.state.studentItems
                                                   .profile_link
                                             : profilepic
                                     }
-                                    alt={this.state.student_data.full_name}
+                                    alt={this.state.studentItems.full_name}
                                     className="img-fluid profile-pic"
                                 />
                             </div>
                             <div className="col-md-10 col-9 pl-0">
                                 <h5 className="primary-text">
-                                    {this.state.student_data.full_name !== ""
-                                        ? this.state.student_data.full_name
-                                        : this.state.student_data.username}
+                                    {this.state.studentItems.full_name !== ""
+                                        ? this.state.studentItems.full_name
+                                        : this.state.studentItems.username}
                                 </h5>
                                 <p className="mb-0">
-                                    {this.state.student_data.length !== 0 ? (
-                                        this.state.student_data.is_active ? (
+                                    {this.state.studentItems.length !== 0 ? (
+                                        this.state.studentItems.is_active ? (
                                             <Badge variant="success">
                                                 Active
                                             </Badge>
@@ -167,68 +168,87 @@ class HODStudentProfile extends Component {
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">First Name</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.first_name}
+                            {this.state.studentItems.first_name}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Last Name</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.last_name}
+                            {this.state.studentItems.last_name}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Email ID</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.email}
+                            {this.state.studentItems.email}
+                        </p>
+                    </div>
+                    <div className="col-md-2 col-sm-4 col-6 mb-3">
+                        <p className="mb-1 font-weight-bold-600">
+                            Mentor Email
+                        </p>
+                        <p className="text-break mb-0">
+                            {this.state.studentItems.mentor_email}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Mobile</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.country_code}
-                            {this.state.student_data.phone_num}
+                            {this.state.studentItems.country_code}
+                            {this.state.studentItems.phone_num}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
-                        <p className="mb-1 font-weight-bold-600">Institution</p>
-                        <p className="text-break mb-0">XYZ</p>
-                    </div>
-                    <div className="col-md-2 col-sm-4 col-6">
-                        <p className="mb-1 font-weight-bold-600">Standard</p>
-                        <p className="text-break mb-0">XYZ</p>
-                    </div>
-                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                        <p className="mb-1 font-weight-bold-600">Referral</p>
-                        <p className="text-break mb-0">XYZ</p>
+                        <p className="mb-1 font-weight-bold-600">
+                            Date of Birth
+                        </p>
+                        <p className="text-break mb-0">
+                            {dateFormat(
+                                this.state.studentItems.date_of_birth,
+                                "dS mmm, yyyy"
+                            )}
+                        </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Address</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.address}
+                            {this.state.studentItems.address}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">City</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.city}
+                            {this.state.studentItems.city}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">District</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.district}
+                            {this.state.studentItems.district}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">State</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.state}
+                            {this.state.studentItems.state}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6">
                         <p className="mb-1 font-weight-bold-600">Country</p>
                         <p className="text-break mb-0">
-                            {this.state.student_data.country}
+                            {this.state.studentItems.country}
+                        </p>
+                    </div>
+                    <div className="col-md-2 col-sm-4 col-6">
+                        <p className="mb-1 font-weight-bold-600">Pincode</p>
+                        <p className="text-break mb-0">
+                            {this.state.studentItems.pincode}
+                        </p>
+                    </div>
+                    <div className="col-md-2 col-sm-4 col-6 mb-3">
+                        <p className="mb-1 font-weight-bold-600">Institution</p>
+                        <p className="text-break mb-0">
+                            {this.state.studentItems.institution_name}
                         </p>
                     </div>
                 </div>

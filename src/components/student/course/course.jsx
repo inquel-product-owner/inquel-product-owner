@@ -764,7 +764,7 @@ const TopicListRender = (props) => {
                             </div>
                             <div className="col-10 d-flex align-items-center small font-weight-bold-600 pl-1">
                                 <div className="mr-3">
-                                    {props.topics.topic_num}
+                                    {props.chapter.chapter_index}{props.topics.topic_num.substring(1,)}
                                 </div>
                                 <div className="w-100">
                                     <button
@@ -1236,7 +1236,7 @@ class Course extends Component {
                         );
                     } else {
                         this.setState({
-                            errorMsg: "Content not available",
+                            errorMsg: "Selected node is a free folder",
                             showErrorAlert: true,
                             page_loading: false,
                         });

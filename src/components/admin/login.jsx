@@ -4,7 +4,8 @@ import logo from "../../assets/Iq-labs-01.svg";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl, accountsUrl } from "../../shared/baseUrl.js";
 import storeDispatch from "../../redux/dispatch";
-import { PROFILE } from "../../redux/action";
+import { NOTIFICATION, PROFILE } from "../../redux/action";
+import { batch } from "react-redux";
 
 class AdminLogin extends Component {
     constructor(props) {
@@ -40,7 +41,10 @@ class AdminLogin extends Component {
     setLocalStorage = (data) => {
         localStorage.clear();
         localStorage.setItem("Inquel-Auth", `Token ${data.token}`);
-        storeDispatch(PROFILE, {});
+        batch(() => {
+            storeDispatch(PROFILE, {});
+            storeDispatch(NOTIFICATION, []);
+        });
 
         this.setState({
             showLoader: false,

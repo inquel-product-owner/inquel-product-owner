@@ -4,12 +4,13 @@ import profilepic from "../../../assets/user-v1.png";
 import { paginationCount } from "../../../shared/constant.js";
 import Paginations from "../../common/pagination";
 import StudentTable from "../../common/table/student";
-import { Badge } from "react-bootstrap";
+import { Badge, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { baseUrl, adminPathUrl } from "../../../shared/baseUrl";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import { connect } from "react-redux";
+import NotificationModal from "../../common/modal/notification";
 
 const mapStateToProps = (state) => ({
     hod_data: state.storage.temp,
@@ -20,8 +21,12 @@ class AdminHodStudentList extends Component {
         super(props);
         this.state = {
             studentItems: [],
+            selectedStudent: [],
             activeStudentPage: 1,
             totalStudentCount: 0,
+
+            notify_all: false,
+            showNotificationModal: false,
 
             errorMsg: "",
             successMsg: "",
@@ -79,6 +84,25 @@ class AdminHodStudentList extends Component {
         this.loadStudentData();
     };
 
+    // Gets Student ID from the Student table
+    handleStudentId = (data) => {
+        let value = [];
+        const studentItems = this.state.studentItems;
+        for (let i = 0; i < studentItems.length; i++) {
+            if (data.includes(studentItems[i].id.toString())) {
+                value.push({
+                    id: studentItems[i].id.toString(),
+                    username: studentItems[i].username,
+                });
+            } else {
+                continue;
+            }
+        }
+        this.setState({
+            selectedStudent: value,
+        });
+    };
+
     handleStudentPageChange(pageNumber) {
         this.setState(
             { activeStudentPage: pageNumber, page_loading: true },
@@ -112,6 +136,24 @@ class AdminHodStudentList extends Component {
                         });
                     }}
                 />
+
+                {/* Notification Modal */}
+                {this.state.showNotificationModal ? (
+                    <NotificationModal
+                        show={this.state.showNotificationModal}
+                        onHide={() => {
+                            this.setState({
+                                showNotificationModal: false,
+                            });
+                        }}
+                        url={`${this.url}/student/notify/`}
+                        data={this.state.selectedStudent}
+                        field="student_id"
+                        notify_all={this.state.notify_all}
+                    />
+                ) : (
+                    ""
+                )}
 
                 {/* Breadcrumb */}
                 <nav aria-label="breadcrumb">
@@ -180,6 +222,52 @@ class AdminHodStudentList extends Component {
                             </div>
                         </div>
                     </div>
+                    <div className="col-md-6 text-right">
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="primary"
+                                id="dropdown-basic"
+                                className="btn-sm shadow-none"
+                            >
+                                Notify
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu className="dropdown-menu-down dropdown-menu-down-btn">
+                                <Dropdown.Item
+                                    onClick={() => {
+                                        this.setState({
+                                            showNotificationModal: true,
+                                            notify_all: true,
+                                        });
+                                    }}
+                                >
+                                    Notify All
+                                </Dropdown.Item>
+                                <div className="dropdown-divider"></div>
+                                <Dropdown.Item
+                                    onClick={() => {
+                                        if (
+                                            this.state.selectedStudent
+                                                .length !== 0
+                                        ) {
+                                            this.setState({
+                                                showNotificationModal: true,
+                                                notify_all: false,
+                                            });
+                                        } else {
+                                            this.setState({
+                                                errorMsg:
+                                                    "Select student to send notification",
+                                                showErrorAlert: true,
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Notify Selected
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </div>
                 </div>
 
                 {/* Student List */}
@@ -188,6 +276,7 @@ class AdminHodStudentList extends Component {
                         studentItems={this.state.studentItems}
                         path={`admin/hod/${this.hodId}`}
                         category={true}
+                        handleStudentId={this.handleStudentId}
                     />
                     <div className="card-body p-3">
                         {this.state.totalStudentCount > paginationCount ? (

@@ -207,18 +207,20 @@ const TopicListRender = (props) => {
                                         to={`${props.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
                                         className="text-dark"
                                         onClick={() => {
-                                            storeDispatch(
-                                                CHAPTER,
-                                                props.chapter.chapter_name
-                                            );
-                                            storeDispatch(
-                                                TOPIC,
-                                                getTopicName(
-                                                    props.chapter.topics[0]
-                                                        .chapter_structure,
-                                                    props.topics.next_topic
-                                                )
-                                            );
+                                            batch(() => {
+                                                storeDispatch(
+                                                    CHAPTER,
+                                                    props.chapter.chapter_name
+                                                );
+                                                storeDispatch(
+                                                    TOPIC,
+                                                    getTopicName(
+                                                        props.chapter.topics[0]
+                                                            .chapter_structure,
+                                                        props.topics.next_topic
+                                                    )
+                                                );
+                                            });
                                         }}
                                     >
                                         {props.topics.next_topic}
@@ -539,15 +541,17 @@ const ChapterListRender = (props) => {
                                                 <Link
                                                     to={`${props.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
                                                     onClick={() => {
-                                                        storeDispatch(
-                                                            CHAPTER,
-                                                            props.chapter
-                                                                .chapter_name
-                                                        );
-                                                        storeDispatch(
-                                                            QUIZ,
-                                                            quiz.quiz_name
-                                                        );
+                                                        batch(() => {
+                                                            storeDispatch(
+                                                                CHAPTER,
+                                                                props.chapter
+                                                                    .chapter_name
+                                                            );
+                                                            storeDispatch(
+                                                                QUIZ,
+                                                                quiz.quiz_name
+                                                            );
+                                                        });
                                                     }}
                                                 >
                                                     <button className="btn btn-primary btn-sm shadow-none">
@@ -690,8 +694,10 @@ class Subject extends Component {
                     }
 
                     // redux store dispatcher
-                    storeDispatch(RESPONSE, result.data);
-                    storeDispatch(TEMP, {});
+                    batch(() => {
+                        storeDispatch(RESPONSE, result.data);
+                        storeDispatch(TEMP, {});
+                    });
 
                     this.setState({
                         subjectItems: result.data,
@@ -934,7 +940,7 @@ class Subject extends Component {
                         );
                     } else {
                         this.setState({
-                            errorMsg: "Content not available",
+                            errorMsg: "Selected node is a free folder",
                             showErrorAlert: true,
                             page_loading: false,
                         });
@@ -1022,14 +1028,16 @@ class Subject extends Component {
                                                 <button
                                                     className="btn btn-primary btn-sm shadow-none"
                                                     onClick={() => {
-                                                        storeDispatch(
-                                                            CHAPTER,
-                                                            chapter_name
-                                                        );
-                                                        storeDispatch(
-                                                            CYCLE,
-                                                            data.cycle_test_name
-                                                        );
+                                                        batch(() => {
+                                                            storeDispatch(
+                                                                CHAPTER,
+                                                                chapter_name
+                                                            );
+                                                            storeDispatch(
+                                                                CYCLE,
+                                                                data.cycle_test_name
+                                                            );
+                                                        });
                                                     }}
                                                 >
                                                     View
@@ -1042,14 +1050,16 @@ class Subject extends Component {
                                                 <button
                                                     className="btn btn-primary btn-sm shadow-none"
                                                     onClick={() => {
-                                                        storeDispatch(
-                                                            CHAPTER,
-                                                            chapter_name
-                                                        );
-                                                        storeDispatch(
-                                                            CYCLE,
-                                                            data.cycle_test_name
-                                                        );
+                                                        batch(() => {
+                                                            storeDispatch(
+                                                                CHAPTER,
+                                                                chapter_name
+                                                            );
+                                                            storeDispatch(
+                                                                CYCLE,
+                                                                data.cycle_test_name
+                                                            );
+                                                        });
                                                     }}
                                                 >
                                                     View
