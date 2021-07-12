@@ -146,7 +146,7 @@ class AdminHodStudentList extends Component {
                                 showNotificationModal: false,
                             });
                         }}
-                        url={`${this.url}/student/notify/`}
+                        url={`${this.url}/hod/${this.hodId}/student/notify/`}
                         data={this.state.selectedStudent}
                         field="student_id"
                         notify_all={this.state.notify_all}

@@ -2304,7 +2304,7 @@ class TeacherType2 extends Component {
 
     render() {
         let data = [...this.state.questions];
-        let boards = [...this.state.keyboards];
+        // let boards = [...this.state.keyboards];
         return (
             <Wrapper
                 header={this.props.subject_name}
@@ -3659,6 +3659,7 @@ class TeacherType2 extends Component {
                                 </Card>
 
                                 {/* ---------- Settings ---------- */}
+                                {!this.groupId ?(
                                 <Card className="shadow-sm mb-2">
                                     <Accordion.Toggle
                                         as={Card.Body}
@@ -3681,7 +3682,7 @@ class TeacherType2 extends Component {
                                     <Accordion.Collapse eventKey="3">
                                         <Card.Body className="p-3">
                                             {/* ---------- Virtual keyboard ---------- */}
-                                            <div className="form-group">
+                                            {/* <div className="form-group">
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     <span>
                                                         Virtual Keyboard
@@ -3793,7 +3794,7 @@ class TeacherType2 extends Component {
                                                 </div>
                                             ) : (
                                                 ""
-                                            )}
+                                            )} */}
 
                                             {/* ---------- Limited ---------- */}
                                             <div className="form-group">
@@ -3823,7 +3824,7 @@ class TeacherType2 extends Component {
                                             </div>
                                         </Card.Body>
                                     </Accordion.Collapse>
-                                </Card>
+                                </Card>):""}
                             </Accordion>
                         </div>
                     ) : (

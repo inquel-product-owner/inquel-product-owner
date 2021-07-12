@@ -134,7 +134,7 @@ class SubscriptionTable extends Component {
                             />
                             <ColumnDirective
                                 field="title"
-                                headerText="Name"
+                                headerText="Title"
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective
@@ -145,6 +145,11 @@ class SubscriptionTable extends Component {
                             <ColumnDirective
                                 field="discounted_price"
                                 headerText="Pricing"
+                                clipMode="EllipsisWithTooltip"
+                            />
+                            <ColumnDirective
+                                field="discount_applicable"
+                                headerText="Discount applicable"
                                 clipMode="EllipsisWithTooltip"
                             />
                             <ColumnDirective

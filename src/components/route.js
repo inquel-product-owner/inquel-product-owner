@@ -132,6 +132,8 @@ import CourseSummary from "./student/course/summary";
 import CourseNotes from "./student/course/notes";
 import CourseFavourites from "./student/course/favourites";
 import CoursePersonalNotes from "./student/course/personalNotes";
+import SimulationExam from "./student/simulation/paper";
+import SimulationSection from "./student/simulation/section";
 
 import Summary from "./student/group/summary";
 import Notes from "./student/group/notes";
@@ -1926,6 +1928,7 @@ const routes = (
                 )
             }
         />
+        {/* Cycle test */}
         <Route
             exact
             path="/dashboard/subscription/:subscriptionId/course/:courseId/chapter/:chapterId/cycle/:cycleTestId"
@@ -1962,6 +1965,7 @@ const routes = (
                 )
             }
         />
+        {/* Quiz */}
         <Route
             exact
             path="/dashboard/subscription/:subscriptionId/course/:courseId/chapter/:chapterId/quiz/:quizId"
@@ -1986,6 +1990,7 @@ const routes = (
                 )
             }
         />
+        {/* Semester exam */}
         <Route
             exact
             path="/dashboard/subscription/:subscriptionId/course/:courseId/semester/:semesterId"
@@ -2022,6 +2027,32 @@ const routes = (
                 )
             }
         />
+        {/* Simulation exam */}
+        <Route
+            exact
+            path="/dashboard/subscription/:subscriptionId/course/:courseId/simulation/:simulationId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <SimulationExam {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/dashboard/subscription/:subscriptionId/course/:courseId/simulation/:simulationId/paper/:paperId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/login" />
+                ) : (
+                    <SimulationSection {...props} />
+                )
+            }
+        />
+        {/* Test analysis */}
         <Route
             exact
             path="/dashboard/subscription/:subscriptionId/course/:courseId/results"

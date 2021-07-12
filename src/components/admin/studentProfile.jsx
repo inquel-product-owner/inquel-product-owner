@@ -7,6 +7,7 @@ import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import dateFormat from "dateformat";
+import StudentSubscriptionTable from "../common/table/student_subscription";
 
 class AdminStudentProfile extends Component {
     constructor(props) {
@@ -240,56 +241,12 @@ class AdminStudentProfile extends Component {
                     </div>
                 </div>
 
-                {/* Course list */}
+                {/* subscribed course list */}
                 <div className="card shadow-sm">
-                    <div className="table-responsive">
-                        <table className="table">
-                            <thead className="primary-text">
-                                <tr>
-                                    <th scope="col">Courses subscribed</th>
-                                    <th scope="col">Valid from</th>
-                                    <th scope="col">Valid to</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Amount paid</th>
-                                    <th scope="col">Discount Applied</th>
-                                    <th scope="col">Quiz Points</th>
-                                    <th scope="col">Simulation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Mathematics 10th CBSE (Full course)</td>
-                                    <td>05/10/2020</td>
-                                    <td>10/10/2020</td>
-                                    <td>Persuing</td>
-                                    <td>2560</td>
-                                    <td>SP2020210001</td>
-                                    <td>212</td>
-                                    <td>First Class</td>
-                                </tr>
-                                <tr>
-                                    <td>Physics</td>
-                                    <td>10/10/2020</td>
-                                    <td>02/03/2020</td>
-                                    <td>Persuing</td>
-                                    <td>3871</td>
-                                    <td>SP2020210001</td>
-                                    <td>436</td>
-                                    <td>Not Taken</td>
-                                </tr>
-                                <tr>
-                                    <td>Chemistry</td>
-                                    <td>03/01/2020</td>
-                                    <td>07/07/2020</td>
-                                    <td>Completed</td>
-                                    <td>9568</td>
-                                    <td>SP2020210001</td>
-                                    <td>128</td>
-                                    <td>Distiction</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <StudentSubscriptionTable
+                        data={this.state.studentItems.subscriptions || []}
+                    />
+                    <div className="card-footer"></div>
                 </div>
 
                 {/* Loading component */}

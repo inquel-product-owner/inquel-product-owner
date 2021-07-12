@@ -313,7 +313,9 @@ class HODSubjectChapter extends Component {
                                         </button>
                                     </Link>
                                 </div>
-                                <div className="col">{data.next_topic}</div>
+                                <div className="col small font-weight-bold-600 text-truncate">
+                                    {data.next_topic_name}
+                                </div>
                             </div>
                         </div>
                     </div>

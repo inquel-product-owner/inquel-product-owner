@@ -259,13 +259,13 @@ export const NotificationDropdown = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            fetchNotification();
-        }, 10000);
-        // clearing interval
-        return () => clearInterval(timer);
-    });
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         fetchNotification();
+    //     }, 10000);
+    //     // clearing interval
+    //     return () => clearInterval(timer);
+    // });
 
     const fetchNotification = () => {
         fetch(props.url, {
