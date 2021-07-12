@@ -387,11 +387,17 @@ class TeacherChapters extends Component {
         );
     };
 
-    handleNextTopic = (event, topic_num, topic_id) => {
+    handleNextTopic = (event, topic_num) => {
         this.setState({
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
+        });
+        let next_topic_name = "";
+        this.state.next_topic.forEach((list) => {
+            if (list.topic_num === event.target.value) {
+                next_topic_name = list.topic_name;
+            }
         });
 
         if (event.target.value !== "") {
@@ -403,8 +409,8 @@ class TeacherChapters extends Component {
                     body: JSON.stringify({
                         chapter_id: this.state.chapterId,
                         topic_num: topic_num,
-                        topic_id: topic_id,
                         next_topic: event.target.value,
+                        next_topic_name: next_topic_name,
                     }),
                 }
             )
@@ -454,11 +460,11 @@ class TeacherChapters extends Component {
         return state;
     };
 
-    topicRender = (data, index, topic_id) => {
+    topicRender = (data, index) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
             return (
                 <Accordion key={index}>
-                    {this.topicRender(topic, index, topic_id)}
+                    {this.topicRender(topic, index)}
                 </Accordion>
             );
         });
@@ -622,28 +628,28 @@ class TeacherChapters extends Component {
                                         onChange={(event) => {
                                             this.handleNextTopic(
                                                 event,
-                                                data.topic_num,
-                                                topic_id
+                                                data.topic_num
                                             );
                                         }}
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <option value="">Select...</option>
-                                        {this.state.next_topic !== undefined
-                                            ? this.state.next_topic.length !== 0
-                                                ? this.state.next_topic.map(
-                                                      (topic, index) => {
-                                                          return (
-                                                              <option
-                                                                  value={topic}
-                                                                  key={index}
-                                                              >
-                                                                  {topic}
-                                                              </option>
-                                                          );
-                                                      }
-                                                  )
-                                                : ""
+                                        {this.state.next_topic &&
+                                        this.state.next_topic.length !== 0
+                                            ? this.state.next_topic.map(
+                                                  (topic, index) => {
+                                                      return (
+                                                          <option
+                                                              value={
+                                                                  topic.topic_num
+                                                              }
+                                                              key={index}
+                                                          >
+                                                              {topic.topic_name}
+                                                          </option>
+                                                      );
+                                                  }
+                                              )
                                             : ""}
                                     </select>
 

@@ -277,12 +277,6 @@ class TeacherCycleTestAuto extends Component {
         super(props);
         this.state = {
             showModal: false,
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            page_loading: true,
-
             sections: [
                 {
                     section_id: "",
@@ -297,11 +291,17 @@ class TeacherCycleTestAuto extends Component {
                 },
             ],
             filterData: [{ category: [], marks: [] }],
-
             duration: "",
             attempts: [],
             selectedAttempt: "",
             question_type: [],
+            publish: false,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
         };
         this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
@@ -409,6 +409,7 @@ class TeacherCycleTestAuto extends Component {
                         this.setState(
                             {
                                 sections: section,
+                                publish: result.data.publish,
                                 duration: duration,
                             },
                             () => {
@@ -1080,6 +1081,7 @@ class TeacherCycleTestAuto extends Component {
                         successMsg: result.msg,
                         showSuccessAlert: true,
                         page_loading: false,
+                        publish: !this.state.publish,
                     });
                 } else {
                     this.setState({
@@ -1247,7 +1249,7 @@ class TeacherCycleTestAuto extends Component {
                                     : true
                             }
                         >
-                            Publish
+                            {this.state.publish ? "Unpublish" : "Publish"}
                         </button>
                     </div>
                 </div>

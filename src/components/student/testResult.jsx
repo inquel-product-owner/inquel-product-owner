@@ -185,11 +185,24 @@ class TestResult extends Component {
         };
     }
 
+    componentDidMount = () => {
+        document.title = `${
+            this.courseId ? this.props.course_name : this.props.subject_name
+        } : Test analysis - Student | IQLabs`;
+
+        this.loadTestResultData();
+    };
+
     loadTestResultData = () => {
-        fetch(`${this.url}/student/subject/${this.subjectId}/testanalysis/`, {
-            method: "GET",
-            headers: this.headers,
-        })
+        fetch(
+            this.courseId
+                ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/testanalysis/`
+                : `${this.url}/student/subject/${this.subjectId}/testanalysis/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
@@ -214,14 +227,6 @@ class TestResult extends Component {
                     page_loading: false,
                 });
             });
-    };
-
-    componentDidMount = () => {
-        document.title = `${
-            this.courseId ? this.props.course_name : this.props.subject_name
-        } : Test analysis - Student | IQLabs`;
-
-        this.loadTestResultData();
     };
 
     render() {

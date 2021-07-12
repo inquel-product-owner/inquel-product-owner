@@ -648,31 +648,35 @@ class TeacherNotes extends Component {
                                     Save
                                 </button>
                                 <button
-                                    className="btn btn-primary btn-sm shadow-none mr-3"
+                                    className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.toggleImageModal}
                                 >
                                     Upload Image
                                 </button>
-                                <div className="d-flex justify-content-end">
-                                    <span className="mr-2 small primary-text font-weight-bold">
-                                        Limited
-                                    </span>
-                                    <Switch
-                                        checked={this.state.limited}
-                                        onChange={this.handleSwitch}
-                                        onColor="#621012"
-                                        onHandleColor="#efd2ac"
-                                        handleDiameter={12}
-                                        uncheckedIcon={false}
-                                        checkedIcon={false}
-                                        boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                        activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                        height={18}
-                                        width={35}
-                                        className="react-switch"
-                                        id="select-all"
-                                    />
-                                </div>
+                                {!this.groupId ? (
+                                    <div className="d-flex justify-content-end ml-3">
+                                        <span className="mr-2 small primary-text font-weight-bold">
+                                            Limited
+                                        </span>
+                                        <Switch
+                                            checked={this.state.limited}
+                                            onChange={this.handleSwitch}
+                                            onColor="#621012"
+                                            onHandleColor="#efd2ac"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            id="select-all"
+                                        />
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                         </div>
                     </div>
@@ -701,7 +705,7 @@ class TeacherNotes extends Component {
                         onChange={this.onEditorChange}
                     />
                 </div>
-                
+
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}
             </Wrapper>

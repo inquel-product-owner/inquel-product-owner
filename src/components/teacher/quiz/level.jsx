@@ -34,6 +34,7 @@ class TeacherQuizLevel extends Component {
             total_questions: [],
             attempts: [],
             selectedAttempt: "",
+            publish: false,
         };
         this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
@@ -99,6 +100,7 @@ class TeacherQuizLevel extends Component {
                         quiz: result.data.levels,
                         negative_points: result.data.negative_points,
                         total_points: result.data.total_points,
+                        publish: result.data.publish,
                         page_loading: false,
                     });
                 } else {
@@ -291,6 +293,7 @@ class TeacherQuizLevel extends Component {
                         successMsg: result.msg,
                         showSuccessAlert: true,
                         page_loading: false,
+                        publish: !this.state.publish,
                     });
                 } else {
                     this.setState({
@@ -463,7 +466,9 @@ class TeacherQuizLevel extends Component {
                             className="btn btn-primary btn-sm shadow-none"
                             onClick={this.handlePublish}
                         >
-                            <span className="mx-2">Publish</span>
+                            <span className="mx-2">
+                                {this.state.publish ? "Unpublish" : "Publish"}
+                            </span>
                         </button>
                     </div>
                 </div>

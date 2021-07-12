@@ -36,6 +36,7 @@ class TeacherSemesterDirect extends Component {
             ends_at: "",
             valid_from: "",
             valid_to: "",
+            publish: false,
 
             path: null,
             numPages: null,
@@ -99,6 +100,7 @@ class TeacherSemesterDirect extends Component {
                             result.group_valid_to,
                             "yyyy-mm-dd"
                         ),
+                        publish: result.data.publish,
                     });
                 } else {
                     this.setState({
@@ -463,6 +465,7 @@ class TeacherSemesterDirect extends Component {
                         successMsg: result.msg,
                         showSuccessAlert: true,
                         page_loading: false,
+                        publish: !this.state.publish,
                     });
                 } else {
                     this.setState({
@@ -556,7 +559,7 @@ class TeacherSemesterDirect extends Component {
                             onClick={this.handlePublish}
                             disabled={this.state.isFileUploaded ? false : true}
                         >
-                            Publish
+                            {this.state.publish ? "Unpublish" : "Publish"}
                         </button>
                     </div>
                 </div>

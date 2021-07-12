@@ -1740,7 +1740,7 @@ class TeacherConcepts extends Component {
 
     render() {
         let data = [...this.state.concepts];
-        let boards = [...this.state.keyboards];
+        // let boards = [...this.state.keyboards];
         return (
             <Wrapper
                 header={this.props.subject_name}
@@ -2590,6 +2590,7 @@ class TeacherConcepts extends Component {
                                 </Card>
 
                                 {/* ---------- Settings ---------- */}
+                                {!this.groupId ? (
                                 <Card className="shadow-sm mb-2">
                                     <Accordion.Toggle
                                         as={Card.Body}
@@ -2612,7 +2613,7 @@ class TeacherConcepts extends Component {
                                     <Accordion.Collapse eventKey="2">
                                         <Card.Body className="p-3">
                                             {/* ---------- Virtual keyboard ---------- */}
-                                            <div className="form-group">
+                                            {/* <div className="form-group">
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     <span>
                                                         Virtual Keyboard
@@ -2628,8 +2629,8 @@ class TeacherConcepts extends Component {
                                                         }
                                                     />
                                                 </div>
-                                            </div>
-                                            {this.state.showVirtual_keyboard ? (
+                                            </div> */}
+                                            {/* {this.state.showVirtual_keyboard ? (
                                                 <div className="form-group">
                                                     <div className="d-flex justify-content-between align-items-center mb-2">
                                                         All
@@ -2724,7 +2725,7 @@ class TeacherConcepts extends Component {
                                                 </div>
                                             ) : (
                                                 ""
-                                            )}
+                                            )} */}
 
                                             {/* ---------- Limited ---------- */}
                                             <div className="form-group">
@@ -2754,7 +2755,7 @@ class TeacherConcepts extends Component {
                                             </div>
                                         </Card.Body>
                                     </Accordion.Collapse>
-                                </Card>
+                                </Card>):""}
                             </Accordion>
                         </div>
                     ) : (

@@ -719,6 +719,20 @@ const TopicListRender = (props) => {
         return topic_name;
     }
 
+    function substring_topic_num(topic) {
+        let topic_num = topic.toString();
+        let dot_index = 0;
+
+        for (var i = 0; i < topic_num.length; i++) {
+            if (topic_num[i] === ".") {
+                dot_index = i;
+                break;
+            }
+        }
+
+        return topic_num.substring(dot_index + 1);
+    }
+
     return (
         <>
             <Accordion.Toggle
@@ -764,7 +778,10 @@ const TopicListRender = (props) => {
                             </div>
                             <div className="col-10 d-flex align-items-center small font-weight-bold-600 pl-1">
                                 <div className="mr-3">
-                                    {props.chapter.chapter_index}{props.topics.topic_num.substring(1,)}
+                                    {props.chapter.chapter_index}.
+                                    {substring_topic_num(
+                                        props.topics.topic_num
+                                    )}
                                 </div>
                                 <div className="w-100">
                                     <button
@@ -853,7 +870,7 @@ const TopicListRender = (props) => {
                                         to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
                                     >
                                         <button
-                                            className="btn btn-light btn-sm shadow-none"
+                                            className="btn btn-light btn-sm shadow-none small"
                                             onClick={() => {
                                                 batch(() => {
                                                     storeDispatch(
@@ -873,7 +890,7 @@ const TopicListRender = (props) => {
                                                 });
                                             }}
                                         >
-                                            {props.topics.next_topic}
+                                            {props.topics.next_topic_name}
                                             <i className="fas fa-external-link-alt fa-xs ml-2"></i>
                                         </button>
                                     </Link>

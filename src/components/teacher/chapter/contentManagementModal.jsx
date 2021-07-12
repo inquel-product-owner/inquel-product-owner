@@ -108,8 +108,6 @@ export class TopicModal extends Component {
             );
         }
 
-        console.log(body);
-
         fetch(
             `${this.url}/teacher/subject/${this.props.subjectId}/chapter/topics/`,
             {

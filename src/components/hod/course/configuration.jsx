@@ -1578,7 +1578,9 @@ class HODCourseConfig extends Component {
                             </div>
                             <div className="card-body pt-0">
                                 {/* chapters */}
-                                <p className="primary-text font-weight-bold-600">Chapters</p>
+                                <p className="primary-text font-weight-bold-600">
+                                    Chapters
+                                </p>
                                 <div className="form-row">
                                     {this.state.chapters.length !== 0
                                         ? this.state.chapters.map(
@@ -1671,7 +1673,9 @@ class HODCourseConfig extends Component {
                                 <div className="dropdown-divider"></div>
 
                                 {/* semesters */}
-                                <p className="primary-text font-weight-bold-600">Exams</p>
+                                <p className="primary-text font-weight-bold-600">
+                                    Exams
+                                </p>
                                 <div className="form-row">
                                     {this.state.semesters.length !== 0
                                         ? this.state.semesters.map(
@@ -2139,8 +2143,10 @@ class HODCourseConfig extends Component {
                                                                         }
                                                                     >
                                                                         <div className="col-2 small primary-text font-weight-bold-600">
-                                                                            {cs_index +
-                                                                                1}
+                                                                            {item.chapter_id
+                                                                                ? cs_index +
+                                                                                  1
+                                                                                : ""}
                                                                         </div>
                                                                         <div className="col-7 small primary-text font-weight-bold-600">
                                                                             {this.getContentName(

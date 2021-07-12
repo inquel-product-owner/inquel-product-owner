@@ -7,6 +7,7 @@ import { baseUrl, adminPathUrl } from "../../../shared/baseUrl";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import dateFormat from "dateformat";
+import StudentSubscriptionTable from "../../common/table/student_subscription";
 
 class AdminHodStudentProfile extends Component {
     constructor(props) {
@@ -242,6 +243,14 @@ class AdminHodStudentProfile extends Component {
                             {this.state.studentItems.institution_name}
                         </p>
                     </div>
+                </div>
+
+                {/* subscribed course list */}
+                <div className="card shadow-sm">
+                    <StudentSubscriptionTable
+                        data={this.state.studentItems.subscriptions || []}
+                    />
+                    <div className="card-footer"></div>
                 </div>
 
                 {/* Loading component */}

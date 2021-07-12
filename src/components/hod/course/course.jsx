@@ -672,7 +672,7 @@ const TopicListRender = (props) => {
                                                 );
                                             }}
                                         >
-                                            {props.topics.next_topic}
+                                            {props.topics.next_topic_name}
                                             <i className="fas fa-external-link-alt fa-xs ml-2"></i>
                                         </button>
                                     </Link>
