@@ -943,6 +943,17 @@ class HODSimulationType2 extends Component {
         });
     };
 
+    handleNegativeMarks = (event) => {
+        let values = [...this.state.questions];
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].negative_marks = event.target.value.toString();
+
+        this.setState({
+            questions: values,
+        });
+    };
+
     // -------------------------- Collapse --------------------------
 
     toggleCollapse = (component) => {
@@ -2846,11 +2857,9 @@ class HODSimulationType2 extends Component {
                                                                     .activeSubQuestion
                                                             ].negative_marks
                                                         }
-                                                        onChange={(event) =>
-                                                            this.handleProperties(
-                                                                event,
-                                                                "negative_marks"
-                                                            )
+                                                        onChange={
+                                                            this
+                                                                .handleNegativeMarks
                                                         }
                                                         autoComplete="off"
                                                     />
