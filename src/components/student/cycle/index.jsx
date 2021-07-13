@@ -3,8 +3,10 @@ import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../common/alert";
 import Loading from "../../common/loader";
-import { connect } from "react-redux";
+import { batch, connect } from "react-redux";
 import { Modal } from "react-bootstrap";
+import storeDispatch from "../../../redux/dispatch";
+import { EXAMDATA, EXAM_STATE } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -156,12 +158,25 @@ class CycleTest extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    storeDispatch(EXAM_STATE, {
+                        examStarted: true,
+                        id: this.cycleTestId,
+                        type: "cycle",
+                    });
                     this.props.history.push(`${this.props.match.url}/auto`);
                 } else {
                     this.setState({
                         errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
+                    });
+                    batch(() => {
+                        storeDispatch(EXAMDATA, {});
+                        storeDispatch(EXAM_STATE, {
+                            examStarted: false,
+                            id: "",
+                            type: "",
+                        });
                     });
                 }
             })
@@ -171,6 +186,11 @@ class CycleTest extends Component {
                     errorMsg: "Cannot start test at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
+                });
+                storeDispatch(EXAM_STATE, {
+                    examStarted: false,
+                    id: "",
+                    type: "",
                 });
             });
     };

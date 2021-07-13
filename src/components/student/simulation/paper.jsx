@@ -111,7 +111,7 @@ class SimulationExam extends Component {
                             {this.props.simulation_name}
                         </div>
 
-                        <div className="card card-body secondary-bg shadow-sm mb-2">
+                        <div className="card card-body secondary-bg shadow-sm mb-3">
                             <div className="row align-items-center font-weight-bold-600 small">
                                 <div className="col-md-4 text-center text-md-left font-weight-bold mb-2 mb-md-0">
                                     Paper description

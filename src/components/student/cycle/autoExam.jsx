@@ -1,16 +1,16 @@
 import React, { Component } from "react";
-import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../common/alert";
 import Loading from "../../common/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { connect } from "react-redux";
+import { batch, connect } from "react-redux";
 import { QuestionDataFormat } from "../../common/function/dataFormating";
 import storeDispatch from "../../../redux/dispatch";
-import { EXAMDATA } from "../../../redux/action";
+import { EXAMDATA, EXAM_STATE } from "../../../redux/action";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../../common/ErrorFallback";
+import { Modal, Navbar } from "react-bootstrap";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -19,6 +19,58 @@ const mapStateToProps = (state) => ({
     examData: state.storage.examData,
     course_name: state.content.course_name,
 });
+
+const ConfirmationModal = (props) => {
+    return (
+        <Modal
+            show={props.show}
+            onHide={props.onHide}
+            size="md"
+            backdrop="static"
+        >
+            <Modal.Header
+                className="border-0 pb-0 pt-1"
+                closeButton
+            ></Modal.Header>
+            <Modal.Body className="pt-0">
+                <h1 className="text-center text-warning display-4 mb-3">
+                    <i className="fas fa-exclamation-triangle"></i>
+                </h1>
+                <p
+                    className="text-center font-weight-bold-600 mb-2"
+                    style={{ fontSize: "22px" }}
+                >
+                    Leave page?
+                </p>
+                <p className="text-center mb-0">
+                    You cannot leave the page without submitting the exam,
+                    please submit before leaving...
+                </p>
+            </Modal.Body>
+            <Modal.Footer className="w-100 border-0 mb-2">
+                <div className="form-row w-100">
+                    <div className="col-6">
+                        <button
+                            className="btn btn-outline-secondary btn-block shadow-none"
+                            onClick={props.onHide}
+                        >
+                            No, continue
+                        </button>
+                    </div>
+                    <div className="col-6">
+                        <button
+                            className="btn btn-primary btn-block shadow-none"
+                            onClick={props.submit}
+                        >
+                            <i className="far fa-check-circle mr-1"></i> Yes,
+                            submit
+                        </button>
+                    </div>
+                </div>
+            </Modal.Footer>
+        </Modal>
+    );
+};
 
 class CycleAutoExam extends Component {
     constructor(props) {
@@ -35,6 +87,8 @@ class CycleAutoExam extends Component {
             selectedImageData: [],
             startIndex: 0,
             isLightBoxOpen: false,
+
+            showConfirmationModal: false,
 
             errorMsg: "",
             successMsg: "",
@@ -129,15 +183,7 @@ class CycleAutoExam extends Component {
                 let totalSubQuestion = [];
                 let currentSubQuestionIndex = [];
                 if (result.sts === true) {
-                    var duration = "";
                     let response = result.data.auto_test;
-                    if (localStorage.getItem("examDuration")) {
-                        duration = localStorage.getItem("examDuration");
-                    } else if (result.data.auto_test_duration !== undefined) {
-                        duration = result.data.auto_test_duration * 60;
-                    } else {
-                        duration = 0;
-                    }
                     if (response.length !== 0) {
                         response.forEach((data) => {
                             let questions = QuestionDataFormat(data.questions);
@@ -155,11 +201,9 @@ class CycleAutoExam extends Component {
                             questionSection: sections,
                             totalSubQuestion: totalSubQuestion,
                             currentSubQuestionIndex: currentSubQuestionIndex,
-                            seconds: duration,
                         },
                         () => {
                             this.loopAnswerSection();
-                            this.loadExamInfo();
                         }
                     );
                 } else {
@@ -167,6 +211,11 @@ class CycleAutoExam extends Component {
                         errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
+                    });
+                    storeDispatch(EXAM_STATE, {
+                        examStarted: false,
+                        id: "",
+                        type: "",
                     });
                 }
             })
@@ -195,8 +244,10 @@ class CycleAutoExam extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    let seconds = result.data.minutes * 60;
                     this.setState({
                         examInfo: result.data,
+                        seconds: seconds + result.data.seconds,
                         page_loading: false,
                     });
                     this.startTimer();
@@ -205,6 +256,11 @@ class CycleAutoExam extends Component {
                         errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
+                    });
+                    storeDispatch(EXAM_STATE, {
+                        examStarted: false,
+                        id: "",
+                        type: "",
                     });
                 }
             })
@@ -226,6 +282,11 @@ class CycleAutoExam extends Component {
         this.setState({ time: timeLeftVar });
 
         this.loadCycleTestData();
+        this.loadExamInfo();
+    };
+
+    componentWillUnmount = () => {
+        clearInterval(this.timer);
     };
 
     // ---------- Submitting the data ----------
@@ -233,6 +294,7 @@ class CycleAutoExam extends Component {
     handleSubmit = () => {
         this.setState({
             page_loading: true,
+            showConfirmationModal: false,
         });
         clearInterval(this.timer);
 
@@ -258,12 +320,18 @@ class CycleAutoExam extends Component {
                             showSuccessAlert: true,
                         },
                         () => {
-                            localStorage.removeItem("examDuration");
                             setTimeout(() => {
                                 this.setState({
                                     page_loading: false,
                                 });
-                                storeDispatch(EXAMDATA, {});
+                                batch(() => {
+                                    storeDispatch(EXAMDATA, {});
+                                    storeDispatch(EXAM_STATE, {
+                                        examStarted: false,
+                                        id: "",
+                                        type: "",
+                                    });
+                                });
                                 this.props.history.goBack();
                             }, 1000);
                         }
@@ -274,6 +342,11 @@ class CycleAutoExam extends Component {
                         showErrorAlert: true,
                         page_loading: false,
                     });
+                    storeDispatch(EXAM_STATE, {
+                        examStarted: false,
+                        id: "",
+                        type: "",
+                    });
                 }
             })
             .catch((err) => {
@@ -282,6 +355,11 @@ class CycleAutoExam extends Component {
                     errorMsg: "Cannot submit test at the moment!",
                     showErrorAlert: true,
                     page_loading: false,
+                });
+                storeDispatch(EXAM_STATE, {
+                    examStarted: false,
+                    id: "",
+                    type: "",
                 });
             });
     };
@@ -542,7 +620,6 @@ class CycleAutoExam extends Component {
             time: this.secondsToTime(seconds),
             seconds: seconds,
         });
-        localStorage.setItem("examDuration", seconds);
 
         // Check if we're at zero.
         if (seconds === 0) {
@@ -576,7 +653,10 @@ class CycleAutoExam extends Component {
 
     typeOneRender = (data, index, answerSection) => {
         return (
-            <div className="d-flex align-items-start mb-3" key={index}>
+            <div
+                className="d-flex align-items-start mb-3 user-select-none"
+                key={index}
+            >
                 <button className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">
                     {index <= 8 ? `0${index + 1}` : index + 1}
                 </button>
@@ -849,7 +929,10 @@ class CycleAutoExam extends Component {
             isAnswerAvailable.push(temp);
         });
         return (
-            <div className="d-flex align-items-start mb-3" key={index}>
+            <div
+                className="d-flex align-items-start mb-3 user-select-none"
+                key={index}
+            >
                 <button className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">
                     {index <= 8 ? `0${index + 1}` : index + 1}
                 </button>
@@ -1186,15 +1269,44 @@ class CycleAutoExam extends Component {
         return (
             <>
                 {/* Navbar */}
-                <Header
-                    name={
-                        this.courseId
-                            ? this.props.course_name
-                            : this.props.subject_name
-                    }
-                    chapter_name={`${this.props.chapter_name} - ${this.props.cycle_name}`}
-                    goBack={this.props.history.goBack}
-                />
+                <Navbar
+                    variant="light"
+                    className="shadow-sm bg-white justify-content-center py-3"
+                >
+                    <div
+                        className="row align-items-center"
+                        style={{ width: "100%" }}
+                    >
+                        <div className="col-md-4 col-6 order-2 order-md-1 pl-0">
+                            <p className="small font-weight-bold-600 primary-text text-truncate mb-0">
+                                {`${this.props.chapter_name} - ${this.props.cycle_name}`}
+                            </p>
+                        </div>
+                        <div className="col-md-4 col-12 order-1 order-md-2">
+                            <h5 className="text-center mb-0 primary-text font-weight-bold-600 text-truncate">
+                                {this.courseId
+                                    ? this.props.course_name
+                                    : this.props.subject_name}
+                            </h5>
+                        </div>
+                        <div className="col-md-4 col-6 order-3 order-md-3 text-right pr-0">
+                            <button
+                                className="btn btn-light bg-white border-0 shadow-none btn-sm"
+                                onClick={() => {
+                                    if (this.state.seconds === 0) {
+                                        this.props.history.goBack();
+                                    } else {
+                                        this.setState({
+                                            showConfirmationModal: true,
+                                        });
+                                    }
+                                }}
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </Navbar>
 
                 {/* Alert message */}
                 <AlertBox
@@ -1228,6 +1340,18 @@ class CycleAutoExam extends Component {
                 ) : (
                     ""
                 )}
+
+                {/* Confirmation modal */}
+                <ConfirmationModal
+                    show={this.state.showConfirmationModal}
+                    onHide={() =>
+                        this.setState({
+                            showConfirmationModal: false,
+                        })
+                    }
+                    submit={this.handleSubmit}
+                    goBack={this.props.history.goBack}
+                />
 
                 <div className="exam-section">
                     <div className="container-fluid">

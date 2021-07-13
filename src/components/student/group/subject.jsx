@@ -25,16 +25,19 @@ import {
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
+    exam_state: state.application.exam_state,
 });
 
-function Lock() {
+function Lock(props) {
     return (
         <OverlayTrigger
             key="top"
             placement="top"
             overlay={
                 <Tooltip id="tooltip">
-                    Complete the topics to unlock cycle test
+                    {props.message
+                        ? props.message
+                        : "Complete the topics to unlock the test"}
                 </Tooltip>
             }
         >
@@ -57,22 +60,6 @@ const TopicListRender = (props) => {
             </Accordion>
         );
     });
-
-    function getTopicName(data, topic_num) {
-        let topic_name = "";
-
-        if (Array.isArray(data)) {
-            data.forEach((item) => {
-                if (item.topic_num === topic_num) {
-                    topic_name = item.topic_name;
-                } else if (item.child.length !== 0) {
-                    topic_name = getTopicName(item.child, topic_num);
-                }
-            });
-        }
-
-        return topic_name;
-    }
 
     return (
         <>
@@ -138,6 +125,12 @@ const TopicListRender = (props) => {
                                                 );
                                             });
                                         }}
+                                        disabled={
+                                            props.exam_state.examStarted ===
+                                            true
+                                                ? true
+                                                : false
+                                        }
                                     >
                                         {props.topics.topic_name}
                                         <i className="fas fa-external-link-alt fa-xs ml-2"></i>
@@ -201,30 +194,37 @@ const TopicListRender = (props) => {
                                     ) : null
                                 ) : null}
                             </div>
-                            <div className="col-2 text-center">
+                            <div className="col-2">
                                 {props.topics.next_topic ? (
                                     <Link
-                                        to={`${props.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
-                                        className="text-dark small"
-                                        onClick={() => {
-                                            batch(() => {
-                                                storeDispatch(
-                                                    CHAPTER,
-                                                    props.chapter.chapter_name
-                                                );
-                                                storeDispatch(
-                                                    TOPIC,
-                                                    getTopicName(
-                                                        props.chapter.topics[0]
-                                                            .chapter_structure,
-                                                        props.topics.next_topic
-                                                    )
-                                                );
-                                            });
-                                        }}
+                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
                                     >
-                                        {props.topics.next_topic_name}
-                                        <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                        <button
+                                            className="btn btn-light btn-sm shadow-none small"
+                                            onClick={() => {
+                                                batch(() => {
+                                                    storeDispatch(
+                                                        CHAPTER,
+                                                        props.chapter
+                                                            .chapter_name
+                                                    );
+                                                    storeDispatch(
+                                                        TOPIC,
+                                                        props.topics
+                                                            .next_topic_name
+                                                    );
+                                                });
+                                            }}
+                                            disabled={
+                                                props.exam_state.examStarted ===
+                                                true
+                                                    ? true
+                                                    : false
+                                            }
+                                        >
+                                            {props.topics.next_topic_name}
+                                            <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                        </button>
                                     </Link>
                                 ) : (
                                     ""
@@ -337,38 +337,70 @@ const ChapterListRender = (props) => {
                                 {props.chapter.weightage}
                             </div>
                             <div className="col-2">
-                                <Link
-                                    to={`${props.url}/chapter/${props.chapter.chapter_id}/summary`}
-                                >
-                                    <button
-                                        className="btn btn-light btn-sm shadow-none"
-                                        onClick={() =>
-                                            storeDispatch(
-                                                CHAPTER,
-                                                props.chapter.chapter_name
-                                            )
-                                        }
-                                    >
-                                        <i className="fas fa-eye fa-sm"></i>
-                                    </button>
-                                </Link>
+                                {
+                                    // check if the exam is started
+                                    props.exam_state.examStarted === false ? (
+                                        <Link
+                                            to={`${props.url}/chapter/${props.chapter.chapter_id}/summary`}
+                                        >
+                                            <button
+                                                className="btn btn-light btn-sm shadow-none"
+                                                onClick={() =>
+                                                    storeDispatch(
+                                                        CHAPTER,
+                                                        props.chapter
+                                                            .chapter_name
+                                                    )
+                                                }
+                                            >
+                                                <i className="fas fa-eye fa-sm"></i>
+                                            </button>
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            className="btn btn-light btn-sm shadow-none"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                            disabled
+                                        >
+                                            <i className="fas fa-eye fa-sm"></i>
+                                        </button>
+                                    )
+                                }
                             </div>
                             <div className="col-2">
-                                <Link
-                                    to={`${props.url}/chapter/${props.chapter.chapter_id}/notes`}
-                                >
-                                    <button
-                                        className="btn btn-light btn-sm shadow-none"
-                                        onClick={() =>
-                                            storeDispatch(
-                                                CHAPTER,
-                                                props.chapter.chapter_name
-                                            )
-                                        }
-                                    >
-                                        <i className="fas fa-eye fa-sm"></i>
-                                    </button>
-                                </Link>
+                                {
+                                    // check if the exam is started
+                                    props.exam_state.examStarted === false ? (
+                                        <Link
+                                            to={`${props.url}/chapter/${props.chapter.chapter_id}/notes`}
+                                        >
+                                            <button
+                                                className="btn btn-light btn-sm shadow-none"
+                                                onClick={() =>
+                                                    storeDispatch(
+                                                        CHAPTER,
+                                                        props.chapter
+                                                            .chapter_name
+                                                    )
+                                                }
+                                            >
+                                                <i className="fas fa-eye fa-sm"></i>
+                                            </button>
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            className="btn btn-light btn-sm shadow-none"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                            disabled
+                                        >
+                                            <i className="fas fa-eye fa-sm"></i>
+                                        </button>
+                                    )
+                                }
                             </div>
                             <div className="col-2">
                                 {props.chapter_remarks[
@@ -538,26 +570,37 @@ const ChapterListRender = (props) => {
                                             </div>
                                             <div className="col-2"></div>
                                             <div className="col-2 text-right">
-                                                <Link
-                                                    to={`${props.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
-                                                    onClick={() => {
-                                                        batch(() => {
-                                                            storeDispatch(
-                                                                CHAPTER,
-                                                                props.chapter
-                                                                    .chapter_name
-                                                            );
-                                                            storeDispatch(
-                                                                QUIZ,
-                                                                quiz.quiz_name
-                                                            );
-                                                        });
-                                                    }}
-                                                >
-                                                    <button className="btn btn-primary btn-sm shadow-none">
-                                                        View
-                                                    </button>
-                                                </Link>
+                                                {
+                                                    // check if the exam has been started
+                                                    props.exam_state
+                                                        .examStarted ===
+                                                    true ? (
+                                                        // if not then display the error message in tooltip
+                                                        <Lock message="Submit the exam to continue..." />
+                                                    ) : (
+                                                        <Link
+                                                            to={`${props.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
+                                                            onClick={() => {
+                                                                batch(() => {
+                                                                    storeDispatch(
+                                                                        CHAPTER,
+                                                                        props
+                                                                            .chapter
+                                                                            .chapter_name
+                                                                    );
+                                                                    storeDispatch(
+                                                                        QUIZ,
+                                                                        quiz.quiz_name
+                                                                    );
+                                                                });
+                                                            }}
+                                                        >
+                                                            <button className="btn btn-primary btn-sm shadow-none">
+                                                                View
+                                                            </button>
+                                                        </Link>
+                                                    )
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -1022,28 +1065,95 @@ class Subject extends Component {
                                             </OverlayTrigger>
                                         ) : // if exist, then redirect them to appropriate cycle test
                                         data.direct_question === true ? (
-                                            <Link
-                                                to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}/direct`}
-                                            >
-                                                <button
-                                                    className="btn btn-primary btn-sm shadow-none"
-                                                    onClick={() => {
-                                                        batch(() => {
-                                                            storeDispatch(
-                                                                CHAPTER,
-                                                                chapter_name
-                                                            );
-                                                            storeDispatch(
-                                                                CYCLE,
-                                                                data.cycle_test_name
-                                                            );
-                                                        });
-                                                    }}
+                                            // check if the exam has been started
+                                            this.props.exam_state
+                                                .examStarted === true ? (
+                                                // check if the current exam id is same as this exam
+                                                this.props.exam_state.id ===
+                                                data.cycle_test_id ? (
+                                                    <Link
+                                                        to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}/direct`}
+                                                    >
+                                                        <button
+                                                            className="btn btn-primary btn-sm shadow-none"
+                                                            onClick={() => {
+                                                                batch(() => {
+                                                                    storeDispatch(
+                                                                        CHAPTER,
+                                                                        chapter_name
+                                                                    );
+                                                                    storeDispatch(
+                                                                        CYCLE,
+                                                                        data.cycle_test_name
+                                                                    );
+                                                                });
+                                                            }}
+                                                        >
+                                                            View
+                                                        </button>
+                                                    </Link>
+                                                ) : (
+                                                    // if not then display the error message in tooltip
+                                                    <Lock message="Submit the exam to continue..." />
+                                                )
+                                            ) : (
+                                                // else display the view button
+                                                <Link
+                                                    to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}/direct`}
                                                 >
-                                                    View
-                                                </button>
-                                            </Link>
+                                                    <button
+                                                        className="btn btn-primary btn-sm shadow-none"
+                                                        onClick={() => {
+                                                            batch(() => {
+                                                                storeDispatch(
+                                                                    CHAPTER,
+                                                                    chapter_name
+                                                                );
+                                                                storeDispatch(
+                                                                    CYCLE,
+                                                                    data.cycle_test_name
+                                                                );
+                                                            });
+                                                        }}
+                                                    >
+                                                        View
+                                                    </button>
+                                                </Link>
+                                            )
+                                        ) : // check if the exam has been started
+                                        this.props.exam_state.examStarted ===
+                                          true ? (
+                                            // check if the current exam id is same as this exam
+                                            this.props.exam_state.id ===
+                                            data.cycle_test_id ? (
+                                                <Link
+                                                    to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}`}
+                                                >
+                                                    <button
+                                                        className="btn btn-primary btn-sm shadow-none"
+                                                        onClick={() => {
+                                                            batch(() => {
+                                                                storeDispatch(
+                                                                    CHAPTER,
+                                                                    chapter_name
+                                                                );
+                                                                storeDispatch(
+                                                                    CYCLE,
+                                                                    data.cycle_test_name
+                                                                );
+                                                            });
+                                                        }}
+                                                    >
+                                                        View
+                                                    </button>
+                                                </Link>
+                                            ) : (
+                                                // if not then display the error message in tooltip
+                                                <Lock message="Submit the exam to continue..." />
+                                            )
                                         ) : (
+                                            // else display the view button
+
                                             <Link
                                                 to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}`}
                                             >
@@ -1197,12 +1307,14 @@ class Subject extends Component {
                             <button
                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                 disabled={
-                                    this.state.subjectItems.chapters
-                                        ? this.state.subjectItems.chapters
-                                              .length !== 0
-                                            ? false
-                                            : true
-                                        : false
+                                    this.state.subjectItems.chapters &&
+                                    this.state.subjectItems.chapters.length !==
+                                        0
+                                        ? this.props.exam_state.examStarted ===
+                                          true
+                                            ? true
+                                            : false
+                                        : true
                                 }
                             >
                                 Personal Notes
@@ -1215,12 +1327,14 @@ class Subject extends Component {
                             <button
                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                 disabled={
-                                    this.state.subjectItems.chapters
-                                        ? this.state.subjectItems.chapters
-                                              .length !== 0
-                                            ? false
-                                            : true
-                                        : false
+                                    this.state.subjectItems.chapters &&
+                                    this.state.subjectItems.chapters.length !==
+                                        0
+                                        ? this.props.exam_state.examStarted ===
+                                          true
+                                            ? true
+                                            : false
+                                        : true
                                 }
                             >
                                 Favourites
@@ -1233,12 +1347,14 @@ class Subject extends Component {
                             <button
                                 className="btn btn-primary btn-sm shadow-none"
                                 disabled={
-                                    this.state.subjectItems.chapters
-                                        ? this.state.subjectItems.chapters
-                                              .length !== 0
-                                            ? false
-                                            : true
-                                        : false
+                                    this.state.subjectItems.chapters &&
+                                    this.state.subjectItems.chapters.length !==
+                                        0
+                                        ? this.props.exam_state.examStarted ===
+                                          true
+                                            ? true
+                                            : false
+                                        : true
                                 }
                             >
                                 Test Analysis
@@ -1248,6 +1364,11 @@ class Subject extends Component {
                             <Dropdown.Toggle
                                 variant="Secondary"
                                 className="btn btn-primary btn-sm shadow-none caret-off"
+                                disabled={
+                                    this.props.exam_state.examStarted === true
+                                        ? true
+                                        : false
+                                }
                             >
                                 <i className="fas fa-ellipsis-h"></i>
                             </Dropdown.Toggle>
@@ -1354,6 +1475,8 @@ class Subject extends Component {
                                                               chapter.chapter_id
                                                           ) ? (
                                                               <ChapterListRender
+                                                                  {...this
+                                                                      .props}
                                                                   key={
                                                                       chapter_index
                                                                   }
@@ -1499,22 +1622,88 @@ class Subject extends Component {
                                                                           ) : // if exist, then redirect them to appropriate cycle test
                                                                           semester.direct_question ===
                                                                             true ? (
-                                                                              <Link
-                                                                                  to={`${this.props.match.url}/semester/${semester.semester_id}/direct`}
-                                                                              >
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm shadow-none"
-                                                                                      onClick={() => {
-                                                                                          storeDispatch(
-                                                                                              SEMESTER,
-                                                                                              semester.semester_name
-                                                                                          );
-                                                                                      }}
+                                                                              // check if the exam has been started
+                                                                              this
+                                                                                  .props
+                                                                                  .exam_state
+                                                                                  .examStarted ===
+                                                                              true ? (
+                                                                                  // check if the current exam id is same as this exam
+                                                                                  this
+                                                                                      .props
+                                                                                      .exam_state
+                                                                                      .id ===
+                                                                                  semester.semester_id ? (
+                                                                                      <Link
+                                                                                          to={`${this.props.match.url}/semester/${semester.semester_id}/direct`}
+                                                                                      >
+                                                                                          <button
+                                                                                              className="btn btn-primary btn-sm shadow-none"
+                                                                                              onClick={() => {
+                                                                                                  storeDispatch(
+                                                                                                      SEMESTER,
+                                                                                                      semester.semester_name
+                                                                                                  );
+                                                                                              }}
+                                                                                          >
+                                                                                              View
+                                                                                          </button>
+                                                                                      </Link>
+                                                                                  ) : (
+                                                                                      // if not then display the error message in tooltip
+                                                                                      <Lock message="Submit the exam to continue..." />
+                                                                                  )
+                                                                              ) : (
+                                                                                  // else display the view button
+                                                                                  <Link
+                                                                                      to={`${this.props.match.url}/semester/${semester.semester_id}/direct`}
                                                                                   >
-                                                                                      View
-                                                                                  </button>
-                                                                              </Link>
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm shadow-none"
+                                                                                          onClick={() => {
+                                                                                              storeDispatch(
+                                                                                                  SEMESTER,
+                                                                                                  semester.semester_name
+                                                                                              );
+                                                                                          }}
+                                                                                      >
+                                                                                          View
+                                                                                      </button>
+                                                                                  </Link>
+                                                                              )
+                                                                          ) : // check if the exam has been started
+                                                                          this
+                                                                                .props
+                                                                                .exam_state
+                                                                                .examStarted ===
+                                                                            true ? (
+                                                                              // check if the current exam id is same as this exam
+                                                                              this
+                                                                                  .props
+                                                                                  .exam_state
+                                                                                  .id ===
+                                                                              semester.semester_id ? (
+                                                                                  <Link
+                                                                                      to={`${this.props.match.url}/semester/${semester.semester_id}`}
+                                                                                  >
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm shadow-none"
+                                                                                          onClick={() => {
+                                                                                              storeDispatch(
+                                                                                                  SEMESTER,
+                                                                                                  semester.semester_name
+                                                                                              );
+                                                                                          }}
+                                                                                      >
+                                                                                          View
+                                                                                      </button>
+                                                                                  </Link>
+                                                                              ) : (
+                                                                                  // if not then display the error message in tooltip
+                                                                                  <Lock message="Submit the exam to continue..." />
+                                                                              )
                                                                           ) : (
+                                                                              // else display the view button
                                                                               <Link
                                                                                   to={`${this.props.match.url}/semester/${semester.semester_id}`}
                                                                               >
@@ -1552,6 +1741,7 @@ class Subject extends Component {
                                               chapter.chapter_id
                                           ) ? (
                                               <ChapterListRender
+                                                  {...this.props}
                                                   key={chapter_index}
                                                   chapter={chapter}
                                                   chapter_index={chapter_index}

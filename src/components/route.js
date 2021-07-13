@@ -143,11 +143,11 @@ import FavouritesFlashcard from "./student/flashcard/bookmarkFlashcard";
 import FlashCard from "./student/flashcard/learnFlashCard";
 
 import CycleTest from "./student/cycle/";
-import CycleDirectExam from "./student/cycle/directExam";
+import CycleDirectExam from "./student/cycle/direct";
 import CycleAutoExam from "./student/cycle/autoExam";
 
 import SemesterExam from "./student/semester";
-import SemesterDirectExam from "./student/semester/directExam";
+import SemesterDirectExam from "./student/semester/direct";
 import SemesterAutoExam from "./student/semester/autoExam";
 
 import Quiz from "./student/quiz/quiz";
