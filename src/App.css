@@ -705,6 +705,7 @@ label {
     top: 0;
     left: 0;
     background: #f8f8f8d5;
+    z-index: 1;
 }
 
 .fp-container .fp-loader {

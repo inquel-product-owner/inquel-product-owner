@@ -27,16 +27,19 @@ import {
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
+    exam_state: state.application.exam_state,
 });
 
-function Lock() {
+function Lock(props) {
     return (
         <OverlayTrigger
             key="top"
             placement="top"
             overlay={
                 <Tooltip id="tooltip">
-                    Complete the topics to unlock cycle test
+                    {props.message
+                        ? props.message
+                        : "Complete the topics to unlock the test"}
                 </Tooltip>
             }
         >
@@ -208,21 +211,52 @@ const UnitListRender = (props) => {
                                                                     <div className="col-2 text-right">
                                                                         {semester.chapters_completed ===
                                                                         true ? (
-                                                                            <Link
-                                                                                to={`${props.match.url}/semester/${semester.semester_id}`}
-                                                                            >
-                                                                                <button
-                                                                                    className="btn btn-primary btn-sm shadow-none"
-                                                                                    onClick={() => {
-                                                                                        storeDispatch(
-                                                                                            SEMESTER,
-                                                                                            semester.semester_name
-                                                                                        );
-                                                                                    }}
+                                                                            // check if the exam has been started
+                                                                            props
+                                                                                .exam_state
+                                                                                .examStarted ===
+                                                                            true ? (
+                                                                                // check if the current exam id is same as this exam
+                                                                                props
+                                                                                    .exam_state
+                                                                                    .id ===
+                                                                                semester.semester_id ? (
+                                                                                    <Link
+                                                                                        to={`${props.match.url}/semester/${semester.semester_id}`}
+                                                                                    >
+                                                                                        <button
+                                                                                            className="btn btn-primary btn-sm shadow-none"
+                                                                                            onClick={() => {
+                                                                                                storeDispatch(
+                                                                                                    SEMESTER,
+                                                                                                    semester.semester_name
+                                                                                                );
+                                                                                            }}
+                                                                                        >
+                                                                                            View
+                                                                                        </button>
+                                                                                    </Link>
+                                                                                ) : (
+                                                                                    // if not then display the error message in tooltip
+                                                                                    <Lock message="Submit the exam to continue..." />
+                                                                                )
+                                                                            ) : (
+                                                                                <Link
+                                                                                    to={`${props.match.url}/semester/${semester.semester_id}`}
                                                                                 >
-                                                                                    View
-                                                                                </button>
-                                                                            </Link>
+                                                                                    <button
+                                                                                        className="btn btn-primary btn-sm shadow-none"
+                                                                                        onClick={() => {
+                                                                                            storeDispatch(
+                                                                                                SEMESTER,
+                                                                                                semester.semester_name
+                                                                                            );
+                                                                                        }}
+                                                                                    >
+                                                                                        View
+                                                                                    </button>
+                                                                                </Link>
+                                                                            )
                                                                         ) : (
                                                                             <Lock />
                                                                         )}
@@ -271,21 +305,52 @@ const UnitListRender = (props) => {
                                                 </p>
                                             </div>
                                             <div className="col-6 text-right">
-                                                <Link
-                                                    to={`${props.match.url}/simulation/${simulation.simulation_id}`}
-                                                >
-                                                    <button
-                                                        className="btn btn-primary btn-sm shadow-none"
-                                                        onClick={() => {
-                                                            storeDispatch(
-                                                                SIMULATION,
-                                                                simulation.simulation_name
-                                                            );
-                                                        }}
-                                                    >
-                                                        View
-                                                    </button>
-                                                </Link>
+                                                {
+                                                    // check if the exam has been started
+                                                    props.exam_state
+                                                        .examStarted ===
+                                                    true ? (
+                                                        // check if the current exam id is same as this exam
+                                                        props.exam_state.id ===
+                                                        simulation.simulation_id ? (
+                                                            <Link
+                                                                to={`${props.match.url}/simulation/${simulation.simulation_id}`}
+                                                            >
+                                                                <button
+                                                                    className="btn btn-primary btn-sm shadow-none"
+                                                                    onClick={() => {
+                                                                        storeDispatch(
+                                                                            SIMULATION,
+                                                                            simulation.simulation_name
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    View
+                                                                </button>
+                                                            </Link>
+                                                        ) : (
+                                                            // if not then display the error message in tooltip
+                                                            <Lock message="Submit the exam to continue..." />
+                                                        )
+                                                    ) : (
+                                                        // else display the view button
+                                                        <Link
+                                                            to={`${props.match.url}/simulation/${simulation.simulation_id}`}
+                                                        >
+                                                            <button
+                                                                className="btn btn-primary btn-sm shadow-none"
+                                                                onClick={() => {
+                                                                    storeDispatch(
+                                                                        SIMULATION,
+                                                                        simulation.simulation_name
+                                                                    );
+                                                                }}
+                                                            >
+                                                                View
+                                                            </button>
+                                                        </Link>
+                                                    )
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -350,26 +415,39 @@ const ChapterListRender = (props) => {
                             </div>
                             <div className="col-2">
                                 {props.chapter.topics ? (
-                                    <Link
-                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/summary`}
-                                        onClick={() => {
-                                            storeDispatch(
-                                                CHAPTER,
-                                                props.chapter.chapter_name
-                                            );
-                                        }}
-                                    >
+                                    // check if the exam is started
+                                    props.exam_state.examStarted === false ? (
+                                        <Link
+                                            to={`${props.match.url}/chapter/${props.chapter.chapter_id}/summary`}
+                                            onClick={() => {
+                                                storeDispatch(
+                                                    CHAPTER,
+                                                    props.chapter.chapter_name
+                                                );
+                                            }}
+                                        >
+                                            <button
+                                                className="btn btn-light btn-sm shadow-none"
+                                                disabled={
+                                                    props.chapter.topics
+                                                        ? false
+                                                        : true
+                                                }
+                                            >
+                                                <i className="fas fa-eye fa-sm"></i>
+                                            </button>
+                                        </Link>
+                                    ) : (
                                         <button
                                             className="btn btn-light btn-sm shadow-none"
-                                            disabled={
-                                                props.chapter.topics
-                                                    ? false
-                                                    : true
-                                            }
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                            disabled
                                         >
                                             <i className="fas fa-eye fa-sm"></i>
                                         </button>
-                                    </Link>
+                                    )
                                 ) : (
                                     <button
                                         className="btn btn-light btn-sm shadow-none"
@@ -384,19 +462,32 @@ const ChapterListRender = (props) => {
                             </div>
                             <div className="col-2">
                                 {props.chapter.topics ? (
-                                    <Link
-                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/notes`}
-                                        onClick={() => {
-                                            storeDispatch(
-                                                CHAPTER,
-                                                props.chapter.chapter_name
-                                            );
-                                        }}
-                                    >
-                                        <button className="btn btn-light btn-sm shadow-none">
+                                    // check if the exam is started
+                                    props.exam_state.examStarted === false ? (
+                                        <Link
+                                            to={`${props.match.url}/chapter/${props.chapter.chapter_id}/notes`}
+                                            onClick={() => {
+                                                storeDispatch(
+                                                    CHAPTER,
+                                                    props.chapter.chapter_name
+                                                );
+                                            }}
+                                        >
+                                            <button className="btn btn-light btn-sm shadow-none">
+                                                <i className="fas fa-eye fa-sm"></i>
+                                            </button>
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            className="btn btn-light btn-sm shadow-none"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                            disabled
+                                        >
                                             <i className="fas fa-eye fa-sm"></i>
                                         </button>
-                                    </Link>
+                                    )
                                 ) : (
                                     <button
                                         className="btn btn-light btn-sm shadow-none"
@@ -580,31 +671,71 @@ const ChapterListRender = (props) => {
                                                                   props
                                                                       .chapter_index
                                                               ] === true ? (
-                                                                  <Link
-                                                                      to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}`}
-                                                                  >
-                                                                      <button
-                                                                          className="btn btn-primary btn-sm shadow-none"
-                                                                          onClick={() => {
-                                                                              batch(
-                                                                                  () => {
-                                                                                      storeDispatch(
-                                                                                          CHAPTER,
-                                                                                          props
-                                                                                              .chapter
-                                                                                              .chapter_name
+                                                                  // check if the exam has been started
+                                                                  props
+                                                                      .exam_state
+                                                                      .examStarted ===
+                                                                  true ? (
+                                                                      props
+                                                                          .exam_state
+                                                                          .id ===
+                                                                      cycle.cycle_test_id ? (
+                                                                          <Link
+                                                                              to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}`}
+                                                                          >
+                                                                              <button
+                                                                                  className="btn btn-primary btn-sm shadow-none"
+                                                                                  onClick={() => {
+                                                                                      batch(
+                                                                                          () => {
+                                                                                              storeDispatch(
+                                                                                                  CHAPTER,
+                                                                                                  props
+                                                                                                      .chapter
+                                                                                                      .chapter_name
+                                                                                              );
+                                                                                              storeDispatch(
+                                                                                                  CYCLE,
+                                                                                                  cycle.cycle_test_name
+                                                                                              );
+                                                                                          }
                                                                                       );
-                                                                                      storeDispatch(
-                                                                                          CYCLE,
-                                                                                          cycle.cycle_test_name
-                                                                                      );
-                                                                                  }
-                                                                              );
-                                                                          }}
+                                                                                  }}
+                                                                              >
+                                                                                  View
+                                                                              </button>
+                                                                          </Link>
+                                                                      ) : (
+                                                                          // if not then display the error message in tooltip
+                                                                          <Lock message="Submit the exam to continue..." />
+                                                                      )
+                                                                  ) : (
+                                                                      <Link
+                                                                          to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}`}
                                                                       >
-                                                                          View
-                                                                      </button>
-                                                                  </Link>
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm shadow-none"
+                                                                              onClick={() => {
+                                                                                  batch(
+                                                                                      () => {
+                                                                                          storeDispatch(
+                                                                                              CHAPTER,
+                                                                                              props
+                                                                                                  .chapter
+                                                                                                  .chapter_name
+                                                                                          );
+                                                                                          storeDispatch(
+                                                                                              CYCLE,
+                                                                                              cycle.cycle_test_name
+                                                                                          );
+                                                                                      }
+                                                                                  );
+                                                                              }}
+                                                                          >
+                                                                              View
+                                                                          </button>
+                                                                      </Link>
+                                                                  )
                                                               ) : (
                                                                   // if not then display the error message in tooltip
                                                                   <Lock />
@@ -653,29 +784,41 @@ const ChapterListRender = (props) => {
                                                   </div>
                                                   <div className="col-2"></div>
                                                   <div className="col-2 text-right">
-                                                      <Link
-                                                          to={`${props.match.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
-                                                      >
-                                                          <button
-                                                              className="btn btn-primary btn-sm shadow-none"
-                                                              onClick={() => {
-                                                                  batch(() => {
-                                                                      storeDispatch(
-                                                                          CHAPTER,
-                                                                          props
-                                                                              .chapter
-                                                                              .chapter_name
-                                                                      );
-                                                                      storeDispatch(
-                                                                          QUIZ,
-                                                                          quiz.quiz_name
-                                                                      );
-                                                                  });
-                                                              }}
-                                                          >
-                                                              View
-                                                          </button>
-                                                      </Link>
+                                                      {
+                                                          // check if the exam has been started
+                                                          props.exam_state
+                                                              .examStarted ===
+                                                          true ? (
+                                                              // if not then display the error message in tooltip
+                                                              <Lock message="Submit the exam to continue..." />
+                                                          ) : (
+                                                              <Link
+                                                                  to={`${props.match.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
+                                                              >
+                                                                  <button
+                                                                      className="btn btn-primary btn-sm shadow-none"
+                                                                      onClick={() => {
+                                                                          batch(
+                                                                              () => {
+                                                                                  storeDispatch(
+                                                                                      CHAPTER,
+                                                                                      props
+                                                                                          .chapter
+                                                                                          .chapter_name
+                                                                                  );
+                                                                                  storeDispatch(
+                                                                                      QUIZ,
+                                                                                      quiz.quiz_name
+                                                                                  );
+                                                                              }
+                                                                          );
+                                                                      }}
+                                                                  >
+                                                                      View
+                                                                  </button>
+                                                              </Link>
+                                                          )
+                                                      }
                                                   </div>
                                               </div>
                                           </div>
@@ -702,22 +845,6 @@ const TopicListRender = (props) => {
             </Accordion>
         );
     });
-
-    function getTopicName(data, topic_num) {
-        let topic_name = "";
-
-        if (Array.isArray(data)) {
-            data.forEach((item) => {
-                if (item.topic_num === topic_num) {
-                    topic_name = item.topic_name;
-                } else if (item.child.length !== 0) {
-                    topic_name = getTopicName(item.child, topic_num);
-                }
-            });
-        }
-
-        return topic_name;
-    }
 
     function substring_topic_num(topic) {
         let topic_num = topic.toString();
@@ -803,6 +930,12 @@ const TopicListRender = (props) => {
                                                 );
                                             });
                                         }}
+                                        disabled={
+                                            props.exam_state.examStarted ===
+                                            true
+                                                ? true
+                                                : false
+                                        }
                                     >
                                         {props.topics.topic_name}
                                         <i className="fas fa-external-link-alt fa-xs ml-2"></i>
@@ -880,15 +1013,17 @@ const TopicListRender = (props) => {
                                                     );
                                                     storeDispatch(
                                                         TOPIC,
-                                                        getTopicName(
-                                                            props.chapter
-                                                                .topics,
-                                                            props.topics
-                                                                .next_topic
-                                                        )
+                                                        props.topics
+                                                            .next_topic_name
                                                     );
                                                 });
                                             }}
+                                            disabled={
+                                                props.exam_state.examStarted ===
+                                                true
+                                                    ? true
+                                                    : false
+                                            }
                                         >
                                             {props.topics.next_topic_name}
                                             <i className="fas fa-external-link-alt fa-xs ml-2"></i>
@@ -1534,7 +1669,10 @@ class Course extends Component {
                                 disabled={
                                     course_data.units &&
                                     course_data.units.length !== 0
-                                        ? false
+                                        ? this.props.exam_state.examStarted ===
+                                          true
+                                            ? true
+                                            : false
                                         : true
                                 }
                             >
@@ -1550,7 +1688,10 @@ class Course extends Component {
                                 disabled={
                                     course_data.units &&
                                     course_data.units.length !== 0
-                                        ? false
+                                        ? this.props.exam_state.examStarted ===
+                                          true
+                                            ? true
+                                            : false
                                         : true
                                 }
                             >
@@ -1566,7 +1707,10 @@ class Course extends Component {
                                 disabled={
                                     course_data &&
                                     Object.keys(course_data).length !== 0
-                                        ? false
+                                        ? this.props.exam_state.examStarted ===
+                                          true
+                                            ? true
+                                            : false
                                         : true
                                 }
                             >
@@ -1587,6 +1731,12 @@ class Course extends Component {
                                 <Dropdown.Toggle
                                     variant="Secondary"
                                     className="btn btn-primary btn-sm shadow-none caret-off"
+                                    disabled={
+                                        this.props.exam_state.examStarted ===
+                                        true
+                                            ? true
+                                            : false
+                                    }
                                 >
                                     <i className="fas fa-ellipsis-h"></i>
                                 </Dropdown.Toggle>

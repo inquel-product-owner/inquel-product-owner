@@ -9,25 +9,6 @@ import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import courseimg from "../../assets/code.jpg";
 
-// const data = [
-//     {
-//         title: "Lorem ipsum is placeholder text",
-//         price: "1000",
-//         duration: "3 Months 10 Days",
-//         category: "Degree",
-//         text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lacinia quis vel eros donec ac odio tempor. Quis ipsum suspendisse ultrices gravida dictum.",
-//         image: "https://images.unsplash.com/photo-1593642634367-d91a135587b5?ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80",
-//     },
-//     {
-//         title: "Lorem ipsum is placeholder text",
-//         price: "1500",
-//         duration: "2 Months 20 Days",
-//         category: "Medical Course",
-//         text: "Never trust a computer you can’t throw out a window. (Steve Wozniak) Hardware: The parts of a computer system that can be kicked. (Jeff Pesis) The only people who have anything to fear from free software are those whose products are worth even less.",
-//         image: "https://images.unsplash.com/photo-1593642532744-d377ab507dc8?ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80",
-//     },
-// ];
-
 const CartEmpty = () => {
     return (
         <div

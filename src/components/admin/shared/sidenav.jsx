@@ -11,7 +11,7 @@ class SideNav extends Component {
                 className={`text-center light-bg ${
                     this.props.shownav ? "active" : ""
                 }`}
-                style={{ display: "flex", flexDirection: "column" }}
+                style={{ display: "flex", flexDirection: "column",overflow:"unset" }}
             >
                 <div>
                     <Link to="/admin">

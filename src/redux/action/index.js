@@ -20,3 +20,7 @@ export const RESPONSE = "RESPONSE";
 export const TEMP = "TEMP";
 export const EXAMDATA = "EXAMDATA";
 export const NOTIFICATION = "NOTIFICATION";
+
+// application state reducer
+
+export const EXAM_STATE = "EXAM_STATE";
