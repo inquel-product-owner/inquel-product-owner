@@ -168,6 +168,7 @@ class CycleAutoExam extends Component {
                 storeDispatch(EXAMDATA, {});
                 sectionStructure();
             } else {
+                // else retrieve the data from redux
                 temp = exam_data.sections;
             }
             // else structure the section data
@@ -1421,7 +1422,7 @@ class CycleAutoExam extends Component {
                                                 {this.state.examInfo.attempt
                                                     ? this.state.examInfo
                                                           .attempt + 1
-                                                    : 0}
+                                                    : 0 + 1}
                                             </div>
                                             <div className="col-md-3">
                                                 {
