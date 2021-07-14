@@ -8,6 +8,13 @@ import { baseUrl, studentUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import courseimg from "../../assets/code.jpg";
+import { connect } from "react-redux";
+import storeDispatch from "../../redux/dispatch";
+import { CART_COUNT } from "../../redux/action";
+
+const mapStateToProps = (state) => ({
+    profile: state.user.profile,
+});
 
 const CartEmpty = () => {
     return (
@@ -42,7 +49,7 @@ const headers = {
     "Content-Type": "application/json",
 };
 
-const Cart = () => {
+const Cart = (props) => {
     const [courses, setCourses] = useState([]);
     const [coupon, setCoupon] = useState("");
     const [subtotal, setSubtotal] = useState(0);
@@ -81,6 +88,10 @@ const Cart = () => {
                     setSubtotal(result.data.total_cart_price);
                     setTotal(result.data.total_cart_price);
                     setLoading(false);
+                    storeDispatch(
+                        CART_COUNT,
+                        result.data.cart_items.length || 0
+                    );
                 } else {
                     setResponseMsg(result.msg);
                     setErrorAlert(true);
@@ -232,10 +243,26 @@ const Cart = () => {
                 onReset={() => window.location.reload()}
             >
                 <main className="container">
-                    <div className="cart shadow-sm">
+                    <div className="cart shadow-sm position-relative">
                         {courses && courses.length !== 0 ? (
                             <>
-                                <h1 className="section-heading">Your cart</h1>
+                                {courses && courses.length !== 0 ? (
+                                    <div
+                                        className="borders rounded-lg primary-text position-absolute px-4 py-2"
+                                        style={{ right: "15px", top: "15px" }}
+                                    >
+                                        <i className="fas fa-wallet mr-1"></i>{" "}
+                                        Wallet:{" "}
+                                        {props.profile.wallet
+                                            ? props.profile.wallet
+                                            : 0}
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                                <h1 className="section-heading text-left text-md-center">
+                                    Your cart
+                                </h1>
                                 <div className="cart-header">
                                     <div className="row mb-2">
                                         <div className="col-8">Courses</div>
@@ -253,17 +280,20 @@ const Cart = () => {
                                                 <div className="row align-items-center justify-content-center">
                                                     <div className="col-8 row align-items-center px-0">
                                                         <div className="col-2 d-none d-md-block">
-                                                            <img
-                                                                src={returnImage(
-                                                                    item.subscription
-                                                                )}
-                                                                alt={
-                                                                    item
-                                                                        .subscription
-                                                                        .title
-                                                                }
-                                                                className="img-fluid rounded-lg shadow"
-                                                            />
+                                                            <div
+                                                                className="rounded-lg shadow"
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "60px",
+                                                                    background: `url(${returnImage(
+                                                                        item.subscription
+                                                                    )})`,
+                                                                    backgroundSize:
+                                                                        "cover",
+                                                                    backgroundPosition:
+                                                                        "center",
+                                                                }}
+                                                            ></div>
                                                         </div>
                                                         <div className="col-md-10 col-12">
                                                             <p className="title text-truncate">
@@ -422,4 +452,4 @@ const Cart = () => {
     );
 };
 
-export default Cart;
+export default connect(mapStateToProps)(Cart);

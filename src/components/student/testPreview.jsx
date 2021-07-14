@@ -957,49 +957,53 @@ class TestPreview extends Component {
 
                                                                 {/* ---------- Student answers ---------- */}
 
-                                                                {question.marks ===
-                                                                    0 &&
-                                                                question
-                                                                    .proper_answer[0]
-                                                                    .content ===
-                                                                    undefined ? (
-                                                                    <div className="row mb-2">
-                                                                        <div className="col-md-6">
-                                                                            <div
-                                                                                className="card card-body danger-bg h-100"
-                                                                                style={{
-                                                                                    minHeight:
-                                                                                        "100px",
-                                                                                }}
-                                                                            >
-                                                                                <p className="font-weight-bold-600 mb-2">
-                                                                                    Your
-                                                                                    answer(s):
-                                                                                </p>
-                                                                                {(
-                                                                                    question.answer ||
-                                                                                    []
-                                                                                ).map(
-                                                                                    (
-                                                                                        answer,
-                                                                                        answer_index
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <p
-                                                                                                className="small mb-2"
-                                                                                                key={
-                                                                                                    answer_index
-                                                                                                }
-                                                                                                dangerouslySetInnerHTML={{
-                                                                                                    __html: answer,
-                                                                                                }}
-                                                                                            ></p>
-                                                                                        );
-                                                                                    }
-                                                                                )}
+                                                                {question.proper_answer ? (
+                                                                    question.marks ===
+                                                                        0 &&
+                                                                    question
+                                                                        .proper_answer[0]
+                                                                        .content ===
+                                                                        undefined ? (
+                                                                        <div className="row mb-2">
+                                                                            <div className="col-md-6">
+                                                                                <div
+                                                                                    className="card card-body danger-bg h-100"
+                                                                                    style={{
+                                                                                        minHeight:
+                                                                                            "100px",
+                                                                                    }}
+                                                                                >
+                                                                                    <p className="font-weight-bold-600 mb-2">
+                                                                                        Your
+                                                                                        answer(s):
+                                                                                    </p>
+                                                                                    {(
+                                                                                        question.answer ||
+                                                                                        []
+                                                                                    ).map(
+                                                                                        (
+                                                                                            answer,
+                                                                                            answer_index
+                                                                                        ) => {
+                                                                                            return (
+                                                                                                <p
+                                                                                                    className="small mb-2"
+                                                                                                    key={
+                                                                                                        answer_index
+                                                                                                    }
+                                                                                                    dangerouslySetInnerHTML={{
+                                                                                                        __html: answer,
+                                                                                                    }}
+                                                                                                ></p>
+                                                                                            );
+                                                                                        }
+                                                                                    )}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
+                                                                    ) : (
+                                                                        ""
+                                                                    )
                                                                 ) : (
                                                                     ""
                                                                 )}

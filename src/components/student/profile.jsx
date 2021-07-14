@@ -339,7 +339,7 @@ class Profile extends Component {
 
                 {/* ---------- Image header card ---------- */}
                 <div
-                    className="container shadow d-flex flex-column align-items-center p-3 mb-4"
+                    className="container position-relative shadow d-flex flex-column align-items-center p-3 mb-4"
                     style={{
                         background:
                             "linear-gradient(90deg, rgba(98,16,18,0.9336776947106968) 0%, rgba(239,210,172,0.9392799356070554) 100%)",
@@ -376,12 +376,22 @@ class Profile extends Component {
                     <span className="secondary-bg rounded-pill py-1 px-3 small font-weight-bold-600">
                         @{this.state.profile.username}
                     </span>
+                    <div
+                        className="border rounded-lg text-white position-absolute px-3 py-1"
+                        style={{ left: "16px" }}
+                    >
+                        <i className="fas fa-coins mr-1"></i> Wallet:{" "}
+                        {this.state.profile.wallet
+                            ? this.state.profile.wallet
+                            : 0}
+                    </div>
                 </div>
 
                 <div className="container">
                     <div className="row justify-content-center">
-                        {/* ---------- Left column ---------- */}
                         <div className="col-md-9 px-0">
+                            {/* ----- Personal details card ----- */}
+
                             <div className="card shadow-sm mb-3">
                                 <div className="card-body">
                                     <h5 className="primary-text mb-4">

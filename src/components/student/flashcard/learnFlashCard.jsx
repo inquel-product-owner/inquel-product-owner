@@ -3090,10 +3090,10 @@ class FlashCard extends Component {
                                             <span className="mr-1">
                                                 {total !== 0
                                                     ? index + 1 < total
-                                                        ? index <= 9
+                                                        ? index < 9
                                                             ? `0${index + 1}`
                                                             : index + 1
-                                                        : total <= 9
+                                                        : total < 9
                                                         ? `0${total}`
                                                         : total
                                                     : 0}

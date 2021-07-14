@@ -173,6 +173,203 @@ class ContentAdding extends Component {
     }
 }
 
+class ContentUpdate extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: {},
+            code: "",
+            title: "",
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+    }
+
+    componentDidMount = () => {
+        let code = this.state.code;
+        let title = this.state.title;
+        if (this.props.type === "category") {
+            code = this.props.data.category.code;
+            title = this.props.data.category.title;
+        }
+        if (this.props.type === "sub_category") {
+            code = this.props.data.category.sub_category.code;
+            title = this.props.data.category.sub_category.title;
+        }
+        if (
+            this.props.type === "discipline" ||
+            this.props.type === "level" ||
+            this.props.type === "subject"
+        ) {
+            code = this.props.data.category.sub_category[this.props.type].code;
+            title =
+                this.props.data.category.sub_category[this.props.type].title;
+        }
+        if (this.props.type === "board" || this.props.type === "course") {
+            code = this.props.data[this.props.type].code;
+            title = this.props.data[this.props.type].title;
+        }
+        this.setState({
+            data: this.props.data,
+            code: code,
+            title: title,
+        });
+    };
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        this.setState({
+            showLoader: true,
+        });
+
+        fetch(`${this.props.url}/data/master/`, {
+            headers: this.props.headers,
+            method: "PATCH",
+            body: JSON.stringify(this.state.data),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
+            });
+    };
+
+    handleInput = (event) => {
+        let data = this.state.data;
+        if (this.props.type === "category") {
+            data.category[event.target.name] = event.target.value;
+        }
+        if (this.props.type === "sub_category") {
+            data.category.sub_category[event.target.name] = event.target.value;
+        }
+        if (
+            this.props.type === "discipline" ||
+            this.props.type === "level" ||
+            this.props.type === "subject"
+        ) {
+            data.category.sub_category[this.props.type][event.target.name] =
+                event.target.value;
+        }
+        if (this.props.type === "board" || this.props.type === "course") {
+            data[this.props.type][event.target.name] = event.target.value;
+        }
+        this.setState({
+            data: data,
+            [event.target.name]: event.target.value,
+        });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Update master data</Modal.Header>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
+
+                        <div className="form-group">
+                            <label htmlFor="code">Code</label>
+                            <input
+                                type="text"
+                                name="code"
+                                id="code"
+                                className="form-control borders"
+                                onChange={this.handleInput}
+                                placeholder="Enter code"
+                                value={this.state.code}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="title">Title</label>
+                            <input
+                                type="text"
+                                name="title"
+                                id="title"
+                                className="form-control borders"
+                                onChange={this.handleInput}
+                                placeholder="Enter title"
+                                value={this.state.title}
+                                required
+                            />
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary btn-block shadow-none">
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Update
+                        </button>
+                    </Modal.Footer>
+                </form>
+            </Modal>
+        );
+    }
+}
+
 const DataNotAvailable = () => {
     return (
         <p className="small border-bottom p-2 mb-0">Data not available...</p>
@@ -191,7 +388,9 @@ const DropDownBtn = (props) => {
 
             <Dropdown.Menu>
                 <Dropdown.Item
-                    onClick={() => props.handleEdit(props.code, props.title)}
+                    onClick={() =>
+                        props.handleEdit(props.code, props.title, props.type)
+                    }
                 >
                     <i className="far fa-edit mr-1"></i> Edit
                 </Dropdown.Item>
@@ -331,7 +530,9 @@ const Discipline = (props) => {
                             className="master-data-list border-bottom"
                             key={index}
                         >
-                            <p className="small">{code} - {title}</p>
+                            <p className="small">
+                                {code} - {title}
+                            </p>
                             <DropDownBtn
                                 {...props}
                                 code={code}
@@ -362,7 +563,9 @@ const Level = (props) => {
                             className="master-data-list border-bottom"
                             key={index}
                         >
-                            <p className="small">{code} - {title}</p>
+                            <p className="small">
+                                {code} - {title}
+                            </p>
                             <DropDownBtn
                                 {...props}
                                 code={code}
@@ -393,7 +596,9 @@ const Subject = (props) => {
                             className="master-data-list border-bottom"
                             key={index}
                         >
-                            <p className="small">{code} - {title}</p>
+                            <p className="small">
+                                {code} - {title}
+                            </p>
                             <DropDownBtn
                                 {...props}
                                 code={code}
@@ -426,7 +631,9 @@ const Board = (props) => {
                                     className="master-data-list border-bottom"
                                     key={index}
                                 >
-                                    <p className="small">{list.code} - {list.title}</p>
+                                    <p className="small">
+                                        {list.code} - {list.title}
+                                    </p>
                                     <DropDownBtn
                                         {...props}
                                         code={list.code}
@@ -461,7 +668,9 @@ const Type = (props) => {
                                     className="master-data-list border-bottom"
                                     key={index}
                                 >
-                                    <p className="small">{list.code} - {list.title}</p>
+                                    <p className="small">
+                                        {list.code} - {list.title}
+                                    </p>
                                     <DropDownBtn
                                         {...props}
                                         code={list.code}
@@ -696,6 +905,81 @@ class AdminMasterData extends Component {
         });
     };
 
+    handleEdit = (code, title, type) => {
+        if (type === "category") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        old_code: code,
+                        code: code,
+                        title: title,
+                    },
+                    category_update: true,
+                },
+            });
+        }
+        if (type === "sub_category") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        code: this.state.selectedCategory,
+                        sub_category: {
+                            old_code: code,
+                            code: code,
+                            title: title,
+                        },
+                    },
+                    sub_category_update: true,
+                },
+            });
+        }
+        if (type === "discipline" || type === "level" || type === "subject") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        code: this.state.selectedCategory,
+                        sub_category: {
+                            code: this.state.selectedSubcategory,
+                            [type]: {
+                                old_code: code,
+                                code: code,
+                                title: title,
+                            },
+                        },
+                    },
+                    [`${type}_update`]: true,
+                },
+            });
+        }
+        if (type === "board" || type === "course") {
+            this.setState({
+                selectedData: {
+                    [type]: {
+                        old_code: code,
+                        code: code,
+                        title: title,
+                    },
+                },
+            });
+        }
+        this.setState({
+            contentAddingType: type,
+            showEditModal: !this.state.showEditModal,
+        });
+    };
+
+    handleDelete = (code, title, type) => {
+        let temp = {
+            code: code,
+            title: title,
+        };
+        this.setState({
+            selectedData: temp,
+            contentAddingType: type,
+            showDeleteModal: !this.state.showDeleteModal,
+        });
+    };
+
     formSubmission = () => {
         setTimeout(() => {
             this.setState({
@@ -723,30 +1007,6 @@ class AdminMasterData extends Component {
         }, 1000);
     };
 
-    handleEdit = (code, title, type) => {
-        let temp = {
-            code: code,
-            title: title,
-        };
-        this.setState({
-            selectedData: temp,
-            contentAddingType: type,
-            showEditModal: !this.state.showEditModal,
-        });
-    };
-
-    handleDelete = (code, title, type) => {
-        let temp = {
-            code: code,
-            title: title,
-        };
-        this.setState({
-            selectedData: temp,
-            contentAddingType: type,
-            showDeleteModal: !this.state.showDeleteModal,
-        });
-    };
-
     render() {
         return (
             <Wrapper
@@ -772,7 +1032,7 @@ class AdminMasterData extends Component {
                     }}
                 />
 
-                {/* Content adding modal */}
+                {/* CREATE Modal */}
                 {this.state.showModal ? (
                     <ContentAdding
                         show={this.state.showModal}
@@ -787,7 +1047,22 @@ class AdminMasterData extends Component {
                     ""
                 )}
 
-                {/* Content delete modal */}
+                {/* UPDATE Modal */}
+                {this.state.showEditModal ? (
+                    <ContentUpdate
+                        show={this.state.showEditModal}
+                        onHide={this.handleEdit}
+                        formSubmission={this.formSubmission}
+                        type={this.state.contentAddingType}
+                        data={this.state.selectedData}
+                        url={this.url}
+                        headers={this.headers}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* DELETE Modal */}
                 {this.state.showDeleteModal ? (
                     <SingleContentDeleteModal
                         show={this.state.showDeleteModal}

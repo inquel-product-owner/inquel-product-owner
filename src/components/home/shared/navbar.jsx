@@ -3,7 +3,7 @@ import logo from "../../../assets/Iq-labs-01.svg";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import userpic from "../../../assets/user-v1.png";
-import { baseUrl, accountsUrl } from "../../../shared/baseUrl";
+import { baseUrl, accountsUrl, studentUrl } from "../../../shared/baseUrl";
 import { Logout } from "../../common/modal/idleLogoutModal";
 import { connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
@@ -11,13 +11,15 @@ import { PROFILE } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
+    cart_count: state.application.cart_count,
 });
 
 class TopNavbar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { isLoggedOut: false };
+        this.state = { isLoggedOut: false, cart_count: 0 };
         this.url = baseUrl + accountsUrl;
+        this.studentURL = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -60,7 +62,9 @@ class TopNavbar extends React.Component {
                             <img src={logo} alt="Logo" />
                         </Link>
                     </Navbar.Brand>
+
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+
                     <Navbar.Collapse
                         id="responsive-navbar-nav"
                         style={{ flexGrow: "0" }}
@@ -80,6 +84,7 @@ class TopNavbar extends React.Component {
                             >
                                 Features
                             </Nav.Link>
+
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant="light"
@@ -95,6 +100,7 @@ class TopNavbar extends React.Component {
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
+
                             <Nav.Link
                                 as={Link}
                                 to="/leaderboard"
@@ -109,6 +115,7 @@ class TopNavbar extends React.Component {
                             >
                                 Leader Board
                             </Nav.Link>
+
                             <Nav.Link
                                 as={Link}
                                 to="/catalog"
@@ -122,10 +129,11 @@ class TopNavbar extends React.Component {
                             >
                                 Buy a Course
                             </Nav.Link>
+
                             <Nav.Link
                                 as={Link}
                                 to="/cart"
-                                className={`${
+                                className={`position-relative ${
                                     this.props.activeLink
                                         ? this.props.activeLink === "cart"
                                             ? "active"
@@ -135,7 +143,29 @@ class TopNavbar extends React.Component {
                             >
                                 <i className="fas fa-shopping-cart mr-1"></i>{" "}
                                 Cart
+                                {localStorage.getItem("Authorization") &&
+                                localStorage.getItem("is_student") ? (
+                                    <div
+                                        className="d-flex align-items-center justify-content-center bg-danger rounded-circle"
+                                        style={{
+                                            width: "12px",
+                                            height: "12px",
+                                            position: "absolute",
+                                            top: "2px",
+                                            left: "22px",
+                                            fontSize: "7.5px",
+                                            fontWeight: "500",
+                                            color: "white",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        {this.props.cart_count}
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
                             </Nav.Link>
+
                             {!localStorage.getItem("Authorization") ||
                             !localStorage.getItem("is_student") ? (
                                 <>
@@ -178,6 +208,7 @@ class TopNavbar extends React.Component {
                             ) : (
                                 ""
                             )}
+
                             {localStorage.getItem("Authorization") &&
                             localStorage.getItem("is_student") ? (
                                 <Dropdown>

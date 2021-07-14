@@ -991,15 +991,12 @@ q:after {
 }
 
 .cart .section-heading {
-    text-align: center;
     color: var(--primary);
     text-transform: uppercase;
     letter-spacing: 0.3px;
     font-size: 30px;
     font-weight: 700;
     margin-bottom: 20px;
-    position: relative;
-    z-index: 1;
 }
 
 .cart .cart-header {
