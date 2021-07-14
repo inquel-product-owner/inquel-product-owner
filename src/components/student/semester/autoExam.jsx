@@ -1412,8 +1412,10 @@ class SemesterAutoExam extends Component {
                                         <div className="row align-items-center">
                                             <div className="col-md-3">
                                                 Attempt{" "}
-                                                {this.state.examInfo.attempt ||
-                                                    0 + 1}
+                                                {this.state.examInfo.attempt
+                                                    ? this.state.examInfo
+                                                          .attempt + 1
+                                                    : 0}
                                             </div>
                                             <div className="col-md-3">
                                                 {

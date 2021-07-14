@@ -369,7 +369,9 @@ class TeacherChapters extends Component {
 
     handleSelect = (event) => {
         this.props.history.push({
-            pathname: `/teacher/subject/${this.subjectId}/chapter/${event.value}`,
+            pathname: this.groupId
+                ? `/teacher/group/${this.groupId}/subject/${this.subjectId}/chapter/${event.value}`
+                : `/teacher/subject/${this.subjectId}/chapter/${event.value}`,
         });
         storeDispatch(CHAPTER, event.label);
         this.setState(
