@@ -19,9 +19,36 @@ const mapStateToProps = (state) => ({
 function remarksCondition(data) {
     let remarks = "";
 
+    // if (data.answered === true) {
+    //     if (data.evaluated === true) {
+    //         if (data.auto_section.length !== 0) {
+    //             remarks = data.auto_section[0].remarks;
+    //         } else if (Object.entries(data.direct_question).length !== 0) {
+    //             remarks = data.direct_question.remarks
+    //                 ? data.direct_question.remarks
+    //                 : "Not yet evaluated";
+    //         }
+    //     } else {
+    //         remarks = "Not yet evaluated";
+    //     }
+    // } else {
+    //     remarks = "Exam not submitted";
+    // }
+
+    // check if the attempt sequence is evaluated or not
     if (data.evaluated === true) {
         if (data.auto_section.length !== 0) {
-            remarks = data.auto_section[0].remarks;
+            // check if the exam is auto submitted by backend
+            if (
+                data.auto_section[0].sections &&
+                data.auto_section[0].sections.length !== 0
+            ) {
+                // if the test is submitted by manual, then display the actual remarks
+                remarks = data.auto_section[0].remarks;
+            } else {
+                // if it is submitted by backend then display this remarks
+                remarks = "Exam not submitted";
+            }
         } else if (Object.entries(data.direct_question).length !== 0) {
             remarks = data.direct_question.remarks
                 ? data.direct_question.remarks
@@ -63,43 +90,78 @@ function CycleTestAttempts(props) {
                 </Tooltip>
             }
         >
-            {props.attempt.evaluated === true ? (
-                <Link
-                    to={`${props.url}/cycle/${props.attempt.cycle_test_id}/preview`}
-                    onClick={() => {
-                        props.attempt.auto_section.length !== 0
-                            ? storeDispatch(TEMP, {
-                                  auto: true,
-                                  direct: false,
-                                  cycle_test_name: props.data.cycle_test_name,
-                                  data: props.attempt.auto_section,
-                                  submit_time: props.attempt.actual_submit_time,
-                              })
-                            : storeDispatch(TEMP, {
-                                  auto: false,
-                                  direct: true,
-                                  cycle_test_name: props.data.cycle_test_name,
-                                  data: props.attempt.direct_question,
-                              });
-                    }}
-                >
+            {
+                // check if the exam is evaluated
+                props.attempt.evaluated === true ? (
+                    // check if the auto_section is empty or not
+                    props.attempt.auto_section &&
+                    props.attempt.auto_section.length !== 0 ? (
+                        // check if the attempt sequence in submitted automatically by backend
+                        props.attempt.auto_section[0].sections &&
+                        props.attempt.auto_section[0].sections.length !== 0 ? (
+                            // if the attempt sequence is evaluated and submitted by student
+                            <Link
+                                to={`${props.url}/cycle/${props.attempt.cycle_test_id}/preview`}
+                                onClick={() => {
+                                    props.attempt.auto_section.length !== 0
+                                        ? storeDispatch(TEMP, {
+                                              auto: true,
+                                              direct: false,
+                                              cycle_test_name:
+                                                  props.data.cycle_test_name,
+                                              data: props.attempt.auto_section,
+                                              submit_time:
+                                                  props.attempt
+                                                      .actual_submit_time,
+                                          })
+                                        : storeDispatch(TEMP, {
+                                              auto: false,
+                                              direct: true,
+                                              cycle_test_name:
+                                                  props.data.cycle_test_name,
+                                              data: props.attempt
+                                                  .direct_question,
+                                          });
+                                }}
+                            >
+                                <i
+                                    className="fas fa-book-open fa-lg mx-3"
+                                    style={{
+                                        color: colorCondition(props.attempt),
+                                        fontSize: "22px",
+                                    }}
+                                ></i>
+                            </Link>
+                        ) : (
+                            // if the attempt is submitted by backend
+                            <i
+                                className="fas fa-book-open fa-lg mx-3 text-warning"
+                                style={{
+                                    fontSize: "22px",
+                                }}
+                            ></i>
+                        )
+                    ) : (
+                        // if the auto_section is empty
+                        <i
+                            className="fas fa-book-open fa-lg mx-3"
+                            style={{
+                                color: "grey",
+                                fontSize: "22px",
+                            }}
+                        ></i>
+                    )
+                ) : (
+                    // if the attempt sequence is not evaluated
                     <i
                         className="fas fa-book-open fa-lg mx-3"
                         style={{
-                            color: colorCondition(props.attempt),
+                            color: "grey",
                             fontSize: "22px",
                         }}
                     ></i>
-                </Link>
-            ) : (
-                <i
-                    className="fas fa-book-open fa-lg mx-3"
-                    style={{
-                        color: "grey",
-                        fontSize: "22px",
-                    }}
-                ></i>
-            )}
+                )
+            }
         </OverlayTrigger>
     );
 }
@@ -119,43 +181,78 @@ function SemesterAttempts(props) {
                 </Tooltip>
             }
         >
-            {props.attempt.evaluated === true ? (
-                <Link
-                    to={`${props.url}/semester/${props.attempt.semester_id}/preview`}
-                    onClick={() => {
-                        props.attempt.auto_section.length !== 0
-                            ? storeDispatch(TEMP, {
-                                  auto: true,
-                                  direct: false,
-                                  semester_name: props.data.semester_name,
-                                  data: props.attempt.auto_section,
-                                  submit_time: props.attempt.actual_submit_time,
-                              })
-                            : storeDispatch(TEMP, {
-                                  auto: false,
-                                  direct: true,
-                                  semester_name: props.data.semester_name,
-                                  data: props.attempt.direct_question,
-                              });
-                    }}
-                >
+            {
+                // check if the exam is evaluated
+                props.attempt.evaluated === true ? (
+                    // check if the auto_section is empty or not
+                    props.attempt.auto_section &&
+                    props.attempt.auto_section.length !== 0 ? (
+                        // check if the attempt sequence in submitted automatically by backend
+                        props.attempt.auto_section[0].sections &&
+                        props.attempt.auto_section[0].sections.length !== 0 ? (
+                            // if the attempt sequence is evaluated and submitted by student
+                            <Link
+                                to={`${props.url}/semester/${props.attempt.semester_id}/preview`}
+                                onClick={() => {
+                                    props.attempt.auto_section.length !== 0
+                                        ? storeDispatch(TEMP, {
+                                              auto: true,
+                                              direct: false,
+                                              semester_name:
+                                                  props.data.semester_name,
+                                              data: props.attempt.auto_section,
+                                              submit_time:
+                                                  props.attempt
+                                                      .actual_submit_time,
+                                          })
+                                        : storeDispatch(TEMP, {
+                                              auto: false,
+                                              direct: true,
+                                              semester_name:
+                                                  props.data.semester_name,
+                                              data: props.attempt
+                                                  .direct_question,
+                                          });
+                                }}
+                            >
+                                <i
+                                    className="fas fa-book-open fa-lg mx-3"
+                                    style={{
+                                        color: colorCondition(props.attempt),
+                                        fontSize: "22px",
+                                    }}
+                                ></i>
+                            </Link>
+                        ) : (
+                            // if the attempt is submitted by backend
+                            <i
+                                className="fas fa-book-open fa-lg mx-3 text-warning"
+                                style={{
+                                    fontSize: "22px",
+                                }}
+                            ></i>
+                        )
+                    ) : (
+                        // if the auto_section is empty
+                        <i
+                            className="fas fa-book-open fa-lg mx-3"
+                            style={{
+                                color: "grey",
+                                fontSize: "22px",
+                            }}
+                        ></i>
+                    )
+                ) : (
+                    // if the attempt sequence is not evaluated
                     <i
                         className="fas fa-book-open fa-lg mx-3"
                         style={{
-                            color: colorCondition(props.attempt),
+                            color: "grey",
                             fontSize: "22px",
                         }}
                     ></i>
-                </Link>
-            ) : (
-                <i
-                    className="fas fa-book-open fa-lg mx-3"
-                    style={{
-                        color: "grey",
-                        fontSize: "22px",
-                    }}
-                ></i>
-            )}
+                )
+            }
         </OverlayTrigger>
     );
 }

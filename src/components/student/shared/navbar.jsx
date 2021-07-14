@@ -12,6 +12,7 @@ import { NotificationDropdown } from "../../common/modal/notification";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
+    cart_count: state.application.cart_count,
 });
 
 class Header extends Component {
@@ -116,8 +117,33 @@ class Header extends Component {
                                     headers={this.headers}
                                 />
 
-                                <Nav.Link as={Link} to="/cart">
+                                <Nav.Link
+                                    as={Link}
+                                    to="/cart"
+                                    className="position-relative"
+                                >
                                     <i className="fas fa-shopping-cart mr-2 mt-2"></i>
+                                    {localStorage.getItem("Authorization") &&
+                                    localStorage.getItem("is_student") ? (
+                                        <div
+                                            className="d-flex align-items-center justify-content-center bg-danger rounded-circle"
+                                            style={{
+                                                width: "12px",
+                                                height: "12px",
+                                                position: "absolute",
+                                                top: "4px",
+                                                left: "22px",
+                                                fontSize: "7.5px",
+                                                fontWeight: "500",
+                                                color: "white",
+                                                textAlign: "center",
+                                            }}
+                                        >
+                                            {this.props.cart_count}
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
                                 </Nav.Link>
 
                                 <Dropdown>
@@ -171,10 +197,12 @@ class Header extends Component {
                                                     : ""}
                                             </span>
                                         </Dropdown.Header>
+
                                         <Dropdown.Item as={Link} to="/">
                                             <i className="fas fa-home fa-sm mr-2"></i>{" "}
                                             Home Page
                                         </Dropdown.Item>
+
                                         <Dropdown.Item
                                             as={Link}
                                             to="/dashboard/profile"
@@ -182,7 +210,9 @@ class Header extends Component {
                                             <i className="fas fa-user fa-sm mr-2"></i>{" "}
                                             My Profile
                                         </Dropdown.Item>
+
                                         <Dropdown.Divider />
+
                                         <Dropdown.Item
                                             onClick={this.handleLogout}
                                         >

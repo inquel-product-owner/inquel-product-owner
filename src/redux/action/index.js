@@ -24,3 +24,4 @@ export const NOTIFICATION = "NOTIFICATION";
 // application state reducer
 
 export const EXAM_STATE = "EXAM_STATE";
+export const CART_COUNT = "CART_COUNT";

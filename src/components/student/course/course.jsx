@@ -780,7 +780,7 @@ const ChapterListRender = (props) => {
                                                   <div className="col-2 small font-weight-bold-600">
                                                       Points:{" "}
                                                       {props.chapter
-                                                          .quiz_points || ""}
+                                                          .quiz_points || 0}
                                                   </div>
                                                   <div className="col-2"></div>
                                                   <div className="col-2 text-right">
@@ -1026,7 +1026,6 @@ const TopicListRender = (props) => {
                                             }
                                         >
                                             {props.topics.next_topic_name}
-                                            <i className="fas fa-external-link-alt fa-xs ml-2"></i>
                                         </button>
                                     </Link>
                                 ) : (

@@ -7,12 +7,13 @@ import {
     adminPathUrl,
     studentUrl,
 } from "../../shared/baseUrl.js";
-import Footer from "../home/shared/footer";
-import TopNavbar from "../home/shared/navbar";
+// import Footer from "../home/shared/footer";
+// import TopNavbar from "../home/shared/navbar";
 import { ForgotPasswordModal } from "../common/forgotPassword";
 import storeDispatch from "../../redux/dispatch";
 import { NOTIFICATION, PROFILE } from "../../redux/action/index.js";
 import { batch } from "react-redux";
+import logo from "../../assets/logo-white.png";
 
 class StudentLogin extends Component {
     constructor(props) {
@@ -219,166 +220,257 @@ class StudentLogin extends Component {
                     ""
                 )}
 
-                <TopNavbar />
+                {/* <TopNavbar /> */}
 
                 <div
                     className="d-flex justify-content-center align-items-center"
-                    style={{
-                        minHeight: "80vh",
-                    }}
+                    style={{ minHeight: "100vh" }}
                 >
-                    <div className="container py-5">
-                        <div className="row justify-content-center align-items-center">
-                            <div className="col-lg-4 col-md-6">
-                                <div className="card shadow py-2">
-                                    <div className="card-body ">
-                                        <h4 className="primary-text">
-                                            STUDENT LOGIN
-                                        </h4>
-                                        <p className="small text-muted">
-                                            Enjoy unlimited learning | Enjoy 7
-                                            days Free Trails
-                                        </p>
-
-                                        <Alert
-                                            variant="danger"
-                                            show={this.state.showErrorAlert}
-                                            onClose={() => {
-                                                this.setState({
-                                                    showErrorAlert: false,
-                                                });
+                    <div className="container my-5">
+                        <div className="row align-items-center justify-content-center">
+                            <div className="col-lg-9">
+                                <div className="card shadow-sm overflow-hidden">
+                                    <div className="row align-items-center">
+                                        {/* ----- left column ----- */}
+                                        <div
+                                            className="col-md-6 pr-md-0"
+                                            style={{
+                                                background:
+                                                    "linear-gradient(145deg, rgba(98,16,18,0.9336776947106968) 25%, rgba(239,210,172,0.9392799356070554) 100%)",
                                             }}
-                                            dismissible
                                         >
-                                            {this.state.errorMsg}
-                                        </Alert>
-
-                                        <form
-                                            onSubmit={this.handleSubmit}
-                                            autoComplete="off"
-                                        >
-                                            <div className="form-group">
-                                                <label htmlFor="username">
-                                                    Username
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="username"
-                                                    id="username"
-                                                    className="form-control form-shadow form-control-lg"
-                                                    onChange={this.handleInput}
-                                                    value={this.state.username}
-                                                    placeholder="Username"
-                                                    autoFocus
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="form-group">
-                                                <label htmlFor="password">
-                                                    Password
-                                                </label>
-                                                <div
-                                                    className="input-group form-shadow"
-                                                    style={{
-                                                        borderRadius: "6px",
-                                                    }}
-                                                >
-                                                    <input
-                                                        type={
-                                                            this.state
-                                                                .showPassword
-                                                                ? "text"
-                                                                : "password"
-                                                        }
-                                                        name="password"
-                                                        id="password"
-                                                        className="form-control form-control-lg"
-                                                        onChange={
-                                                            this.handleInput
-                                                        }
-                                                        value={
-                                                            this.state.password
-                                                        }
-                                                        placeholder="**********"
-                                                        required
-                                                    />
-                                                    <div className="input-group-append">
-                                                        <button
-                                                            className="btn btn-link btn-sm bg-white shadow-none"
-                                                            type="button"
-                                                            id="button-addon2"
-                                                            onClick={
-                                                                this
-                                                                    .showPassword
-                                                            }
+                                            <div className="card-body">
+                                                <div className="row justify-content-center my-3 my-md-5">
+                                                    <div className="col-sm-11">
+                                                        <div
+                                                            className="row"
+                                                            style={{
+                                                                marginBottom:
+                                                                    "35px",
+                                                            }}
                                                         >
-                                                            {this.state
-                                                                .showPassword ? (
-                                                                <i className="far fa-eye-slash"></i>
-                                                            ) : (
-                                                                <i className="far fa-eye"></i>
-                                                            )}
-                                                        </button>
+                                                            <div className="col-6">
+                                                                <Link to="/">
+                                                                    <img
+                                                                        src={
+                                                                            logo
+                                                                        }
+                                                                        alt="IQ Labs Academy"
+                                                                        className="img-fluid"
+                                                                    />
+                                                                </Link>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="text-white">
+                                                            <h2 className="mb-3">
+                                                                Welcome back!
+                                                            </h2>
+                                                            <p
+                                                                style={{
+                                                                    lineHeight:
+                                                                        "30px",
+                                                                    marginBottom:
+                                                                        "40px",
+                                                                }}
+                                                            >
+                                                                Enter your
+                                                                credentials to
+                                                                continue your
+                                                                learning, or
+                                                                login using
+                                                                social media to
+                                                                get quick access
+                                                            </p>
+                                                            <button className="btn btn-outline-light btn-block shadow-none">
+                                                                <i className="fab fa-google mr-1"></i>{" "}
+                                                                Continue with
+                                                                Google
+                                                            </button>
+                                                            <button className="btn btn-outline-light btn-block shadow-none">
+                                                                <i className="fab fa-facebook-f mr-1"></i>{" "}
+                                                                Continue with
+                                                                Faceboook
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="form-group">
-                                                <p className="small mb-0 text-right">
-                                                    {" "}
-                                                    <Link
-                                                        to="#"
-                                                        onClick={
-                                                            this.toggleModal
-                                                        }
-                                                        className="primary-text"
-                                                    >
-                                                        Forgot password?
-                                                    </Link>
-                                                </p>
-                                            </div>
-                                            <div className="form-group">
-                                                <button
-                                                    type="submit"
-                                                    className="btn btn-primary btn-block shadow-none"
-                                                >
-                                                    {this.state.showLoader ? (
-                                                        <Spinner
-                                                            as="span"
-                                                            animation="border"
-                                                            size="sm"
-                                                            role="status"
-                                                            aria-hidden="true"
-                                                            className="mr-2"
-                                                        />
-                                                    ) : (
-                                                        <>
-                                                            LOGIN{" "}
-                                                            <i className="fas fa-sign-in-alt ml-2"></i>
-                                                        </>
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </form>
-                                        <p className="small text-center mb-2">
-                                            or
-                                        </p>
-                                        <div className="d-flex justify-content-center mb-3">
-                                            <button className="btn btn-primary btn-sm mr-3">
-                                                <i className="fab fa-google"></i>
-                                            </button>
-                                            <button className="btn btn-primary btn-sm">
-                                                <i className="fab fa-facebook"></i>
-                                            </button>
                                         </div>
-                                        <p className="text-center small mb-0">
-                                            Don't have an account?{" "}
-                                            <Link
-                                                to="/register"
-                                                className="primary-text font-weight-bold"
-                                            >
-                                                Join Inquel Online Learning
-                                            </Link>{" "}
-                                        </p>
+
+                                        {/* ----- right column ----- */}
+                                        <div className="col-md-6 pl-md-0">
+                                            <div className="card-body">
+                                                <div className="row justify-content-center">
+                                                    <div className="col-sm-11">
+                                                        <h4 className="primary-text">
+                                                            Login
+                                                        </h4>
+                                                        <p className="small text-muted">
+                                                            Enjoy unlimited
+                                                            learning | Enjoy 7
+                                                            days Free Trails
+                                                        </p>
+
+                                                        <Alert
+                                                            variant="danger"
+                                                            show={
+                                                                this.state
+                                                                    .showErrorAlert
+                                                            }
+                                                            onClose={() => {
+                                                                this.setState({
+                                                                    showErrorAlert: false,
+                                                                });
+                                                            }}
+                                                            dismissible
+                                                        >
+                                                            {
+                                                                this.state
+                                                                    .errorMsg
+                                                            }
+                                                        </Alert>
+
+                                                        <form
+                                                            onSubmit={
+                                                                this
+                                                                    .handleSubmit
+                                                            }
+                                                            autoComplete="off"
+                                                        >
+                                                            <div className="form-group">
+                                                                <label htmlFor="username">
+                                                                    Username
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    name="username"
+                                                                    id="username"
+                                                                    className="form-control form-shadow form-control-lg"
+                                                                    onChange={
+                                                                        this
+                                                                            .handleInput
+                                                                    }
+                                                                    value={
+                                                                        this
+                                                                            .state
+                                                                            .username
+                                                                    }
+                                                                    placeholder="Username"
+                                                                    autoFocus
+                                                                    required
+                                                                />
+                                                            </div>
+                                                            <div className="form-group">
+                                                                <label htmlFor="password">
+                                                                    Password
+                                                                </label>
+                                                                <div
+                                                                    className="input-group form-shadow"
+                                                                    style={{
+                                                                        borderRadius:
+                                                                            "6px",
+                                                                    }}
+                                                                >
+                                                                    <input
+                                                                        type={
+                                                                            this
+                                                                                .state
+                                                                                .showPassword
+                                                                                ? "text"
+                                                                                : "password"
+                                                                        }
+                                                                        name="password"
+                                                                        id="password"
+                                                                        className="form-control form-control-lg"
+                                                                        onChange={
+                                                                            this
+                                                                                .handleInput
+                                                                        }
+                                                                        value={
+                                                                            this
+                                                                                .state
+                                                                                .password
+                                                                        }
+                                                                        placeholder="**********"
+                                                                        required
+                                                                    />
+                                                                    <div className="input-group-append">
+                                                                        <button
+                                                                            className="btn btn-link btn-sm bg-white shadow-none"
+                                                                            type="button"
+                                                                            id="button-addon2"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showPassword
+                                                                            }
+                                                                        >
+                                                                            {this
+                                                                                .state
+                                                                                .showPassword ? (
+                                                                                <i className="far fa-eye-slash"></i>
+                                                                            ) : (
+                                                                                <i className="far fa-eye"></i>
+                                                                            )}
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="form-group">
+                                                                <p className="small mb-0 text-right">
+                                                                    {" "}
+                                                                    <Link
+                                                                        to="#"
+                                                                        onClick={
+                                                                            this
+                                                                                .toggleModal
+                                                                        }
+                                                                        className="primary-text"
+                                                                    >
+                                                                        Forgot
+                                                                        password?
+                                                                    </Link>
+                                                                </p>
+                                                            </div>
+                                                            <div className="form-group">
+                                                                <button
+                                                                    type="submit"
+                                                                    className="btn btn-primary btn-block shadow-none"
+                                                                >
+                                                                    {this.state
+                                                                        .showLoader ? (
+                                                                        <Spinner
+                                                                            as="span"
+                                                                            animation="border"
+                                                                            size="sm"
+                                                                            role="status"
+                                                                            aria-hidden="true"
+                                                                            className="mr-2"
+                                                                        />
+                                                                    ) : (
+                                                                        <>
+                                                                            LOGIN{" "}
+                                                                            <i className="fas fa-sign-in-alt ml-2"></i>
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                        <p className="text-center small mb-0">
+                                                            Don't have an
+                                                            account?{" "}
+                                                            <Link
+                                                                to="/register"
+                                                                className="primary-text font-weight-bold"
+                                                            >
+                                                                Join Inquel
+                                                                Online Learning
+                                                            </Link>{" "}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -386,11 +478,152 @@ class StudentLogin extends Component {
                     </div>
                 </div>
 
-                {/* Footer */}
-                <Footer />
+                {/* <Footer /> */}
             </>
         );
     }
 }
 
 export default StudentLogin;
+
+// {/* <div
+//     className="d-flex justify-content-center align-items-center"
+//     style={{
+//         minHeight: "80vh",
+//     }}
+// >
+//     <div className="container py-5">
+//         <div className="row justify-content-center align-items-center">
+//             <div className="col-lg-4 col-md-6">
+//                 <div className="card shadow py-2">
+//                     <div className="card-body ">
+//                         <h4 className="primary-text">STUDENT LOGIN</h4>
+//                         <p className="small text-muted">
+//                             Enjoy unlimited learning | Enjoy 7 days Free Trails
+//                         </p>
+
+//                         <Alert
+//                             variant="danger"
+//                             show={this.state.showErrorAlert}
+//                             onClose={() => {
+//                                 this.setState({
+//                                     showErrorAlert: false,
+//                                 });
+//                             }}
+//                             dismissible
+//                         >
+//                             {this.state.errorMsg}
+//                         </Alert>
+
+//                         <form onSubmit={this.handleSubmit} autoComplete="off">
+//                             <div className="form-group">
+//                                 <label htmlFor="username">Username</label>
+//                                 <input
+//                                     type="text"
+//                                     name="username"
+//                                     id="username"
+//                                     className="form-control form-shadow form-control-lg"
+//                                     onChange={this.handleInput}
+//                                     value={this.state.username}
+//                                     placeholder="Username"
+//                                     autoFocus
+//                                     required
+//                                 />
+//                             </div>
+//                             <div className="form-group">
+//                                 <label htmlFor="password">Password</label>
+//                                 <div
+//                                     className="input-group form-shadow"
+//                                     style={{
+//                                         borderRadius: "6px",
+//                                     }}
+//                                 >
+//                                     <input
+//                                         type={
+//                                             this.state.showPassword
+//                                                 ? "text"
+//                                                 : "password"
+//                                         }
+//                                         name="password"
+//                                         id="password"
+//                                         className="form-control form-control-lg"
+//                                         onChange={this.handleInput}
+//                                         value={this.state.password}
+//                                         placeholder="**********"
+//                                         required
+//                                     />
+//                                     <div className="input-group-append">
+//                                         <button
+//                                             className="btn btn-link btn-sm bg-white shadow-none"
+//                                             type="button"
+//                                             id="button-addon2"
+//                                             onClick={this.showPassword}
+//                                         >
+//                                             {this.state.showPassword ? (
+//                                                 <i className="far fa-eye-slash"></i>
+//                                             ) : (
+//                                                 <i className="far fa-eye"></i>
+//                                             )}
+//                                         </button>
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                             <div className="form-group">
+//                                 <p className="small mb-0 text-right">
+//                                     {" "}
+//                                     <Link
+//                                         to="#"
+//                                         onClick={this.toggleModal}
+//                                         className="primary-text"
+//                                     >
+//                                         Forgot password?
+//                                     </Link>
+//                                 </p>
+//                             </div>
+//                             <div className="form-group">
+//                                 <button
+//                                     type="submit"
+//                                     className="btn btn-primary btn-block shadow-none"
+//                                 >
+//                                     {this.state.showLoader ? (
+//                                         <Spinner
+//                                             as="span"
+//                                             animation="border"
+//                                             size="sm"
+//                                             role="status"
+//                                             aria-hidden="true"
+//                                             className="mr-2"
+//                                         />
+//                                     ) : (
+//                                         <>
+//                                             LOGIN{" "}
+//                                             <i className="fas fa-sign-in-alt ml-2"></i>
+//                                         </>
+//                                     )}
+//                                 </button>
+//                             </div>
+//                         </form>
+//                         <p className="small text-center mb-2">or</p>
+//                         <div className="d-flex justify-content-center mb-3">
+//                             <button className="btn btn-primary btn-sm mr-3">
+//                                 <i className="fab fa-google"></i>
+//                             </button>
+//                             <button className="btn btn-primary btn-sm">
+//                                 <i className="fab fa-facebook"></i>
+//                             </button>
+//                         </div>
+//                         <p className="text-center small mb-0">
+//                             Don't have an account?{" "}
+//                             <Link
+//                                 to="/register"
+//                                 className="primary-text font-weight-bold"
+//                             >
+//                                 Join Inquel Online Learning
+//                             </Link>{" "}
+//                         </p>
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//     </div>
+// </div>; */}

@@ -7,6 +7,11 @@ import { baseUrl, studentUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import courseimg from "../../assets/code.jpg";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => ({
+    profile: state.user.profile,
+});
 
 const url = baseUrl + studentUrl;
 const headers = {
@@ -179,8 +184,17 @@ const Checkout = (props) => {
                 onReset={() => window.location.reload()}
             >
                 <main className="container">
-                    <div className="cart shadow-sm">
-                        <h1 className="section-heading">Checkout</h1>
+                    <div className="cart position-relative shadow-sm">
+                        <div
+                            className="borders rounded-lg primary-text position-absolute px-4 py-2"
+                            style={{ right: "15px", top: "15px" }}
+                        >
+                            <i className="fas fa-wallet mr-1"></i> Wallet:{" "}
+                            {props.profile.wallet ? props.profile.wallet : 0}
+                        </div>
+                        <h1 className="section-heading text-left text-md-center">
+                            Checkout
+                        </h1>
                         <div className="cart-header">
                             <div className="row justify-content-md-center justify-content-between mb-2">
                                 <div className="col-8">Courses</div>
@@ -190,13 +204,21 @@ const Checkout = (props) => {
                         <div className="cart-body">
                             <div className="cart-row">
                                 <div className="row align-items-center justify-content-md-center justify-content-between">
-                                    <div className="col-8 row align-items-center">
+                                    <div className="col-8 row align-items-center px-0">
                                         <div className="col-2 d-none d-md-block">
-                                            <img
-                                                src={returnImage(subscription)}
-                                                alt={subscription.title}
-                                                className="img-fluid rounded-lg shadow"
-                                            />
+                                            <div
+                                                className="rounded-lg shadow"
+                                                style={{
+                                                    width: "100%",
+                                                    height: "60px",
+                                                    backgroundImage: `url(${returnImage(
+                                                        subscription
+                                                    )})`,
+                                                    backgroundSize: "cover",
+                                                    backgroundPosition:
+                                                        "center",
+                                                }}
+                                            ></div>
                                         </div>
                                         <div className="col-md-10 col-12">
                                             <p className="title text-truncate">
@@ -315,4 +337,4 @@ const Checkout = (props) => {
     );
 };
 
-export default Checkout;
+export default connect(mapStateToProps)(Checkout);

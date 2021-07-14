@@ -13,7 +13,7 @@ import AlertBox from "../common/alert";
 import DetailModal from "../common/modal/courseDetail";
 import { Link } from "react-router-dom";
 import storeDispatch from "../../redux/dispatch";
-import { TEMP } from "../../redux/action";
+import { CART_COUNT, TEMP } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
     temp: state.storage.temp,
@@ -117,6 +117,25 @@ const Catalog = (props) => {
             });
     };
 
+    const loadCartData = () => {
+        fetch(`${baseUrl}${studentUrl}/student/cart/checkout/`, {
+            headers: headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    storeDispatch(
+                        CART_COUNT,
+                        result.data.cart_items.length || 0
+                    );
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     const handle_AddToCart = (id) => {
         setLoading(true);
         setErrorAlert(false);
@@ -139,6 +158,7 @@ const Catalog = (props) => {
                         setResponseMsg(result.msg);
                         setSuccessAlert(true);
                         loadCourses(page, tab);
+                        loadCartData();
                     } else {
                         setResponseMsg(result.msg);
                         setErrorAlert(true);
