@@ -162,10 +162,11 @@ class SemesterAutoExam extends Component {
         ) {
             let exam_data = JSON.parse(this.props.examData);
             // check if the current exam data belongs to this exam
-            if (exam_data.id !== this.cycleTestId) {
+            if (exam_data.id !== this.semesterId) {
                 storeDispatch(EXAMDATA, {});
                 sectionStructure();
             } else {
+                // else retrieve the data from redux
                 temp = exam_data.sections;
             }
             // else structure the section data
@@ -1415,7 +1416,7 @@ class SemesterAutoExam extends Component {
                                                 {this.state.examInfo.attempt
                                                     ? this.state.examInfo
                                                           .attempt + 1
-                                                    : 0}
+                                                    : 0 + 1}
                                             </div>
                                             <div className="col-md-3">
                                                 {
