@@ -1383,6 +1383,7 @@ class Course extends Component {
                         result.data.type_two_exists === true ||
                         result.data.match_exists === true
                     ) {
+                        storeDispatch(TEMP, result.data);
                         this.props.history.push(
                             `${this.props.match.url}/chapter/${chapter_id}/${topic_num}/learn`
                         );
