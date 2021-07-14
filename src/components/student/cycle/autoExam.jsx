@@ -125,12 +125,7 @@ class CycleAutoExam extends Component {
         let temp = [...this.state.answerSection];
         let questions = [];
 
-        if (
-            this.props.examData &&
-            Object.keys(this.props.examData).length !== 0
-        ) {
-            temp = JSON.parse(this.props.examData);
-        } else {
+        function sectionStructure() {
             if (sections.length !== 0) {
                 sections.forEach((data) => {
                     questions = [];
@@ -161,6 +156,25 @@ class CycleAutoExam extends Component {
                 });
             }
         }
+
+        // check if the exam data is present in redux
+        if (
+            this.props.examData &&
+            Object.keys(this.props.examData).length !== 0
+        ) {
+            let exam_data = JSON.parse(this.props.examData);
+            // check if the current exam data belongs to this exam
+            if (exam_data.id !== this.cycleTestId) {
+                storeDispatch(EXAMDATA, {});
+                sectionStructure();
+            } else {
+                temp = exam_data.sections;
+            }
+            // else structure the section data
+        } else {
+            sectionStructure();
+        }
+
         this.setState({
             answerSection: temp,
         });
@@ -423,7 +437,10 @@ class CycleAutoExam extends Component {
                 this.setState({
                     answerSection: sections,
                 });
-                storeDispatch(EXAMDATA, JSON.stringify(sections));
+                storeDispatch(
+                    EXAMDATA,
+                    JSON.stringify({ id: this.cycleTestId, sections })
+                );
             } else {
                 sections[this.state.currentSectionIndex].questions[
                     index
@@ -431,7 +448,10 @@ class CycleAutoExam extends Component {
                 this.setState({
                     answerSection: sections,
                 });
-                storeDispatch(EXAMDATA, JSON.stringify(sections));
+                storeDispatch(
+                    EXAMDATA,
+                    JSON.stringify({ id: this.cycleTestId, sections })
+                );
             }
         } else if (type === "radio") {
             sections[this.state.currentSectionIndex].questions[
@@ -440,7 +460,10 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            storeDispatch(EXAMDATA, JSON.stringify(sections));
+            storeDispatch(
+                EXAMDATA,
+                JSON.stringify({ id: this.cycleTestId, sections })
+            );
         }
     };
 
@@ -453,14 +476,20 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            storeDispatch(EXAMDATA, JSON.stringify(sections));
+            storeDispatch(
+                EXAMDATA,
+                JSON.stringify({ id: this.cycleTestId, sections })
+            );
         } else {
             sections[this.state.currentSectionIndex].questions[index].answer =
                 [];
             this.setState({
                 answerSection: sections,
             });
-            storeDispatch(EXAMDATA, JSON.stringify(sections));
+            storeDispatch(
+                EXAMDATA,
+                JSON.stringify({ id: this.cycleTestId, sections })
+            );
         }
     };
 
@@ -471,7 +500,10 @@ class CycleAutoExam extends Component {
         this.setState({
             answerSection: sections,
         });
-        storeDispatch(EXAMDATA, JSON.stringify(sections));
+        storeDispatch(
+            EXAMDATA,
+            JSON.stringify({ id: this.cycleTestId, sections })
+        );
     };
 
     handleEventChange = (event, index) => {
@@ -488,7 +520,10 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            storeDispatch(EXAMDATA, JSON.stringify(sections));
+            storeDispatch(
+                EXAMDATA,
+                JSON.stringify({ id: this.cycleTestId, sections })
+            );
         } else {
             sections[this.state.currentSectionIndex].questions[
                 index
@@ -496,7 +531,10 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            storeDispatch(EXAMDATA, JSON.stringify(sections));
+            storeDispatch(
+                EXAMDATA,
+                JSON.stringify({ id: this.cycleTestId, sections })
+            );
         }
     };
 
@@ -546,7 +584,10 @@ class CycleAutoExam extends Component {
             answerSection: sections,
         });
         window.MathJax.typeset();
-        storeDispatch(EXAMDATA, JSON.stringify(sections));
+        storeDispatch(
+            EXAMDATA,
+            JSON.stringify({ id: this.cycleTestId, sections })
+        );
     };
 
     handleDropFillin = (event, index) => {
@@ -562,7 +603,10 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            storeDispatch(EXAMDATA, JSON.stringify(sections));
+            storeDispatch(
+                EXAMDATA,
+                JSON.stringify({ id: this.cycleTestId, sections })
+            );
         } else {
             sections[this.state.currentSectionIndex].questions[
                 index
@@ -574,7 +618,10 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            storeDispatch(EXAMDATA, JSON.stringify(sections));
+            storeDispatch(
+                EXAMDATA,
+                JSON.stringify({ id: this.cycleTestId, sections })
+            );
         }
     };
 

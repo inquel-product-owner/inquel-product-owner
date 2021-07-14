@@ -23,6 +23,7 @@ const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
     chapter_name: state.content.chapter_name,
     topic_name: state.content.topic_name,
+    temp: state.storage.temp,
 });
 
 const NoContentToDisplay = () => {
@@ -111,72 +112,45 @@ class FlashCard extends Component {
             match: [],
         });
 
-        let apiURL = this.courseId
-            ? `${this.url}/student/sub/${this.subscriptionId}/course/${this.courseId}/chapter/${this.chapterId}/${this.topicNum}/`
-            : `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/checkup/?topic_num=${this.topicNum}`;
+        // content checkup
+        let checkup = this.state.checkup;
+        checkup.concepts_exists = this.props.temp.concepts_exists;
+        checkup.mcq_exists = this.props.temp.mcq_exists;
+        checkup.type_two_exists = this.props.temp.type_two_exists;
+        checkup.match_exists = this.props.temp.match_exists;
 
-        // checkup API
-        fetch(apiURL, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    let checkup = this.state.checkup;
-                    checkup.concepts_exists = result.data.concepts_exists;
-                    checkup.mcq_exists = result.data.mcq_exists;
-                    checkup.type_two_exists = result.data.type_two_exists;
-                    checkup.match_exists = result.data.match_exists;
-
-                    this.setState(
-                        {
-                            checkup: checkup,
-                        },
-                        () => {
-                            if (this.state.checkup.concepts_exists) {
-                                this.setState({
-                                    activeTab: "concept",
-                                });
-                                this.loadConceptData();
-                            } else if (
-                                this.state.checkup.mcq_exists ||
-                                this.state.checkup.type_two_exists
-                            ) {
-                                this.setState({
-                                    activeTab: "practice",
-                                });
-                                this.loadPracticeData();
-                            } else if (this.state.checkup.match_exists) {
-                                this.setState({
-                                    activeTab: "match",
-                                });
-                                this.loadMatchData();
-                            } else {
-                                this.setState({
-                                    errorMsg: "Content not available",
-                                    showErrorAlert: true,
-                                    page_loading: false,
-                                });
-                            }
-                        }
-                    );
+        this.setState(
+            {
+                checkup: checkup,
+            },
+            () => {
+                if (this.state.checkup.concepts_exists) {
+                    this.setState({
+                        activeTab: "concept",
+                    });
+                    this.loadConceptData();
+                } else if (
+                    this.state.checkup.mcq_exists ||
+                    this.state.checkup.type_two_exists
+                ) {
+                    this.setState({
+                        activeTab: "practice",
+                    });
+                    this.loadPracticeData();
+                } else if (this.state.checkup.match_exists) {
+                    this.setState({
+                        activeTab: "match",
+                    });
+                    this.loadMatchData();
                 } else {
                     this.setState({
-                        errorMsg: result.msg,
+                        errorMsg: "Content not available",
                         showErrorAlert: true,
                         page_loading: false,
                     });
                 }
-            })
-            .catch((err) => {
-                console.log(err);
-                this.setState({
-                    errorMsg: "Something went wrong!",
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
-            });
+            }
+        );
 
         document.addEventListener("keydown", this.handleKeys);
     };
