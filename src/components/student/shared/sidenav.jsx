@@ -169,7 +169,7 @@ class SideNav extends Component {
                                 ></i>
                             </button>
                         </OverlayTrigger>
-                        <Link to="/dashboard">
+                        <Link to="/privacy-policy">
                             <OverlayTrigger
                                 key="right"
                                 placement="right"

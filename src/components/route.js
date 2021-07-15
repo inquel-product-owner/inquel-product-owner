@@ -9,6 +9,11 @@ import Catalog from "./home/catalog";
 import Cart from "./home/cart";
 import Checkout from "./home/checkout";
 import HomeLeaderboard from "./home/leaderBoard";
+import PrivacyPolicy from "./home/privacy-policy";
+import AboutInquel from "./home/about";
+import TermsAndConditions from "./home/terms-and-conditions";
+import LegalNotice from "./home/legal-noticec";
+import HelpCenter from "./home/help-center";
 
 // -------------------- Admin Imports --------------------
 
@@ -211,6 +216,15 @@ const routes = (
             }
         />
         <Route exact path="/leaderboard" component={HomeLeaderboard} />
+        <Route exact path="/about" component={AboutInquel} />
+        <Route exact path="/privacy-policy" component={PrivacyPolicy} />
+        <Route
+            exact
+            path="/terms-and-conditions"
+            component={TermsAndConditions}
+        />
+        <Route exact path="/legal-notice" component={LegalNotice} />
+        <Route exact path="/help" component={HelpCenter} />
 
         {/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= Admin Routes =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */}
 

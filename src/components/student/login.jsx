@@ -232,13 +232,7 @@ class StudentLogin extends Component {
                                 <div className="card shadow-sm overflow-hidden">
                                     <div className="row align-items-center">
                                         {/* ----- left column ----- */}
-                                        <div
-                                            className="col-md-6 pr-md-0"
-                                            style={{
-                                                background:
-                                                    "linear-gradient(145deg, rgba(98,16,18,0.9336776947106968) 25%, rgba(239,210,172,0.9392799356070554) 100%)",
-                                            }}
-                                        >
+                                        <div className="col-md-6 primary-bg pr-md-0">
                                             <div className="card-body">
                                                 <div className="row justify-content-center my-3 my-md-5">
                                                     <div className="col-sm-11">

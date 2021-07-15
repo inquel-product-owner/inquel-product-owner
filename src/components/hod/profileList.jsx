@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import Wrapper from "./wrapper";
 import { Link } from "react-router-dom";
 import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
@@ -23,10 +23,12 @@ class AddStudentModal extends Component {
             email: [""],
             terms_and_condition: false,
 
-            errorMsg: [],
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
+            mail_sent: [],
+            mail_not_sent: [],
+            existing_email: [],
+            showExistingEmailAlert: false,
+            showMailNotSentAlert: false,
+            showMailSentAlert: false,
             showLoader: false,
         };
     }
@@ -43,8 +45,9 @@ class AddStudentModal extends Component {
 
         this.setState({
             showLoader: true,
-            showErrorAlert: false,
-            showSuccessAlert: false,
+            showExistingEmailAlert: false,
+            showMailNotSentAlert: false,
+            showMailSentAlert: false,
         });
 
         fetch(`${url}/hod/create/student/`, {
@@ -58,22 +61,42 @@ class AddStudentModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                    this.setState({
-                        successMsg: "Email added successfully!",
-                        showSuccessAlert: true,
-                        showLoader: false,
-                        email: [""],
-                    });
-                    if (result.data.existing_email) {
-                        if (result.data.existing_email.length !== 0) {
-                            this.setState({
-                                errorMsg: result.data.existing_email,
-                                showErrorAlert: true,
-                            });
-                        } else {
-                            this.props.studentFormSubmission(true);
-                        }
+                    // mail sent
+                    if (
+                        result.data.mail_sent &&
+                        result.data.mail_sent.length !== 0
+                    ) {
+                        this.setState({
+                            mail_sent: result.data.mail_sent,
+                            showMailSentAlert: true,
+                        });
                     }
+
+                    // existing mail
+                    if (
+                        result.data.existing_email &&
+                        result.data.existing_email.length !== 0
+                    ) {
+                        this.setState({
+                            existing_email: result.data.existing_email,
+                            showExistingEmailAlert: true,
+                        });
+                    }
+
+                    // mail not sent
+                    if (
+                        result.data.mail_not_sent &&
+                        result.data.mail_not_sent.length !== 0
+                    ) {
+                        this.setState({
+                            mail_not_sent: result.data.mail_not_sent,
+                            showMailNotSentAlert: true,
+                        });
+                    }
+
+                    this.setState({
+                        showLoader: false,
+                    });
                 } else {
                     this.setState({
                         errorMsg: result.data.existing_email,
@@ -138,28 +161,54 @@ class AddStudentModal extends Component {
                     <Modal.Body>
                         <Alert
                             variant="success"
-                            show={this.state.showSuccessAlert}
+                            show={this.state.showMailSentAlert}
                             onClose={() => {
                                 this.setState({
-                                    showSuccessAlert: false,
+                                    showMailSentAlert: false,
                                 });
                             }}
                             dismissible
                         >
-                            {this.state.successMsg}
+                            <h6>Mail sent</h6>
+                            {this.state.mail_sent.map((email, index) => {
+                                return (
+                                    <p className="small mb-2" key={index}>
+                                        {email}
+                                    </p>
+                                );
+                            })}
                         </Alert>
                         <Alert
                             variant="danger"
-                            show={this.state.showErrorAlert}
+                            show={this.state.showExistingEmailAlert}
                             onClose={() => {
                                 this.setState({
-                                    showErrorAlert: false,
+                                    showExistingEmailAlert: false,
                                 });
                             }}
                             dismissible
                         >
                             <h6>Existing email</h6>
-                            {this.state.errorMsg.map((email, index) => {
+                            {this.state.existing_email.map((email, index) => {
+                                return (
+                                    <p className="small mb-2" key={index}>
+                                        {email}
+                                    </p>
+                                );
+                            })}
+                        </Alert>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showMailNotSentAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showMailNotSentAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            <h6>Mail not sent</h6>
+                            {this.state.mail_not_sent.map((email, index) => {
                                 return (
                                     <p className="small mb-2" key={index}>
                                         {email}
@@ -169,94 +218,90 @@ class AddStudentModal extends Component {
                         </Alert>
 
                         {this.state.email.map((inputField, index) => (
-                            <Fragment key={index}>
-                                <div className="form-group">
-                                    <label htmlFor={`semail${index}`}>
-                                        {`Student email ${index + 1}`}
-                                    </label>
-                                    <div
-                                        className="input-group borders"
-                                        style={{
-                                            borderRadius: "6px",
-                                        }}
-                                    >
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            id={`semail${index}`}
-                                            name="semail"
-                                            value={inputField}
-                                            onChange={(event) =>
-                                                this.handleInputChange(
-                                                    index,
-                                                    event
-                                                )
-                                            }
-                                            required
-                                        />
-                                        <div className="input-group-append">
-                                            <div
-                                                className="btn-group"
-                                                role="group"
-                                                aria-label="Basic example"
-                                            >
-                                                {index !== 0 ? (
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-light shadow-none font-weight-bold"
-                                                        onClick={() =>
-                                                            this.handleRemoveFields(
-                                                                index
-                                                            )
-                                                        }
-                                                    >
-                                                        -
-                                                    </button>
-                                                ) : (
-                                                    ""
-                                                )}
+                            <div className="form-group" key={index}>
+                                <label htmlFor={`semail${index}`}>
+                                    {`Student email ${index + 1}`}
+                                </label>
+                                <div
+                                    className="input-group borders"
+                                    style={{
+                                        borderRadius: "6px",
+                                    }}
+                                >
+                                    <input
+                                        type="email"
+                                        className="form-control"
+                                        id={`semail${index}`}
+                                        name="semail"
+                                        value={inputField}
+                                        onChange={(event) =>
+                                            this.handleInputChange(index, event)
+                                        }
+                                        required
+                                    />
+                                    <div className="input-group-append">
+                                        <div
+                                            className="btn-group"
+                                            role="group"
+                                            aria-label="Basic example"
+                                        >
+                                            {index !== 0 ? (
                                                 <button
                                                     type="button"
                                                     className="btn btn-light shadow-none font-weight-bold"
                                                     onClick={() =>
-                                                        this.handleAddFields()
+                                                        this.handleRemoveFields(
+                                                            index
+                                                        )
                                                     }
                                                 >
-                                                    +
+                                                    -
                                                 </button>
-                                            </div>
+                                            ) : (
+                                                ""
+                                            )}
+                                            <button
+                                                type="button"
+                                                className="btn btn-light shadow-none font-weight-bold"
+                                                onClick={() =>
+                                                    this.handleAddFields()
+                                                }
+                                            >
+                                                +
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="custom-control custom-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        className="custom-control-input"
-                                        id="customCheck1"
-                                        name="terms_and_condition"
-                                        onChange={this.handleCheck}
-                                        disabled={
-                                            this.state.terms_and_condition
-                                                ? true
-                                                : false
-                                        }
-                                        required
-                                    />
-                                    <label
-                                        className="custom-control-label"
-                                        htmlFor="customCheck1"
-                                    >
-                                        I agree to the{" "}
-                                        <Link
-                                            to="/"
-                                            className="primary-text font-weight-bold-600"
-                                        >
-                                            Terms and Conditions
-                                        </Link>
-                                    </label>
-                                </div>
-                            </Fragment>
+                            </div>
                         ))}
+
+                        <div className="custom-control custom-checkbox">
+                            <input
+                                type="checkbox"
+                                className="custom-control-input"
+                                id="customCheck1"
+                                name="terms_and_condition"
+                                onChange={this.handleCheck}
+                                disabled={
+                                    this.state.terms_and_condition
+                                        ? true
+                                        : false
+                                }
+                                required
+                            />
+                            <label
+                                className="custom-control-label"
+                                htmlFor="customCheck1"
+                            >
+                                I agree to the{" "}
+                                <Link
+                                    to="/"
+                                    className="primary-text font-weight-bold-600"
+                                >
+                                    Terms and Conditions
+                                </Link>
+                            </label>
+                        </div>
                     </Modal.Body>
                     <Modal.Footer>
                         <button
@@ -879,6 +924,7 @@ class HODTeacherStudentList extends Component {
             this.setState({
                 showStudentModal: !this.state.showStudentModal,
             });
+            this.studentFormSubmission();
         }
     };
 

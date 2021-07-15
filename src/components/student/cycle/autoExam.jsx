@@ -1408,37 +1408,37 @@ class CycleAutoExam extends Component {
                             onReset={() => window.location.reload()}
                         >
                             {/* Header */}
-                            <div className="card card-body secondary-bg primary-text font-weight-bold-600 small mb-4 py-2">
+                            <div className="card card-body secondary-bg primary-text font-weight-bold-600 small mb-3 py-2">
                                 <div className="row align-items-center">
-                                    <div className="col-md-7">
+                                    <div className="col-md-5 text-center text-md-left mb-2 mb-md-0">
                                         {cycleTest.length !== 0
                                             ? cycleTest.section_description
                                             : ""}
                                     </div>
-                                    <div className="col-md-5">
+                                    <div className="col-md-7">
                                         <div className="row align-items-center">
-                                            <div className="col-md-3">
+                                            <div className="col-md-3 col-4">
                                                 Attempt{" "}
                                                 {this.state.examInfo.attempt
                                                     ? this.state.examInfo
                                                           .attempt + 1
                                                     : 0 + 1}
                                             </div>
-                                            <div className="col-md-3">
+                                            <div className="col-md-3 col-4">
+                                                Total questions:{" "}
                                                 {
                                                     this.state.cycleTestItem
                                                         .total_questions
-                                                }{" "}
-                                                Questions
+                                                }
                                             </div>
-                                            <div className="col-md-3">
+                                            <div className="col-md-3 col-4">
                                                 Total marks:{" "}
                                                 {
                                                     this.state.cycleTestItem
                                                         .total_marks
                                                 }
                                             </div>
-                                            <div className="col-md-3">
+                                            <div className="col-md-3 col-6 mx-auto mt-2 mt-md-0">
                                                 <div className="bg-warning text-center rounded py-2">
                                                     {this.state.time.h}:
                                                     {this.state.time.m}:
@@ -1447,6 +1447,20 @@ class CycleAutoExam extends Component {
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* any question section */}
+                            <div className="d-flex justify-content-center mb-3">
+                                <div className="pinkrange-bg px-3 py-2 rounded-lg small font-weight-bold-600">
+                                    <i className="fas fa-info-circle mr-1"></i>{" "}
+                                    Attend any{" "}
+                                    {cycleTest.length !== 0
+                                        ? cycleTest.any_questions <= 9
+                                            ? `0${cycleTest.any_questions}`
+                                            : cycleTest.any_questions
+                                        : ""}{" "}
+                                    questions in this section
                                 </div>
                             </div>
 
@@ -1467,7 +1481,7 @@ class CycleAutoExam extends Component {
 
                             {/* ----- Navigation ----- */}
                             <div className="row align-items-center">
-                                <div className="col-3">
+                                <div className="col-md-3 col-6 order-1 order-md-1">
                                     {this.state.currentSectionIndex !== 0 ? (
                                         <button
                                             className="btn btn-primary btn-sm shadow-none"
@@ -1494,7 +1508,7 @@ class CycleAutoExam extends Component {
                                         ""
                                     )}
                                 </div>
-                                <div className="col-6">
+                                <div className="col-md-6 col-12 order-3 order-md-2 mt-2 mt-md-0">
                                     {this.state.currentSectionIndex ===
                                     this.state.questionSection.length - 1 ? (
                                         <button
@@ -1507,7 +1521,7 @@ class CycleAutoExam extends Component {
                                         ""
                                     )}
                                 </div>
-                                <div className="col-3 text-right">
+                                <div className="col-md-3 col-6 text-right order-2 order-md-3">
                                     {this.state.currentSectionIndex <
                                     this.state.questionSection.length - 1 ? (
                                         <button
