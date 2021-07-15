@@ -10,7 +10,7 @@ import Banner from "./sections/banner";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../common/ErrorFallback";
 import "./shared/style.css";
-import tawkTo from "tawkto-react";
+// import tawkTo from "tawkto-react";
 
 class Home extends React.Component {
     componentDidMount = () => {
@@ -30,15 +30,7 @@ class Home extends React.Component {
         //     // document.getElementById("tawk-to-component").appendChild(s1);
         // })();
 
-        tawkTo('60e83166649e0a0a5ccb5b03', '1fa5g1ui2');
-    };
-
-    componentWillUnmount = () => {
-        // let script = document.getElementById("tawk-to-react");
-        // document.body.removeChild(script);
-        // if(script.parentNode.removeChild(script)) {
-        //     console.log('Success')
-        // }
+        // tawkTo('60e83166649e0a0a5ccb5b03', '1fa5g1ui2');
     };
 
     render() {
