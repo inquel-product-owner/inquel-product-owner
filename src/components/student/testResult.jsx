@@ -359,134 +359,136 @@ class TestResult extends Component {
                 />
 
                 <div className="exam-section">
-                    <div className="container-fluid">
+                    <div className="container overflow-auto">
                         <ErrorBoundary
                             FallbackComponent={ErrorFallback}
                             onReset={() => window.location.reload()}
                         >
-                            <div className="row justify-content-center">
-                                <div className="col-md-10">
-                                    <div className="row align-items-center font-weight-bold-600 primary-text mb-3">
-                                        <div className="col-md-3">
-                                            TEST ANALYSIS
+                            <div style={{ minWidth: "1100px" }}>
+                                <div className="row justify-content-center">
+                                    <div className="col-md-11">
+                                        <div className="row align-items-center font-weight-bold-600 primary-text mb-3">
+                                            <div className="col-3">
+                                                TEST ANALYSIS
+                                            </div>
+                                            <div className="col-7">
+                                                ATTEMPTS & PAPERS
+                                            </div>
                                         </div>
-                                        <div className="col-md-7">
-                                            ATTEMPTS & PAPERS
-                                        </div>
+
+                                        {/* ----- Cycle test list ----- */}
+                                        {(this.state.cycle_test || []).map(
+                                            (data, index) => {
+                                                return (
+                                                    <div
+                                                        className="card light-bg shadow-sm mb-2"
+                                                        key={index}
+                                                    >
+                                                        <div className="row align-items-center font-weight-bold-600 small">
+                                                            <div className="col-3">
+                                                                <div className="card card-body secondary-bg p-3">
+                                                                    {
+                                                                        data.cycle_test_name
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            {/* ----- Attempts score card ----- */}
+                                                            <div className="col-9">
+                                                                {(
+                                                                    data.student_cycle_test ||
+                                                                    []
+                                                                ).map(
+                                                                    (
+                                                                        attempt,
+                                                                        attempt_index
+                                                                    ) => {
+                                                                        return (
+                                                                            <CycleTestAttempts
+                                                                                key={
+                                                                                    attempt_index
+                                                                                }
+                                                                                attempt={
+                                                                                    attempt
+                                                                                }
+                                                                                data={
+                                                                                    data
+                                                                                }
+                                                                                url={
+                                                                                    this
+                                                                                        .props
+                                                                                        .match
+                                                                                        .url
+                                                                                }
+                                                                            />
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+
+                                        {/* ----- Semester list ----- */}
+                                        {(this.state.semester || []).map(
+                                            (data, index) => {
+                                                return (
+                                                    <div
+                                                        className="card light-bg shadow-sm mb-2"
+                                                        key={index}
+                                                    >
+                                                        <div className="row align-items-center font-weight-bold-600 small">
+                                                            <div className="col-3">
+                                                                <div className="card card-body secondary-bg p-3">
+                                                                    {
+                                                                        data.semester_name
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            <div className="col-9">
+                                                                {(
+                                                                    data.student_semester ||
+                                                                    []
+                                                                ).map(
+                                                                    (
+                                                                        attempt,
+                                                                        attempt_index
+                                                                    ) => {
+                                                                        return (
+                                                                            <SemesterAttempts
+                                                                                key={
+                                                                                    attempt_index
+                                                                                }
+                                                                                attempt={
+                                                                                    attempt
+                                                                                }
+                                                                                data={
+                                                                                    data
+                                                                                }
+                                                                                url={
+                                                                                    this
+                                                                                        .props
+                                                                                        .match
+                                                                                        .url
+                                                                                }
+                                                                            />
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+
+                                        <small className="mt-2 text-muted">
+                                            <i className="fas fa-info-circle fa-sm mr-1"></i>{" "}
+                                            Click on the attempt sequence icon
+                                            to view the result
+                                        </small>
                                     </div>
-
-                                    {/* ----- Cycle test list ----- */}
-                                    {(this.state.cycle_test || []).map(
-                                        (data, index) => {
-                                            return (
-                                                <div
-                                                    className="card light-bg shadow-sm mb-2"
-                                                    key={index}
-                                                >
-                                                    <div className="row align-items-center font-weight-bold-600 small">
-                                                        <div className="col-3">
-                                                            <div className="card card-body secondary-bg p-3">
-                                                                {
-                                                                    data.cycle_test_name
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                        {/* ----- Attempts score card ----- */}
-                                                        <div className="col-9">
-                                                            {(
-                                                                data.student_cycle_test ||
-                                                                []
-                                                            ).map(
-                                                                (
-                                                                    attempt,
-                                                                    attempt_index
-                                                                ) => {
-                                                                    return (
-                                                                        <CycleTestAttempts
-                                                                            key={
-                                                                                attempt_index
-                                                                            }
-                                                                            attempt={
-                                                                                attempt
-                                                                            }
-                                                                            data={
-                                                                                data
-                                                                            }
-                                                                            url={
-                                                                                this
-                                                                                    .props
-                                                                                    .match
-                                                                                    .url
-                                                                            }
-                                                                        />
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                    )}
-
-                                    {/* ----- Semester list ----- */}
-                                    {(this.state.semester || []).map(
-                                        (data, index) => {
-                                            return (
-                                                <div
-                                                    className="card light-bg shadow-sm mb-2"
-                                                    key={index}
-                                                >
-                                                    <div className="row align-items-center font-weight-bold-600 small">
-                                                        <div className="col-3">
-                                                            <div className="card card-body secondary-bg p-3">
-                                                                {
-                                                                    data.semester_name
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-9">
-                                                            {(
-                                                                data.student_semester ||
-                                                                []
-                                                            ).map(
-                                                                (
-                                                                    attempt,
-                                                                    attempt_index
-                                                                ) => {
-                                                                    return (
-                                                                        <SemesterAttempts
-                                                                            key={
-                                                                                attempt_index
-                                                                            }
-                                                                            attempt={
-                                                                                attempt
-                                                                            }
-                                                                            data={
-                                                                                data
-                                                                            }
-                                                                            url={
-                                                                                this
-                                                                                    .props
-                                                                                    .match
-                                                                                    .url
-                                                                            }
-                                                                        />
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                    )}
-
-                                    <small className="mt-2 text-muted">
-                                        <i className="fas fa-info-circle fa-sm mr-1"></i>{" "}
-                                        Click on the attempt sequence icon to
-                                        view the result
-                                    </small>
                                 </div>
                             </div>
                         </ErrorBoundary>

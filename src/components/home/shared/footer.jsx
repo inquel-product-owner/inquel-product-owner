@@ -58,7 +58,10 @@ export default function Footer() {
                                     </Link>
                                 </p>
                                 <p className="mb-2">
-                                    <Link to="/leaderboard" className="text-light">
+                                    <Link
+                                        to="/leaderboard"
+                                        className="text-light"
+                                    >
                                         Leader Board
                                     </Link>
                                 </p>
@@ -78,12 +81,12 @@ export default function Footer() {
                                     </Link>
                                 </p>
                                 <p className="mb-2">
-                                    <Link to="" className="text-light">
+                                    <Link to="/help" className="text-light">
                                         Help Center
                                     </Link>
                                 </p>
                                 <p>
-                                    <Link to="" className="text-light">
+                                    <Link to="/contact" className="text-light">
                                         Contact Us
                                     </Link>
                                 </p>
@@ -93,22 +96,31 @@ export default function Footer() {
                                     ABOUT
                                 </h5>
                                 <p className="mb-2">
-                                    <Link to="" className="text-light">
+                                    <Link to="/about" className="text-light">
                                         Company
                                     </Link>
                                 </p>
                                 <p className="mb-2">
-                                    <Link to="" className="text-light">
+                                    <Link
+                                        to="/privacy-policy"
+                                        className="text-light"
+                                    >
                                         Privacy Policy
                                     </Link>
                                 </p>
                                 <p className="mb-2">
-                                    <Link to="" className="text-light">
+                                    <Link
+                                        to="/terms-and-conditions"
+                                        className="text-light"
+                                    >
                                         Terms & Conditions
                                     </Link>
                                 </p>
                                 <p className="mb-0">
-                                    <Link to="" className="text-light">
+                                    <Link
+                                        to="/legal-notice"
+                                        className="text-light"
+                                    >
                                         Legal Notice
                                     </Link>
                                 </p>
