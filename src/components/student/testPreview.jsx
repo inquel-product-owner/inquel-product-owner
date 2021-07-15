@@ -112,6 +112,7 @@ class TestPreview extends Component {
             currentSubQuestionIndex: [],
             totalQuestion: 0,
             section_marks: [],
+            topic_marks: {},
 
             selectedImageData: [],
             startIndex: 0,
@@ -137,6 +138,16 @@ class TestPreview extends Component {
         pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
+    componentDidMount = () => {
+        document.title = `${
+            this.props.temp.cycle_test_name || this.props.temp.semester_name
+        } : Test preview - Student | IQLabs`;
+
+        if (this.props.temp.auto === true) {
+            this.loopAutoSection();
+        }
+    };
+
     loopAutoSection = async () => {
         let sections = [];
         let questions = [];
@@ -144,6 +155,9 @@ class TestPreview extends Component {
         let currentSubQuestionIndex = [];
         let totalQuestion = 0;
         let section_marks = [];
+
+        let topic_marks = {};
+
         this.props.temp.data.forEach((data) => {
             if (
                 data.cycle_test_id === this.cycleTestId ||
@@ -428,6 +442,22 @@ class TestPreview extends Component {
                         }
                     }
 
+                    // topic_marks looping
+                    if (
+                        section.topic_marks &&
+                        Object.keys(section.topic_marks).length !== 0
+                    ) {
+                        Object.entries(section.topic_marks).forEach(
+                            ([key, value]) => {
+                                topic_marks[key] = {
+                                    any_questions: 0,
+                                    correct_marks: 0,
+                                    total_marks: 0,
+                                };
+                            }
+                        );
+                    }
+
                     totalSubQuestion.push(total);
                     currentSubQuestionIndex.push(current);
                     sections.push(questions);
@@ -435,25 +465,72 @@ class TestPreview extends Component {
                 });
             }
         });
-        await this.setState({
-            questions: sections,
-            totalSubQuestion: totalSubQuestion,
-            currentSubQuestionIndex: currentSubQuestionIndex,
-            totalSection: sections.length,
-            totalQuestion: totalQuestion,
-            section_marks: section_marks,
-        });
+        await this.setState(
+            {
+                questions: sections,
+                totalSubQuestion: totalSubQuestion,
+                currentSubQuestionIndex: currentSubQuestionIndex,
+                totalSection: sections.length,
+                totalQuestion: totalQuestion,
+                section_marks: section_marks,
+                topic_marks: topic_marks,
+            },
+            () => {
+                this.calculateRemarks();
+            }
+        );
         window.MathJax.typeset();
     };
 
-    componentDidMount = () => {
-        document.title = `${
-            this.props.temp.cycle_test_name || this.props.temp.semester_name
-        } : Test preview - Student | IQLabs`;
+    calculateRemarks = () => {
+        let topic_marks = this.state.topic_marks;
 
-        if (this.props.temp.auto === true) {
-            this.loopAutoSection();
-        }
+        this.props.temp.data.forEach((data) => {
+            if (
+                data.cycle_test_id === this.cycleTestId ||
+                data.semester_id === this.semesterId
+            ) {
+                // section looping
+                data.sections.forEach((section) => {
+                    // topic_marks looping
+                    if (
+                        section.topic_marks &&
+                        Object.keys(section.topic_marks).length !== 0
+                    ) {
+                        Object.entries(section.topic_marks).forEach(
+                            ([key, value]) => {
+                                topic_marks[key].any_questions +=
+                                    value.any_questions;
+                                topic_marks[key].correct_marks +=
+                                    value.correct_marks;
+                                topic_marks[key].total_marks +=
+                                    value.total_marks;
+                            }
+                        );
+                    }
+                });
+            }
+        });
+
+        this.setState(
+            {
+                topic_marks: topic_marks,
+            },
+            () => {
+                // sorting object based on keys
+                function sortObj(obj) {
+                    return Object.keys(obj)
+                        .sort()
+                        .reduce(function (result, key) {
+                            result[key] = obj[key];
+                            return result;
+                        }, {});
+                }
+                this.setState({
+                    topic_marks: sortObj(topic_marks),
+                });
+            }
+        );
     };
 
     // ---------- Navigation ----------
@@ -827,41 +904,48 @@ class TestPreview extends Component {
                                         </div>
                                     </div>
 
-                                    {/* section details */}
-                                    <div className="row justify-content-center mb-3">
-                                        <div className="col-md-4 secondary-bg primary-text rounded-lg px-3 py-2">
-                                            <div className="row align-items-center">
-                                                <div className="col-6 font-weight-bold-600">
-                                                    {
-                                                        this.props.temp.data[0]
-                                                            .sections[
+                                    {/* ----- section details ----- */}
+                                    <div className="container-fluid">
+                                        <div className="row justify-content-center mb-3">
+                                            <div className="col-md-4 secondary-bg primary-text rounded-lg px-3 py-2">
+                                                <div className="row align-items-center">
+                                                    <div className="col-6 font-weight-bold-600">
+                                                        {
+                                                            this.props.temp
+                                                                .data[0]
+                                                                .sections[
+                                                                this.state
+                                                                    .currentSectionIndex
+                                                            ]
+                                                                .section_description
+                                                        }
+                                                    </div>
+                                                    <div className="col-6 text-right small font-weight-bold-600">
+                                                        Scored marks:{" "}
+                                                        {
                                                             this.state
-                                                                .currentSectionIndex
-                                                        ].section_description
-                                                    }
-                                                </div>
-                                                <div className="col-6 small font-weight-bold-600">
-                                                    Scored marks:{" "}
-                                                    {
-                                                        this.state
-                                                            .section_marks[
-                                                            this.state
-                                                                .currentSectionIndex
-                                                        ]
-                                                    }
-                                                    /
-                                                    {
-                                                        this.props.temp.data[0]
-                                                            .sections[
-                                                            this.state
-                                                                .currentSectionIndex
-                                                        ].section_total_marks
-                                                    }
+                                                                .section_marks[
+                                                                this.state
+                                                                    .currentSectionIndex
+                                                            ]
+                                                        }
+                                                        /
+                                                        {
+                                                            this.props.temp
+                                                                .data[0]
+                                                                .sections[
+                                                                this.state
+                                                                    .currentSectionIndex
+                                                            ]
+                                                                .section_total_marks
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    {/* ----- Question and Answer ----- */}
                                     {(data || []).map((question, q_index) => {
                                         return question.type === "type_1" ? (
                                             <div
@@ -1351,6 +1435,98 @@ class TestPreview extends Component {
                                             </div>
                                         );
                                     })}
+
+                                    {/* ----- Topic wise remarks table ----- */}
+                                    {this.state.currentSectionIndex + 1 ===
+                                    this.state.totalSection ? (
+                                        this.state.topic_marks &&
+                                        Object.keys(this.state.topic_marks)
+                                            .length !== 0 ? (
+                                            <div className="container mb-3">
+                                                <div className="card shadow-sm">
+                                                    <div className="table-responsive">
+                                                        <table className="table">
+                                                            <thead className="primary-text">
+                                                                <tr
+                                                                    style={{
+                                                                        whiteSpace:
+                                                                            "nowrap",
+                                                                    }}
+                                                                >
+                                                                    <th scope="col">
+                                                                        Topic
+                                                                        number
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Total
+                                                                        marks
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Secured
+                                                                        marks
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Percentage %
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {Object.entries(
+                                                                    this.state
+                                                                        .topic_marks
+                                                                ).map(
+                                                                    (
+                                                                        [
+                                                                            key,
+                                                                            value,
+                                                                        ],
+                                                                        index
+                                                                    ) => {
+                                                                        return (
+                                                                            <tr
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                            >
+                                                                                <td>
+                                                                                    {
+                                                                                        key
+                                                                                    }
+                                                                                </td>
+                                                                                <td>
+                                                                                    {
+                                                                                        value.total_marks
+                                                                                    }
+                                                                                </td>
+                                                                                <td>
+                                                                                    {
+                                                                                        value.correct_marks
+                                                                                    }
+                                                                                </td>
+                                                                                <td>
+                                                                                    {(
+                                                                                        (value.correct_marks /
+                                                                                            value.total_marks) *
+                                                                                        100
+                                                                                    ).toFixed(
+                                                                                        2
+                                                                                    )}
+                                                                                </td>
+                                                                            </tr>
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            ""
+                                        )
+                                    ) : (
+                                        ""
+                                    )}
 
                                     {/* ---------- Section navigation ---------- */}
                                     <div className="row">
