@@ -196,35 +196,64 @@ const TopicListRender = (props) => {
                             </div>
                             <div className="col-2">
                                 {props.topics.next_topic ? (
-                                    <Link
-                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
-                                    >
-                                        <button
-                                            className="btn btn-light btn-sm shadow-none small"
-                                            onClick={() => {
-                                                batch(() => {
-                                                    storeDispatch(
-                                                        CHAPTER,
-                                                        props.chapter
-                                                            .chapter_name
-                                                    );
-                                                    storeDispatch(
-                                                        TOPIC,
+                                    props.exam_state.examStarted === false ? (
+                                        <OverlayTrigger
+                                            key="next_topic"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="tooltip">
+                                                    {
                                                         props.topics
                                                             .next_topic_name
-                                                    );
-                                                });
-                                            }}
-                                            disabled={
-                                                props.exam_state.examStarted ===
-                                                true
-                                                    ? true
-                                                    : false
+                                                    }
+                                                </Tooltip>
                                             }
                                         >
-                                            {props.topics.next_topic_name}
-                                        </button>
-                                    </Link>
+                                            <Link
+                                                to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
+                                            >
+                                                <button
+                                                    className="btn btn-light btn-sm shadow-none small"
+                                                    onClick={() => {
+                                                        batch(() => {
+                                                            storeDispatch(
+                                                                CHAPTER,
+                                                                props.chapter
+                                                                    .chapter_name
+                                                            );
+                                                            storeDispatch(
+                                                                TOPIC,
+                                                                props.topics
+                                                                    .next_topic_name
+                                                            );
+                                                        });
+                                                    }}
+                                                >
+                                                    {props.topics.next_topic}
+                                                </button>
+                                            </Link>
+                                        </OverlayTrigger>
+                                    ) : (
+                                        <OverlayTrigger
+                                            key="next_topic"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="tooltip">
+                                                    {
+                                                        props.topics
+                                                            .next_topic_name
+                                                    }
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <button
+                                                className="btn btn-light btn-sm shadow-none small"
+                                                disabled
+                                            >
+                                                {props.topics.next_topic}
+                                            </button>
+                                        </OverlayTrigger>
+                                    )
                                 ) : (
                                     ""
                                 )}

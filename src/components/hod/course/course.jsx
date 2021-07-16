@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import Wrapper from "../wrapper";
-import { Card, Accordion, Modal, Dropdown } from "react-bootstrap";
+import {
+    Card,
+    Accordion,
+    Modal,
+    Dropdown,
+    OverlayTrigger,
+    Tooltip,
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
@@ -556,20 +563,18 @@ const TopicListRender = (props) => {
         );
     });
 
-    function getTopicName(data, topic_num) {
-        let topic_name = "";
+    function substring_topic_num(topic) {
+        let topic_num = topic.toString();
+        let dot_index = 0;
 
-        if (Array.isArray(data)) {
-            data.forEach((item) => {
-                if (item.topic_num === topic_num) {
-                    topic_name = item.topic_name;
-                } else if (item.child.length !== 0) {
-                    topic_name = getTopicName(item.child, topic_num);
-                }
-            });
+        for (var i = 0; i < topic_num.length; i++) {
+            if (topic_num[i] === ".") {
+                dot_index = i;
+                break;
+            }
         }
 
-        return topic_name;
+        return topic_num.substring(dot_index + 1);
     }
 
     return (
@@ -618,7 +623,10 @@ const TopicListRender = (props) => {
                             </div>
                             <div className="col-10 d-flex align-items-center small font-weight-bold-600 pl-1">
                                 <div className="mr-3">
-                                    {props.topics.topic_num}
+                                    {props.chapter.chapter_index}.
+                                    {substring_topic_num(
+                                        props.topics.topic_num
+                                    )}
                                 </div>
                                 <div className="w-100">
                                     <Link
@@ -653,29 +661,38 @@ const TopicListRender = (props) => {
                             <div className="col-3"></div>
                             <div className="col-3">
                                 {props.topics.next_topic ? (
-                                    <Link
-                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
+                                    <OverlayTrigger
+                                        key="next_topic"
+                                        placement="top"
+                                        overlay={
+                                            <Tooltip id="tooltip">
+                                                {props.topics.next_topic_name}
+                                            </Tooltip>
+                                        }
                                     >
-                                        <button
-                                            className="btn btn-sm bg-white shadow-none"
-                                            onClick={() => {
-                                                storeDispatch(
-                                                    CHAPTER,
-                                                    props.chapter.chapter_name
-                                                );
-                                                storeDispatch(
-                                                    TOPIC,
-                                                    getTopicName(
-                                                        props.chapter.topics,
-                                                        props.topics.next_topic
-                                                    )
-                                                );
-                                            }}
+                                        <Link
+                                            to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
                                         >
-                                            {props.topics.next_topic_name}
-                                            <i className="fas fa-external-link-alt fa-xs ml-2"></i>
-                                        </button>
-                                    </Link>
+                                            <button
+                                                className="btn btn-sm bg-white shadow-none"
+                                                onClick={() => {
+                                                    storeDispatch(
+                                                        CHAPTER,
+                                                        props.chapter
+                                                            .chapter_name
+                                                    );
+                                                    storeDispatch(
+                                                        TOPIC,
+                                                        props.topics
+                                                            .next_topic_name
+                                                    );
+                                                }}
+                                            >
+                                                {props.topics.next_topic}
+                                                <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                            </button>
+                                        </Link>
+                                    </OverlayTrigger>
                                 ) : (
                                     ""
                                 )}
