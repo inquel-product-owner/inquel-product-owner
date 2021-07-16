@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import { Card, Accordion } from "react-bootstrap";
+import { Card, Accordion, OverlayTrigger, Tooltip } from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
@@ -314,7 +314,17 @@ class HODSubjectChapter extends Component {
                                     </Link>
                                 </div>
                                 <div className="col small font-weight-bold-600 text-truncate">
-                                    {data.next_topic_name}
+                                    <OverlayTrigger
+                                        key="next_topic"
+                                        placement="top"
+                                        overlay={
+                                            <Tooltip id="tooltip">
+                                                {data.next_topic_name}
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <span>{data.next_topic}</span>
+                                    </OverlayTrigger>
                                 </div>
                             </div>
                         </div>

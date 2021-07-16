@@ -395,9 +395,7 @@ const DropDownBtn = (props) => {
                     <i className="far fa-edit mr-1"></i> Edit
                 </Dropdown.Item>
                 <Dropdown.Item
-                    onClick={() =>
-                        props.handleDelete(props.code, props.title, props.type)
-                    }
+                    onClick={() => props.handleDelete(props.code, props.type)}
                 >
                     <i className="far fa-trash-alt mr-1"></i> Delete
                 </Dropdown.Item>
@@ -970,13 +968,57 @@ class AdminMasterData extends Component {
         });
     };
 
-    handleDelete = (code, title, type) => {
-        let temp = {
-            code: code,
-            title: title,
-        };
+    handleDelete = (code, type) => {
+        if (type === "category") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        code: code,
+                    },
+                    category_delete: true,
+                },
+            });
+        }
+        if (type === "sub_category") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        code: this.state.selectedCategory,
+                        sub_category: {
+                            code: code,
+                        },
+                    },
+                    sub_category_delete: true,
+                },
+            });
+        }
+        if (type === "discipline" || type === "level" || type === "subject") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        code: this.state.selectedCategory,
+                        sub_category: {
+                            code: this.state.selectedSubcategory,
+                            [type]: {
+                                code: code,
+                            },
+                        },
+                    },
+                    [`${type}_delete`]: true,
+                },
+            });
+        }
+        if (type === "board" || type === "course") {
+            this.setState({
+                selectedData: {
+                    [type]: {
+                        code: code,
+                    },
+                    [`${type}_delete`]: true,
+                },
+            });
+        }
         this.setState({
-            selectedData: temp,
             contentAddingType: type,
             showDeleteModal: !this.state.showDeleteModal,
         });
