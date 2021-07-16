@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Slider from "react-slick";
-import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
+import { SUBJECT_THUMBNAIL } from "../../shared/constant";
 
 class CarouselCard extends Component {
     render() {
@@ -44,7 +44,7 @@ class CarouselCard extends Component {
                 <div className="px-3">
                     <div className="card">
                         <img
-                            src={courseimg}
+                            src={SUBJECT_THUMBNAIL}
                             className="card-img-top"
                             alt="Course"
                         />
@@ -85,7 +85,7 @@ class CarouselCard extends Component {
                 <div className="px-3">
                     <div className="card">
                         <img
-                            src={courseimg}
+                            src={SUBJECT_THUMBNAIL}
                             className="card-img-top"
                             alt="Course"
                         />
@@ -126,7 +126,7 @@ class CarouselCard extends Component {
                 <div className="px-3">
                     <div className="card">
                         <img
-                            src={courseimg}
+                            src={SUBJECT_THUMBNAIL}
                             className="card-img-top"
                             alt="Course"
                         />
@@ -167,7 +167,7 @@ class CarouselCard extends Component {
                 <div className="px-3">
                     <div className="card">
                         <img
-                            src={courseimg}
+                            src={SUBJECT_THUMBNAIL}
                             className="card-img-top"
                             alt="Course"
                         />
@@ -208,7 +208,7 @@ class CarouselCard extends Component {
                 <div className="px-3">
                     <div className="card">
                         <img
-                            src={courseimg}
+                            src={SUBJECT_THUMBNAIL}
                             className="card-img-top"
                             alt="Course"
                         />

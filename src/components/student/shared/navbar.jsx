@@ -5,9 +5,9 @@ import logo from "../../../assets/Iq-labs-01.svg";
 import userpic from "../../../assets/user-v1.png";
 import { baseUrl, accountsUrl, studentUrl } from "../../../shared/baseUrl";
 import { Logout } from "../../common/modal/idleLogoutModal";
-import { batch, connect } from "react-redux";
+import { connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
-import { NOTIFICATION, PROFILE } from "../../../redux/action";
+import { PROFILE, RESET_STATE } from "../../../redux/action";
 import { NotificationDropdown } from "../../common/modal/notification";
 
 const mapStateToProps = (state) => ({
@@ -63,12 +63,10 @@ class Header extends Component {
             .then((res) => res.json())
             .then((result) => {
                 localStorage.clear();
+                storeDispatch(RESET_STATE);
+
                 this.setState({
                     isLoggedOut: true,
-                });
-                batch(() => {
-                    storeDispatch(PROFILE, {});
-                    storeDispatch(NOTIFICATION, []);
                 });
             })
             .catch((err) => {

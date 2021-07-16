@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Wrapper from "./wrapper";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/constant.js";
+import { GROUP_THUMBNAIL, paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import GroupTable from "../common/table/group";
 import SubjectTable from "../common/table/subject";
@@ -9,7 +9,6 @@ import Paginations from "../common/pagination";
 import AlertBox from "../common/alert";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import Slider from "react-slick";
-import courseimg from "../../assets/code.jpg";
 import storeDispatch from "../../redux/dispatch";
 import { GROUP } from "../../redux/action";
 import { Link } from "react-router-dom";
@@ -307,7 +306,7 @@ class TeacherDashboard extends Component {
                                             >
                                                 <div className="card">
                                                     <img
-                                                        src={courseimg}
+                                                        src={GROUP_THUMBNAIL}
                                                         className="card-img-top"
                                                         alt={data.group_name}
                                                     />

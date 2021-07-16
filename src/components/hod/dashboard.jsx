@@ -9,9 +9,12 @@ import {
     OverlayTrigger,
     Tooltip,
 } from "react-bootstrap";
-import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
-import { paginationCount } from "../../shared/constant";
+import {
+    GROUP_THUMBNAIL,
+    paginationCount,
+    SUBJECT_THUMBNAIL,
+} from "../../shared/constant";
 import Loading from "../common/loader";
 import GroupTable from "../common/table/group";
 import SubjectTable from "../common/table/subject";
@@ -1084,7 +1087,7 @@ const GroupSection = (props) => {
                                     >
                                         <div className="card">
                                             <img
-                                                src={courseimg}
+                                                src={GROUP_THUMBNAIL}
                                                 className="card-img-top"
                                                 alt={data.group_name}
                                             />
@@ -1487,7 +1490,7 @@ const CourseSection = (props) => {
                                                 src={
                                                     data.course_thumbnail_url ===
                                                     null
-                                                        ? courseimg
+                                                        ? SUBJECT_THUMBNAIL
                                                         : data.course_thumbnail_url
                                                 }
                                                 className="card-img-top"

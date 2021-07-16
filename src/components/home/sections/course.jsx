@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
 import { baseUrl, homeURL, studentUrl } from "../../../shared/baseUrl";
-import courseimg from "../../../assets/code.jpg";
 import { TEMP } from "../../../redux/action";
 import storeDispatch from "../../../redux/dispatch";
 import DetailModal from "../../common/modal/courseDetail";
 import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
+import { SUBJECT_THUMBNAIL } from "../../../shared/constant";
 
 const settings = {
     dots: false,
@@ -228,7 +228,7 @@ const PopularCourse = (props) => {
                                                                 ? data
                                                                       .subscription_file_link
                                                                       .subscription_image_1
-                                                                : courseimg
+                                                                : SUBJECT_THUMBNAIL
                                                         }
                                                         alt={data.title}
                                                         className="card-img-top shadow-sm"

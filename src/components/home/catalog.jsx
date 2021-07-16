@@ -5,10 +5,9 @@ import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../common/ErrorFallback";
 import { connect } from "react-redux";
 import { baseUrl, homeURL, studentUrl } from "../../shared/baseUrl";
-import courseimg from "../../assets/code.jpg";
 import Loading from "../common/loader";
 import Paginations from "../common/pagination";
-import { paginationCount } from "../../shared/constant";
+import { paginationCount, SUBJECT_THUMBNAIL } from "../../shared/constant";
 import AlertBox from "../common/alert";
 import DetailModal from "../common/modal/courseDetail";
 import { Link } from "react-router-dom";
@@ -345,7 +344,7 @@ const Catalog = (props) => {
                                                                         ? item
                                                                               .subscription_file_link
                                                                               .subscription_image_1
-                                                                        : courseimg
+                                                                        : SUBJECT_THUMBNAIL
                                                                 }
                                                                 alt={item.title}
                                                                 className="card-img-top shadow-sm"

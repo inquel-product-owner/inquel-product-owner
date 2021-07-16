@@ -7,12 +7,9 @@ import {
     adminPathUrl,
     studentUrl,
 } from "../../shared/baseUrl.js";
-// import Footer from "../home/shared/footer";
-// import TopNavbar from "../home/shared/navbar";
 import { ForgotPasswordModal } from "../common/forgotPassword";
 import storeDispatch from "../../redux/dispatch";
-import { NOTIFICATION, PROFILE } from "../../redux/action/index.js";
-import { batch } from "react-redux";
+import { PROFILE, RESET_STATE } from "../../redux/action/index.js";
 import logo from "../../assets/logo-white.png";
 
 class StudentLogin extends Component {
@@ -79,10 +76,7 @@ class StudentLogin extends Component {
 
     setLocalStorage = async (data) => {
         localStorage.clear();
-        batch(() => {
-            storeDispatch(PROFILE, {});
-            storeDispatch(NOTIFICATION, []);
-        });
+        storeDispatch(RESET_STATE);
 
         localStorage.setItem("Authorization", `Token ${data.token}`);
         localStorage.setItem("is_student", data.is_student);
@@ -219,8 +213,6 @@ class StudentLogin extends Component {
                 ) : (
                     ""
                 )}
-
-                {/* <TopNavbar /> */}
 
                 <div
                     className="d-flex justify-content-center align-items-center"
@@ -471,8 +463,6 @@ class StudentLogin extends Component {
                         </div>
                     </div>
                 </div>
-
-                {/* <Footer /> */}
             </>
         );
     }

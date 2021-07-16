@@ -896,6 +896,7 @@ class AdminMasterData extends Component {
                         code: "",
                         title: "",
                     },
+                    [`${type}_update`]: true,
                 },
             });
         }
@@ -959,6 +960,7 @@ class AdminMasterData extends Component {
                         code: code,
                         title: title,
                     },
+                    [`${type}_update`]: true,
                 },
             });
         }

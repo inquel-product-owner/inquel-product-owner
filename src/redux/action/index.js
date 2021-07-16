@@ -1,4 +1,4 @@
-// content reducer
+// content actions
 export const GROUP = "GROUP";
 export const SUBJECT = "SUBJECT";
 export const SUBSCRIPTION = "SUBSCRIPTION";
@@ -12,16 +12,20 @@ export const SECTION = "SECTION";
 export const SIMULATION = "SIMULATION";
 export const PAPER = "PAPER";
 
-// profile reducer
+// profile actions
 export const PROFILE = "PROFILE";
 
-// storage reducer
+// storage actions
 export const RESPONSE = "RESPONSE";
 export const TEMP = "TEMP";
 export const EXAMDATA = "EXAMDATA";
 export const NOTIFICATION = "NOTIFICATION";
 
-// application state reducer
+// application state actions
 
 export const EXAM_STATE = "EXAM_STATE";
 export const CART_COUNT = "CART_COUNT";
+
+// reset actions
+
+export const RESET_STATE = "RESET_STATE";

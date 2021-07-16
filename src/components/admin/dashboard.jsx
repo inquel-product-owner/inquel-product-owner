@@ -1,12 +1,11 @@
 import React, { Component, useState } from "react";
 import Wrapper from "./wrapper";
 import { Tabs, Tab, OverlayTrigger, Tooltip, Dropdown } from "react-bootstrap";
-import courseimg from "../../assets/code.jpg";
 import { baseUrl, adminPathUrl, inquelAdminUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import SubscriptionTable from "../common/table/subscription";
-import { paginationCount } from "../../shared/constant";
+import { paginationCount, SUBJECT_THUMBNAIL } from "../../shared/constant";
 import Paginations from "../common/pagination";
 import SubscriptionModal from "./subscriptionModal";
 import CourseTable from "../common/table/course";
@@ -79,12 +78,12 @@ const CourseCard = (props) => {
             if (list.subscription_file_link.subscription_image_1) {
                 URL = list.subscription_file_link.subscription_image_1;
             } else {
-                URL = courseimg;
+                URL = SUBJECT_THUMBNAIL;
             }
         } else if (list.course_thumbnail_url) {
             URL = list.course_thumbnail_url;
         } else {
-            URL = courseimg;
+            URL = SUBJECT_THUMBNAIL;
         }
 
         return URL;

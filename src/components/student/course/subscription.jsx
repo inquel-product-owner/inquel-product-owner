@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Wrapper from "../wrapper";
-import courseimg from "../../../assets/code.jpg";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
@@ -9,6 +8,7 @@ import Slider from "react-slick";
 import { connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
 import { COURSE } from "../../../redux/action";
+import { SUBJECT_THUMBNAIL } from "../../../shared/constant";
 
 const mapStateToProps = (state) => ({
     subscription_name: state.content.subscription_name,
@@ -170,7 +170,7 @@ class Subscription extends Component {
                                                             src={
                                                                 data.course_thumbnail_url
                                                                     ? data.course_thumbnail_url
-                                                                    : courseimg
+                                                                    : SUBJECT_THUMBNAIL
                                                             }
                                                             className="card-img-top"
                                                             alt={

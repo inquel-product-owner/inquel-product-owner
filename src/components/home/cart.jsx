@@ -7,10 +7,10 @@ import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
-import courseimg from "../../assets/code.jpg";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import { CART_COUNT } from "../../redux/action";
+import { SUBJECT_THUMBNAIL } from "../../shared/constant";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -171,10 +171,10 @@ const Cart = (props) => {
             if (list.subscription_file_link.subscription_image_1) {
                 URL = list.subscription_file_link.subscription_image_1;
             } else {
-                URL = courseimg;
+                URL = SUBJECT_THUMBNAIL;
             }
         } else {
-            URL = courseimg;
+            URL = SUBJECT_THUMBNAIL;
         }
 
         return URL;
