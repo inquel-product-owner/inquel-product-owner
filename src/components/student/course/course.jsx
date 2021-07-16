@@ -1192,13 +1192,20 @@ class Course extends Component {
                             // chapter loop
                             if (data.chapters && data.chapters.length !== 0) {
                                 data.chapters.forEach((chapter) => {
-                                    // topic event key
-                                    temp.push([]);
+                                    if (
+                                        chapter.topics &&
+                                        chapter.topics.lenght !== 0
+                                    ) {
+                                        // topic event key
+                                        temp.push([]);
 
-                                    // Extracting topics from the chapter_structure
-                                    temp_topics.push(
-                                        this.loopTopicStructure(chapter.topics)
-                                    );
+                                        // Extracting topics from the chapter_structure
+                                        temp_topics.push(
+                                            this.loopTopicStructure(
+                                                chapter.topics
+                                            )
+                                        );
+                                    }
 
                                     // call the cycle reduction api on loop
                                     if (
