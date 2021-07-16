@@ -611,7 +611,10 @@ class CoursePersonalNotes extends Component {
                                                                         }
                                                                     >
                                                                         <Card>
-                                                                            {chapter.topics.map(
+                                                                            {(
+                                                                                chapter.topics ||
+                                                                                []
+                                                                            ).map(
                                                                                 (
                                                                                     topics,
                                                                                     topic_index

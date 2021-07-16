@@ -1113,7 +1113,7 @@ class AdminMasterData extends Component {
                         onHide={this.handleDelete}
                         formSubmission={this.formSubmission}
                         url={`${this.url}/data/master/`}
-                        name={this.state.selectedData.title}
+                        name="this master data"
                         data={this.state.selectedData}
                         type="master data"
                     />
