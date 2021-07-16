@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Wrapper from "../wrapper";
-import courseimg from "../../../assets/code.jpg";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../common/loader";
@@ -9,6 +8,7 @@ import Slider from "react-slick";
 import { connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
 import { SUBJECT } from "../../../redux/action";
+import { SUBJECT_THUMBNAIL } from "../../../shared/constant";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -174,9 +174,9 @@ class Group extends Component {
                                                 >
                                                     <div className="card">
                                                         <img
-                                                            src={courseimg}
+                                                            src={SUBJECT_THUMBNAIL}
                                                             className="card-img-top"
-                                                            alt="Course"
+                                                            alt={data.subject_name}
                                                         />
                                                         <div
                                                             className="card-body primary-bg text-white p-2"

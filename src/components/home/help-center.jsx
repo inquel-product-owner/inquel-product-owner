@@ -5,6 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../common/ErrorFallback";
 import Loading from "../common/loader";
 import { Accordion, Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const data = [
     {
@@ -53,13 +54,13 @@ const HelpCenter = () => {
                 onReset={() => window.location.reload()}
             >
                 <main className="container mb-5">
-                    <div className="row justify-content-center">
+                    <div className="row justify-content-center mb-3">
                         <div className="col-lg-10 col-md-11">
                             <Accordion>
                                 {data.map((list, index) => {
                                     return (
                                         <div
-                                            className={`rounded-lg mb-2`}
+                                            className={`bg-white rounded-lg shadow-sm mb-2`}
                                             key={index}
                                         >
                                             <Accordion.Toggle
@@ -68,9 +69,12 @@ const HelpCenter = () => {
                                                 className={`${
                                                     activeKey === index + 1
                                                         ? "text-danger"
-                                                        : "primary-text"
+                                                        : "text-dark"
                                                 }`}
-                                                style={{ borderRadius: "4px" }}
+                                                style={{
+                                                    padding: "20px",
+                                                    cursor: "default",
+                                                }}
                                                 onClick={() => {
                                                     if (
                                                         activeKey ===
@@ -82,13 +86,28 @@ const HelpCenter = () => {
                                                     }
                                                 }}
                                             >
-                                                {list.title}
+                                                <div className="d-flex align-items-center flex-nowrap">
+                                                    <div className="w-100">
+                                                        {list.title}
+                                                    </div>
+                                                    {activeKey === index + 1 ? (
+                                                        <i className="fas fa-minus ml-1"></i>
+                                                    ) : (
+                                                        <i className="fas fa-plus ml-1"></i>
+                                                    )}
+                                                </div>
                                             </Accordion.Toggle>
 
                                             <Accordion.Collapse
                                                 eventKey={index + 1}
                                             >
-                                                <Card.Body className="bg-light">
+                                                <Card.Body
+                                                    className="text-dark pt-0"
+                                                    style={{
+                                                        fontSize: "15px",
+                                                        lineHeight: "25px",
+                                                    }}
+                                                >
                                                     {list.description}
                                                 </Card.Body>
                                             </Accordion.Collapse>
@@ -97,6 +116,13 @@ const HelpCenter = () => {
                                 })}
                             </Accordion>
                         </div>
+                    </div>
+
+                    <div className="text-center text-secondary">
+                        Not sure what you are looking for?{" "}
+                        <Link to="/contact" className="primary-text">
+                            Contact Us
+                        </Link>
                     </div>
                 </main>
 

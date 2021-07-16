@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal } from "react-bootstrap";
-import courseimg from "../../../assets/code.jpg";
+import { SUBJECT_THUMBNAIL } from "../../../shared/constant";
 
 const DetailModal = (props) => {
     return (
@@ -24,7 +24,7 @@ const DetailModal = (props) => {
                         props.data.subscription_file_link.subscription_image_1
                             ? props.data.subscription_file_link
                                   .subscription_image_1
-                            : courseimg
+                            : SUBJECT_THUMBNAIL
                     })`,
                     backgroundPosition: "center",
                     backgroundSize: "cover",

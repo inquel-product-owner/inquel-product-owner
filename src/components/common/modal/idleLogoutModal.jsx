@@ -3,9 +3,8 @@ import IdleTimer from "react-idle-timer";
 import { Modal } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../../shared/baseUrl";
-import { NOTIFICATION, PROFILE } from "../../../redux/action";
+import { RESET_STATE } from "../../../redux/action";
 import storeDispatch from "../../../redux/dispatch";
-import { batch } from "react-redux";
 
 export class Logout extends React.Component {
     constructor(props) {
@@ -47,10 +46,8 @@ export class Logout extends React.Component {
                 .then((res) => res.json())
                 .then((result) => {
                     localStorage.clear();
-                    batch(() => {
-                        storeDispatch(PROFILE, {});
-                        storeDispatch(NOTIFICATION, []);
-                    });
+                    storeDispatch(RESET_STATE);
+
                     this.setState({ showModal: true });
                 })
                 .catch((err) => {
@@ -157,10 +154,8 @@ export class AdminLogout extends React.Component {
                 .then((res) => res.json())
                 .then((result) => {
                     localStorage.clear();
-                    batch(() => {
-                        storeDispatch(PROFILE, {});
-                        storeDispatch(NOTIFICATION, []);
-                    });
+                    storeDispatch(RESET_STATE);
+
                     this.setState({ showModal: true });
                 })
                 .catch((err) => {

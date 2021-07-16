@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Badge, Spinner } from "react-bootstrap";
 import profilepic from "../../../assets/user-v1.png";
 import Select from "react-select";
-import { paginationCount } from "../../../shared/constant.js";
+import { paginationCount, SUBJECT_THUMBNAIL } from "../../../shared/constant.js";
 import GroupTable from "../../common/table/group";
 import Paginations from "../../common/pagination";
 import ReactSwitch from "../../common/switchComponent";
@@ -15,7 +15,6 @@ import AlertBox from "../../common/alert";
 import storeDispatch from "../../../redux/dispatch";
 import { TEMP } from "../../../redux/action";
 import Slider from "react-slick";
-import courseimg from "../../../assets/code.jpg";
 
 const ConfigurationSection = (props) => {
     function customDataValidation(data) {
@@ -953,7 +952,7 @@ class AdminHodProfile extends Component {
                                                                 src={
                                                                     data.course_thumbnail_url
                                                                         ? data.course_thumbnail_url
-                                                                        : courseimg
+                                                                        : SUBJECT_THUMBNAIL
                                                                 }
                                                                 className="card-img-top"
                                                                 alt={

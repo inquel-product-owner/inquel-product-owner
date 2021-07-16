@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Wrapper from "./wrapper";
-import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import CarouselCard from "../common/owlCarousel";
@@ -11,6 +10,7 @@ import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import { GROUP, SUBSCRIPTION } from "../../redux/action";
 import Slider from "react-slick";
+import { GROUP_THUMBNAIL, SUBJECT_THUMBNAIL } from "../../shared/constant";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -39,9 +39,9 @@ const Group = (props) => {
                                 >
                                     <div className="card">
                                         <img
-                                            src={courseimg}
+                                            src={GROUP_THUMBNAIL}
                                             className="card-img-top"
-                                            alt="Course"
+                                            alt={props.group.group_name}
                                         />
                                         <div
                                             className="card-body primary-bg text-white p-2"
@@ -210,7 +210,7 @@ class Courses extends Component {
                                                                     ? data
                                                                           .subscription_file_link
                                                                           .subscription_image_1
-                                                                    : courseimg
+                                                                    : SUBJECT_THUMBNAIL
                                                             }
                                                             className="card-img-top"
                                                             alt={data.title}

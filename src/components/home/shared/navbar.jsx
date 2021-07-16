@@ -7,7 +7,7 @@ import { baseUrl, accountsUrl, studentUrl } from "../../../shared/baseUrl";
 import { Logout } from "../../common/modal/idleLogoutModal";
 import { connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
-import { PROFILE } from "../../../redux/action";
+import { RESET_STATE } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -36,10 +36,12 @@ class TopNavbar extends React.Component {
             .then((res) => res.json())
             .then((result) => {
                 localStorage.clear();
+                storeDispatch(RESET_STATE);
+
                 this.setState({
                     isLoggedOut: true,
                 });
-                storeDispatch(PROFILE, {});
+
                 window.location.reload();
             })
             .catch((err) => {

@@ -6,7 +6,7 @@ import Loading from "../../common/loader";
 import AlertBox from "../../common/alert";
 import { connect } from "react-redux";
 import Slider from "react-slick";
-import courseimg from "../../../assets/code.jpg";
+import { SUBJECT_THUMBNAIL } from "../../../shared/constant";
 
 const mapStateToProps = (state) => ({
     hod_data: state.storage.temp,
@@ -162,7 +162,7 @@ class AdminHODGroup extends Component {
                                             >
                                                 <div className="card">
                                                     <img
-                                                        src={courseimg}
+                                                        src={SUBJECT_THUMBNAIL}
                                                         className="card-img-top"
                                                         alt={data.subject_name}
                                                     />

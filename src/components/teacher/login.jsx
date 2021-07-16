@@ -5,8 +5,7 @@ import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import { ForgotPasswordModal } from "../common/forgotPassword";
 import storeDispatch from "../../redux/dispatch";
-import { NOTIFICATION, PROFILE } from "../../redux/action";
-import { batch } from "react-redux";
+import { RESET_STATE } from "../../redux/action";
 
 class TeacherLogin extends Component {
     constructor(props) {
@@ -48,10 +47,8 @@ class TeacherLogin extends Component {
 
     setLocalStorage = (data) => {
         localStorage.clear();
-        batch(() => {
-            storeDispatch(PROFILE, {});
-            storeDispatch(NOTIFICATION, []);
-        });
+        storeDispatch(RESET_STATE);
+
         localStorage.setItem("Authorization", `Token ${data.token}`);
         localStorage.setItem("is_teacher", data.is_teacher);
 
