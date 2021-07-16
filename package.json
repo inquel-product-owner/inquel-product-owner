@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.2",
+    "@fortawesome/fontawesome-free": "^5.15.3",
     "@popperjs/core": "^2.5.4",
     "@sendgrid/mail": "^7.4.5",
     "@syncfusion/ej2-react-grids": "^18.4.32",
