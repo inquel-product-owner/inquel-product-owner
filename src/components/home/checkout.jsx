@@ -279,7 +279,7 @@ const Checkout = (props) => {
                                                         className="btn btn-light btn-sm shadow-none"
                                                         onClick={handleCoupon}
                                                     >
-                                                        <i className="fas fa-save"></i>
+                                                        <i className="far fa-check-circle"></i>
                                                     </button>
                                                 </div>
                                             </div>

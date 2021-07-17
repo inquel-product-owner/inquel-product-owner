@@ -24,6 +24,7 @@ import {
     TEMP,
     TOPIC,
 } from "../../../redux/action";
+import FeedbackModal from "../shared/feedbackModal";
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
@@ -1132,6 +1133,7 @@ class Course extends Component {
         super(props);
         this.state = {
             showModal: false,
+            showFeedbackModal: false,
             type: "",
             selectedData: "",
 
@@ -1648,6 +1650,15 @@ class Course extends Component {
                     }}
                 />
 
+                <FeedbackModal
+                    show={this.state.showFeedbackModal}
+                    onHide={() =>
+                        this.setState({
+                            showFeedbackModal: false,
+                        })
+                    }
+                />
+
                 {/* Course detail Modal */}
                 {this.state.showModal && this.state.type === "detail" ? (
                     <CourseDetail
@@ -1869,7 +1880,7 @@ class Course extends Component {
                 </div>
 
                 {/* Course details */}
-                <div className="card shadow-sm overflow-auto">
+                <div className="card shadow-sm overflow-auto mb-3">
                     <div style={{ minWidth: "1100px" }}>
                         <div className="card-header secondary-bg primary-text font-weight-bold">
                             <div className="row align-items-center">
@@ -1921,6 +1932,20 @@ class Course extends Component {
                             ) : null}
                         </div>
                     </div>
+                </div>
+
+                {/* feedback button */}
+                <div className="d-flex justify-content-end">
+                    <button
+                        className="btn btn-primary rounded-pill shadow-none"
+                        onClick={() =>
+                            this.setState({
+                                showFeedbackModal: true,
+                            })
+                        }
+                    >
+                       <i className="far fa-comment-dots fa-lg mr-1"></i> Feedback
+                    </button>
                 </div>
 
                 {/* Loading component */}

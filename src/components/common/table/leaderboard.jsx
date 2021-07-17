@@ -78,7 +78,7 @@ class LeaderboardTable extends Component {
                                 isPrimaryKey={true}
                             />
                             <ColumnDirective
-                                field="key"
+                                field="sl_no"
                                 headerText="Sl No"
                                 clipMode="EllipsisWithTooltip"
                             />
@@ -95,7 +95,7 @@ class LeaderboardTable extends Component {
                             />
                             {this.props.points ? (
                                 <ColumnDirective
-                                    field="points"
+                                    field="scored_quiz_points"
                                     headerText="Points"
                                     clipMode="EllipsisWithTooltip"
                                 />

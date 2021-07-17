@@ -386,7 +386,7 @@ const Cart = (props) => {
                                                                     handleCoupon
                                                                 }
                                                             >
-                                                                <i className="fas fa-save"></i>
+                                                                <i className="far fa-check-circle"></i>
                                                             </button>
                                                         </div>
                                                     </div>

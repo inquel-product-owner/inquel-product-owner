@@ -12,6 +12,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../common/ErrorFallback";
 
 const mapStateToProps = (state) => ({
+    course_data: state.storage.response,
     subject_name: state.content.subject_name,
     temp: state.storage.temp,
     course_name: state.content.course_name,
@@ -112,7 +113,7 @@ class TestPreview extends Component {
             currentSubQuestionIndex: [],
             totalQuestion: 0,
             section_marks: [],
-            topic_marks: {},
+            chapter_topic_remarks: {},
 
             selectedImageData: [],
             startIndex: 0,
@@ -126,6 +127,7 @@ class TestPreview extends Component {
         this.subscriptionId = this.props.match.params.subscriptionId;
         this.courseId = this.props.match.params.courseId;
         this.subjectId = this.props.match.params.subjectId;
+
         this.cycleTestId = this.props.match.params.cycleTestId;
         this.semesterId = this.props.match.params.semesterId;
         this.url = baseUrl + studentUrl;
@@ -156,7 +158,7 @@ class TestPreview extends Component {
         let totalQuestion = 0;
         let section_marks = [];
 
-        let topic_marks = {};
+        let chapter_topic_remarks = {};
 
         this.props.temp.data.forEach((data) => {
             if (
@@ -295,6 +297,8 @@ class TestPreview extends Component {
                                     section.questions[i].proper_answer || [],
                                 answer: section.questions[i].answer || [],
                                 marks: section.questions[i].marks,
+                                choice: section.questions[i].choice,
+                                unanswered: section.questions[i].unanswered,
                             });
                             // type two
                         } else if (
@@ -438,24 +442,28 @@ class TestPreview extends Component {
                                     url: "",
                                 },
                                 audio: audio.length !== 0 ? audio : [],
+                                choice: section.questions[i].choice,
+                                unanswered: section.questions[i].unanswered,
                             });
                         }
                     }
 
-                    // topic_marks looping
-                    if (
-                        section.topic_marks &&
-                        Object.keys(section.topic_marks).length !== 0
-                    ) {
-                        Object.entries(section.topic_marks).forEach(
-                            ([key, value]) => {
-                                topic_marks[key] = {
-                                    any_questions: 0,
-                                    correct_marks: 0,
-                                    total_marks: 0,
-                                };
-                            }
-                        );
+                    // topic_remarks looping
+                    if (this.cycleTestId) {
+                        if (
+                            section.topic_marks &&
+                            Object.keys(section.topic_marks).length !== 0
+                        ) {
+                            Object.entries(section.topic_marks).forEach(
+                                ([key, value]) => {
+                                    chapter_topic_remarks[key] = {
+                                        any_questions: 0,
+                                        correct_marks: 0,
+                                        total_marks: 0,
+                                    };
+                                }
+                            );
+                        }
                     }
 
                     totalSubQuestion.push(total);
@@ -463,6 +471,25 @@ class TestPreview extends Component {
                     sections.push(questions);
                     section_marks.push(temp_section_marks);
                 });
+
+                // if chapter_remarks is added, then it is a semester
+                if (this.semesterId) {
+                    if (data.chapter_remarks) {
+                        if (
+                            data.chapter_remarks &&
+                            Object.keys(data.chapter_remarks).length !== 0
+                        ) {
+                            Object.entries(data.chapter_remarks).forEach(
+                                ([key, value]) => {
+                                    chapter_topic_remarks[key] = {
+                                        correct_marks: 0,
+                                        total_marks: 0,
+                                    };
+                                }
+                            );
+                        }
+                    }
+                }
             }
         });
         await this.setState(
@@ -473,7 +500,7 @@ class TestPreview extends Component {
                 totalSection: sections.length,
                 totalQuestion: totalQuestion,
                 section_marks: section_marks,
-                topic_marks: topic_marks,
+                chapter_topic_remarks: chapter_topic_remarks,
             },
             () => {
                 this.calculateRemarks();
@@ -483,52 +510,68 @@ class TestPreview extends Component {
     };
 
     calculateRemarks = () => {
-        let topic_marks = this.state.topic_marks;
+        let chapter_topic_remarks = this.state.chapter_topic_remarks;
 
         this.props.temp.data.forEach((data) => {
-            if (
-                data.cycle_test_id === this.cycleTestId ||
-                data.semester_id === this.semesterId
-            ) {
-                // section looping
+            // section looping
+            if (this.cycleTestId) {
                 data.sections.forEach((section) => {
-                    // topic_marks looping
+                    // chapter_topic_remarks looping
                     if (
                         section.topic_marks &&
                         Object.keys(section.topic_marks).length !== 0
                     ) {
                         Object.entries(section.topic_marks).forEach(
                             ([key, value]) => {
-                                topic_marks[key].any_questions +=
+                                chapter_topic_remarks[key].any_questions +=
                                     value.any_questions;
-                                topic_marks[key].correct_marks +=
+                                chapter_topic_remarks[key].correct_marks +=
                                     value.correct_marks;
-                                topic_marks[key].total_marks +=
+                                chapter_topic_remarks[key].total_marks +=
                                     value.total_marks;
                             }
                         );
                     }
                 });
             }
+
+            // chapter_marks looping
+            if (this.semesterId) {
+                if (
+                    data.chapter_remarks &&
+                    Object.keys(data.chapter_remarks).length !== 0
+                ) {
+                    Object.entries(data.chapter_remarks).forEach(
+                        ([key, value]) => {
+                            chapter_topic_remarks[key].correct_marks +=
+                                value.correct_marks;
+                            chapter_topic_remarks[key].total_marks +=
+                                value.total_marks;
+                        }
+                    );
+                }
+            }
         });
 
         this.setState(
             {
-                topic_marks: topic_marks,
+                chapter_topic_remarks: chapter_topic_remarks,
             },
             () => {
                 // sorting object based on keys
-                function sortObj(obj) {
-                    return Object.keys(obj)
-                        .sort()
-                        .reduce(function (result, key) {
-                            result[key] = obj[key];
-                            return result;
-                        }, {});
+                if (this.cycleTestId) {
+                    function sortObj(obj) {
+                        return Object.keys(obj)
+                            .sort()
+                            .reduce(function (result, key) {
+                                result[key] = obj[key];
+                                return result;
+                            }, {});
+                    }
+                    this.setState({
+                        chapter_topic_remarks: sortObj(chapter_topic_remarks),
+                    });
                 }
-                this.setState({
-                    topic_marks: sortObj(topic_marks),
-                });
             }
         );
     };
@@ -665,6 +708,30 @@ class TestPreview extends Component {
             showVideoModal: !this.state.showVideoModal,
             selectedVideoData: data,
         });
+    };
+
+    // ---------- Return chapter name ----------
+
+    returnChapterName = (id) => {
+        let chapter_name = "";
+
+        if (this.subjectId) {
+            this.props.course_data.chapters.forEach((chapter) => {
+                if (chapter.chapter_id === id) {
+                    chapter_name = chapter.chapter_name;
+                }
+            });
+        } else if (this.courseId) {
+            this.props.course_data.units.forEach((unit) => {
+                unit.chapters.forEach((chapter) => {
+                    if (chapter.chapter_id === id) {
+                        chapter_name = chapter.chapter_name;
+                    }
+                });
+            });
+        }
+
+        return chapter_name;
     };
 
     render() {
@@ -975,7 +1042,6 @@ class TestPreview extends Component {
                                                                 ></div>
 
                                                                 {/* ---------- Options ---------- */}
-
                                                                 {(
                                                                     question.proper_answer ||
                                                                     []
@@ -993,33 +1059,41 @@ class TestPreview extends Component {
                                                                             >
                                                                                 <div
                                                                                     className={`card shadow-sm ${
-                                                                                        (
-                                                                                            question.answer ||
-                                                                                            []
-                                                                                        )
-                                                                                            .map(
-                                                                                                (
-                                                                                                    data
-                                                                                                ) =>
-                                                                                                    option.content
-                                                                                                        ? data
-                                                                                                        : data.toLowerCase()
-                                                                                            )
-                                                                                            .includes(
-                                                                                                option.content
-                                                                                                    ? option.content
-                                                                                                    : option.toLowerCase()
-                                                                                            )
-                                                                                            ? question.marks >
-                                                                                              0
+                                                                                        // check if it is a unanswered or choice question
+                                                                                        question.choice ===
+                                                                                            false &&
+                                                                                        question.unanswered ===
+                                                                                            false
+                                                                                            ? // check if the option is same as student answer
+                                                                                              (
+                                                                                                  question.answer ||
+                                                                                                  []
+                                                                                              )
+                                                                                                  .map(
+                                                                                                      (
+                                                                                                          data
+                                                                                                      ) =>
+                                                                                                          option.content
+                                                                                                              ? data
+                                                                                                              : data.toLowerCase()
+                                                                                                  )
+                                                                                                  .includes(
+                                                                                                      option.content
+                                                                                                          ? option.content
+                                                                                                          : option.toLowerCase()
+                                                                                                  )
+                                                                                                ? // if the marks is greater than 0, then it is a correct answer
+                                                                                                  question.marks >
+                                                                                                  0
+                                                                                                    ? "success-bg"
+                                                                                                    : option.correct
+                                                                                                    ? "success-bg"
+                                                                                                    : "danger-bg"
+                                                                                                : option.correct ===
+                                                                                                  true
                                                                                                 ? "success-bg"
-                                                                                                : option.correct
-                                                                                                ? "success-bg"
-                                                                                                : "danger-bg"
-                                                                                            : option.correct ===
-                                                                                              true
-                                                                                            ? "success-bg"
-                                                                                            : "bg-white"
+                                                                                                : "bg-white"
+                                                                                            : "bg-white choice-question and unanswered-question"
                                                                                     }`}
                                                                                 >
                                                                                     <div
@@ -1040,8 +1114,11 @@ class TestPreview extends Component {
                                                                 )}
 
                                                                 {/* ---------- Student answers ---------- */}
-
-                                                                {question.proper_answer ? (
+                                                                {/* showing this section only for fill in question */}
+                                                                {question.proper_answer &&
+                                                                question
+                                                                    .proper_answer[0] ? (
+                                                                    // if the marks is 0 and it is a fill in question, show the student answer
                                                                     question.marks ===
                                                                         0 &&
                                                                     question
@@ -1136,6 +1213,7 @@ class TestPreview extends Component {
                                                 </div>
                                             </div>
                                         ) : (
+                                            // type two questions
                                             <div
                                                 className="d-flex align-items-start justify-content mb-3"
                                                 key={q_index}
@@ -1273,12 +1351,18 @@ class TestPreview extends Component {
                                                                                         return (
                                                                                             <div
                                                                                                 className={`card shadow-sm mb-2 ${
-                                                                                                    option.correct !==
-                                                                                                    undefined
-                                                                                                        ? option.correct
-                                                                                                            ? "success-bg"
+                                                                                                    // check if it is a choice or unanswered question
+                                                                                                    question.choice ===
+                                                                                                        false &&
+                                                                                                    question.unanswered ===
+                                                                                                        false
+                                                                                                        ? option.correct !==
+                                                                                                          undefined
+                                                                                                            ? option.correct
+                                                                                                                ? "success-bg"
+                                                                                                                : "bg-white"
                                                                                                             : "bg-white"
-                                                                                                        : ""
+                                                                                                        : "bg-white"
                                                                                                 }`}
                                                                                                 key={
                                                                                                     option_index
@@ -1436,12 +1520,13 @@ class TestPreview extends Component {
                                         );
                                     })}
 
-                                    {/* ----- Topic wise remarks table ----- */}
+                                    {/* ----- Chapter and Topic wise remarks table ----- */}
                                     {this.state.currentSectionIndex + 1 ===
                                     this.state.totalSection ? (
-                                        this.state.topic_marks &&
-                                        Object.keys(this.state.topic_marks)
-                                            .length !== 0 ? (
+                                        this.state.chapter_topic_remarks &&
+                                        Object.keys(
+                                            this.state.chapter_topic_remarks
+                                        ).length !== 0 ? (
                                             <div className="container mb-3">
                                                 <div className="card shadow-sm">
                                                     <div className="table-responsive">
@@ -1454,8 +1539,10 @@ class TestPreview extends Component {
                                                                     }}
                                                                 >
                                                                     <th scope="col">
-                                                                        Topic
-                                                                        number
+                                                                        {this
+                                                                            .semesterId
+                                                                            ? "Chapter"
+                                                                            : "Topic number"}
                                                                     </th>
                                                                     <th scope="col">
                                                                         Total
@@ -1466,14 +1553,15 @@ class TestPreview extends Component {
                                                                         marks
                                                                     </th>
                                                                     <th scope="col">
-                                                                        Percentage %
+                                                                        Percentage
+                                                                        %
                                                                     </th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 {Object.entries(
                                                                     this.state
-                                                                        .topic_marks
+                                                                        .chapter_topic_remarks
                                                                 ).map(
                                                                     (
                                                                         [
@@ -1489,9 +1577,12 @@ class TestPreview extends Component {
                                                                                 }
                                                                             >
                                                                                 <td>
-                                                                                    {
-                                                                                        key
-                                                                                    }
+                                                                                    {this
+                                                                                        .semesterId
+                                                                                        ? this.returnChapterName(
+                                                                                              key
+                                                                                          )
+                                                                                        : key}
                                                                                 </td>
                                                                                 <td>
                                                                                     {

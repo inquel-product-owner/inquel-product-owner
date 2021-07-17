@@ -12,8 +12,9 @@ import HomeLeaderboard from "./home/leaderBoard";
 import PrivacyPolicy from "./home/privacy-policy";
 import AboutInquel from "./home/about";
 import TermsAndConditions from "./home/terms-and-conditions";
-import LegalNotice from "./home/legal-noticec";
+import LegalNotice from "./home/legal-notice";
 import HelpCenter from "./home/help-center";
+import ContactUs from "./home/contact-us";
 
 // -------------------- Admin Imports --------------------
 
@@ -225,6 +226,7 @@ const routes = (
         />
         <Route exact path="/legal-notice" component={LegalNotice} />
         <Route exact path="/help" component={HelpCenter} />
+        <Route exact path="/contact" component={ContactUs} />
 
         {/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= Admin Routes =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */}
 

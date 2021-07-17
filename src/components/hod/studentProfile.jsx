@@ -17,8 +17,9 @@ class HODStudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            studentItems: [],
+            student_data: [],
             subject_data: [],
+            filtered_subject_data: [],
 
             errorMsg: "",
             successMsg: "",
@@ -47,8 +48,17 @@ class HODStudentProfile extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    if (
+                        result.data.group &&
+                        Object.keys(result.data.group).length !== 0
+                    ) {
+                        this.setState({
+                            subject_data: result.data.group.subjects,
+                            filtered_subject_data: result.data.group.subjects,
+                        });
+                    }
                     this.setState({
-                        studentItems: result.data,
+                        student_data: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -67,6 +77,36 @@ class HODStudentProfile extends Component {
                     page_loading: false,
                 });
             });
+    };
+
+    handleStatus = (valid_to) => {
+        let end_date = new Date(valid_to);
+        let current_date = new Date();
+        if (end_date.getTime() >= current_date.getTime()) {
+            return (
+                <div className="statustemp e-activecolor">
+                    <span className="statustxt e-activecolor">Active</span>
+                </div>
+            );
+        } else {
+            return (
+                <div className="statustemp e-inactivecolor">
+                    <span className="statustxt e-inactivecolor">Inactive</span>
+                </div>
+            );
+        }
+    };
+
+    handleSearch = (event) => {
+        const filtered = this.state.subject_data.filter((subject) => {
+            return subject.subject_name
+                .toLowerCase()
+                .includes(event.target.value.toLowerCase());
+        });
+
+        this.setState({
+            filtered_subject_data: filtered,
+        });
     };
 
     render() {
@@ -129,25 +169,25 @@ class HODStudentProfile extends Component {
                             <div className="col-md-2 col-3">
                                 <img
                                     src={
-                                        this.state.studentItems.profile_link !==
+                                        this.state.student_data.profile_link !==
                                         null
-                                            ? this.state.studentItems
+                                            ? this.state.student_data
                                                   .profile_link
                                             : profilepic
                                     }
-                                    alt={this.state.studentItems.full_name}
+                                    alt={this.state.student_data.full_name}
                                     className="img-fluid profile-pic"
                                 />
                             </div>
                             <div className="col-md-10 col-9 pl-0">
                                 <h5 className="primary-text">
-                                    {this.state.studentItems.full_name !== ""
-                                        ? this.state.studentItems.full_name
-                                        : this.state.studentItems.username}
+                                    {this.state.student_data.full_name !== ""
+                                        ? this.state.student_data.full_name
+                                        : this.state.student_data.username}
                                 </h5>
                                 <p className="mb-0">
-                                    {this.state.studentItems.length !== 0 ? (
-                                        this.state.studentItems.is_active ? (
+                                    {this.state.student_data.length !== 0 ? (
+                                        this.state.student_data.is_active ? (
                                             <Badge variant="success">
                                                 Active
                                             </Badge>
@@ -168,19 +208,19 @@ class HODStudentProfile extends Component {
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">First Name</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.first_name}
+                            {this.state.student_data.first_name}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Last Name</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.last_name}
+                            {this.state.student_data.last_name}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Email ID</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.email}
+                            {this.state.student_data.email}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
@@ -188,14 +228,14 @@ class HODStudentProfile extends Component {
                             Mentor Email
                         </p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.mentor_email}
+                            {this.state.student_data.mentor_email}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Mobile</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.country_code}
-                            {this.state.studentItems.phone_num}
+                            {this.state.student_data.country_code}
+                            {this.state.student_data.phone_num}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
@@ -204,7 +244,7 @@ class HODStudentProfile extends Component {
                         </p>
                         <p className="text-break mb-0">
                             {dateFormat(
-                                this.state.studentItems.date_of_birth,
+                                this.state.student_data.date_of_birth,
                                 "dS mmm, yyyy"
                             )}
                         </p>
@@ -212,65 +252,135 @@ class HODStudentProfile extends Component {
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Address</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.address}
+                            {this.state.student_data.address}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">City</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.city}
+                            {this.state.student_data.city}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">District</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.district}
+                            {this.state.student_data.district}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">State</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.state}
+                            {this.state.student_data.state}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6">
                         <p className="mb-1 font-weight-bold-600">Country</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.country}
+                            {this.state.student_data.country}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6">
                         <p className="mb-1 font-weight-bold-600">Pincode</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.pincode}
+                            {this.state.student_data.pincode}
                         </p>
                     </div>
                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                         <p className="mb-1 font-weight-bold-600">Institution</p>
                         <p className="text-break mb-0">
-                            {this.state.studentItems.institution_name}
+                            {this.state.student_data.institution_name}
                         </p>
                     </div>
                 </div>
 
                 {/* Subject list */}
-                {this.state.subject_data &&
-                this.state.subject_data.length !== 0 ? (
+                {this.state.student_data.group &&
+                Object.keys(this.state.student_data.group).length !== 0 ? (
                     <div className="card shadow-sm">
+                        <div className="row justify-content-end m-1">
+                            <div className="col-lg-3 col-md-4 col-sm-8">
+                                <div
+                                    style={{ borderBottom: "1.5px solid #ccc" }}
+                                >
+                                    <input
+                                        type="search"
+                                        name="search"
+                                        id="search"
+                                        className="form-control form-control-sm pl-0"
+                                        placeholder="Search"
+                                        onChange={this.handleSearch}
+                                        autoComplete="off"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                         <div className="table-responsive">
                             <table className="table">
                                 <thead className="primary-text">
                                     <tr>
-                                        <th scope="col">Subjects</th>
+                                        <th scope="col">Subject</th>
+                                        <th scope="col">Group</th>
                                         <th scope="col">Valid from</th>
                                         <th scope="col">Valid to</th>
                                         <th scope="col">Status</th>
-                                        <th scope="col">Group</th>
                                     </tr>
                                 </thead>
-                                <tbody></tbody>
+                                <tbody>
+                                    {this.state.filtered_subject_data &&
+                                    this.state.filtered_subject_data.length !==
+                                        0
+                                        ? this.state.filtered_subject_data.map(
+                                              (list, index) => {
+                                                  return (
+                                                      <tr key={index}>
+                                                          <td>
+                                                              {
+                                                                  list.subject_name
+                                                              }
+                                                          </td>
+                                                          <td>
+                                                              {
+                                                                  this.state
+                                                                      .student_data
+                                                                      .group
+                                                                      .group_name
+                                                              }
+                                                          </td>
+                                                          <td>
+                                                              {dateFormat(
+                                                                  this.state
+                                                                      .student_data
+                                                                      .group
+                                                                      .valid_from,
+                                                                  "dd/mm/yyyy"
+                                                              )}
+                                                          </td>
+                                                          <td>
+                                                              {dateFormat(
+                                                                  this.state
+                                                                      .student_data
+                                                                      .group
+                                                                      .valid_to,
+                                                                  "dd/mm/yyyy"
+                                                              )}
+                                                          </td>
+                                                          <td>
+                                                              {this.handleStatus(
+                                                                  this.state
+                                                                      .student_data
+                                                                      .group
+                                                                      .valid_to
+                                                              )}
+                                                          </td>
+                                                      </tr>
+                                                  );
+                                              }
+                                          )
+                                        : null}
+                                </tbody>
                             </table>
                         </div>
+                        <div className="card-footer"></div>
                     </div>
                 ) : (
                     ""

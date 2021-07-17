@@ -289,6 +289,7 @@ export default class SubscriptionModal extends Component {
                             filter: filter,
                             loader: loader,
                         });
+                        this.discountsAPI();
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -349,6 +350,7 @@ export default class SubscriptionModal extends Component {
                         });
                         let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}`;
                         this.courseAPI(URL);
+                        this.discountsAPI();
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -407,6 +409,7 @@ export default class SubscriptionModal extends Component {
                         });
                         let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}&level=${data.levels}`;
                         this.courseAPI(URL);
+                        this.discountsAPI();
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -463,12 +466,7 @@ export default class SubscriptionModal extends Component {
                         });
                         let URL = `${this.url}/subscription/filter/course/?category=${data.category}&sub_category=${data.sub_category}&discipline=${data.discipline}&level=${data.levels}&subject=${data.subjects}`;
                         this.courseAPI(URL);
-                        if (
-                            this.state.discounts &&
-                            this.state.discounts.length === 0
-                        ) {
-                            this.discountsAPI();
-                        }
+                        this.discountsAPI();
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -873,7 +871,25 @@ export default class SubscriptionModal extends Component {
         let selected = this.state.selected;
         let URL = path
             ? path
-            : `${this.url}/subscription/filter/coupon/?category=${selected.category}&sub_category=${selected.sub_category}&discipline=${selected.discipline}&level=${selected.levels}&subject=${selected.subjects}`;
+            : `${this.url}/subscription/filter/coupon/?category=${
+                  selected.category
+              }&sub_category=${selected.sub_category}&discipline=${returnValue(
+                  selected.discipline
+              )}&level=${returnValue(selected.levels)}&subject=${returnValue(
+                  selected.subjects
+              )}`;
+
+        function returnValue(data) {
+            let value = "";
+
+            if (data !== "") {
+                value = data;
+            } else {
+                value = "ALL";
+            }
+
+            return value;
+        }
 
         fetch(URL, {
             headers: this.headers,
