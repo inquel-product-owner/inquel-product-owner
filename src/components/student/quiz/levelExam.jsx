@@ -316,7 +316,7 @@ class QuizLevelExam extends Component {
     // Handle data encryption
     handleEncrypt = (data) => {
         // INIT
-        var key = "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxi";
+        var key = process.env.REACT_APP_QUIZ_ENCRYPT_DECRYPT_KEY;
         var iv = this.state.iv;
 
         var keyBytes = aesjs.utils.utf8.toBytes(key);
@@ -337,7 +337,7 @@ class QuizLevelExam extends Component {
     // Handle data decryption
     handleDecrypt = (data) => {
         // INIT
-        var key = "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxi";
+        var key = process.env.REACT_APP_QUIZ_ENCRYPT_DECRYPT_KEY;
         var iv = data.substring(0, 16);
         var keyBytes = aesjs.utils.utf8.toBytes(key);
         var ivBytes = aesjs.utils.utf8.toBytes(iv);

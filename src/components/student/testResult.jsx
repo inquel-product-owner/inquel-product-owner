@@ -135,8 +135,9 @@ function CycleTestAttempts(props) {
                         ) : (
                             // if the attempt is submitted by backend
                             <i
-                                className="fas fa-book-open fa-lg mx-3 text-warning"
+                                className="fas fa-book-open fa-lg mx-3"
                                 style={{
+                                    color: "grey",
                                     fontSize: "22px",
                                 }}
                             ></i>
@@ -226,8 +227,9 @@ function SemesterAttempts(props) {
                         ) : (
                             // if the attempt is submitted by backend
                             <i
-                                className="fas fa-book-open fa-lg mx-3 text-warning"
+                                className="fas fa-book-open fa-lg mx-3"
                                 style={{
+                                    color: "grey",
                                     fontSize: "22px",
                                 }}
                             ></i>

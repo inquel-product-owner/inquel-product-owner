@@ -1,39 +1,66 @@
 import React, { useState } from "react";
-import { Modal, Spinner } from "react-bootstrap";
-import sgMail from "@sendgrid/mail";
+import { Modal, Spinner, Alert } from "react-bootstrap";
+// import sgMail from "@sendgrid/mail";
 
 const ContactInquelModal = (props) => {
+    const [subject, setSubject] = useState("");
+    const [message, setMessage] = useState("");
+
     const [showLoader, setLoader] = useState(false);
+    const [responseMsg, setResponseMsg] = useState("");
+    const [showErrorAlert, setErrorAlert] = useState(false);
+    const [showSuccessAlert, setSuccessAlert] = useState(false);
 
     const handleSend = () => {
         setLoader(true);
-        sgMail.setApiKey(process.env.REACT_APP_SENDGRID_API_KEY);
-        const msg = {
-            to: process.env.REACT_APP_INQUEL_SUPPORT_EMAIL,
-            from: process.env.REACT_APP_INQUEL_SUPPORT_EMAIL,
-            subject: "Sending with Twilio SendGrid is Fun",
-            text: "and easy to do anywhere, even with Node.js",
-            html: "<strong>and easy to do anywhere, even with Node.js</strong>",
-        };
+        setErrorAlert(false);
+        setSuccessAlert(false);
 
-        sgMail
-            .send(msg, {
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
-            })
-            .then((response) => {
-                console.log(response[0].statusCode);
-                console.log(response[0].headers);
-            })
-            .catch((error) => {
-                console.error(error);
-                if (error.response) {
-                    console.error(error.response.body);
-                }
-            });
+        if (subject === "") {
+            setResponseMsg("Subject field is required!");
+            setErrorAlert(true);
+            setLoader(false);
+        } else if (message === "") {
+            setResponseMsg("Message field is required!");
+            setErrorAlert(true);
+            setLoader(false);
+        } else {
+            setResponseMsg("Your message has been sent!");
+            setSuccessAlert(true);
+            setLoader(false);
+        }
     };
+
+    // const handleSend = () => {
+    //     setLoader(true);
+
+    //     sgMail.setApiKey(process.env.REACT_APP_SENDGRID_API_KEY);
+    //     const msg = {
+    //         to: process.env.REACT_APP_INQUEL_SUPPORT_EMAIL,
+    //         from: process.env.REACT_APP_INQUEL_SUPPORT_EMAIL,
+    //         subject: "Sending with Twilio SendGrid is Fun",
+    //         text: "and easy to do anywhere, even with Node.js",
+    //         html: "<strong>and easy to do anywhere, even with Node.js</strong>",
+    //     };
+
+    //     sgMail
+    //         .send(msg, {
+    //             headers: {
+    //                 Accept: "application/json",
+    //                 "Content-Type": "application/json",
+    //             },
+    //         })
+    //         .then((response) => {
+    //             console.log(response[0].statusCode);
+    //             console.log(response[0].headers);
+    //         })
+    //         .catch((error) => {
+    //             console.error(error);
+    //             if (error.response) {
+    //                 console.error(error.response.body);
+    //             }
+    //         });
+    // };
 
     return (
         <Modal
@@ -45,6 +72,23 @@ const ContactInquelModal = (props) => {
         >
             <Modal.Header closeButton>Contact Inquel</Modal.Header>
             <Modal.Body>
+                <Alert
+                    variant="danger"
+                    show={showErrorAlert}
+                    onClose={() => setErrorAlert(false)}
+                    dismissible
+                >
+                    {responseMsg}
+                </Alert>
+                <Alert
+                    variant="success"
+                    show={showSuccessAlert}
+                    onClose={() => setSuccessAlert(false)}
+                    dismissible
+                >
+                    {responseMsg}
+                </Alert>
+
                 <div className="form-group">
                     <label htmlFor="subject">Subject</label>
                     <input
@@ -53,6 +97,8 @@ const ContactInquelModal = (props) => {
                         id="subject"
                         className="form-control borders"
                         placeholder="Enter the subject"
+                        onChange={(event) => setSubject(event.target.value)}
+                        autoComplete="off"
                     />
                 </div>
                 <div className="form-group">
@@ -63,6 +109,7 @@ const ContactInquelModal = (props) => {
                         rows="6"
                         className="form-control borders"
                         placeholder="Type your message here"
+                        onChange={(event) => setMessage(event.target.value)}
                     ></textarea>
                 </div>
             </Modal.Body>

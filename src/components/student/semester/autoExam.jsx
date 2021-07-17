@@ -1448,13 +1448,17 @@ class SemesterAutoExam extends Component {
                             <div className="d-flex justify-content-center mb-3">
                                 <div className="pinkrange-bg px-3 py-2 rounded-lg small font-weight-bold-600">
                                     <i className="fas fa-info-circle mr-1"></i>{" "}
-                                    Attend any{" "}
-                                    {semesterExam.length !== 0
-                                        ? semesterExam.any_questions <= 9
-                                            ? `0${semesterExam.any_questions}`
-                                            : semesterExam.any_questions
-                                        : ""}{" "}
-                                    questions in this section
+                                    {questionSection && semesterExam
+                                        ? questionSection.length ===
+                                          semesterExam.any_questions
+                                            ? `Answer all the questions in this section`
+                                            : `Answer any ${
+                                                  semesterExam.any_questions <=
+                                                  9
+                                                      ? `0${semesterExam.any_questions}`
+                                                      : `${semesterExam.any_questions}`
+                                              } questions in this section`
+                                        : ""}
                                 </div>
                             </div>
 
